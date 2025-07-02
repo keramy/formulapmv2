@@ -149,18 +149,32 @@ CREATE TYPE scope_status AS ENUM (
   'cancelled'
 );
 
--- Main scope items
+-- Main scope items with enhanced fields
 CREATE TABLE scope_items (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
   category scope_category NOT NULL,
-  title TEXT NOT NULL,
-  description TEXT,
+  
+  -- Core Required Fields (Business Requirements)
+  item_no INTEGER NOT NULL, -- Auto-generated sequential number per project
+  item_code TEXT, -- Client-provided code (Excel importable, nullable)
+  description TEXT NOT NULL, -- Detailed item description (required)
+  quantity DECIMAL(10,2) NOT NULL, -- Numeric quantity with unit validation
+  unit_price DECIMAL(10,2) NOT NULL, -- Base unit pricing
+  total_price DECIMAL(12,2) GENERATED ALWAYS AS (quantity * unit_price) STORED,
+  
+  -- Cost Tracking (Technical Office + Purchasing Access Only)
+  initial_cost DECIMAL(12,2), -- Original estimated cost
+  actual_cost DECIMAL(12,2), -- Real incurred cost
+  cost_variance DECIMAL(12,2) GENERATED ALWAYS AS (actual_cost - initial_cost) STORED,
+  
+  -- Legacy/Additional Fields
+  title TEXT, -- For backward compatibility, auto-populated from description
   specifications TEXT,
   unit_of_measure TEXT,
-  quantity DECIMAL(10,2),
-  unit_price DECIMAL(10,2),
-  total_price DECIMAL(12,2) GENERATED ALWAYS AS (quantity * unit_price) STORED,
+  markup_percentage DECIMAL(5,2) DEFAULT 0,
+  final_price DECIMAL(12,2) GENERATED ALWAYS AS (total_price * (1 + markup_percentage/100)) STORED,
+  
   timeline_start DATE,
   timeline_end DATE,
   duration_days INTEGER,
@@ -173,7 +187,12 @@ CREATE TABLE scope_items (
   metadata JSONB DEFAULT '{}',
   created_by UUID REFERENCES user_profiles(id),
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  
+  -- Constraints
+  CONSTRAINT unique_item_no_per_project UNIQUE (project_id, item_no),
+  CONSTRAINT positive_quantity CHECK (quantity > 0),
+  CONSTRAINT positive_unit_price CHECK (unit_price >= 0)
 );
 
 -- Scope item dependencies
@@ -366,6 +385,10 @@ CREATE INDEX idx_scope_category ON scope_items(category);
 CREATE INDEX idx_scope_status ON scope_items(status);
 CREATE INDEX idx_scope_assigned ON scope_items USING gin(assigned_to);
 CREATE INDEX idx_scope_timeline ON scope_items(timeline_start, timeline_end);
+-- New indexes for core business fields
+CREATE INDEX idx_scope_item_no ON scope_items(project_id, item_no);
+CREATE INDEX idx_scope_item_code ON scope_items(item_code) WHERE item_code IS NOT NULL;
+CREATE INDEX idx_scope_costs ON scope_items(initial_cost, actual_cost) WHERE initial_cost IS NOT NULL OR actual_cost IS NOT NULL;
 
 -- Document indexes
 CREATE INDEX idx_documents_project ON documents(project_id);

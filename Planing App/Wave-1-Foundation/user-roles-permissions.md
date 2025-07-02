@@ -115,6 +115,8 @@ Define and implement a comprehensive permission matrix for all 13 user types, en
   - Scope list pricing
   - Technical proposal writing
   - Material specification support
+  - **Cost Tracking Access**: View and edit initial_cost, actual_cost, cost_variance
+  - **Pricing Visibility**: Full access to unit_price, total_price, markup_percentage
 
 ---
 
@@ -130,6 +132,9 @@ Define and implement a comprehensive permission matrix for all 13 user types, en
   - Payment oversight
   - Supplier performance evaluation
   - Cost control monitoring
+  - **Cost Tracking Access**: View and edit initial_cost, actual_cost, cost_variance
+  - **Pricing Visibility**: Full access to unit_price, total_price, markup_percentage
+  - **Supplier Cost Management**: Link suppliers to scope items with cost tracking
 
 #### **10. Purchase Specialist**
 - **Authority Level**: Specialist - Procurement execution
@@ -141,6 +146,8 @@ Define and implement a comprehensive permission matrix for all 13 user types, en
   - Payment tracking
   - Purchase order management
   - Supplier communication
+  - **Cost Tracking Access**: View and edit initial_cost, actual_cost, cost_variance
+  - **Pricing Visibility**: Full access to unit_price, total_price, markup_percentage
 
 ---
 
@@ -156,6 +163,10 @@ Define and implement a comprehensive permission matrix for all 13 user types, en
   - Task status updates
   - Issue reporting
   - Document viewing (no pricing)
+- **Restricted Access**: 
+  - **NO Cost Tracking**: Cannot view initial_cost, actual_cost, cost_variance
+  - **NO Pricing Data**: Cannot view unit_price, total_price, markup_percentage
+  - **Basic Scope View**: Only item_no, item_code, description, quantity, status
 
 ---
 
@@ -170,6 +181,10 @@ Define and implement a comprehensive permission matrix for all 13 user types, en
   - Project progress viewing
   - Document download
   - Comment submission
+- **Restricted Access**: 
+  - **NO Cost Tracking**: Cannot view initial_cost, actual_cost, cost_variance
+  - **NO Internal Pricing**: Cannot view unit_price, total_price, markup_percentage
+  - **Basic Scope View**: Only item_no, item_code, description, quantity, completion status
   - PM communication
 
 #### **13. Subcontractor**
@@ -181,6 +196,10 @@ Define and implement a comprehensive permission matrix for all 13 user types, en
   - Photo upload for assigned tasks
   - Task status updates
   - Limited document access
+- **Restricted Access**: 
+  - **NO Cost Tracking**: Cannot view initial_cost, actual_cost, cost_variance
+  - **NO Internal Pricing**: Cannot view unit_price, total_price, markup_percentage
+  - **Limited Scope View**: Only assigned scope items with basic information
 
 ---
 

@@ -23,7 +23,13 @@
       "Bash(git rm:*)",
       "Bash(rm:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "WebFetch(domain:modelcontextprotocol.io)",
+      "Bash(grep:*)",
+      "mcp__context7__resolve-library-id",
+      "Bash(npx:*)",
+      "Bash(npm search:*)",
+      "mcp__context7__get-library-docs"
     ],
     "deny": []
   }

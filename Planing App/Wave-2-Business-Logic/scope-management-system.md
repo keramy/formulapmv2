@@ -29,17 +29,24 @@ export interface ScopeItem {
   project_id: string
   category: ScopeCategory
   
-  // Basic Information
-  title: string
-  description: string
+  // Core Required Fields (Based on Business Requirements)
+  item_no: number // Auto-generated sequential number per project
+  item_code?: string // Client-provided code (Excel importable, nullable)
+  description: string // Detailed item description
+  quantity: number // Numeric quantity with unit validation
+  unit_price: number // Base unit pricing
+  total_price: number // Auto-calculated (Quantity × Unit Price)
+  
+  // Cost Tracking (Technical Office + Purchasing Access Only)
+  initial_cost?: number // Original estimated cost
+  actual_cost?: number // Real incurred cost
+  cost_variance?: number // Auto-calculated difference (actual_cost - initial_cost)
+  
+  // Legacy/Additional Fields
+  title: string // For backward compatibility
   specifications: string
   drawing_reference?: string
-  
-  // Measurement & Pricing
   unit_of_measure: string
-  quantity: number
-  unit_price: number
-  total_price: number // calculated field
   markup_percentage: number
   final_price: number // with markup
   
@@ -641,6 +648,752 @@ export const ScopeItemsTable: React.FC<ScopeItemsTableProps> = ({
 
 ---
 
+## **✏️ Enhanced Editing Interface System**
+
+### **Single Item Editing Component**
+```typescript
+// components/scope/ScopeItemEditor.tsx
+'use client'
+
+import { useState, useEffect } from 'react'
+import { ScopeItem } from '@/types/scope'
+import { usePermissions } from '@/hooks/usePermissions'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
+import { Save, X, Copy, Trash } from 'lucide-react'
+
+interface ScopeItemEditorProps {
+  item: ScopeItem
+  onSave: (item: ScopeItem) => Promise<void>
+  onCancel: () => void
+  onDuplicate?: (item: ScopeItem) => void
+  mode: 'edit' | 'create'
+}
+
+export const ScopeItemEditor: React.FC<ScopeItemEditorProps> = ({
+  item,
+  onSave,
+  onCancel,
+  onDuplicate,
+  mode
+}) => {
+  const [editedItem, setEditedItem] = useState<ScopeItem>(item)
+  const [isLoading, setIsLoading] = useState(false)
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  
+  const { 
+    canViewCosts, 
+    canEditCosts, 
+    canViewPricing,
+    role 
+  } = usePermissions()
+
+  // Auto-calculate total price when quantity or unit_price changes
+  useEffect(() => {
+    const total = editedItem.quantity * editedItem.unit_price
+    setEditedItem(prev => ({ ...prev, total_price: total }))
+  }, [editedItem.quantity, editedItem.unit_price])
+
+  // Auto-calculate cost variance when costs change
+  useEffect(() => {
+    if (editedItem.initial_cost && editedItem.actual_cost) {
+      const variance = editedItem.actual_cost - editedItem.initial_cost
+      setEditedItem(prev => ({ ...prev, cost_variance: variance }))
+    }
+  }, [editedItem.initial_cost, editedItem.actual_cost])
+
+  const handleSave = async () => {
+    setIsLoading(true)
+    try {
+      await onSave(editedItem)
+    } catch (error) {
+      console.error('Save failed:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleFieldChange = (field: keyof ScopeItem, value: any) => {
+    setEditedItem(prev => ({ ...prev, [field]: value }))
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }))
+    }
+  }
+
+  const canEditField = (field: string): boolean => {
+    switch (field) {
+      case 'initial_cost':
+      case 'actual_cost':
+        return canEditCosts()
+      case 'unit_price':
+      case 'total_price':
+        return canViewPricing()
+      default:
+        return true
+    }
+  }
+
+  return (
+    <Card className="w-full max-w-4xl">
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center space-x-2">
+            <span>{mode === 'create' ? 'Create New' : 'Edit'} Scope Item</span>
+            <Badge variant="outline">#{editedItem.item_no}</Badge>
+          </CardTitle>
+          <div className="flex items-center space-x-2">
+            {onDuplicate && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onDuplicate(editedItem)}
+              >
+                <Copy className="h-4 w-4 mr-2" />
+                Duplicate
+              </Button>
+            )}
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent className="space-y-6">
+        {/* Core Fields Section */}
+        <div>
+          <h3 className="text-lg font-semibold mb-4">Core Information</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Item No</label>
+              <Input
+                value={editedItem.item_no}
+                disabled={true}
+                className="bg-gray-50"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Item Code</label>
+              <Input
+                value={editedItem.item_code || ''}
+                onChange={(e) => handleFieldChange('item_code', e.target.value)}
+                placeholder="Client-provided code..."
+              />
+            </div>
+
+            <div className="col-span-2 space-y-2">
+              <label className="text-sm font-medium">Description *</label>
+              <Input
+                value={editedItem.description}
+                onChange={(e) => handleFieldChange('description', e.target.value)}
+                placeholder="Detailed item description..."
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Quantity *</label>
+              <Input
+                type="number"
+                value={editedItem.quantity}
+                onChange={(e) => handleFieldChange('quantity', parseFloat(e.target.value) || 0)}
+                min="0"
+                step="0.01"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Unit of Measure</label>
+              <Input
+                value={editedItem.unit_of_measure}
+                onChange={(e) => handleFieldChange('unit_of_measure', e.target.value)}
+                placeholder="m², pcs, kg..."
+              />
+            </div>
+          </div>
+        </div>
+
+        <Separator />
+
+        {/* Pricing Section */}
+        {canViewPricing() && (
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Pricing Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Unit Price</label>
+                <Input
+                  type="number"
+                  value={editedItem.unit_price}
+                  onChange={(e) => handleFieldChange('unit_price', parseFloat(e.target.value) || 0)}
+                  min="0"
+                  step="0.01"
+                  disabled={!canEditField('unit_price')}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Total Price</label>
+                <Input
+                  type="number"
+                  value={editedItem.total_price}
+                  disabled={true}
+                  className="bg-gray-50"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Markup %</label>
+                <Input
+                  type="number"
+                  value={editedItem.markup_percentage}
+                  onChange={(e) => handleFieldChange('markup_percentage', parseFloat(e.target.value) || 0)}
+                  min="0"
+                  max="100"
+                  step="0.1"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Cost Tracking Section (Technical Office + Purchasing Only) */}
+        {canViewCosts() && (
+          <>
+            <Separator />
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Cost Tracking</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Initial Cost</label>
+                  <Input
+                    type="number"
+                    value={editedItem.initial_cost || ''}
+                    onChange={(e) => handleFieldChange('initial_cost', parseFloat(e.target.value) || undefined)}
+                    min="0"
+                    step="0.01"
+                    disabled={!canEditField('initial_cost')}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Actual Cost</label>
+                  <Input
+                    type="number"
+                    value={editedItem.actual_cost || ''}
+                    onChange={(e) => handleFieldChange('actual_cost', parseFloat(e.target.value) || undefined)}
+                    min="0"
+                    step="0.01"
+                    disabled={!canEditField('actual_cost')}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Cost Variance</label>
+                  <div className="flex items-center space-x-2">
+                    <Input
+                      type="number"
+                      value={editedItem.cost_variance || ''}
+                      disabled={true}
+                      className="bg-gray-50"
+                    />
+                    {editedItem.cost_variance && (
+                      <Badge 
+                        variant={editedItem.cost_variance > 0 ? "destructive" : "default"}
+                        className="whitespace-nowrap"
+                      >
+                        {editedItem.cost_variance > 0 ? '+' : ''}{editedItem.cost_variance.toFixed(2)}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Action Buttons */}
+        <div className="flex items-center justify-end space-x-2 pt-4">
+          <Button
+            variant="outline"
+            onClick={onCancel}
+            disabled={isLoading}
+          >
+            <X className="h-4 w-4 mr-2" />
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSave}
+            disabled={isLoading}
+          >
+            <Save className="h-4 w-4 mr-2" />
+            {isLoading ? 'Saving...' : 'Save Changes'}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+```
+
+### **Bulk Editing Interface**
+```typescript
+// components/scope/BulkEditInterface.tsx
+'use client'
+
+import { useState } from 'react'
+import { ScopeItem } from '@/types/scope'
+import { usePermissions } from '@/hooks/usePermissions'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Badge } from '@/components/ui/badge'
+import { DataTable } from '@/components/ui/data-table'
+import { 
+  Edit3, 
+  Save, 
+  X, 
+  CheckSquare, 
+  Square,
+  Copy,
+  Trash,
+  Filter
+} from 'lucide-react'
+
+interface BulkEditInterfaceProps {
+  items: ScopeItem[]
+  onSave: (items: ScopeItem[]) => Promise<void>
+  onCancel: () => void
+}
+
+export const BulkEditInterface: React.FC<BulkEditInterfaceProps> = ({
+  items,
+  onSave,
+  onCancel
+}) => {
+  const [editedItems, setEditedItems] = useState<ScopeItem[]>(items)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [bulkEditMode, setBulkEditMode] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  
+  const { canViewCosts, canEditCosts, canViewPricing } = usePermissions()
+
+  const handleSelectAll = () => {
+    if (selectedIds.size === items.length) {
+      setSelectedIds(new Set())
+    } else {
+      setSelectedIds(new Set(items.map(item => item.id)))
+    }
+  }
+
+  const handleSelectItem = (id: string) => {
+    const newSelected = new Set(selectedIds)
+    if (newSelected.has(id)) {
+      newSelected.delete(id)
+    } else {
+      newSelected.add(id)
+    }
+    setSelectedIds(newSelected)
+  }
+
+  const handleCellEdit = (itemId: string, field: keyof ScopeItem, value: any) => {
+    setEditedItems(prev => 
+      prev.map(item => 
+        item.id === itemId 
+          ? { 
+              ...item, 
+              [field]: value,
+              // Auto-calculate dependent fields
+              ...(field === 'quantity' || field === 'unit_price' 
+                ? { total_price: (field === 'quantity' ? value : item.quantity) * (field === 'unit_price' ? value : item.unit_price) }
+                : {}),
+              ...(field === 'actual_cost' || field === 'initial_cost'
+                ? { cost_variance: (field === 'actual_cost' ? value : item.actual_cost || 0) - (field === 'initial_cost' ? value : item.initial_cost || 0) }
+                : {})
+            }
+          : item
+      )
+    )
+  }
+
+  const handleBulkUpdate = (field: keyof ScopeItem, value: any) => {
+    if (selectedIds.size === 0) return
+
+    setEditedItems(prev =>
+      prev.map(item =>
+        selectedIds.has(item.id)
+          ? { ...item, [field]: value }
+          : item
+      )
+    )
+  }
+
+  const handleSave = async () => {
+    setIsLoading(true)
+    try {
+      await onSave(editedItems)
+    } catch (error) {
+      console.error('Bulk save failed:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const editableColumns = [
+    {
+      accessorKey: "select",
+      header: () => (
+        <Checkbox
+          checked={selectedIds.size === items.length}
+          onCheckedChange={handleSelectAll}
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={selectedIds.has(row.original.id)}
+          onCheckedChange={() => handleSelectItem(row.original.id)}
+        />
+      ),
+    },
+    {
+      accessorKey: "item_no",
+      header: "Item No",
+      cell: ({ row }) => (
+        <Badge variant="outline">#{row.original.item_no}</Badge>
+      ),
+    },
+    {
+      accessorKey: "item_code",
+      header: "Item Code",
+      cell: ({ row }) => (
+        <Input
+          value={row.original.item_code || ''}
+          onChange={(e) => handleCellEdit(row.original.id, 'item_code', e.target.value)}
+          className="min-w-24"
+          placeholder="Code..."
+        />
+      ),
+    },
+    {
+      accessorKey: "description",
+      header: "Description",
+      cell: ({ row }) => (
+        <Input
+          value={row.original.description}
+          onChange={(e) => handleCellEdit(row.original.id, 'description', e.target.value)}
+          className="min-w-48"
+        />
+      ),
+    },
+    {
+      accessorKey: "quantity",
+      header: "Quantity",
+      cell: ({ row }) => (
+        <Input
+          type="number"
+          value={row.original.quantity}
+          onChange={(e) => handleCellEdit(row.original.id, 'quantity', parseFloat(e.target.value) || 0)}
+          className="min-w-20"
+          min="0"
+          step="0.01"
+        />
+      ),
+    }
+  ]
+
+  // Add pricing columns if user has permission
+  if (canViewPricing()) {
+    editableColumns.push(
+      {
+        accessorKey: "unit_price",
+        header: "Unit Price",
+        cell: ({ row }) => (
+          <Input
+            type="number"
+            value={row.original.unit_price}
+            onChange={(e) => handleCellEdit(row.original.id, 'unit_price', parseFloat(e.target.value) || 0)}
+            className="min-w-24"
+            min="0"
+            step="0.01"
+          />
+        ),
+      },
+      {
+        accessorKey: "total_price",
+        header: "Total Price",
+        cell: ({ row }) => (
+          <div className="text-right font-medium">
+            ${row.original.total_price?.toLocaleString()}
+          </div>
+        ),
+      }
+    )
+  }
+
+  // Add cost tracking columns if user has permission
+  if (canViewCosts()) {
+    editableColumns.push(
+      {
+        accessorKey: "initial_cost",
+        header: "Initial Cost",
+        cell: ({ row }) => (
+          <Input
+            type="number"
+            value={row.original.initial_cost || ''}
+            onChange={(e) => handleCellEdit(row.original.id, 'initial_cost', parseFloat(e.target.value) || undefined)}
+            className="min-w-24"
+            min="0"
+            step="0.01"
+            disabled={!canEditCosts()}
+          />
+        ),
+      },
+      {
+        accessorKey: "actual_cost",
+        header: "Actual Cost",
+        cell: ({ row }) => (
+          <Input
+            type="number"
+            value={row.original.actual_cost || ''}
+            onChange={(e) => handleCellEdit(row.original.id, 'actual_cost', parseFloat(e.target.value) || undefined)}
+            className="min-w-24"
+            min="0"
+            step="0.01"
+            disabled={!canEditCosts()}
+          />
+        ),
+      }
+    )
+  }
+
+  return (
+    <Card className="w-full">
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center space-x-2">
+            <Edit3 className="h-5 w-5" />
+            <span>Bulk Edit Mode</span>
+            <Badge variant="secondary">{editedItems.length} items</Badge>
+          </CardTitle>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSelectedIds(new Set())}
+            >
+              Clear Selection
+            </Button>
+            <Badge variant="outline">
+              {selectedIds.size} selected
+            </Badge>
+          </div>
+        </div>
+
+        {/* Bulk Action Panel */}
+        {selectedIds.size > 0 && (
+          <div className="flex items-center space-x-4 p-4 bg-blue-50 rounded-lg">
+            <span className="text-sm font-medium">
+              Bulk update {selectedIds.size} items:
+            </span>
+            
+            <Select onValueChange={(value) => handleBulkUpdate('status', value)}>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="Status..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="not_started">Not Started</SelectItem>
+                <SelectItem value="in_progress">In Progress</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="blocked">Blocked</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Input
+              type="number"
+              placeholder="Set markup %..."
+              className="w-32"
+              onChange={(e) => {
+                const value = parseFloat(e.target.value)
+                if (!isNaN(value)) handleBulkUpdate('markup_percentage', value)
+              }}
+            />
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                // Duplicate selected items
+                const newItems = editedItems.filter(item => selectedIds.has(item.id))
+                  .map(item => ({
+                    ...item,
+                    id: crypto.randomUUID(),
+                    item_no: Math.max(...editedItems.map(i => i.item_no)) + 1,
+                    description: `${item.description} (Copy)`
+                  }))
+                setEditedItems(prev => [...prev, ...newItems])
+              }}
+            >
+              <Copy className="h-4 w-4 mr-2" />
+              Duplicate
+            </Button>
+          </div>
+        )}
+      </CardHeader>
+
+      <CardContent>
+        <DataTable
+          columns={editableColumns}
+          data={editedItems}
+          searchable={true}
+          searchPlaceholder="Search items..."
+        />
+
+        {/* Action Buttons */}
+        <div className="flex items-center justify-end space-x-2 mt-6">
+          <Button
+            variant="outline"
+            onClick={onCancel}
+            disabled={isLoading}
+          >
+            <X className="h-4 w-4 mr-2" />
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSave}
+            disabled={isLoading}
+          >
+            <Save className="h-4 w-4 mr-2" />
+            {isLoading ? 'Saving...' : `Save ${editedItems.length} Items`}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+```
+
+### **Copy/Paste System Implementation**
+```typescript
+// hooks/useCopyPaste.ts
+'use client'
+
+import { useCallback, useEffect } from 'react'
+import { ScopeItem } from '@/types/scope'
+import { useToast } from '@/components/ui/use-toast'
+
+interface CopyPasteHookProps {
+  onPaste: (data: any[]) => void
+  selectedItems?: ScopeItem[]
+}
+
+export const useCopyPaste = ({ onPaste, selectedItems }: CopyPasteHookProps) => {
+  const { toast } = useToast()
+
+  const handleCopy = useCallback(async () => {
+    if (!selectedItems || selectedItems.length === 0) {
+      toast({
+        title: "Nothing to copy",
+        description: "Please select items first",
+        variant: "destructive"
+      })
+      return
+    }
+
+    try {
+      // Prepare data for clipboard (CSV format for Excel compatibility)
+      const headers = ['Item No', 'Item Code', 'Description', 'Quantity', 'Unit Price', 'Total Price']
+      const rows = selectedItems.map(item => [
+        item.item_no,
+        item.item_code || '',
+        item.description,
+        item.quantity,
+        item.unit_price,
+        item.total_price
+      ])
+
+      const csvContent = [headers, ...rows]
+        .map(row => row.map(cell => `"${cell}"`).join('\t'))
+        .join('\n')
+
+      await navigator.clipboard.writeText(csvContent)
+      
+      toast({
+        title: "Copied to clipboard",
+        description: `${selectedItems.length} items copied`,
+      })
+    } catch (error) {
+      toast({
+        title: "Copy failed",
+        description: "Failed to copy to clipboard",
+        variant: "destructive"
+      })
+    }
+  }, [selectedItems, toast])
+
+  const handlePaste = useCallback(async () => {
+    try {
+      const clipboardText = await navigator.clipboard.readText()
+      
+      // Parse clipboard data (assuming tab-separated values)
+      const lines = clipboardText.trim().split('\n')
+      const parsedData = lines.map(line => {
+        const cells = line.split('\t').map(cell => cell.replace(/^"|"$/g, ''))
+        return {
+          item_code: cells[1] || '',
+          description: cells[2] || '',
+          quantity: parseFloat(cells[3]) || 0,
+          unit_price: parseFloat(cells[4]) || 0,
+        }
+      })
+
+      onPaste(parsedData)
+      
+      toast({
+        title: "Pasted successfully",
+        description: `${parsedData.length} items pasted`,
+      })
+    } catch (error) {
+      toast({
+        title: "Paste failed",
+        description: "Failed to paste from clipboard",
+        variant: "destructive"
+      })
+    }
+  }, [onPaste, toast])
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyboard = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        switch (e.key) {
+          case 'c':
+            e.preventDefault()
+            handleCopy()
+            break
+          case 'v':
+            e.preventDefault()
+            handlePaste()
+            break
+        }
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyboard)
+    return () => window.removeEventListener('keydown', handleKeyboard)
+  }, [handleCopy, handlePaste])
+
+  return { handleCopy, handlePaste }
+}
+```
+
+---
+
 ## **📁 Excel Import/Export System**
 
 ### **Excel Import Service**
@@ -652,20 +1405,22 @@ import { supabase } from '@/lib/supabase'
 import { z } from 'zod'
 
 const EXCEL_COLUMNS = {
-  A: 'category',
-  B: 'title', 
-  C: 'description',
-  D: 'specifications',
+  A: 'item_code', // Client-provided code
+  B: 'description', // Required field
+  C: 'category',
+  D: 'quantity', // Required field
   E: 'unit_of_measure',
-  F: 'quantity',
-  G: 'unit_price',
-  H: 'markup_percentage',
-  I: 'timeline_start',
-  J: 'timeline_end',
-  K: 'priority',
-  L: 'risk_level',
-  M: 'special_requirements',
-  N: 'drawing_reference'
+  F: 'unit_price', // Required field
+  G: 'initial_cost', // Technical Office access
+  H: 'actual_cost', // Technical Office access
+  I: 'markup_percentage',
+  J: 'specifications',
+  K: 'timeline_start',
+  L: 'timeline_end',
+  M: 'priority',
+  N: 'risk_level',
+  O: 'special_requirements',
+  P: 'drawing_reference'
 }
 
 const scopeItemSchema = z.object({
