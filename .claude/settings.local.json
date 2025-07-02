@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude status)",
+      "Bash(npm install:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(gemini-mcp-tool:*)",
+      "Bash(npx gemini-mcp-tool:*)",
+      "Bash(cat:*)",
+      "Bash(mkdir:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "Bash(gemini:*)",
+      "Bash(git init:*)",
+      "Bash(git branch:*)",
+      "Bash(git config:*)",
+      "Bash(git remote remove:*)",
+      "Bash(git remote add:*)",
+      "Bash(git add:*)",
+      "Bash(git rm:*)",
+      "Bash(rm:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
+    ],
+    "deny": []
+  }
+}
