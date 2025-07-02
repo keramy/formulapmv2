@@ -29,7 +29,9 @@
       "mcp__context7__resolve-library-id",
       "Bash(npx:*)",
       "Bash(npm search:*)",
-      "mcp__context7__get-library-docs"
+      "mcp__context7__get-library-docs",
+      "Bash(npm run type-check:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": []
   }

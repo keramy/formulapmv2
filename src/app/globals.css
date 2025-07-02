@@ -1,0 +1,152 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 201 96% 32%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 201 96% 32%;
+    --radius: 0.5rem;
+    
+    /* Formula PM Brand Colors */
+    --management: 237 73% 30%;
+    --project: 270 91% 29%;
+    --technical: 122 39% 33%;
+    --purchase: 14 76% 47%;
+    --field: 14 25% 33%;
+    --client: 291 47% 71%;
+    --external: 21 25% 40%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 201 96% 32%;
+    --primary-foreground: 222.2 84% 4.9%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 201 96% 32%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Construction Industry Specific Styles */
+.role-management {
+  @apply border-l-4 border-l-blue-800;
+}
+
+.role-project {
+  @apply border-l-4 border-l-purple-800;
+}
+
+.role-technical {
+  @apply border-l-4 border-l-green-700;
+}
+
+.role-purchase {
+  @apply border-l-4 border-l-orange-600;
+}
+
+.role-field {
+  @apply border-l-4 border-l-amber-800;
+}
+
+.role-client {
+  @apply border-l-4 border-l-pink-600;
+}
+
+.role-external {
+  @apply border-l-4 border-l-stone-600;
+}
+
+/* Mobile-first responsive utilities */
+.container-mobile {
+  @apply px-4 mx-auto;
+}
+
+@media (min-width: 640px) {
+  .container-mobile {
+    @apply px-6;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-mobile {
+    @apply px-8;
+  }
+}
+
+/* Project status colors */
+.status-planning {
+  @apply bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300;
+}
+
+.status-active {
+  @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300;
+}
+
+.status-on-hold {
+  @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300;
+}
+
+.status-completed {
+  @apply bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300;
+}
+
+.status-cancelled {
+  @apply bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300;
+}
+
+/* Priority colors */
+.priority-low {
+  @apply text-green-600 dark:text-green-400;
+}
+
+.priority-medium {
+  @apply text-yellow-600 dark:text-yellow-400;
+}
+
+.priority-high {
+  @apply text-orange-600 dark:text-orange-400;
+}
+
+.priority-urgent {
+  @apply text-red-600 dark:text-red-400;
+}
