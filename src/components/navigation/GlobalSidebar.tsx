@@ -99,12 +99,12 @@ export const GlobalSidebar = () => {
       description: 'Client management and communication'
     },
     {
-      id: 'procurement',
-      label: 'Procurement',
-      href: '/procurement',
+      id: 'purchase',
+      label: 'Purchase',
+      href: '/purchase',
       icon: ShoppingCart,
-      permission: 'procurement.view',
-      description: 'Supplier management and purchasing'
+      permission: 'purchase.requests.read',
+      description: 'Purchase requests, orders, and vendor management'
     },
     {
       id: 'reports',

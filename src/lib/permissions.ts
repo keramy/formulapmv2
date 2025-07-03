@@ -57,6 +57,38 @@ export const PERMISSIONS = {
   'payments.view': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'purchase_director'],
   'payments.track': ['purchase_director', 'purchase_specialist'],
 
+  // Purchase Department Workflow Permissions
+  'purchase.requests.create': ['project_manager', 'technical_engineer', 'field_worker', 'purchase_director', 'purchase_specialist'],
+  'purchase.requests.read': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'technical_engineer', 'field_worker', 'purchase_director', 'purchase_specialist'],
+  'purchase.requests.update': ['project_manager', 'technical_engineer', 'purchase_director', 'purchase_specialist'],
+  'purchase.requests.delete': ['project_manager', 'purchase_director', 'purchase_specialist'],
+  'purchase.requests.approve': ['project_manager', 'general_manager', 'deputy_general_manager', 'purchase_director'],
+  'purchase.requests.emergency': ['project_manager', 'general_manager', 'deputy_general_manager', 'purchase_director'],
+  
+  'purchase.orders.create': ['purchase_director', 'purchase_specialist'],
+  'purchase.orders.read': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'purchase_director', 'purchase_specialist'],
+  'purchase.orders.update': ['purchase_director', 'purchase_specialist'],
+  'purchase.orders.delete': ['purchase_director', 'general_manager', 'deputy_general_manager'],
+  'purchase.orders.send': ['purchase_director', 'purchase_specialist'],
+  'purchase.orders.confirm': ['purchase_director', 'purchase_specialist'],
+  
+  'purchase.vendors.create': ['purchase_director', 'purchase_specialist'],
+  'purchase.vendors.read': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'purchase_director', 'purchase_specialist'],
+  'purchase.vendors.update': ['purchase_director', 'purchase_specialist'],
+  'purchase.vendors.rate': ['project_manager', 'purchase_director', 'purchase_specialist'],
+  'purchase.vendors.approve': ['general_manager', 'deputy_general_manager', 'purchase_director'],
+  
+  'purchase.approvals.view': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'purchase_director', 'purchase_specialist'],
+  'purchase.approvals.process': ['project_manager', 'general_manager', 'deputy_general_manager', 'purchase_director'],
+  'purchase.approvals.delegate': ['project_manager', 'general_manager', 'deputy_general_manager', 'purchase_director'],
+  
+  'purchase.deliveries.confirm': ['field_worker', 'project_manager', 'technical_engineer', 'purchase_director', 'purchase_specialist'],
+  'purchase.deliveries.reject': ['field_worker', 'project_manager', 'technical_engineer', 'purchase_director', 'purchase_specialist'],
+  'purchase.deliveries.view': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'technical_engineer', 'field_worker', 'purchase_director', 'purchase_specialist'],
+  
+  'purchase.financials.view': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'purchase_director'],
+  'purchase.reports.view': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'purchase_director', 'purchase_specialist'],
+
   // Reporting Permissions
   'reports.create.internal': ['project_manager', 'architect', 'technical_engineer'],
   'reports.create.client': ['project_manager'],

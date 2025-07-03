@@ -167,6 +167,79 @@ export const usePermissions = () => {
     return checkPermission('procurement.approve')
   }
 
+  // Purchase Department Permissions
+  const canCreatePurchaseRequests = (): boolean => {
+    return checkPermission('purchase.requests.create')
+  }
+
+  const canViewPurchaseRequests = (): boolean => {
+    return checkPermission('purchase.requests.read')
+  }
+
+  const canUpdatePurchaseRequests = (): boolean => {
+    return checkPermission('purchase.requests.update')
+  }
+
+  const canDeletePurchaseRequests = (): boolean => {
+    return checkPermission('purchase.requests.delete')
+  }
+
+  const canApprovePurchaseRequests = (): boolean => {
+    return checkPermission('purchase.requests.approve')
+  }
+
+  const canCreatePurchaseOrders = (): boolean => {
+    return checkPermission('purchase.orders.create')
+  }
+
+  const canViewPurchaseOrders = (): boolean => {
+    return checkPermission('purchase.orders.read')
+  }
+
+  const canUpdatePurchaseOrders = (): boolean => {
+    return checkPermission('purchase.orders.update')
+  }
+
+  const canSendPurchaseOrders = (): boolean => {
+    return checkPermission('purchase.orders.send')
+  }
+
+  const canManagePurchaseVendors = (): boolean => {
+    return checkPermission('purchase.vendors.create') && checkPermission('purchase.vendors.update')
+  }
+
+  const canViewPurchaseVendors = (): boolean => {
+    return checkPermission('purchase.vendors.read')
+  }
+
+  const canRatePurchaseVendors = (): boolean => {
+    return checkPermission('purchase.vendors.rate')
+  }
+
+  const canViewPurchaseApprovals = (): boolean => {
+    return checkPermission('purchase.approvals.view')
+  }
+
+  const canProcessPurchaseApprovals = (): boolean => {
+    return checkPermission('purchase.approvals.process')
+  }
+
+  const canConfirmPurchaseDeliveries = (): boolean => {
+    return checkPermission('purchase.deliveries.confirm')
+  }
+
+  const canViewPurchaseDeliveries = (): boolean => {
+    return checkPermission('purchase.deliveries.view')
+  }
+
+  const canViewPurchaseFinancials = (): boolean => {
+    return checkPermission('purchase.financials.view')
+  }
+
+  const canViewPurchaseReports = (): boolean => {
+    return checkPermission('purchase.reports.view')
+  }
+
   const canViewReports = (): boolean => {
     return checkPermission('reports.read.all') || 
            checkPermission('reports.read.project') || 
@@ -266,7 +339,7 @@ export const usePermissions = () => {
     if (canViewScope()) navItems.push('scope')
     if (canViewShopDrawings()) navItems.push('shop-drawings')
     if (canViewClients()) navItems.push('clients')
-    if (canViewProcurement()) navItems.push('procurement')
+    if (canViewPurchaseRequests()) navItems.push('purchase')
     if (canViewReports()) navItems.push('reports')
     if (canViewDocuments()) navItems.push('documents')
     if (canAccessSystemSettings()) navItems.push('settings')
@@ -295,6 +368,26 @@ export const usePermissions = () => {
     canViewProcurement,
     canManageProcurement,
     canApproveProcurement,
+    
+    // Purchase Department
+    canCreatePurchaseRequests,
+    canViewPurchaseRequests,
+    canUpdatePurchaseRequests,
+    canDeletePurchaseRequests,
+    canApprovePurchaseRequests,
+    canCreatePurchaseOrders,
+    canViewPurchaseOrders,
+    canUpdatePurchaseOrders,
+    canSendPurchaseOrders,
+    canManagePurchaseVendors,
+    canViewPurchaseVendors,
+    canRatePurchaseVendors,
+    canViewPurchaseApprovals,
+    canProcessPurchaseApprovals,
+    canConfirmPurchaseDeliveries,
+    canViewPurchaseDeliveries,
+    canViewPurchaseFinancials,
+    canViewPurchaseReports,
     
     // User management
     canManageUsers,

@@ -66,6 +66,13 @@ export type ApproverType = 'internal' | 'client';
 export type ApprovalStatus = 'pending' | 'approved' | 'rejected';
 export type DependencyType = 'blocks' | 'requires' | 'related';
 
+// Purchase Department Types
+export type UrgencyLevel = 'low' | 'normal' | 'high' | 'emergency';
+export type RequestStatus = 'draft' | 'pending_approval' | 'approved' | 'rejected' | 'cancelled';
+export type PoStatus = 'draft' | 'sent' | 'confirmed' | 'delivered' | 'completed' | 'cancelled';
+export type PurchaseApprovalStatus = 'pending' | 'approved' | 'rejected' | 'delegated';
+export type DeliveryStatus = 'pending' | 'partial' | 'completed' | 'damaged' | 'rejected';
+
 // ============================================================================
 // CORE INTERFACES
 // ============================================================================
@@ -221,6 +228,108 @@ export interface DocumentApproval {
 }
 
 // ============================================================================
+// PURCHASE DEPARTMENT INTERFACES
+// ============================================================================
+
+export interface Vendor {
+  id: string;
+  company_name: string;
+  contact_person?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  payment_terms?: string;
+  is_active: boolean;
+  performance_rating: number;
+  specializations: string[];
+  created_by?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PurchaseRequest {
+  id: string;
+  project_id: string;
+  requester_id: string;
+  request_number: string;
+  item_description: string;
+  quantity: number;
+  unit_of_measure: string;
+  estimated_cost?: number;
+  required_date: string;
+  urgency_level: UrgencyLevel;
+  justification?: string;
+  status: RequestStatus;
+  budget_code?: string;
+  cost_center?: string;
+  metadata: Record<string, any>;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PurchaseOrder {
+  id: string;
+  purchase_request_id: string;
+  po_number: string;
+  vendor_id: string;
+  total_amount: number;
+  po_date: string;
+  expected_delivery_date?: string;
+  status: PoStatus;
+  terms_conditions?: string;
+  email_sent_at?: string;
+  phone_confirmed_at?: string;
+  phone_confirmed_by?: string;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface VendorRating {
+  id: string;
+  vendor_id: string;
+  project_id: string;
+  purchase_order_id?: string;
+  rater_id: string;
+  quality_score: number;
+  delivery_score: number;
+  communication_score: number;
+  overall_score: number;
+  comments?: string;
+  created_at: string;
+}
+
+export interface PurchaseApprovalWorkflow {
+  id: string;
+  purchase_request_id: string;
+  approver_role: UserRole;
+  approver_id?: string;
+  approval_status: PurchaseApprovalStatus;
+  approval_date?: string;
+  comments?: string;
+  sequence_order: number;
+  delegated_to?: string;
+  delegated_at?: string;
+  created_at: string;
+}
+
+export interface DeliveryConfirmation {
+  id: string;
+  purchase_order_id: string;
+  confirmed_by: string;
+  delivery_date: string;
+  quantity_received: number;
+  quantity_ordered: number;
+  condition_notes?: string;
+  photos: string[];
+  status: DeliveryStatus;
+  quality_assessment?: string;
+  damage_reported: boolean;
+  rejection_reason?: string;
+  created_at: string;
+}
+
+// ============================================================================
 // JOINED INTERFACES FOR COMPLEX QUERIES
 // ============================================================================
 
@@ -250,6 +359,35 @@ export interface UserProfileWithDetails extends UserProfile {
   client_info?: Client;
   assigned_projects?: ProjectAssignment[];
   managed_projects?: Project[];
+}
+
+// Purchase Department Complex Interfaces
+export interface PurchaseRequestWithDetails extends PurchaseRequest {
+  project?: Project;
+  requester?: UserProfile;
+  approval_workflows?: PurchaseApprovalWorkflow[];
+  purchase_order?: PurchaseOrder;
+}
+
+export interface PurchaseOrderWithDetails extends PurchaseOrder {
+  purchase_request?: PurchaseRequestWithDetails;
+  vendor?: Vendor;
+  delivery_confirmations?: DeliveryConfirmation[];
+  created_by_user?: UserProfile;
+  phone_confirmed_by_user?: UserProfile;
+}
+
+export interface VendorWithDetails extends Vendor {
+  ratings?: VendorRating[];
+  purchase_orders?: PurchaseOrder[];
+  created_by_user?: UserProfile;
+  average_rating?: number;
+  total_orders?: number;
+}
+
+export interface DeliveryConfirmationWithDetails extends DeliveryConfirmation {
+  purchase_order?: PurchaseOrderWithDetails;
+  confirmed_by_user?: UserProfile;
 }
 
 // ============================================================================
@@ -384,6 +522,113 @@ export interface UpdateDocument {
   version?: number;
   status?: DocumentStatus;
   is_client_visible?: boolean;
+}
+
+// Purchase Department Create/Update Interfaces
+export interface CreateVendor {
+  company_name: string;
+  contact_person?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  payment_terms?: string;
+  is_active?: boolean;
+  specializations?: string[];
+}
+
+export interface UpdateVendor {
+  company_name?: string;
+  contact_person?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  payment_terms?: string;
+  is_active?: boolean;
+  specializations?: string[];
+}
+
+export interface CreatePurchaseRequest {
+  project_id: string;
+  item_description: string;
+  quantity: number;
+  unit_of_measure: string;
+  estimated_cost?: number;
+  required_date: string;
+  urgency_level?: UrgencyLevel;
+  justification?: string;
+  budget_code?: string;
+  cost_center?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface UpdatePurchaseRequest {
+  item_description?: string;
+  quantity?: number;
+  unit_of_measure?: string;
+  estimated_cost?: number;
+  required_date?: string;
+  urgency_level?: UrgencyLevel;
+  justification?: string;
+  status?: RequestStatus;
+  budget_code?: string;
+  cost_center?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface CreatePurchaseOrder {
+  purchase_request_id: string;
+  vendor_id: string;
+  total_amount: number;
+  po_date: string;
+  expected_delivery_date?: string;
+  terms_conditions?: string;
+}
+
+export interface UpdatePurchaseOrder {
+  vendor_id?: string;
+  total_amount?: number;
+  po_date?: string;
+  expected_delivery_date?: string;
+  status?: PoStatus;
+  terms_conditions?: string;
+  email_sent_at?: string;
+  phone_confirmed_at?: string;
+  phone_confirmed_by?: string;
+}
+
+export interface CreateVendorRating {
+  vendor_id: string;
+  project_id: string;
+  purchase_order_id?: string;
+  quality_score: number;
+  delivery_score: number;
+  communication_score: number;
+  overall_score: number;
+  comments?: string;
+}
+
+export interface CreateDeliveryConfirmation {
+  purchase_order_id: string;
+  delivery_date: string;
+  quantity_received: number;
+  quantity_ordered: number;
+  condition_notes?: string;
+  photos?: string[];
+  status?: DeliveryStatus;
+  quality_assessment?: string;
+  damage_reported?: boolean;
+  rejection_reason?: string;
+}
+
+export interface UpdateDeliveryConfirmation {
+  delivery_date?: string;
+  quantity_received?: number;
+  condition_notes?: string;
+  photos?: string[];
+  status?: DeliveryStatus;
+  quality_assessment?: string;
+  damage_reported?: boolean;
+  rejection_reason?: string;
 }
 
 // ============================================================================
@@ -530,7 +775,13 @@ export type DatabaseTable =
   | 'scope_items'
   | 'scope_dependencies'
   | 'documents'
-  | 'document_approvals';
+  | 'document_approvals'
+  | 'vendors'
+  | 'purchase_requests'
+  | 'purchase_orders'
+  | 'vendor_ratings'
+  | 'approval_workflows'
+  | 'delivery_confirmations';
 
 export type SortDirection = 'asc' | 'desc';
 
@@ -643,6 +894,36 @@ export interface Database {
         Insert: Omit<DocumentApproval, 'id' | 'created_at'>;
         Update: Partial<Omit<DocumentApproval, 'id' | 'created_at'>>;
       };
+      vendors: {
+        Row: Vendor;
+        Insert: CreateVendor;
+        Update: UpdateVendor;
+      };
+      purchase_requests: {
+        Row: PurchaseRequest;
+        Insert: CreatePurchaseRequest;
+        Update: UpdatePurchaseRequest;
+      };
+      purchase_orders: {
+        Row: PurchaseOrder;
+        Insert: CreatePurchaseOrder;
+        Update: UpdatePurchaseOrder;
+      };
+      vendor_ratings: {
+        Row: VendorRating;
+        Insert: CreateVendorRating;
+        Update: never;
+      };
+      approval_workflows: {
+        Row: PurchaseApprovalWorkflow;
+        Insert: Omit<PurchaseApprovalWorkflow, 'id' | 'created_at'>;
+        Update: Partial<Omit<PurchaseApprovalWorkflow, 'id' | 'created_at'>>;
+      };
+      delivery_confirmations: {
+        Row: DeliveryConfirmation;
+        Insert: CreateDeliveryConfirmation;
+        Update: UpdateDeliveryConfirmation;
+      };
     };
     Views: {
       [_ in never]: never;
@@ -657,6 +938,11 @@ export interface Database {
       scope_status: ScopeStatus;
       document_type: DocumentType;
       document_status: DocumentStatus;
+      urgency_level: UrgencyLevel;
+      request_status: RequestStatus;
+      po_status: PoStatus;
+      approval_status: PurchaseApprovalStatus;
+      delivery_status: DeliveryStatus;
     };
   };
 }

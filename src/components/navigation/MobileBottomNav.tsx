@@ -81,11 +81,11 @@ export const MobileBottomNav = () => {
       permission: 'clients.view'
     },
     {
-      id: 'procurement',
-      label: 'Procurement',
-      href: '/procurement',
+      id: 'purchase',
+      label: 'Purchase',
+      href: '/purchase',
       icon: ShoppingCart,
-      permission: 'procurement.view'
+      permission: 'purchase.requests.read'
     },
     {
       id: 'reports',
