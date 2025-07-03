@@ -21,22 +21,32 @@ export const PERMISSIONS = {
 
   // Document Management
   'documents.create': ['project_manager', 'architect', 'technical_engineer', 'field_worker'],
+  'documents.read': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'architect', 'technical_engineer', 'field_worker', 'purchase_director', 'purchase_specialist'],
   'documents.read.all': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'],
   'documents.read.project': ['project_manager', 'architect', 'technical_engineer', 'field_worker', 'purchase_director', 'purchase_specialist'],
   'documents.read.client_visible': ['client'],
+  'documents.update': ['project_manager', 'architect', 'technical_engineer'],
+  'documents.delete': ['project_manager', 'technical_director', 'general_manager', 'admin'],
+  'documents.version.manage': ['project_manager', 'architect'],
+  
+  // Document Approval Workflow
+  'documents.view': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'architect', 'technical_engineer', 'field_worker', 'purchase_director', 'purchase_specialist', 'client'],
+  'documents.manage': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager'],
+  'documents.approve': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'architect', 'technical_engineer', 'client'],
   'documents.approve.internal': ['project_manager', 'technical_director', 'general_manager'],
   'documents.approve.client': ['client'],
-  'documents.version.manage': ['project_manager', 'architect'],
 
   // Shop Drawing Permissions
-  'shop_drawings.create': ['architect'],
+  'shop_drawings.create': ['architect', 'project_manager'],
   'shop_drawings.edit': ['architect', 'project_manager'],
+  'shop_drawings.delete': ['architect', 'project_manager', 'technical_director', 'admin'],
+  'shop_drawings.view': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'architect', 'technical_engineer', 'field_worker', 'client'],
+  'shop_drawings.approve': ['architect', 'project_manager', 'general_manager', 'deputy_general_manager', 'technical_director', 'client'],
   'shop_drawings.review.internal': ['project_manager', 'technical_director'],
   'shop_drawings.approve.internal': ['project_manager', 'technical_director'],
   'shop_drawings.submit.client': ['project_manager'],
   'shop_drawings.approve.client': ['client'],
   'shop_drawings.revision.request': ['client', 'project_manager', 'technical_director'],
-  'shop_drawings.view': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'architect', 'technical_engineer', 'field_worker', 'client'],
 
   // Purchase & Supplier Permissions
   'suppliers.create': ['purchase_director', 'purchase_specialist'],

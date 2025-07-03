@@ -1,97 +1,111 @@
-# Using Gemini CLI for Large Codebase Analysis
+# Using Gemini MCP Tool for Large Codebase Analysis
 
-When analyzing large codebases or multiple files that might exceed context limits, use the Gemini CLI with its massive context window. Use `gemini -p` to leverage Google Gemini's large context capacity.
+When analyzing large codebases or multiple files that might exceed context limits, use the Gemini MCP Tool with its massive context window. This tool bridges Claude with Google Gemini's large context capacity through natural language commands.
+
+## MCP Tool Overview
+
+The `gemini-mcp-tool` is a Model Context Protocol server that allows Claude to interact with Gemini AI for powerful file and codebase analysis. It uses natural language commands with `@` syntax for file inclusion.
+
+**Installation Status**: ✅ Installed as `gemini-mcp-tool@1.1.1`
 
 ## File and Directory Inclusion Syntax
 
-Use the `@` syntax to include files and directories in your Gemini prompts. The paths should be relative to WHERE you run the gemini command:
+Use natural language commands with the `@` syntax to include files and directories. The paths should be relative to your current working directory:
 
 ### Examples:
 
 **Single file analysis:**
-```bash
-gemini -p "@src/main.py Explain this file's purpose and structure"
+```
+Ask gemini to analyze @src/main.py and explain this file's purpose and structure
 ```
 
 **Multiple files:**
-```bash
-gemini -p "@package.json @src/index.js Analyze the dependencies used in the code"
+```
+Use gemini to analyze @package.json and @src/index.js to understand the dependencies used in the code
 ```
 
 **Entire directory:**
-```bash
-gemini -p "@src/ Summarize the architecture of this codebase"
+```
+Ask gemini to summarize the architecture of @src/ directory
 ```
 
 **Multiple directories:**
-```bash
-gemini -p "@src/ @tests/ Analyze test coverage for the source code"
+```
+Use gemini to analyze @src/ and @tests/ directories for test coverage analysis
 ```
 
 **Current directory and subdirectories:**
-```bash
-gemini -p "@./ Give me an overview of this entire project"
-# Or use --all_files flag:
-gemini --all_files -p "Analyze the project structure and dependencies"
+```
+Ask gemini to give an overview of @./ entire project structure
 ```
 
 ## Implementation Verification Examples
 
 **Check if a feature is implemented:**
-```bash
-gemini -p "@src/ @lib/ Has dark mode been implemented in this codebase? Show me the relevant files and functions"
+```
+Ask gemini to analyze @src/ and @lib/ directories to check if dark mode has been implemented and show me the relevant files and functions
 ```
 
 **Verify authentication implementation:**
-```bash
-gemini -p "@src/ @middleware/ Is JWT authentication implemented? List all auth-related endpoints and middleware"
+```
+Use gemini to examine @src/ and @middleware/ to determine if JWT authentication is implemented and list all auth-related endpoints and middleware
 ```
 
 **Check for specific patterns:**
-```bash
-gemini -p "@src/ Are there any React hooks that handle WebSocket connections? List them with file paths"
+```
+Ask gemini to analyze @src/ directory and find any React hooks that handle WebSocket connections, listing them with file paths
 ```
 
 **Verify error handling:**
-```bash
-gemini -p "@src/ @api/ Is proper error handling implemented for all API endpoints? Show examples of try-catch blocks"
+```
+Use gemini to examine @src/ and @api/ directories to check if proper error handling is implemented for all API endpoints and show examples of try-catch blocks
 ```
 
 **Check for rate limiting:**
-```bash
-gemini -p "@backend/ @middleware/ Is rate limiting implemented for the API? Show the implementation details"
+```
+Ask gemini to analyze @backend/ and @middleware/ directories to determine if rate limiting is implemented for the API and show implementation details
 ```
 
 **Verify caching strategy:**
-```bash
-gemini -p "@src/ @lib/ @services/ Is Redis caching implemented? List all cache-related functions and their usage"
+```
+Use gemini to examine @src/, @lib/, and @services/ directories to check if Redis caching is implemented and list all cache-related functions and their usage
 ```
 
 **Check for specific security measures:**
-```bash
-gemini -p "@src/ @api/ Are SQL injection protections implemented? Show how user inputs are sanitized"
+```
+Ask gemini to analyze @src/ and @api/ directories to verify if SQL injection protections are implemented and show how user inputs are sanitized
 ```
 
 **Verify test coverage for features:**
-```bash
-gemini -p "@src/payment/ @tests/ Is the payment processing module fully tested? List all test cases"
+```
+Use gemini to examine @src/payment/ and @tests/ directories to check if the payment processing module is fully tested and list all test cases
 ```
 
-## When to Use Gemini CLI
+## When to Use Gemini MCP Tool
 
-Use `gemini -p` when:
-- Analyzing entire codebases or large directories
-- Comparing multiple large files
+Use Gemini MCP tool when:
+- Analyzing entire codebases or large directories that exceed Claude's context window
+- Comparing multiple large files simultaneously
 - Need to understand project-wide patterns or architecture
-- Current context window is insufficient for the task
 - Working with files totaling more than 100KB
 - Verifying if specific features, patterns, or security measures are implemented
 - Checking for the presence of certain coding patterns across the entire codebase
+- Performing comprehensive codebase analysis that requires Gemini's large context window
 
-## Important Notes
+## Setup and Configuration
 
-- Paths in @ syntax are relative to your current working directory when invoking gemini
-- The CLI will include file contents directly in the context
-- No need for --yolo flag for read-only analysis
+### Prerequisites
+- Node.js (v16.0.0+)
+- MCP tool installed: `npm install -g gemini-mcp-tool` ✅
+- Google Gemini API access (configured automatically)
+
+### MCP Server Status
+The Gemini MCP tool is installed and ready to use. It runs as an MCP server that bridges Claude with Google Gemini's analysis capabilities.
+
+### Usage Notes
+- Paths in @ syntax are relative to your current working directory
+- Use natural language commands to interact with the tool
+- The MCP server includes file contents directly in the context
 - Gemini's context window can handle entire codebases that would overflow Claude's context
 - When checking implementations, be specific about what you're looking for to get accurate results
+- The tool works within Claude's MCP environment for seamless integration
