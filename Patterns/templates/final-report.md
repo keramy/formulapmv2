@@ -7,6 +7,10 @@
 - Execution Time: [duration]
 - Files Modified: [count]
 - New Patterns: [list]
+- Feature Changes: [only with explicit user approval]
+- Scope Adherence: [stayed within defined requirements]
+- Documentation Created: [only when explicitly requested]
+- Files Added: [code files only, no unnecessary .md/scripts]
 
 ### Key Achievements
 1. [Most impactful feature implemented]

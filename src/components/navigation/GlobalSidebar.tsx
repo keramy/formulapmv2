@@ -19,7 +19,8 @@ import {
   Settings,
   Bell,
   BarChart3,
-  Building2
+  Building2,
+  ExternalLink
 } from 'lucide-react'
 
 interface NavigationItem {
@@ -44,6 +45,7 @@ export const GlobalSidebar = () => {
     canViewReports,
     canViewDocuments,
     canAccessSystemSettings,
+    canViewClientPortalAdmin,
     checkPermission
   } = usePermissions()
   const pathname = usePathname()
@@ -121,6 +123,14 @@ export const GlobalSidebar = () => {
       icon: FileText,
       permission: 'documents.read.all',
       description: 'Document management'
+    },
+    {
+      id: 'client-portal-admin',
+      label: 'Client Portal',
+      href: '/client-portal/admin',
+      icon: ExternalLink,
+      permission: 'client_portal.admin.view',
+      description: 'External client portal administration'
     }
   ]
 

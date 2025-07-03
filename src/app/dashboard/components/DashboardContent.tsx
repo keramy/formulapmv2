@@ -7,10 +7,11 @@ import { ProjectOverview } from './ProjectOverview';
 import { RecentActivity } from './RecentActivity';
 import { QuickActions } from './QuickActions';
 import { TaskSummary } from './TaskSummary';
+import { ClientPortalCard } from './ClientPortalCard';
 
 export function DashboardContent() {
   const { user } = useAuth();
-  const { hasPermission, canAccess } = usePermissions();
+  const { hasPermission, canAccess, canViewClientPortalAdmin } = usePermissions();
 
   if (!user) return null;
 
@@ -32,6 +33,9 @@ export function DashboardContent() {
 
         {/* Right Column - Sidebar */}
         <div className="space-y-6">
+          {/* Client Portal Card - Only for admin users */}
+          {canViewClientPortalAdmin() && <ClientPortalCard />}
+          
           {/* Recent Activity */}
           <RecentActivity />
           

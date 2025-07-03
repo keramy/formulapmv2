@@ -76,21 +76,62 @@ Total: ___
 □ New pattern for already-solved problem
 □ Type conflicts or introduces `any` types
 □ Breaks existing APIs or contracts
+□ Created unnecessary documentation files (.md, scripts)
+□ Generated reports/summaries without explicit request
 
 ### 3. STOP Criteria (Auto-fail if ANY true)
 □ Solving already-solved problems differently
 □ Adding abstraction without clear benefit
 □ Breaking existing APIs/types  
 □ >50% more complex than problem requires
+□ Unhandled architectural/technical decisions
+□ Added new features without explicit user approval
+□ Removed existing features without explicit user approval
+□ Made assumptions when requirements were unclear
+□ Created unnecessary .md files, scripts, or reports without instruction
+□ Generated documentation/summaries when not requested
 
 ## REPORT FORMAT
+
+### Standard Evaluation:
 ```
 EVALUATION COMPLETE
 Final Score: XX/100
-Verdict: APPROVE/REJECT
+Verdict: APPROVE/REJECT/BLOCKED_DECISION
 Complexity/Benefit Ratio: X.X [Well-balanced/Over-engineered/etc]
 Integration Red Flags: X detected
+Decision Blocks: [none/list with type]
 Key Strengths: [top 2-3 achievements]  
 Improvement Areas: [specific issues if rejected]
 Re-delegation Focus: [what to emphasize if task needs redo]
 ```
+
+### Re-delegation Format (for REJECT verdict):
+```
+EVALUATION COMPLETE - REQUIRES RE-DELEGATION
+Final Score: XX/100
+Verdict: REJECT
+
+STRUCTURED FEEDBACK FOR RE-DELEGATION:
+$REDELEGATE_FOCUS: [Primary issue that MUST be fixed]
+$MISSING_REQUIREMENTS: 
+  - [Requirement 1 not met]
+  - [Requirement 2 partially met]
+$IMPROVEMENT_AREAS:
+  - [Specific code issue 1]
+  - [Specific pattern violation]
+  - [Missing error handling in X]
+$SUGGESTED_APPROACH: [Recommended way to fix the issues]
+
+Key Strengths (preserve these): [what was done well]
+Critical Fixes Required: [top 3 must-fix items]
+Files to Focus On: [specific files needing work]
+```
+
+### Variables for Coordinator:
+When score < 90, provide these for re-delegation:
+- $EVALUATION_SCORE: [numeric score]
+- $EVALUATION_VERDICT: REJECT
+- $IMPROVEMENT_AREAS: [bullet list of specific issues]
+- $REDELEGATE_FOCUS: [single most important fix]
+- $MISSING_REQUIREMENTS: [unmet requirements from original task]

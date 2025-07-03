@@ -37,3 +37,6 @@ export * from "./scope"
 
 // Tasks Components
 export * from "./tasks"
+
+// Client Portal Components
+export * from "./client-portal"

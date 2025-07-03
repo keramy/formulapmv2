@@ -267,6 +267,92 @@ export const usePermissions = () => {
            checkPermission('documents.approve.client')
   }
 
+  // Client Portal Permissions - External Client Access
+  const canAccessClientPortal = (): boolean => {
+    return checkPermission('client_portal.access')
+  }
+
+  const canViewClientPortalDashboard = (): boolean => {
+    return checkPermission('client_portal.dashboard.view')
+  }
+
+  const canViewClientPortalProjects = (): boolean => {
+    return checkPermission('client_portal.projects.view')
+  }
+
+  const canViewClientPortalDocuments = (): boolean => {
+    return checkPermission('client_portal.documents.view')
+  }
+
+  const canDownloadClientPortalDocuments = (): boolean => {
+    return checkPermission('client_portal.documents.download')
+  }
+
+  const canCommentClientPortalDocuments = (): boolean => {
+    return checkPermission('client_portal.documents.comment')
+  }
+
+  const canApproveClientPortalDocuments = (): boolean => {
+    return checkPermission('client_portal.documents.approve')
+  }
+
+  const canViewClientPortalCommunications = (): boolean => {
+    return checkPermission('client_portal.communications.view')
+  }
+
+  const canCreateClientPortalCommunications = (): boolean => {
+    return checkPermission('client_portal.communications.create')
+  }
+
+  const canReplyClientPortalCommunications = (): boolean => {
+    return checkPermission('client_portal.communications.reply')
+  }
+
+  const canViewClientPortalNotifications = (): boolean => {
+    return checkPermission('client_portal.notifications.view')
+  }
+
+  const canManageClientPortalNotifications = (): boolean => {
+    return checkPermission('client_portal.notifications.manage')
+  }
+
+  const canViewClientPortalProfile = (): boolean => {
+    return checkPermission('client_portal.profile.view')
+  }
+
+  const canUpdateClientPortalProfile = (): boolean => {
+    return checkPermission('client_portal.profile.update')
+  }
+
+  // Client Portal Administration - Internal Management
+  const canViewClientPortalAdmin = (): boolean => {
+    return checkPermission('client_portal.admin.view')
+  }
+
+  const canManageClientPortalUsers = (): boolean => {
+    return checkPermission('client_portal.admin.manage_users')
+  }
+
+  const canManageClientPortalCompanies = (): boolean => {
+    return checkPermission('client_portal.admin.manage_companies')
+  }
+
+  const canManageClientPortalAccess = (): boolean => {
+    return checkPermission('client_portal.admin.manage_access')
+  }
+
+  const canManageClientPortalPermissions = (): boolean => {
+    return checkPermission('client_portal.admin.manage_permissions')
+  }
+
+  const canViewClientPortalAnalytics = (): boolean => {
+    return checkPermission('client_portal.admin.view_analytics')
+  }
+
+  const canManageClientPortalBranding = (): boolean => {
+    return checkPermission('client_portal.admin.manage_branding')
+  }
+
   // User Management Permissions
   const canCreateUsers = (): boolean => {
     return checkPermission('users.create')
@@ -426,6 +512,31 @@ export const usePermissions = () => {
     canViewDocuments,
     canCreateDocuments,
     canApproveDocuments,
+    
+    // Client Portal - External Client Access
+    canAccessClientPortal,
+    canViewClientPortalDashboard,
+    canViewClientPortalProjects,
+    canViewClientPortalDocuments,
+    canDownloadClientPortalDocuments,
+    canCommentClientPortalDocuments,
+    canApproveClientPortalDocuments,
+    canViewClientPortalCommunications,
+    canCreateClientPortalCommunications,
+    canReplyClientPortalCommunications,
+    canViewClientPortalNotifications,
+    canManageClientPortalNotifications,
+    canViewClientPortalProfile,
+    canUpdateClientPortalProfile,
+    
+    // Client Portal Administration - Internal Management
+    canViewClientPortalAdmin,
+    canManageClientPortalUsers,
+    canManageClientPortalCompanies,
+    canManageClientPortalAccess,
+    canManageClientPortalPermissions,
+    canViewClientPortalAnalytics,
+    canManageClientPortalBranding,
     
     // Role helpers
     isManagement,

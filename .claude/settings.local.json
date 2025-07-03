@@ -38,7 +38,8 @@
       "Bash(apt list:*)",
       "Bash(echo $PATH)",
       "Bash(genai:*)",
-      "WebFetch(domain:www.npmjs.com)"
+      "WebFetch(domain:www.npmjs.com)",
+      "Bash(rg:*)"
     ],
     "deny": []
   }

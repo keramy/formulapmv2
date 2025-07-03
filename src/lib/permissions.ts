@@ -132,7 +132,32 @@ export const PERMISSIONS = {
 
   // System Administration
   'system.admin': ['company_owner', 'admin'],
-  'system.settings': ['company_owner', 'general_manager', 'admin']
+  'system.settings': ['company_owner', 'general_manager', 'admin'],
+
+  // Client Portal Permissions - External Client Access
+  'client_portal.access': ['client'],
+  'client_portal.dashboard.view': ['client'],
+  'client_portal.projects.view': ['client'],
+  'client_portal.documents.view': ['client'],
+  'client_portal.documents.download': ['client'],
+  'client_portal.documents.comment': ['client'],
+  'client_portal.documents.approve': ['client'],
+  'client_portal.communications.view': ['client'],
+  'client_portal.communications.create': ['client'],
+  'client_portal.communications.reply': ['client'],
+  'client_portal.notifications.view': ['client'],
+  'client_portal.notifications.manage': ['client'],
+  'client_portal.profile.view': ['client'],
+  'client_portal.profile.update': ['client'],
+
+  // Client Portal Administration - Internal Management
+  'client_portal.admin.view': ['company_owner', 'general_manager', 'deputy_general_manager', 'admin'],
+  'client_portal.admin.manage_users': ['company_owner', 'general_manager', 'admin'],
+  'client_portal.admin.manage_companies': ['company_owner', 'general_manager', 'admin'],
+  'client_portal.admin.manage_access': ['company_owner', 'general_manager', 'deputy_general_manager', 'project_manager', 'admin'],
+  'client_portal.admin.manage_permissions': ['company_owner', 'general_manager', 'admin'],
+  'client_portal.admin.view_analytics': ['company_owner', 'general_manager', 'deputy_general_manager', 'project_manager', 'admin'],
+  'client_portal.admin.manage_branding': ['company_owner', 'general_manager', 'admin']
 } as const
 
 export type Permission = keyof typeof PERMISSIONS
