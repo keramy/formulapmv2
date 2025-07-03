@@ -1,0 +1,685 @@
+/**
+ * Formula PM 2.0 Scope Management API - Main Route
+ * Wave 2B Business Logic Implementation
+ * 
+ * Handles scope item listing, creation, and bulk operations with role-based access control
+ */
+
+import { NextRequest, NextResponse } from 'next/server'
+import { withAuth, getAuthenticatedUser } from '@/lib/middleware'
+import { createServerClient } from '@/lib/supabase'
+import { hasPermission } from '@/lib/permissions'
+import { 
+  ScopeItem, 
+  ScopeListParams,
+  ScopeFilters,
+  ScopeApiResponse,
+  ScopeListResponse,
+  ScopeCreateResponse,
+  ScopeStatistics
+} from '@/types/scope'
+
+// ============================================================================
+// GET /api/scope - List scope items with filtering and pagination
+// ============================================================================
+
+export const GET = withAuth(async (request: NextRequest) => {
+  try {
+    const user = getAuthenticatedUser(request)
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: 'Authentication required' },
+        { status: 401 }
+      )
+    }
+
+    // Check read permission
+    if (!hasPermission(user.role, 'scope.view')) {
+      return NextResponse.json(
+        { success: false, error: 'Insufficient permissions to view scope items' },
+        { status: 403 }
+      )
+    }
+
+    const url = new URL(request.url)
+    const queryParams: ScopeListParams = {
+      project_id: url.searchParams.get('project_id') || undefined,
+      page: parseInt(url.searchParams.get('page') || '1'),
+      limit: parseInt(url.searchParams.get('limit') || '20'),
+      include_dependencies: url.searchParams.get('include_dependencies') === 'true',
+      include_materials: url.searchParams.get('include_materials') === 'true',
+      include_assignments: url.searchParams.get('include_assignments') === 'true',
+      filters: {
+        category: url.searchParams.get('category') as any || undefined,
+        status: url.searchParams.get('status')?.split(',') as any || undefined,
+        assigned_to: url.searchParams.get('assigned_to')?.split(','),
+        supplier_id: url.searchParams.get('supplier_id') || undefined,
+        priority_min: url.searchParams.get('priority_min') ? parseInt(url.searchParams.get('priority_min')!) : undefined,
+        priority_max: url.searchParams.get('priority_max') ? parseInt(url.searchParams.get('priority_max')!) : undefined,
+        risk_level: url.searchParams.get('risk_level')?.split(',') as any || undefined,
+        progress_min: url.searchParams.get('progress_min') ? parseInt(url.searchParams.get('progress_min')!) : undefined,
+        progress_max: url.searchParams.get('progress_max') ? parseInt(url.searchParams.get('progress_max')!) : undefined,
+        has_dependencies: url.searchParams.get('has_dependencies') === 'true' ? true : undefined,
+        requires_approval: url.searchParams.get('requires_approval') === 'true' ? true : undefined,
+        overdue_only: url.searchParams.get('overdue_only') === 'true',
+        search_term: url.searchParams.get('search') || undefined
+      },
+      sort: url.searchParams.get('sort_field') ? {
+        field: url.searchParams.get('sort_field') as keyof ScopeItem,
+        direction: (url.searchParams.get('sort_direction') || 'asc') as 'asc' | 'desc'
+      } : undefined
+    }
+
+    const supabase = createServerClient()
+
+    // Build base query
+    let query = supabase
+      .from('scope_items')
+      .select(`
+        *,
+        supplier:suppliers(*),
+        created_by_user:user_profiles!created_by(*),
+        last_updated_by_user:user_profiles!last_updated_by(*)
+      `, { count: 'exact' })
+
+    // Apply role-based filtering for project access
+    if (!hasPermission(user.role, 'scope.view_all')) {
+      // Get accessible projects for this user
+      const accessibleProjects = await getAccessibleProjects(supabase, user)
+      if (accessibleProjects.length === 0) {
+        return NextResponse.json({
+          success: true,
+          data: {
+            items: [],
+            statistics: getEmptyStatistics(),
+            filters_applied: queryParams.filters || {},
+            sort_applied: queryParams.sort
+          },
+          pagination: {
+            page: 1,
+            limit: queryParams.limit || 20,
+            total: 0,
+            has_more: false
+          }
+        } as ScopeApiResponse<ScopeListResponse>)
+      }
+      query = query.in('project_id', accessibleProjects)
+    }
+
+    // Apply project filter if specified
+    if (queryParams.project_id) {
+      query = query.eq('project_id', queryParams.project_id)
+    }
+
+    // Apply filters
+    const filters = queryParams.filters
+    if (filters) {
+      if (filters.category && filters.category !== 'all') {
+        query = query.eq('category', filters.category)
+      }
+
+      if (filters.status?.length) {
+        query = query.in('status', filters.status)
+      }
+
+      if (filters.assigned_to?.length) {
+        query = query.overlaps('assigned_to', filters.assigned_to)
+      }
+
+      if (filters.supplier_id) {
+        query = query.eq('supplier_id', filters.supplier_id)
+      }
+
+      if (filters.priority_min !== undefined) {
+        query = query.gte('priority', filters.priority_min)
+      }
+
+      if (filters.priority_max !== undefined) {
+        query = query.lte('priority', filters.priority_max)
+      }
+
+      if (filters.risk_level?.length) {
+        query = query.in('risk_level', filters.risk_level)
+      }
+
+      if (filters.progress_min !== undefined) {
+        query = query.gte('progress_percentage', filters.progress_min)
+      }
+
+      if (filters.progress_max !== undefined) {
+        query = query.lte('progress_percentage', filters.progress_max)
+      }
+
+      if (filters.has_dependencies) {
+        query = query.not('dependencies', 'eq', '{}')
+      }
+
+      if (filters.requires_approval) {
+        query = query.eq('requires_client_approval', true)
+      }
+
+      if (filters.overdue_only) {
+        const today = new Date().toISOString().split('T')[0]
+        query = query
+          .not('timeline_end', 'is', null)
+          .lt('timeline_end', today)
+          .neq('status', 'completed')
+      }
+
+      if (filters.search_term) {
+        query = query.or(`title.ilike.%${filters.search_term}%,description.ilike.%${filters.search_term}%,item_code.ilike.%${filters.search_term}%`)
+      }
+
+      if (filters.date_range?.field && (filters.date_range.start || filters.date_range.end)) {
+        if (filters.date_range.start) {
+          query = query.gte(filters.date_range.field, filters.date_range.start)
+        }
+        if (filters.date_range.end) {
+          query = query.lte(filters.date_range.field, filters.date_range.end)
+        }
+      }
+    }
+
+    // Apply sorting
+    if (queryParams.sort) {
+      query = query.order(queryParams.sort.field, { ascending: queryParams.sort.direction === 'asc' })
+    } else {
+      query = query.order('item_no', { ascending: true })
+    }
+
+    // Apply pagination
+    const page = queryParams.page || 1
+    const limit = queryParams.limit || 20
+    const from = (page - 1) * limit
+    const to = from + limit - 1
+    query = query.range(from, to)
+
+    const { data: scopeItems, error, count } = await query
+
+    if (error) {
+      console.error('Scope items fetch error:', error)
+      return NextResponse.json(
+        { success: false, error: 'Failed to fetch scope items' },
+        { status: 500 }
+      )
+    }
+
+    // Enhance items with additional data if requested
+    let enhancedItems = scopeItems as ScopeItem[]
+
+    if (queryParams.include_dependencies && scopeItems) {
+      enhancedItems = await Promise.all(
+        scopeItems.map(async (item) => {
+          const dependencies = await getDependencyDetails(supabase, item.id)
+          return { ...item, dependency_items: dependencies.depends_on, blocked_items: dependencies.blocks }
+        })
+      )
+    }
+
+    if (queryParams.include_materials && scopeItems) {
+      enhancedItems = await Promise.all(
+        enhancedItems.map(async (item) => {
+          const { data: materials } = await supabase
+            .from('material_requirements')
+            .select('*')
+            .eq('scope_item_id', item.id)
+          
+          return { ...item, material_list: materials || [] }
+        })
+      )
+    }
+
+    if (queryParams.include_assignments && scopeItems) {
+      enhancedItems = await Promise.all(
+        enhancedItems.map(async (item) => {
+          if (item.assigned_to?.length > 0) {
+            const { data: assignments } = await supabase
+              .from('user_profiles')
+              .select('id, first_name, last_name, role')
+              .in('id', item.assigned_to)
+            
+            return { 
+              ...item, 
+              assignments: assignments?.map(user => ({
+                user_id: user.id,
+                user_name: `${user.first_name} ${user.last_name}`,
+                user_role: user.role,
+                assigned_at: item.updated_at // Approximation
+              })) || []
+            }
+          }
+          return item
+        })
+      )
+    }
+
+    // Filter out cost data if user doesn't have permission
+    if (!hasPermission(user.role, 'scope.costs.view')) {
+      enhancedItems = enhancedItems.map(item => ({
+        ...item,
+        initial_cost: undefined,
+        actual_cost: undefined,
+        cost_variance: undefined
+      }))
+    }
+
+    // Filter out pricing data if user doesn't have permission
+    if (!hasPermission(user.role, 'scope.prices.view')) {
+      enhancedItems = enhancedItems.map(item => ({
+        ...item,
+        unit_price: 0,
+        total_price: 0,
+        final_price: 0
+      }))
+    }
+
+    // Calculate statistics
+    const statistics = await calculateScopeStatistics(
+      supabase, 
+      queryParams.project_id, 
+      queryParams.filters,
+      hasPermission(user.role, 'scope.costs.view')
+    )
+
+    const response: ScopeApiResponse<ScopeListResponse> = {
+      success: true,
+      data: {
+        items: enhancedItems,
+        statistics,
+        filters_applied: queryParams.filters || {},
+        sort_applied: queryParams.sort
+      },
+      pagination: {
+        page,
+        limit,
+        total: count || 0,
+        has_more: page * limit < (count || 0)
+      }
+    }
+
+    return NextResponse.json(response)
+
+  } catch (error) {
+    console.error('Scope API error:', error)
+    return NextResponse.json(
+      { success: false, error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+})
+
+// ============================================================================
+// POST /api/scope - Create new scope item
+// ============================================================================
+
+export const POST = withAuth(async (request: NextRequest) => {
+  try {
+    const user = getAuthenticatedUser(request)
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: 'Authentication required' },
+        { status: 401 }
+      )
+    }
+
+    // Check create permission
+    if (!hasPermission(user.role, 'scope.create')) {
+      return NextResponse.json(
+        { success: false, error: 'Insufficient permissions to create scope items' },
+        { status: 403 }
+      )
+    }
+
+    const body = await request.json()
+    
+    // Validate required fields
+    if (!body.project_id || !body.category || !body.description || !body.quantity) {
+      return NextResponse.json(
+        { success: false, error: 'Missing required fields: project_id, category, description, quantity' },
+        { status: 400 }
+      )
+    }
+
+    const supabase = createServerClient()
+
+    // Verify user has access to the project
+    const hasProjectAccess = await verifyProjectAccess(supabase, user, body.project_id)
+    if (!hasProjectAccess) {
+      return NextResponse.json(
+        { success: false, error: 'Access denied to this project' },
+        { status: 403 }
+      )
+    }
+
+    // Generate next item number for this project
+    const { data: maxItemNo } = await supabase
+      .from('scope_items')
+      .select('item_no')
+      .eq('project_id', body.project_id)
+      .order('item_no', { ascending: false })
+      .limit(1)
+      .single()
+
+    const nextItemNo = (maxItemNo?.item_no || 0) + 1
+
+    // Prepare scope item data
+    const scopeItemData = {
+      project_id: body.project_id,
+      item_no: nextItemNo,
+      category: body.category,
+      item_code: body.item_code || null,
+      description: body.description,
+      title: body.title || body.description,
+      specifications: body.specifications || '',
+      quantity: parseFloat(body.quantity),
+      unit_of_measure: body.unit_of_measure || 'pcs',
+      unit_price: parseFloat(body.unit_price || '0'),
+      markup_percentage: parseFloat(body.markup_percentage || '0'),
+      initial_cost: hasPermission(user.role, 'scope.costs.edit') && body.initial_cost ? 
+        parseFloat(body.initial_cost) : null,
+      actual_cost: hasPermission(user.role, 'scope.costs.edit') && body.actual_cost ? 
+        parseFloat(body.actual_cost) : null,
+      timeline_start: body.timeline_start || null,
+      timeline_end: body.timeline_end || null,
+      duration_days: body.duration_days || null,
+      status: 'not_started',
+      progress_percentage: 0,
+      priority: parseInt(body.priority || '1'),
+      risk_level: body.risk_level || 'medium',
+      installation_method: body.installation_method || null,
+      special_requirements: body.special_requirements || [],
+      assigned_to: body.assigned_to || [],
+      supplier_id: body.supplier_id || null,
+      dependencies: body.dependencies || [],
+      requires_client_approval: body.requires_client_approval || false,
+      quality_check_required: body.quality_check_required !== false,
+      created_by: user.id,
+      last_updated_by: user.id
+    }
+
+    const { data: scopeItem, error: insertError } = await supabase
+      .from('scope_items')
+      .insert(scopeItemData)
+      .select(`
+        *,
+        supplier:suppliers(*),
+        created_by_user:user_profiles!created_by(*),
+        last_updated_by_user:user_profiles!last_updated_by(*)
+      `)
+      .single()
+
+    if (insertError) {
+      console.error('Scope item creation error:', insertError)
+      return NextResponse.json(
+        { success: false, error: 'Failed to create scope item' },
+        { status: 500 }
+      )
+    }
+
+    // Create material requirements if provided
+    if (body.material_list?.length > 0) {
+      const materials = body.material_list.map((material: any) => ({
+        ...material,
+        scope_item_id: scopeItem.id,
+        id: undefined // Let Supabase generate ID
+      }))
+
+      await supabase
+        .from('material_requirements')
+        .insert(materials)
+    }
+
+    // Create dependencies if provided
+    if (body.dependencies?.length > 0) {
+      const dependencies = body.dependencies.map((dependsOnId: string) => ({
+        scope_item_id: scopeItem.id,
+        depends_on_id: dependsOnId,
+        dependency_type: 'blocks'
+      }))
+
+      await supabase
+        .from('scope_dependencies')
+        .insert(dependencies)
+    }
+
+    const response: ScopeApiResponse<ScopeCreateResponse> = {
+      success: true,
+      data: {
+        item: scopeItem,
+        warnings: []
+      }
+    }
+
+    return NextResponse.json(response, { status: 201 })
+
+  } catch (error) {
+    console.error('Scope creation API error:', error)
+    return NextResponse.json(
+      { success: false, error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+})
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+async function getAccessibleProjects(supabase: any, user: any): Promise<string[]> {
+  if (hasPermission(user.role, 'projects.read.all')) {
+    const { data: allProjects } = await supabase
+      .from('projects')
+      .select('id')
+    return allProjects?.map((p: any) => p.id) || []
+  }
+
+  if (hasPermission(user.role, 'projects.read.assigned')) {
+    const { data: assignedProjects } = await supabase
+      .from('project_assignments')
+      .select('project_id')
+      .eq('user_id', user.id)
+      .eq('is_active', true)
+    return assignedProjects?.map((p: any) => p.project_id) || []
+  }
+
+  if (hasPermission(user.role, 'projects.read.own') && user.role === 'client') {
+    const { data: clientProjects } = await supabase
+      .from('projects')
+      .select('id')
+      .eq('client_id', user.profile.id)
+    return clientProjects?.map((p: any) => p.id) || []
+  }
+
+  return []
+}
+
+async function verifyProjectAccess(supabase: any, user: any, projectId: string): Promise<boolean> {
+  const accessibleProjects = await getAccessibleProjects(supabase, user)
+  return accessibleProjects.includes(projectId)
+}
+
+async function getDependencyDetails(supabase: any, scopeItemId: string) {
+  const { data: dependsOn } = await supabase
+    .from('scope_dependencies')
+    .select(`
+      depends_on_id,
+      scope_item:scope_items!depends_on_id(id, item_no, title, status, progress_percentage)
+    `)
+    .eq('scope_item_id', scopeItemId)
+
+  const { data: blocks } = await supabase
+    .from('scope_dependencies')
+    .select(`
+      scope_item_id,
+      scope_item:scope_items!scope_item_id(id, item_no, title, status, progress_percentage)
+    `)
+    .eq('depends_on_id', scopeItemId)
+
+  return {
+    depends_on: dependsOn?.map((d: any) => d.scope_item) || [],
+    blocks: blocks?.map((b: any) => b.scope_item) || []
+  }
+}
+
+async function calculateScopeStatistics(
+  supabase: any, 
+  projectId?: string, 
+  filters?: ScopeFilters,
+  includeFinancials: boolean = false
+): Promise<ScopeStatistics> {
+  let query = supabase.from('scope_items').select('*')
+  
+  if (projectId) {
+    query = query.eq('project_id', projectId)
+  }
+
+  const { data: items } = await query
+
+  if (!items) {
+    return getEmptyStatistics()
+  }
+
+  const stats: ScopeStatistics = {
+    total_items: items.length,
+    by_category: {
+      construction: { total: 0, completed: 0, in_progress: 0, blocked: 0, completion_percentage: 0 },
+      millwork: { total: 0, completed: 0, in_progress: 0, blocked: 0, completion_percentage: 0 },
+      electrical: { total: 0, completed: 0, in_progress: 0, blocked: 0, completion_percentage: 0 },
+      mechanical: { total: 0, completed: 0, in_progress: 0, blocked: 0, completion_percentage: 0 }
+    },
+    by_status: {
+      not_started: 0,
+      planning: 0,
+      materials_ordered: 0,
+      in_progress: 0,
+      quality_check: 0,
+      client_review: 0,
+      completed: 0,
+      blocked: 0,
+      on_hold: 0,
+      cancelled: 0
+    },
+    by_priority: {},
+    timeline: {
+      on_schedule: 0,
+      behind_schedule: 0,
+      ahead_schedule: 0,
+      overdue: 0
+    },
+    quality: {
+      items_requiring_approval: 0,
+      items_pending_quality_check: 0,
+      items_approved: 0
+    }
+  }
+
+  // Calculate statistics
+  items.forEach((item: any) => {
+    // By status
+    stats.by_status[item.status as keyof typeof stats.by_status]++
+
+    // By category
+    const catStats = stats.by_category[item.category]
+    catStats.total++
+    if (item.status === 'completed') catStats.completed++
+    if (item.status === 'in_progress') catStats.in_progress++
+    if (item.status === 'blocked') catStats.blocked++
+
+    // By priority
+    const priority = `priority_${item.priority}`
+    stats.by_priority[priority] = (stats.by_priority[priority] || 0) + 1
+
+    // Timeline analysis
+    if (item.timeline_end) {
+      const endDate = new Date(item.timeline_end)
+      const today = new Date()
+      
+      if (item.status === 'completed') {
+        const actualEnd = item.actual_end ? new Date(item.actual_end) : today
+        if (actualEnd <= endDate) {
+          stats.timeline.on_schedule++
+        } else {
+          stats.timeline.behind_schedule++
+        }
+      } else if (today > endDate) {
+        stats.timeline.overdue++
+      } else {
+        stats.timeline.on_schedule++
+      }
+    }
+
+    // Quality tracking
+    if (item.requires_client_approval) {
+      stats.quality.items_requiring_approval++
+      if (item.client_approved) {
+        stats.quality.items_approved++
+      }
+    }
+    
+    if (item.quality_check_required && !item.quality_check_passed) {
+      stats.quality.items_pending_quality_check++
+    }
+  })
+
+  // Calculate completion percentages for categories
+  Object.keys(stats.by_category).forEach(category => {
+    const catStats = stats.by_category[category as keyof typeof stats.by_category]
+    if (catStats.total > 0) {
+      catStats.completion_percentage = Math.round((catStats.completed / catStats.total) * 100)
+    }
+  })
+
+  // Add financial data if permitted
+  if (includeFinancials) {
+    const totalBudget = items.reduce((sum: number, item: any) => sum + (item.total_price || 0), 0)
+    const actualCost = items.reduce((sum: number, item: any) => sum + (item.actual_cost || 0), 0)
+    const itemsOverBudget = items.filter((item: any) => 
+      item.actual_cost && item.initial_cost && item.actual_cost > item.initial_cost
+    ).length
+
+    stats.financial = {
+      total_budget: totalBudget,
+      actual_cost: actualCost,
+      cost_variance: actualCost - totalBudget,
+      items_over_budget: itemsOverBudget
+    }
+  }
+
+  return stats
+}
+
+function getEmptyStatistics(): ScopeStatistics {
+  return {
+    total_items: 0,
+    by_category: {
+      construction: { total: 0, completed: 0, in_progress: 0, blocked: 0, completion_percentage: 0 },
+      millwork: { total: 0, completed: 0, in_progress: 0, blocked: 0, completion_percentage: 0 },
+      electrical: { total: 0, completed: 0, in_progress: 0, blocked: 0, completion_percentage: 0 },
+      mechanical: { total: 0, completed: 0, in_progress: 0, blocked: 0, completion_percentage: 0 }
+    },
+    by_status: {
+      not_started: 0,
+      planning: 0,
+      materials_ordered: 0,
+      in_progress: 0,
+      quality_check: 0,
+      client_review: 0,
+      completed: 0,
+      blocked: 0,
+      on_hold: 0,
+      cancelled: 0
+    },
+    by_priority: {},
+    timeline: {
+      on_schedule: 0,
+      behind_schedule: 0,
+      ahead_schedule: 0,
+      overdue: 0
+    },
+    quality: {
+      items_requiring_approval: 0,
+      items_pending_quality_check: 0,
+      items_approved: 0
+    }
+  }
+}

@@ -1,0 +1,702 @@
+/**
+ * Formula PM 2.0 Scope Management Hooks
+ * Wave 2B Business Logic Implementation
+ * 
+ * Custom React hooks for scope management operations with role-based access control
+ */
+
+'use client'
+
+import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useAuth } from './useAuth'
+import { usePermissions } from './usePermissions'
+import { 
+  ScopeItem,
+  ScopeItemFormData,
+  ScopeItemUpdateData,
+  ScopeFilters,
+  ScopeListParams,
+  ScopeStatistics,
+  BulkScopeUpdate,
+  ScopeApiResponse,
+  ScopeListResponse,
+  ScopeCreateResponse,
+  ScopeUpdateResponse,
+  ScopeBulkUpdateResponse,
+  ScopeCategory,
+  ScopeStatus,
+  ExcelImportBatch
+} from '@/types/scope'
+
+// ============================================================================
+// MAIN SCOPE ITEMS HOOK
+// ============================================================================
+
+export const useScope = (projectId?: string) => {
+  const { profile } = useAuth()
+  const { 
+    canViewScope,
+    canCreateScope,
+    canEditScope,
+    canViewPricing,
+    checkPermission
+  } = usePermissions()
+
+  const [scopeItems, setScopeItems] = useState<ScopeItem[]>([])
+  const [statistics, setStatistics] = useState<ScopeStatistics | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [totalCount, setTotalCount] = useState(0)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [hasMore, setHasMore] = useState(false)
+
+  // Fetch scope items with filters
+  const fetchScopeItems = useCallback(async (params?: ScopeListParams) => {
+    if (!profile || !canViewScope()) return
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const queryParams = new URLSearchParams()
+      
+      if (projectId) queryParams.set('project_id', projectId)
+      if (params?.page) queryParams.set('page', params.page.toString())
+      if (params?.limit) queryParams.set('limit', params.limit.toString())
+      if (params?.include_dependencies) queryParams.set('include_dependencies', 'true')
+      if (params?.include_materials) queryParams.set('include_materials', 'true')
+      if (params?.include_assignments) queryParams.set('include_assignments', 'true')
+      
+      // Apply filters
+      if (params?.filters) {
+        Object.entries(params.filters).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            if (Array.isArray(value)) {
+              queryParams.set(key, value.join(','))
+            } else {
+              queryParams.set(key, value.toString())
+            }
+          }
+        })
+      }
+
+      // Apply sorting
+      if (params?.sort) {
+        queryParams.set('sort_field', params.sort.field)
+        queryParams.set('sort_direction', params.sort.direction)
+      }
+
+      const response = await fetch(`/api/scope?${queryParams.toString()}`, {
+        headers: {
+          'Authorization': `Bearer ${profile.id}`,
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch scope items')
+      }
+
+      const data: ScopeApiResponse<ScopeListResponse> = await response.json()
+      
+      if (data.success && data.data) {
+        setScopeItems(data.data.items)
+        setStatistics(data.data.statistics)
+        setCurrentPage(data.pagination?.page || 1)
+        setTotalCount(data.pagination?.total || 0)
+        setHasMore(data.pagination?.has_more || false)
+      } else {
+        throw new Error(data.error || 'Failed to fetch scope items')
+      }
+    } catch (err) {
+      console.error('Error fetching scope items:', err)
+      setError(err instanceof Error ? err.message : 'Failed to fetch scope items')
+    } finally {
+      setLoading(false)
+    }
+  }, [profile, projectId, canViewScope])
+
+  // Create new scope item
+  const createScopeItem = useCallback(async (itemData: ScopeItemFormData) => {
+    if (!profile || !canCreateScope()) {
+      throw new Error('Insufficient permissions to create scope items')
+    }
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const response = await fetch('/api/scope', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${profile.id}`,
+        },
+        body: JSON.stringify({
+          ...itemData,
+          project_id: projectId || itemData.project_id
+        })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to create scope item')
+      }
+
+      const data: ScopeApiResponse<ScopeCreateResponse> = await response.json()
+      
+      if (data.success && data.data) {
+        // Refresh scope items list
+        await fetchScopeItems()
+        return data.data.item
+      } else {
+        throw new Error(data.error || 'Failed to create scope item')
+      }
+    } catch (err) {
+      console.error('Error creating scope item:', err)
+      const errorMessage = err instanceof Error ? err.message : 'Failed to create scope item'
+      setError(errorMessage)
+      throw new Error(errorMessage)
+    } finally {
+      setLoading(false)
+    }
+  }, [profile, projectId, canCreateScope, fetchScopeItems])
+
+  // Update scope item
+  const updateScopeItem = useCallback(async (itemId: string, updates: ScopeItemUpdateData) => {
+    if (!profile || !canEditScope()) {
+      throw new Error('Insufficient permissions to update scope items')
+    }
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const response = await fetch(`/api/scope/${itemId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${profile.id}`,
+        },
+        body: JSON.stringify(updates)
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to update scope item')
+      }
+
+      const data: ScopeApiResponse<ScopeUpdateResponse> = await response.json()
+      
+      if (data.success && data.data) {
+        // Update the item in the local state
+        setScopeItems(prev => 
+          prev.map(item => 
+            item.id === itemId ? data.data!.item : item
+          )
+        )
+        return data.data.item
+      } else {
+        throw new Error(data.error || 'Failed to update scope item')
+      }
+    } catch (err) {
+      console.error('Error updating scope item:', err)
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update scope item'
+      setError(errorMessage)
+      throw new Error(errorMessage)
+    } finally {
+      setLoading(false)
+    }
+  }, [profile, canEditScope])
+
+  // Delete scope item
+  const deleteScopeItem = useCallback(async (itemId: string, forceDelete = false) => {
+    if (!profile || !checkPermission('scope.delete')) {
+      throw new Error('Insufficient permissions to delete scope items')
+    }
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const url = forceDelete ? `/api/scope/${itemId}?force=true` : `/api/scope/${itemId}`
+      const response = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${profile.id}`,
+        }
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to delete scope item')
+      }
+
+      const data = await response.json()
+      
+      if (data.success) {
+        // Remove from local state or mark as cancelled
+        if (forceDelete) {
+          setScopeItems(prev => prev.filter(item => item.id !== itemId))
+        } else {
+          setScopeItems(prev => 
+            prev.map(item => 
+              item.id === itemId ? { ...item, status: 'cancelled' as ScopeStatus } : item
+            )
+          )
+        }
+        return true
+      } else {
+        throw new Error(data.error || 'Failed to delete scope item')
+      }
+    } catch (err) {
+      console.error('Error deleting scope item:', err)
+      const errorMessage = err instanceof Error ? err.message : 'Failed to delete scope item'
+      setError(errorMessage)
+      throw new Error(errorMessage)
+    } finally {
+      setLoading(false)
+    }
+  }, [profile, checkPermission])
+
+  // Bulk update scope items
+  const bulkUpdateScopeItems = useCallback(async (bulkUpdate: BulkScopeUpdate) => {
+    if (!profile || !checkPermission('scope.bulk_edit')) {
+      throw new Error('Insufficient permissions for bulk operations')
+    }
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const response = await fetch('/api/scope/bulk', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${profile.id}`,
+        },
+        body: JSON.stringify(bulkUpdate)
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to perform bulk update')
+      }
+
+      const data: ScopeApiResponse<ScopeBulkUpdateResponse> = await response.json()
+      
+      if (data.success && data.data) {
+        // Update local state with successful updates
+        const updatedItemsMap = new Map(data.data.updated_items.map(item => [item.id, item]))
+        
+        setScopeItems(prev => 
+          prev.map(item => 
+            updatedItemsMap.has(item.id) ? updatedItemsMap.get(item.id)! : item
+          )
+        )
+        
+        return data.data
+      } else {
+        throw new Error(data.error || 'Failed to perform bulk update')
+      }
+    } catch (err) {
+      console.error('Error performing bulk update:', err)
+      const errorMessage = err instanceof Error ? err.message : 'Failed to perform bulk update'
+      setError(errorMessage)
+      throw new Error(errorMessage)
+    } finally {
+      setLoading(false)
+    }
+  }, [profile, checkPermission])
+
+  // Filter scope items by category
+  const filterByCategory = useCallback((category: ScopeCategory | 'all') => {
+    if (category === 'all') return scopeItems
+    return scopeItems.filter(item => item.category === category)
+  }, [scopeItems])
+
+  // Filter scope items by status
+  const filterByStatus = useCallback((statuses: ScopeStatus[]) => {
+    return scopeItems.filter(item => statuses.includes(item.status))
+  }, [scopeItems])
+
+  // Get scope items by assignment
+  const getAssignedItems = useCallback((userId?: string) => {
+    const targetUserId = userId || profile?.id
+    if (!targetUserId) return []
+    
+    return scopeItems.filter(item => 
+      item.assigned_to?.includes(targetUserId)
+    )
+  }, [scopeItems, profile])
+
+  // Calculate category statistics
+  const categoryStats = useMemo(() => {
+    const stats = {
+      construction: { total: 0, completed: 0, in_progress: 0 },
+      millwork: { total: 0, completed: 0, in_progress: 0 },
+      electrical: { total: 0, completed: 0, in_progress: 0 },
+      mechanical: { total: 0, completed: 0, in_progress: 0 }
+    }
+
+    scopeItems.forEach(item => {
+      stats[item.category].total++
+      if (item.status === 'completed') stats[item.category].completed++
+      if (item.status === 'in_progress') stats[item.category].in_progress++
+    })
+
+    return stats
+  }, [scopeItems])
+
+  return {
+    scopeItems,
+    statistics,
+    loading,
+    error,
+    totalCount,
+    currentPage,
+    hasMore,
+    categoryStats,
+    
+    // Actions
+    fetchScopeItems,
+    createScopeItem,
+    updateScopeItem,
+    deleteScopeItem,
+    bulkUpdateScopeItems,
+    
+    // Utilities
+    filterByCategory,
+    filterByStatus,
+    getAssignedItems,
+    refreshScopeItems: () => fetchScopeItems(),
+    
+    // Permissions
+    canCreate: canCreateScope(),
+    canEdit: canEditScope(),
+    canDelete: checkPermission('scope.delete'),
+    canViewFinancials: canViewPricing(),
+    canBulkEdit: checkPermission('scope.bulk_edit')
+  }
+}
+
+// ============================================================================
+// INDIVIDUAL SCOPE ITEM HOOK
+// ============================================================================
+
+export const useScopeItem = (itemId: string) => {
+  const { profile } = useAuth()
+  const { canViewScope } = usePermissions()
+  
+  const [scopeItem, setScopeItem] = useState<ScopeItem | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  // Fetch individual scope item
+  const fetchScopeItem = useCallback(async () => {
+    if (!profile || !itemId || !canViewScope()) return
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const response = await fetch(`/api/scope/${itemId}`, {
+        headers: {
+          'Authorization': `Bearer ${profile.id}`,
+        }
+      })
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error('Scope item not found or access denied')
+        }
+        throw new Error('Failed to fetch scope item')
+      }
+
+      const data: ScopeApiResponse<ScopeItem> = await response.json()
+      
+      if (data.success && data.data) {
+        setScopeItem(data.data)
+      } else {
+        throw new Error(data.error || 'Failed to fetch scope item')
+      }
+    } catch (err) {
+      console.error('Error fetching scope item:', err)
+      setError(err instanceof Error ? err.message : 'Failed to fetch scope item')
+    } finally {
+      setLoading(false)
+    }
+  }, [profile, itemId, canViewScope])
+
+  // Load scope item on mount
+  useEffect(() => {
+    fetchScopeItem()
+  }, [fetchScopeItem])
+
+  return {
+    scopeItem,
+    loading,
+    error,
+    fetchScopeItem,
+    refreshScopeItem: fetchScopeItem
+  }
+}
+
+// ============================================================================
+// SCOPE STATISTICS HOOK
+// ============================================================================
+
+export const useScopeStatistics = (projectId?: string) => {
+  const { profile } = useAuth()
+  const { canViewScope, canViewPricing } = usePermissions()
+  
+  const [statistics, setStatistics] = useState<ScopeStatistics | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  // Fetch scope statistics
+  const fetchStatistics = useCallback(async () => {
+    if (!profile || !canViewScope()) return
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const queryParams = new URLSearchParams()
+      if (projectId) queryParams.set('project_id', projectId)
+      if (canViewPricing()) queryParams.set('include_financials', 'true')
+
+      const response = await fetch(`/api/scope/statistics?${queryParams.toString()}`, {
+        headers: {
+          'Authorization': `Bearer ${profile.id}`,
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch scope statistics')
+      }
+
+      const data = await response.json()
+      
+      if (data.success) {
+        setStatistics(data.data.statistics)
+      } else {
+        throw new Error(data.error || 'Failed to fetch scope statistics')
+      }
+    } catch (err) {
+      console.error('Error fetching scope statistics:', err)
+      setError(err instanceof Error ? err.message : 'Failed to fetch scope statistics')
+    } finally {
+      setLoading(false)
+    }
+  }, [profile, projectId, canViewScope, canViewPricing])
+
+  // Load statistics on mount
+  useEffect(() => {
+    fetchStatistics()
+  }, [fetchStatistics])
+
+  return {
+    statistics,
+    loading,
+    error,
+    fetchStatistics,
+    refreshStatistics: fetchStatistics,
+    canViewFinancials: canViewPricing()
+  }
+}
+
+// ============================================================================
+// EXCEL IMPORT/EXPORT HOOK
+// ============================================================================
+
+export const useScopeExcel = (projectId: string) => {
+  const { profile } = useAuth()
+  const { checkPermission } = usePermissions()
+  
+  const [importing, setImporting] = useState(false)
+  const [exporting, setExporting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  // Import scope items from Excel
+  const importFromExcel = useCallback(async (file: File) => {
+    if (!profile || !checkPermission('scope.import_excel')) {
+      throw new Error('Insufficient permissions to import Excel files')
+    }
+
+    setImporting(true)
+    setError(null)
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('project_id', projectId)
+
+      const response = await fetch('/api/scope/excel/import', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${profile.id}`,
+        },
+        body: formData
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to import Excel file')
+      }
+
+      const data = await response.json()
+      
+      if (data.success) {
+        return data.data as ExcelImportBatch
+      } else {
+        throw new Error(data.error || 'Failed to import Excel file')
+      }
+    } catch (err) {
+      console.error('Error importing Excel file:', err)
+      const errorMessage = err instanceof Error ? err.message : 'Failed to import Excel file'
+      setError(errorMessage)
+      throw new Error(errorMessage)
+    } finally {
+      setImporting(false)
+    }
+  }, [profile, projectId, checkPermission])
+
+  // Export scope items to Excel
+  const exportToExcel = useCallback(async (filters?: ScopeFilters) => {
+    if (!profile || !checkPermission('scope.export_excel')) {
+      throw new Error('Insufficient permissions to export Excel files')
+    }
+
+    setExporting(true)
+    setError(null)
+
+    try {
+      const queryParams = new URLSearchParams()
+      queryParams.set('project_id', projectId)
+      
+      if (filters) {
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            if (Array.isArray(value)) {
+              queryParams.set(key, value.join(','))
+            } else {
+              queryParams.set(key, value.toString())
+            }
+          }
+        })
+      }
+
+      const response = await fetch(`/api/scope/excel/export?${queryParams.toString()}`, {
+        headers: {
+          'Authorization': `Bearer ${profile.id}`,
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to export Excel file')
+      }
+
+      // Download the file
+      const blob = await response.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `scope-items-${projectId}-${new Date().toISOString().split('T')[0]}.xlsx`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+
+      return true
+    } catch (err) {
+      console.error('Error exporting Excel file:', err)
+      const errorMessage = err instanceof Error ? err.message : 'Failed to export Excel file'
+      setError(errorMessage)
+      throw new Error(errorMessage)
+    } finally {
+      setExporting(false)
+    }
+  }, [profile, projectId, checkPermission])
+
+  return {
+    importing,
+    exporting,
+    error,
+    importFromExcel,
+    exportToExcel,
+    canImport: checkPermission('scope.import_excel'),
+    canExport: checkPermission('scope.export_excel')
+  }
+}
+
+// ============================================================================
+// UTILITY HOOKS
+// ============================================================================
+
+// Hook for scope dependencies
+export const useScopeDependencies = (itemId: string) => {
+  const { profile } = useAuth()
+  const [dependencies, setDependencies] = useState<any[]>([])
+  const [loading, setLoading] = useState(false)
+
+  const fetchDependencies = useCallback(async () => {
+    if (!profile || !itemId) return
+
+    setLoading(true)
+    try {
+      const response = await fetch(`/api/scope/${itemId}/dependencies`, {
+        headers: {
+          'Authorization': `Bearer ${profile.id}`,
+        }
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setDependencies(data.data || [])
+      }
+    } catch (error) {
+      console.error('Error fetching dependencies:', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [profile, itemId])
+
+  useEffect(() => {
+    fetchDependencies()
+  }, [fetchDependencies])
+
+  return { dependencies, loading, fetchDependencies }
+}
+
+// Hook for scope progress tracking
+export const useScopeProgress = (projectId?: string) => {
+  const { scopeItems, statistics } = useScope(projectId)
+
+  const progressMetrics = useMemo(() => {
+    if (!scopeItems.length) return null
+
+    const totalItems = scopeItems.length
+    const completedItems = scopeItems.filter(item => item.status === 'completed').length
+    const inProgressItems = scopeItems.filter(item => item.status === 'in_progress').length
+    const blockedItems = scopeItems.filter(item => item.status === 'blocked').length
+    
+    const overallProgress = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0
+    
+    // Calculate weighted progress including partially completed items
+    const weightedProgress = scopeItems.reduce((sum, item) => {
+      return sum + (item.progress_percentage || 0)
+    }, 0) / totalItems
+
+    return {
+      totalItems,
+      completedItems,
+      inProgressItems,
+      blockedItems,
+      overallProgress,
+      weightedProgress: Math.round(weightedProgress),
+      statistics
+    }
+  }, [scopeItems, statistics])
+
+  return progressMetrics
+}

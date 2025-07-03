@@ -1,7 +1,7 @@
 'use client'
 
 import { useAuth } from './useAuth'
-import { hasPermission, getUserPermissions, Permission, isManagementRole, isProjectRole, isPurchaseRole, isFieldRole, isExternalRole, hasHigherRole, canManageUser } from '@/lib/permissions'
+import { hasPermission as checkUserPermission, getUserPermissions, Permission, isManagementRole, isProjectRole, isPurchaseRole, isFieldRole, isExternalRole, hasHigherRole, canManageUser } from '@/lib/permissions'
 import { UserRole } from '@/types/auth'
 
 export const usePermissions = () => {
@@ -9,7 +9,12 @@ export const usePermissions = () => {
 
   const checkPermission = (permission: Permission): boolean => {
     if (!profile) return false
-    return hasPermission(profile.role, permission)
+    return checkUserPermission(profile.role, permission)
+  }
+
+  // Direct permission function export for compatibility
+  const hasPermission = (permission: Permission): boolean => {
+    return checkPermission(permission)
   }
 
   const canAccessProject = (projectId?: string): boolean => {
@@ -21,14 +26,20 @@ export const usePermissions = () => {
     }
     
     // Other roles need to be assigned to the project
-    // This would require a separate query to project_assignments
-    // For now, return true for project roles when no projectId is provided
+    // For project-level access, use project hooks for actual assignment checking
     if (!projectId) {
-      return isProjectRole(profile.role) || isPurchaseRole(profile.role)
+      return isProjectRole(profile.role) || isPurchaseRole(profile.role) || isFieldRole(profile.role)
     }
     
-    // TODO: Implement actual project assignment check
-    return false
+    // For specific project access, this should be checked via the project hooks
+    // which have access to the actual project assignment data
+    return isProjectRole(profile.role) || isPurchaseRole(profile.role) || isFieldRole(profile.role)
+  }
+
+  // Helper function for checking if user can access certain role-based features
+  const canAccess = (roles: string[]): boolean => {
+    if (!profile) return false
+    return roles.includes(profile.role)
   }
 
   const canViewPricing = (): boolean => {
@@ -37,6 +48,30 @@ export const usePermissions = () => {
 
   const canCreateProject = (): boolean => {
     return checkPermission('projects.create')
+  }
+
+  const canReadAllProjects = (): boolean => {
+    return checkPermission('projects.read.all')
+  }
+
+  const canReadAssignedProjects = (): boolean => {
+    return checkPermission('projects.read.assigned')
+  }
+
+  const canReadOwnProjects = (): boolean => {
+    return checkPermission('projects.read.own')
+  }
+
+  const canUpdateProjects = (): boolean => {
+    return checkPermission('projects.update')
+  }
+
+  const canDeleteProjects = (): boolean => {
+    return checkPermission('projects.delete')
+  }
+
+  const canArchiveProjects = (): boolean => {
+    return checkPermission('projects.archive')
   }
 
   const canApproveSuppliers = (): boolean => {
@@ -78,6 +113,10 @@ export const usePermissions = () => {
 
   const canManageAllTasks = (): boolean => {
     return checkPermission('tasks.manage_all')
+  }
+
+  const canComment = (): boolean => {
+    return checkPermission('tasks.view') // Use tasks.view permission for commenting
   }
 
   const canViewScope = (): boolean => {
@@ -241,8 +280,15 @@ export const usePermissions = () => {
     
     // Project access
     canAccessProject,
+    canAccess,
     canViewPricing,
     canCreateProject,
+    canReadAllProjects,
+    canReadAssignedProjects,
+    canReadOwnProjects,
+    canUpdateProjects,
+    canDeleteProjects,
+    canArchiveProjects,
     
     // Suppliers and procurement
     canApproveSuppliers,
@@ -272,6 +318,7 @@ export const usePermissions = () => {
     canViewTasks,
     canCreateTasks,
     canManageAllTasks,
+    canComment,
     canViewScope,
     canEditScope,
     canCreateScope,

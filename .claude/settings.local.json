@@ -31,7 +31,11 @@
       "Bash(npm search:*)",
       "mcp__context7__get-library-docs",
       "Bash(npm run type-check:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(sed:*)",
+      "Bash(node:*)",
+      "Bash(python3 -m pip:*)",
+      "Bash(apt list:*)"
     ],
     "deny": []
   }

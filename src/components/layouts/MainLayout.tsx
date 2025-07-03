@@ -1,7 +1,7 @@
 'use client'
 
 import { ReactNode } from 'react'
-import { useAuthMock } from '@/hooks/useAuth'
+import { useAuth } from '@/hooks/useAuth'
 import { usePermissions } from '@/hooks/usePermissions'
 import { useResponsive } from '@/hooks/useResponsive'
 import { GlobalSidebar } from '@/components/navigation/GlobalSidebar'
@@ -15,11 +15,11 @@ interface MainLayoutProps {
 }
 
 export const MainLayout = ({ children, className }: MainLayoutProps) => {
-  const { profile, isLoading } = useAuthMock()
-  const { isManagementLevel } = usePermissions()
+  const { profile, loading } = useAuth()
+  const { isManagement } = usePermissions()
   const { isMobile } = useResponsive()
 
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -70,7 +70,7 @@ export const MainLayout = ({ children, className }: MainLayoutProps) => {
               <div className="hidden md:block">
                 <span className={cn(
                   "px-2 py-1 text-xs font-medium rounded-full",
-                  isManagementLevel() ? "bg-management/10 text-management border border-management/20" : "bg-muted text-muted-foreground"
+                  isManagement() ? "bg-management/10 text-management border border-management/20" : "bg-muted text-muted-foreground"
                 )}>
                   {profile.role.replace(/_/g, ' ').toUpperCase()}
                 </span>

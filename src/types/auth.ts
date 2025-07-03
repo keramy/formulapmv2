@@ -24,6 +24,7 @@ export interface UserProfile {
   phone?: string
   company?: string
   department?: string
+  avatar_url?: string
   permissions: Record<string, boolean>
   is_active: boolean
   created_at: string

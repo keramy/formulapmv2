@@ -42,7 +42,7 @@ export const Navigation = () => {
     canViewProcurement,
     canViewClients,
     canViewReports,
-    canViewUsers,
+    canViewAllUsers,
     canAccessSystemSettings,
     isManagement,
     isProject,
@@ -165,7 +165,7 @@ export const Navigation = () => {
       href: '/users',
       icon: Users,
       description: 'User and team management',
-      requiresPermission: canViewUsers
+      requiresPermission: canViewAllUsers
     },
     // Settings
     {
