@@ -330,6 +330,205 @@ export interface DeliveryConfirmation {
 }
 
 // ============================================================================
+// CLIENT PORTAL INTERFACES
+// ============================================================================
+
+export interface ClientCompany {
+  id: string;
+  company_name: string;
+  company_type: ClientCompanyType;
+  contact_person?: string;
+  primary_email?: string;
+  primary_phone?: string;
+  address?: string;
+  billing_address?: string;
+  tax_id?: string;
+  is_active: boolean;
+  logo_url?: string;
+  brand_colors?: Record<string, any>;
+  custom_domain?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ClientUser {
+  id: string;
+  user_profile_id: string;
+  client_company_id: string;
+  access_level: ClientAccessLevel;
+  portal_access_enabled: boolean;
+  last_login?: string;
+  login_attempts: number;
+  account_locked: boolean;
+  password_reset_required: boolean;
+  two_factor_enabled: boolean;
+  notification_preferences: Record<string, any>;
+  language: string;
+  timezone: string;
+  theme: string;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+  last_activity?: string;
+}
+
+export interface ClientProjectAccess {
+  id: string;
+  client_user_id: string;
+  project_id: string;
+  access_level: ClientProjectAccessLevel;
+  can_view_financials: boolean;
+  can_approve_documents: boolean;
+  can_view_schedules: boolean;
+  can_access_reports: boolean;
+  restricted_areas?: string[];
+  access_start_date?: string;
+  access_end_date?: string;
+  granted_by: string;
+  granted_at: string;
+  last_accessed?: string;
+}
+
+export interface ClientPermission {
+  id: string;
+  client_user_id: string;
+  permission_type: ClientPermissionType;
+  resource_type: string;
+  resource_id?: string;
+  project_specific: boolean;
+  allowed_actions: string[];
+  conditions: Record<string, any>;
+  granted_by: string;
+  granted_at: string;
+  expires_at?: string;
+  is_active: boolean;
+}
+
+export interface ClientDocumentAccess {
+  id: string;
+  client_user_id: string;
+  document_id: string;
+  access_type: ClientDocumentAccessType;
+  can_download: boolean;
+  can_comment: boolean;
+  can_approve: boolean;
+  watermarked: boolean;
+  first_accessed?: string;
+  last_accessed?: string;
+  view_count: number;
+  download_count: number;
+  granted_by: string;
+  granted_at: string;
+}
+
+export interface ClientDocumentApproval {
+  id: string;
+  client_user_id: string;
+  document_id: string;
+  approval_decision: ClientApprovalDecision;
+  approval_date: string;
+  approval_comments?: string;
+  approval_conditions?: string[];
+  digital_signature?: Record<string, any>;
+  document_version: number;
+  revision_letter?: string;
+  is_final: boolean;
+  superseded_by?: string;
+  ip_address?: string;
+  user_agent?: string;
+  session_id?: string;
+}
+
+export interface ClientDocumentComment {
+  id: string;
+  client_user_id: string;
+  document_id: string;
+  comment_text: string;
+  comment_type: ClientCommentType;
+  priority: ClientPriority;
+  page_number?: number;
+  x_coordinate?: number;
+  y_coordinate?: number;
+  markup_data?: Record<string, any>;
+  status: ClientCommentStatus;
+  parent_comment_id?: string;
+  created_at: string;
+  updated_at: string;
+  resolved_at?: string;
+  resolved_by?: string;
+}
+
+export interface ClientNotification {
+  id: string;
+  client_user_id: string;
+  project_id?: string;
+  title: string;
+  message: string;
+  notification_type: ClientNotificationType;
+  priority: ClientPriority;
+  delivery_method: ClientDeliveryMethod[];
+  email_sent: boolean;
+  sms_sent: boolean;
+  is_read: boolean;
+  read_at?: string;
+  dismissed: boolean;
+  dismissed_at?: string;
+  created_at: string;
+  scheduled_for: string;
+  sent_at?: string;
+}
+
+export interface ClientActivityLog {
+  id: string;
+  client_user_id: string;
+  project_id?: string;
+  activity_type: ClientActivityType;
+  resource_type?: string;
+  resource_id?: string;
+  action_taken: string;
+  description?: string;
+  metadata: Record<string, any>;
+  ip_address?: string;
+  user_agent?: string;
+  session_id?: string;
+  created_at: string;
+}
+
+export interface ClientCommunicationThread {
+  id: string;
+  project_id: string;
+  client_user_id: string;
+  subject: string;
+  thread_type: ClientThreadType;
+  priority: ClientPriority;
+  status: ClientThreadStatus;
+  internal_participants: string[];
+  client_participants: string[];
+  auto_close_after_days?: number;
+  requires_response: boolean;
+  response_deadline?: string;
+  created_at: string;
+  updated_at: string;
+  last_message_at: string;
+  closed_at?: string;
+  closed_by?: string;
+}
+
+export interface ClientMessage {
+  id: string;
+  thread_id: string;
+  sender_id: string;
+  message_body: string;
+  message_type: ClientMessageType;
+  attachments: Record<string, any>[];
+  is_read: boolean;
+  read_at?: string;
+  created_at: string;
+  updated_at: string;
+  deleted_at?: string;
+}
+
+// ============================================================================
 // JOINED INTERFACES FOR COMPLEX QUERIES
 // ============================================================================
 
@@ -388,6 +587,60 @@ export interface VendorWithDetails extends Vendor {
 export interface DeliveryConfirmationWithDetails extends DeliveryConfirmation {
   purchase_order?: PurchaseOrderWithDetails;
   confirmed_by_user?: UserProfile;
+}
+
+// Client Portal Complex Interfaces
+export interface ClientUserWithDetails extends ClientUser {
+  user_profile?: UserProfile;
+  client_company?: ClientCompany;
+  project_access?: ClientProjectAccess[];
+  permissions?: ClientPermission[];
+  recent_activity?: ClientActivityLog[];
+}
+
+export interface ClientProjectAccessWithDetails extends ClientProjectAccess {
+  client_user?: ClientUserWithDetails;
+  project?: Project;
+  granted_by_user?: UserProfile;
+}
+
+export interface ClientDocumentAccessWithDetails extends ClientDocumentAccess {
+  client_user?: ClientUserWithDetails;
+  document?: DocumentWithDetails;
+  granted_by_user?: UserProfile;
+}
+
+export interface ClientDocumentApprovalWithDetails extends ClientDocumentApproval {
+  client_user?: ClientUserWithDetails;
+  document?: DocumentWithDetails;
+  superseded_by_approval?: ClientDocumentApproval;
+}
+
+export interface ClientDocumentCommentWithDetails extends ClientDocumentComment {
+  client_user?: ClientUserWithDetails;
+  document?: DocumentWithDetails;
+  parent_comment?: ClientDocumentComment;
+  replies?: ClientDocumentComment[];
+  resolved_by_user?: UserProfile;
+}
+
+export interface ClientNotificationWithDetails extends ClientNotification {
+  client_user?: ClientUserWithDetails;
+  project?: Project;
+}
+
+export interface ClientCommunicationThreadWithDetails extends ClientCommunicationThread {
+  client_user?: ClientUserWithDetails;
+  project?: Project;
+  messages?: ClientMessage[];
+  internal_participant_users?: UserProfile[];
+  client_participant_users?: ClientUser[];
+  closed_by_user?: UserProfile;
+}
+
+export interface ClientMessageWithDetails extends ClientMessage {
+  thread?: ClientCommunicationThreadWithDetails;
+  sender_user?: UserProfile;
 }
 
 // ============================================================================
@@ -631,6 +884,209 @@ export interface UpdateDeliveryConfirmation {
   rejection_reason?: string;
 }
 
+// Client Portal Create/Update Interfaces
+export interface CreateClientCompany {
+  company_name: string;
+  company_type: ClientCompanyType;
+  contact_person?: string;
+  primary_email?: string;
+  primary_phone?: string;
+  address?: string;
+  billing_address?: string;
+  tax_id?: string;
+  is_active?: boolean;
+  logo_url?: string;
+  brand_colors?: Record<string, any>;
+  custom_domain?: string;
+}
+
+export interface UpdateClientCompany {
+  company_name?: string;
+  company_type?: ClientCompanyType;
+  contact_person?: string;
+  primary_email?: string;
+  primary_phone?: string;
+  address?: string;
+  billing_address?: string;
+  tax_id?: string;
+  is_active?: boolean;
+  logo_url?: string;
+  brand_colors?: Record<string, any>;
+  custom_domain?: string;
+}
+
+export interface CreateClientUser {
+  user_profile_id: string;
+  client_company_id: string;
+  access_level?: ClientAccessLevel;
+  portal_access_enabled?: boolean;
+  password_reset_required?: boolean;
+  two_factor_enabled?: boolean;
+  notification_preferences?: Record<string, any>;
+  language?: string;
+  timezone?: string;
+  theme?: string;
+  created_by: string;
+}
+
+export interface UpdateClientUser {
+  access_level?: ClientAccessLevel;
+  portal_access_enabled?: boolean;
+  login_attempts?: number;
+  account_locked?: boolean;
+  password_reset_required?: boolean;
+  two_factor_enabled?: boolean;
+  notification_preferences?: Record<string, any>;
+  language?: string;
+  timezone?: string;
+  theme?: string;
+  last_activity?: string;
+}
+
+export interface CreateClientProjectAccess {
+  client_user_id: string;
+  project_id: string;
+  access_level?: ClientProjectAccessLevel;
+  can_view_financials?: boolean;
+  can_approve_documents?: boolean;
+  can_view_schedules?: boolean;
+  can_access_reports?: boolean;
+  restricted_areas?: string[];
+  access_start_date?: string;
+  access_end_date?: string;
+  granted_by: string;
+}
+
+export interface UpdateClientProjectAccess {
+  access_level?: ClientProjectAccessLevel;
+  can_view_financials?: boolean;
+  can_approve_documents?: boolean;
+  can_view_schedules?: boolean;
+  can_access_reports?: boolean;
+  restricted_areas?: string[];
+  access_start_date?: string;
+  access_end_date?: string;
+  last_accessed?: string;
+}
+
+export interface CreateClientDocumentAccess {
+  client_user_id: string;
+  document_id: string;
+  access_type?: ClientDocumentAccessType;
+  can_download?: boolean;
+  can_comment?: boolean;
+  can_approve?: boolean;
+  watermarked?: boolean;
+  granted_by: string;
+}
+
+export interface UpdateClientDocumentAccess {
+  access_type?: ClientDocumentAccessType;
+  can_download?: boolean;
+  can_comment?: boolean;
+  can_approve?: boolean;
+  watermarked?: boolean;
+  first_accessed?: string;
+  last_accessed?: string;
+  view_count?: number;
+  download_count?: number;
+}
+
+export interface CreateClientDocumentApproval {
+  client_user_id: string;
+  document_id: string;
+  approval_decision: ClientApprovalDecision;
+  approval_comments?: string;
+  approval_conditions?: string[];
+  digital_signature?: Record<string, any>;
+  document_version: number;
+  revision_letter?: string;
+  is_final?: boolean;
+  ip_address?: string;
+  user_agent?: string;
+  session_id?: string;
+}
+
+export interface CreateClientDocumentComment {
+  client_user_id: string;
+  document_id: string;
+  comment_text: string;
+  comment_type?: ClientCommentType;
+  priority?: ClientPriority;
+  page_number?: number;
+  x_coordinate?: number;
+  y_coordinate?: number;
+  markup_data?: Record<string, any>;
+  parent_comment_id?: string;
+}
+
+export interface UpdateClientDocumentComment {
+  comment_text?: string;
+  comment_type?: ClientCommentType;
+  priority?: ClientPriority;
+  status?: ClientCommentStatus;
+  markup_data?: Record<string, any>;
+}
+
+export interface CreateClientNotification {
+  client_user_id: string;
+  project_id?: string;
+  title: string;
+  message: string;
+  notification_type: ClientNotificationType;
+  priority?: ClientPriority;
+  delivery_method?: ClientDeliveryMethod[];
+  scheduled_for?: string;
+}
+
+export interface UpdateClientNotification {
+  is_read?: boolean;
+  dismissed?: boolean;
+  email_sent?: boolean;
+  sms_sent?: boolean;
+  sent_at?: string;
+}
+
+export interface CreateClientCommunicationThread {
+  project_id: string;
+  client_user_id: string;
+  subject: string;
+  thread_type?: ClientThreadType;
+  priority?: ClientPriority;
+  internal_participants?: string[];
+  client_participants?: string[];
+  auto_close_after_days?: number;
+  requires_response?: boolean;
+  response_deadline?: string;
+}
+
+export interface UpdateClientCommunicationThread {
+  subject?: string;
+  thread_type?: ClientThreadType;
+  priority?: ClientPriority;
+  status?: ClientThreadStatus;
+  internal_participants?: string[];
+  client_participants?: string[];
+  auto_close_after_days?: number;
+  requires_response?: boolean;
+  response_deadline?: string;
+  closed_by?: string;
+}
+
+export interface CreateClientMessage {
+  thread_id: string;
+  sender_id: string;
+  message_body: string;
+  message_type?: ClientMessageType;
+  attachments?: Record<string, any>[];
+}
+
+export interface UpdateClientMessage {
+  message_body?: string;
+  attachments?: Record<string, any>[];
+  is_read?: boolean;
+}
+
 // ============================================================================
 // PERMISSION AND SECURITY TYPES
 // ============================================================================
@@ -661,6 +1117,20 @@ export interface UserPermissions {
   'documents.approve.internal'?: boolean;
   'documents.approve.client'?: boolean;
   'documents.version.manage'?: boolean;
+  
+  // Client portal permissions
+  'client_portal.access'?: boolean;
+  'client_portal.admin'?: boolean;
+  'client_companies.create'?: boolean;
+  'client_companies.read'?: boolean;
+  'client_companies.update'?: boolean;
+  'client_users.create'?: boolean;
+  'client_users.read'?: boolean;
+  'client_users.update'?: boolean;
+  'client_users.manage_access'?: boolean;
+  'client_communications.read'?: boolean;
+  'client_communications.moderate'?: boolean;
+  'client_activity.monitor'?: boolean;
   
   // Additional permissions
   [key: string]: boolean | undefined;
@@ -781,7 +1251,18 @@ export type DatabaseTable =
   | 'purchase_orders'
   | 'vendor_ratings'
   | 'approval_workflows'
-  | 'delivery_confirmations';
+  | 'delivery_confirmations'
+  | 'client_companies'
+  | 'client_users'
+  | 'client_project_access'
+  | 'client_permissions'
+  | 'client_document_access'
+  | 'client_document_approvals'
+  | 'client_document_comments'
+  | 'client_notifications'
+  | 'client_activity_log'
+  | 'client_communication_threads'
+  | 'client_messages';
 
 export type SortDirection = 'asc' | 'desc';
 
@@ -816,6 +1297,28 @@ export const COST_TRACKING_ROLES: UserRole[] = [
   'purchase_director',
   'purchase_specialist'
 ];
+
+// Client Portal Types
+export type ClientAccessLevel = 'view_only' | 'reviewer' | 'approver' | 'project_owner';
+export type ClientCompanyType = 'individual' | 'corporation' | 'partnership' | 'government' | 'non_profit';
+export type ClientProjectAccessLevel = 'viewer' | 'reviewer' | 'approver' | 'stakeholder';
+export type ClientPermissionType = 'document_access' | 'project_access' | 'communication' | 'reporting' | 'financial';
+export type ClientDocumentAccessType = 'view' | 'download' | 'comment' | 'approve';
+export type ClientApprovalDecision = 'approved' | 'approved_with_conditions' | 'rejected' | 'requires_revision';
+export type ClientCommentType = 'general' | 'revision_request' | 'question' | 'approval_condition' | 'concern';
+export type ClientCommentStatus = 'open' | 'addressed' | 'resolved' | 'closed';
+export type ClientPriority = 'low' | 'medium' | 'high' | 'urgent';
+export type ClientNotificationType = 
+  | 'document_submitted' | 'approval_required' | 'approval_received' | 'project_milestone'
+  | 'schedule_change' | 'budget_update' | 'quality_issue' | 'delivery_notification'
+  | 'message_received' | 'system_announcement';
+export type ClientDeliveryMethod = 'in_app' | 'email' | 'sms' | 'push';
+export type ClientActivityType = 
+  | 'login' | 'logout' | 'document_view' | 'document_download' | 'document_approve'
+  | 'comment_add' | 'message_send' | 'project_access' | 'profile_update';
+export type ClientThreadType = 'general' | 'technical' | 'commercial' | 'quality' | 'schedule' | 'support';
+export type ClientThreadStatus = 'open' | 'pending_response' | 'resolved' | 'closed';
+export type ClientMessageType = 'text' | 'file' | 'image' | 'system';
 
 // External user roles
 export const EXTERNAL_ROLES: UserRole[] = [
@@ -924,6 +1427,61 @@ export interface Database {
         Insert: CreateDeliveryConfirmation;
         Update: UpdateDeliveryConfirmation;
       };
+      client_companies: {
+        Row: ClientCompany;
+        Insert: CreateClientCompany;
+        Update: UpdateClientCompany;
+      };
+      client_users: {
+        Row: ClientUser;
+        Insert: CreateClientUser;
+        Update: UpdateClientUser;
+      };
+      client_project_access: {
+        Row: ClientProjectAccess;
+        Insert: CreateClientProjectAccess;
+        Update: UpdateClientProjectAccess;
+      };
+      client_permissions: {
+        Row: ClientPermission;
+        Insert: Omit<ClientPermission, 'id' | 'granted_at'>;
+        Update: Partial<Omit<ClientPermission, 'id' | 'granted_at'>>;
+      };
+      client_document_access: {
+        Row: ClientDocumentAccess;
+        Insert: CreateClientDocumentAccess;
+        Update: UpdateClientDocumentAccess;
+      };
+      client_document_approvals: {
+        Row: ClientDocumentApproval;
+        Insert: CreateClientDocumentApproval;
+        Update: never;
+      };
+      client_document_comments: {
+        Row: ClientDocumentComment;
+        Insert: CreateClientDocumentComment;
+        Update: UpdateClientDocumentComment;
+      };
+      client_notifications: {
+        Row: ClientNotification;
+        Insert: CreateClientNotification;
+        Update: UpdateClientNotification;
+      };
+      client_activity_log: {
+        Row: ClientActivityLog;
+        Insert: Omit<ClientActivityLog, 'id' | 'created_at'>;
+        Update: never;
+      };
+      client_communication_threads: {
+        Row: ClientCommunicationThread;
+        Insert: CreateClientCommunicationThread;
+        Update: UpdateClientCommunicationThread;
+      };
+      client_messages: {
+        Row: ClientMessage;
+        Insert: CreateClientMessage;
+        Update: UpdateClientMessage;
+      };
     };
     Views: {
       [_ in never]: never;
@@ -943,6 +1501,21 @@ export interface Database {
       po_status: PoStatus;
       approval_status: PurchaseApprovalStatus;
       delivery_status: DeliveryStatus;
+      client_access_level: ClientAccessLevel;
+      client_company_type: ClientCompanyType;
+      client_project_access_level: ClientProjectAccessLevel;
+      client_permission_type: ClientPermissionType;
+      client_document_access_type: ClientDocumentAccessType;
+      client_approval_decision: ClientApprovalDecision;
+      client_comment_type: ClientCommentType;
+      client_comment_status: ClientCommentStatus;
+      client_priority: ClientPriority;
+      client_notification_type: ClientNotificationType;
+      client_delivery_method: ClientDeliveryMethod;
+      client_activity_type: ClientActivityType;
+      client_thread_type: ClientThreadType;
+      client_thread_status: ClientThreadStatus;
+      client_message_type: ClientMessageType;
     };
   };
 }
