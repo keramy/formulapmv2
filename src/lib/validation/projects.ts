@@ -452,7 +452,6 @@ export const validateProjectPermissions = (userRole: string, action: string): bo
     'purchase_specialist': ['read'],
     'field_worker': ['read'],
     'client': ['read'],
-    'subcontractor': ['read']
   }
   
   return rolePermissions[userRole]?.includes(action) || false

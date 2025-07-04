@@ -20,7 +20,8 @@ import {
   Bell,
   BarChart3,
   Building2,
-  ExternalLink
+  ExternalLink,
+  HardHat
 } from 'lucide-react'
 
 interface NavigationItem {
@@ -131,7 +132,7 @@ export const GlobalSidebar = () => {
       icon: ExternalLink,
       permission: 'client_portal.admin.view',
       description: 'External client portal administration'
-    }
+    },
   ]
 
   // Filter items based on user permissions

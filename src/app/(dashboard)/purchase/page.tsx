@@ -33,10 +33,18 @@ import { PurchaseRequestList } from '@/components/purchase/requests/PurchaseRequ
 import { PurchaseRequestDetails } from '@/components/purchase/requests/PurchaseRequestDetails'
 import { PurchaseOrderForm } from '@/components/purchase/orders/PurchaseOrderForm'
 import { PurchaseOrderList } from '@/components/purchase/orders/PurchaseOrderList'
+import { PurchaseOrderDetails } from '@/components/purchase/orders/PurchaseOrderDetails'
 import { VendorDatabase } from '@/components/purchase/vendors/VendorDatabase'
+import { VendorDetails } from '@/components/purchase/vendors/VendorDetails'
+import { VendorEditForm } from '@/components/purchase/vendors/VendorEditForm'
+import { ApprovalQueue } from '@/components/purchase/approvals/ApprovalQueue'
+import { ApprovalDetails } from '@/components/purchase/approvals/ApprovalDetails'
+import { DeliveryList } from '@/components/purchase/deliveries/DeliveryList'
+import { DeliveryConfirmationForm } from '@/components/purchase/deliveries/DeliveryConfirmationForm'
+import { ErrorBoundary, LoadingState, ErrorAlert } from '@/components/purchase/shared/ErrorBoundary'
 import { useAuth } from '@/hooks/useAuth'
 import { usePermissions } from '@/hooks/usePermissions'
-import { PurchaseRequest, PurchaseOrder } from '@/types/purchase'
+import { PurchaseRequest, PurchaseOrder, Vendor, ApprovalWorkflow } from '@/types/purchase'
 
 export default function PurchasePage() {
   const { profile } = useAuth()
@@ -44,9 +52,17 @@ export default function PurchasePage() {
   
   const [selectedRequest, setSelectedRequest] = useState<PurchaseRequest | null>(null)
   const [selectedOrder, setSelectedOrder] = useState<PurchaseOrder | null>(null)
+  const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null)
+  const [selectedApproval, setSelectedApproval] = useState<ApprovalWorkflow | null>(null)
   const [showRequestForm, setShowRequestForm] = useState(false)
   const [showOrderForm, setShowOrderForm] = useState(false)
   const [showRequestDetails, setShowRequestDetails] = useState(false)
+  const [showOrderDetails, setShowOrderDetails] = useState(false)
+  const [showVendorDetails, setShowVendorDetails] = useState(false)
+  const [showVendorForm, setShowVendorForm] = useState(false)
+  const [showApprovalDetails, setShowApprovalDetails] = useState(false)
+  const [showDeliveryForm, setShowDeliveryForm] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   // Use the main coordinator
   const {
@@ -134,7 +150,25 @@ export default function PurchasePage() {
 
   return (
     <AuthGuard requiredPermission="purchase.view">
-      <div className="space-y-6">
+      <ErrorBoundary onReset={() => setError(null)}>
+        <div className="space-y-6">
+          {/* Error Alert */}
+          {error && (
+            <ErrorAlert
+              error={error}
+              onDismiss={() => setError(null)}
+              onRetry={() => {
+                setError(null)
+                // Trigger data refresh
+                coordinateDataFetch()
+              }}
+            />
+          )}
+
+          {/* Loading State */}
+          {loading && !error && (
+            <LoadingState message="Loading purchase data..." />
+          )}
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -285,8 +319,15 @@ export default function PurchasePage() {
             <PurchaseOrderList
               orders={orders}
               loading={ordersLoading}
-              onView={() => {}} // TODO: Implement order details
-              onEdit={() => {}} // TODO: Implement order editing
+              onView={(order) => {
+                setSelectedOrder(order)
+                setShowOrderDetails(true)
+              }}
+              onEdit={(order) => {
+                setSelectedOrder(order)
+                // Could implement order editing form
+                console.log('Edit order:', order)
+              }}
               onStatusFilter={() => {}} // Handled by coordinator
               onSearch={() => {}} // Handled by coordinator
               canEdit={effectivePermissions.canCreateOrders}
@@ -299,9 +340,18 @@ export default function PurchasePage() {
             <VendorDatabase
               vendors={vendors}
               loading={vendorsLoading}
-              onView={() => {}} // TODO: Implement vendor details
-              onEdit={() => {}} // TODO: Implement vendor editing
-              onCreate={coordinateVendorCreation}
+              onView={(vendor) => {
+                setSelectedVendor(vendor)
+                setShowVendorDetails(true)
+              }}
+              onEdit={(vendor) => {
+                setSelectedVendor(vendor)
+                setShowVendorForm(true)
+              }}
+              onCreate={() => {
+                setSelectedVendor(null)
+                setShowVendorForm(true)
+              }}
               onUpdate={coordinateVendorUpdate}
               onRate={coordinateVendorRating}
               onSearch={() => {}} // Handled by coordinator
@@ -313,38 +363,32 @@ export default function PurchasePage() {
 
           {/* Approvals Tab */}
           <TabsContent value="approvals" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <CheckCircle className="h-5 w-5 mr-2" />
-                  Approval Workflow
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8">
-                  <AlertTriangle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">Approval workflow components coming soon</p>
-                </div>
-              </CardContent>
-            </Card>
+            <ApprovalQueue
+              approvals={pendingApprovals || []}
+              loading={approvalsLoading}
+              onApprove={(approvalId, comments) => coordinateApprovalAction(approvalId, { approval_status: 'approved', comments })}
+              onReject={(approvalId, comments) => coordinateApprovalAction(approvalId, { approval_status: 'rejected', comments })}
+              onView={(approval) => {
+                setSelectedApproval(approval)
+                setShowApprovalDetails(true)
+              }}
+              canApprove={effectivePermissions.canApprove}
+              enableBatchActions={true}
+            />
           </TabsContent>
 
           {/* Deliveries Tab */}
           <TabsContent value="deliveries" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Truck className="h-5 w-5 mr-2" />
-                  Delivery Confirmations
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8">
-                  <Truck className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">Delivery confirmation components coming soon</p>
-                </div>
-              </CardContent>
-            </Card>
+            <DeliveryList
+              deliveries={deliveries || []}
+              loading={deliveriesLoading}
+              onConfirm={(deliveryId, confirmationData) => coordinateDeliveryConfirmation(deliveryId, confirmationData)}
+              onView={(delivery) => {
+                // Could implement delivery details view
+                console.log('View delivery:', delivery)
+              }}
+              canConfirm={effectivePermissions.canConfirmDeliveries}
+            />
           </TabsContent>
         </Tabs>
 
@@ -418,7 +462,127 @@ export default function PurchasePage() {
             )}
           </DialogContent>
         </Dialog>
-      </div>
+
+        {/* Order Details Dialog */}
+        <Dialog open={showOrderDetails} onOpenChange={setShowOrderDetails}>
+          <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+            {selectedOrder && (
+              <PurchaseOrderDetails
+                order={selectedOrder}
+                onEdit={() => {
+                  // Could implement order editing
+                  console.log('Edit order:', selectedOrder)
+                }}
+                onDownload={() => {
+                  // Could implement order download
+                  console.log('Download order:', selectedOrder)
+                }}
+                onSendToVendor={() => {
+                  // Could implement send to vendor
+                  console.log('Send to vendor:', selectedOrder)
+                }}
+                onConfirmDelivery={() => {
+                  setShowOrderDetails(false)
+                  setShowDeliveryForm(true)
+                }}
+                onClose={() => {
+                  setShowOrderDetails(false)
+                  setSelectedOrder(null)
+                }}
+                canEdit={effectivePermissions.canCreateOrders}
+                canDownload={true}
+                canSendToVendor={effectivePermissions.canCreateOrders}
+                canConfirmDelivery={effectivePermissions.canConfirmDeliveries}
+                canViewFinancials={effectivePermissions.canViewFinancials}
+              />
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Vendor Details Dialog */}
+        <Dialog open={showVendorDetails} onOpenChange={setShowVendorDetails}>
+          <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+            {selectedVendor && (
+              <VendorDetails
+                vendor={selectedVendor}
+                onEdit={() => {
+                  setShowVendorDetails(false)
+                  setShowVendorForm(true)
+                }}
+                onToggleStatus={(isActive) => {
+                  coordinateVendorUpdate(selectedVendor.id, { is_active: isActive })
+                }}
+                onRate={() => {
+                  // Could implement rating form
+                  console.log('Rate vendor:', selectedVendor)
+                }}
+                onClose={() => {
+                  setShowVendorDetails(false)
+                  setSelectedVendor(null)
+                }}
+                canEdit={effectivePermissions.canManageVendors}
+                canToggleStatus={effectivePermissions.canManageVendors}
+                canRate={isPurchaseRoleActive || isManagementRole}
+                canViewFinancials={effectivePermissions.canViewFinancials}
+              />
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Vendor Form Dialog */}
+        <Dialog open={showVendorForm} onOpenChange={setShowVendorForm}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <VendorEditForm
+              vendor={selectedVendor || undefined}
+              onSubmit={selectedVendor ? 
+                (data) => coordinateVendorUpdate(selectedVendor.id, data) : 
+                coordinateVendorCreation
+              }
+              onCancel={() => {
+                setShowVendorForm(false)
+                setSelectedVendor(null)
+              }}
+              loading={loading}
+            />
+          </DialogContent>
+        </Dialog>
+
+        {/* Approval Details Dialog */}
+        <Dialog open={showApprovalDetails} onOpenChange={setShowApprovalDetails}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            {selectedApproval && (
+              <ApprovalDetails
+                approval={selectedApproval}
+                onApprove={(approvalId, action) => coordinateApprovalAction(approvalId, action)}
+                onClose={() => {
+                  setShowApprovalDetails(false)
+                  setSelectedApproval(null)
+                }}
+                loading={loading}
+                canApprove={effectivePermissions.canApprove}
+              />
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Delivery Confirmation Dialog */}
+        <Dialog open={showDeliveryForm} onOpenChange={setShowDeliveryForm}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            {selectedOrder && (
+              <DeliveryConfirmationForm
+                purchaseOrder={selectedOrder}
+                onSubmit={(data) => coordinateDeliveryConfirmation(selectedOrder.id, data)}
+                onClose={() => {
+                  setShowDeliveryForm(false)
+                  setSelectedOrder(null)
+                }}
+                loading={loading}
+              />
+            )}
+          </DialogContent>
+        </Dialog>
+        </div>
+      </ErrorBoundary>
     </AuthGuard>
   )
 }

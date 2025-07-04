@@ -11,7 +11,22 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useAuth } from './useAuth'
 import { usePermissions } from './usePermissions'
 import { useProjects } from './useProjects'
-import { PurchaseRequest, PurchaseOrder, Vendor, PurchaseStatistics } from '@/types/purchase'
+import { 
+  PurchaseRequest, 
+  PurchaseOrder, 
+  Vendor, 
+  PurchaseStatistics,
+  PurchaseRequestFilters,
+  PurchaseOrderFilters,
+  VendorFilters,
+  PaginationParams,
+  ApprovalWorkflow,
+  DeliveryConfirmation,
+  VendorRating,
+  ApprovalAction,
+  DeliveryConfirmationData,
+  VendorRatingCreateData
+} from '@/types/purchase'
 
 // ============================================================================
 // MAIN PURCHASE HOOK
@@ -475,5 +490,739 @@ export const usePurchaseRequest = (requestId: string) => {
     error,
     fetchRequest,
     updateRequest
+  }
+}
+
+// ============================================================================
+// PURCHASE REQUESTS HOOK
+// ============================================================================
+
+export const usePurchaseRequests = (projectId?: string) => {
+  const { profile } = useAuth()
+  const { canViewPurchaseRequests, canCreatePurchaseRequests, canUpdatePurchaseRequests } = usePermissions()
+  
+  const [requests, setRequests] = useState<PurchaseRequest[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [totalCount, setTotalCount] = useState(0)
+
+  const fetchRequests = useCallback(async (filters?: PurchaseRequestFilters, pagination?: PaginationParams) => {
+    if (!profile || !canViewPurchaseRequests()) return
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const queryParams = new URLSearchParams()
+      if (projectId) queryParams.set('project_id', projectId)
+      if (filters) {
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value !== undefined) {
+            queryParams.set(key, Array.isArray(value) ? value.join(',') : String(value))
+          }
+        })
+      }
+      if (pagination) {
+        Object.entries(pagination).forEach(([key, value]) => {
+          if (value !== undefined) {
+            queryParams.set(key, String(value))
+          }
+        })
+      }
+
+      const response = await fetch(`/api/purchase/requests?${queryParams.toString()}`, {
+        headers: {
+          'Authorization': `Bearer ${profile.id}`,
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch purchase requests')
+      }
+
+      const data = await response.json()
+      
+      if (data.success) {
+        setRequests(data.data.requests)
+        setTotalCount(data.pagination?.total || 0)
+      } else {
+        throw new Error(data.error || 'Failed to fetch purchase requests')
+      }
+    } catch (err) {
+      console.error('Error fetching requests:', err)
+      setError(err instanceof Error ? err.message : 'Failed to fetch requests')
+    } finally {
+      setLoading(false)
+    }
+  }, [profile, projectId, canViewPurchaseRequests])
+
+  const createRequest = useCallback(async (requestData: any) => {
+    if (!profile || !canCreatePurchaseRequests()) {
+      throw new Error('Insufficient permissions to create purchase requests')
+    }
+
+    const response = await fetch('/api/purchase/requests', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${profile.id}`,
+      },
+      body: JSON.stringify(requestData)
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || 'Failed to create purchase request')
+    }
+
+    const data = await response.json()
+    if (data.success) {
+      await fetchRequests()
+      return data.data.request
+    } else {
+      throw new Error(data.error || 'Failed to create purchase request')
+    }
+  }, [profile, canCreatePurchaseRequests, fetchRequests])
+
+  const updateRequest = useCallback(async (requestId: string, updates: any) => {
+    if (!profile || !canUpdatePurchaseRequests()) {
+      throw new Error('Insufficient permissions to update purchase requests')
+    }
+
+    const response = await fetch(`/api/purchase/requests/${requestId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${profile.id}`,
+      },
+      body: JSON.stringify(updates)
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || 'Failed to update purchase request')
+    }
+
+    const data = await response.json()
+    if (data.success) {
+      await fetchRequests()
+      return data.data.request
+    } else {
+      throw new Error(data.error || 'Failed to update purchase request')
+    }
+  }, [profile, canUpdatePurchaseRequests, fetchRequests])
+
+  const deleteRequest = useCallback(async (requestId: string) => {
+    if (!profile) {
+      throw new Error('Authentication required')
+    }
+
+    const response = await fetch(`/api/purchase/requests/${requestId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${profile.id}`,
+      }
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || 'Failed to delete purchase request')
+    }
+
+    await fetchRequests()
+  }, [profile, fetchRequests])
+
+  const filterByStatus = useCallback((status: string[]) => {
+    return requests.filter(req => status.includes(req.status))
+  }, [requests])
+
+  const filterByUrgency = useCallback((urgency: string[]) => {
+    return requests.filter(req => urgency.includes(req.urgency_level))
+  }, [requests])
+
+  return {
+    requests,
+    loading,
+    error,
+    totalCount,
+    fetchRequests,
+    createRequest,
+    updateRequest,
+    deleteRequest,
+    filterByStatus,
+    filterByUrgency,
+    canCreate: canCreatePurchaseRequests(),
+    canUpdate: canUpdatePurchaseRequests(),
+    canDelete: canUpdatePurchaseRequests(),
+    canApprove: canUpdatePurchaseRequests()
+  }
+}
+
+// ============================================================================
+// PURCHASE ORDERS HOOK
+// ============================================================================
+
+export const usePurchaseOrders = (projectId?: string) => {
+  const { profile } = useAuth()
+  const { canViewPurchaseRequests, canCreatePurchaseRequests, canViewPurchaseFinancials } = usePermissions()
+  
+  const [orders, setOrders] = useState<PurchaseOrder[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [totalCount, setTotalCount] = useState(0)
+
+  const fetchOrders = useCallback(async (filters?: PurchaseOrderFilters, pagination?: PaginationParams) => {
+    if (!profile || !canViewPurchaseRequests()) return
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const queryParams = new URLSearchParams()
+      if (projectId) queryParams.set('project_id', projectId)
+      if (filters) {
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value !== undefined) {
+            queryParams.set(key, Array.isArray(value) ? value.join(',') : String(value))
+          }
+        })
+      }
+      if (pagination) {
+        Object.entries(pagination).forEach(([key, value]) => {
+          if (value !== undefined) {
+            queryParams.set(key, String(value))
+          }
+        })
+      }
+
+      const response = await fetch(`/api/purchase/orders?${queryParams.toString()}`, {
+        headers: {
+          'Authorization': `Bearer ${profile.id}`,
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch purchase orders')
+      }
+
+      const data = await response.json()
+      
+      if (data.success) {
+        setOrders(data.data.orders)
+        setTotalCount(data.pagination?.total || 0)
+      } else {
+        throw new Error(data.error || 'Failed to fetch purchase orders')
+      }
+    } catch (err) {
+      console.error('Error fetching orders:', err)
+      setError(err instanceof Error ? err.message : 'Failed to fetch orders')
+    } finally {
+      setLoading(false)
+    }
+  }, [profile, projectId, canViewPurchaseRequests])
+
+  const createOrder = useCallback(async (orderData: any) => {
+    if (!profile || !canCreatePurchaseRequests()) {
+      throw new Error('Insufficient permissions to create purchase orders')
+    }
+
+    const response = await fetch('/api/purchase/orders', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${profile.id}`,
+      },
+      body: JSON.stringify(orderData)
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || 'Failed to create purchase order')
+    }
+
+    const data = await response.json()
+    if (data.success) {
+      await fetchOrders()
+      return data.data.order
+    } else {
+      throw new Error(data.error || 'Failed to create purchase order')
+    }
+  }, [profile, canCreatePurchaseRequests, fetchOrders])
+
+  const updateOrder = useCallback(async (orderId: string, updates: any) => {
+    if (!profile || !canCreatePurchaseRequests()) {
+      throw new Error('Insufficient permissions to update purchase orders')
+    }
+
+    const response = await fetch(`/api/purchase/orders/${orderId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${profile.id}`,
+      },
+      body: JSON.stringify(updates)
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || 'Failed to update purchase order')
+    }
+
+    const data = await response.json()
+    if (data.success) {
+      await fetchOrders()
+      return data.data.order
+    } else {
+      throw new Error(data.error || 'Failed to update purchase order')
+    }
+  }, [profile, canCreatePurchaseRequests, fetchOrders])
+
+  const filterByStatus = useCallback((status: string[]) => {
+    return orders.filter(order => status.includes(order.status))
+  }, [orders])
+
+  return {
+    orders,
+    loading,
+    error,
+    totalCount,
+    fetchOrders,
+    createOrder,
+    updateOrder,
+    filterByStatus,
+    canCreate: canCreatePurchaseRequests(),
+    canUpdate: canCreatePurchaseRequests(),
+    canViewFinancials: canViewPurchaseFinancials()
+  }
+}
+
+// ============================================================================
+// VENDORS HOOK
+// ============================================================================
+
+export const useVendors = () => {
+  const { profile } = useAuth()
+  const { canViewPurchaseRequests, canCreatePurchaseRequests } = usePermissions()
+  
+  const [vendors, setVendors] = useState<Vendor[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [totalCount, setTotalCount] = useState(0)
+
+  const fetchVendors = useCallback(async (filters?: VendorFilters, pagination?: PaginationParams) => {
+    if (!profile || !canViewPurchaseRequests()) return
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const queryParams = new URLSearchParams()
+      if (filters) {
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value !== undefined) {
+            queryParams.set(key, Array.isArray(value) ? value.join(',') : String(value))
+          }
+        })
+      }
+      if (pagination) {
+        Object.entries(pagination).forEach(([key, value]) => {
+          if (value !== undefined) {
+            queryParams.set(key, String(value))
+          }
+        })
+      }
+
+      const response = await fetch(`/api/purchase/vendors?${queryParams.toString()}`, {
+        headers: {
+          'Authorization': `Bearer ${profile.id}`,
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch vendors')
+      }
+
+      const data = await response.json()
+      
+      if (data.success) {
+        setVendors(data.data.vendors)
+        setTotalCount(data.pagination?.total || 0)
+      } else {
+        throw new Error(data.error || 'Failed to fetch vendors')
+      }
+    } catch (err) {
+      console.error('Error fetching vendors:', err)
+      setError(err instanceof Error ? err.message : 'Failed to fetch vendors')
+    } finally {
+      setLoading(false)
+    }
+  }, [profile, canViewPurchaseRequests])
+
+  const createVendor = useCallback(async (vendorData: any) => {
+    if (!profile || !canCreatePurchaseRequests()) {
+      throw new Error('Insufficient permissions to create vendors')
+    }
+
+    const response = await fetch('/api/purchase/vendors', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${profile.id}`,
+      },
+      body: JSON.stringify(vendorData)
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || 'Failed to create vendor')
+    }
+
+    const data = await response.json()
+    if (data.success) {
+      await fetchVendors()
+      return data.data.vendor
+    } else {
+      throw new Error(data.error || 'Failed to create vendor')
+    }
+  }, [profile, canCreatePurchaseRequests, fetchVendors])
+
+  const updateVendor = useCallback(async (vendorId: string, updates: any) => {
+    if (!profile || !canCreatePurchaseRequests()) {
+      throw new Error('Insufficient permissions to update vendors')
+    }
+
+    const response = await fetch(`/api/purchase/vendors/${vendorId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${profile.id}`,
+      },
+      body: JSON.stringify(updates)
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || 'Failed to update vendor')
+    }
+
+    const data = await response.json()
+    if (data.success) {
+      await fetchVendors()
+      return data.data.vendor
+    } else {
+      throw new Error(data.error || 'Failed to update vendor')
+    }
+  }, [profile, canCreatePurchaseRequests, fetchVendors])
+
+  const rateVendor = useCallback(async (ratingData: VendorRatingCreateData) => {
+    if (!profile || !canCreatePurchaseRequests()) {
+      throw new Error('Insufficient permissions to rate vendors')
+    }
+
+    const response = await fetch(`/api/purchase/vendors/${ratingData.vendor_id}/rate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${profile.id}`,
+      },
+      body: JSON.stringify(ratingData)
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || 'Failed to rate vendor')
+    }
+
+    const data = await response.json()
+    if (data.success) {
+      await fetchVendors()
+      return data.data.rating
+    } else {
+      throw new Error(data.error || 'Failed to rate vendor')
+    }
+  }, [profile, canCreatePurchaseRequests, fetchVendors])
+
+  const activeVendors = useMemo(() => {
+    return vendors.filter(vendor => vendor.is_active)
+  }, [vendors])
+
+  const getVendorsByRating = useCallback((minRating: number = 0) => {
+    return vendors.filter(vendor => (vendor.average_rating || 0) >= minRating)
+  }, [vendors])
+
+  return {
+    vendors,
+    loading,
+    error,
+    totalCount,
+    fetchVendors,
+    createVendor,
+    updateVendor,
+    rateVendor,
+    activeVendors,
+    getVendorsByRating,
+    canCreate: canCreatePurchaseRequests(),
+    canUpdate: canCreatePurchaseRequests(),
+    canRate: canCreatePurchaseRequests()
+  }
+}
+
+// ============================================================================
+// PURCHASE APPROVALS HOOK
+// ============================================================================
+
+export const usePurchaseApprovals = (projectId?: string) => {
+  const { profile } = useAuth()
+  const { canViewPurchaseRequests, canCreatePurchaseRequests } = usePermissions()
+  
+  const [pendingApprovals, setPendingApprovals] = useState<ApprovalWorkflow[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchPendingApprovals = useCallback(async () => {
+    if (!profile || !canViewPurchaseRequests()) return
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const queryParams = new URLSearchParams()
+      if (projectId) queryParams.set('project_id', projectId)
+
+      const response = await fetch(`/api/purchase/approvals/pending?${queryParams.toString()}`, {
+        headers: {
+          'Authorization': `Bearer ${profile.id}`,
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch pending approvals')
+      }
+
+      const data = await response.json()
+      
+      if (data.success) {
+        setPendingApprovals(data.data.approvals)
+      } else {
+        throw new Error(data.error || 'Failed to fetch pending approvals')
+      }
+    } catch (err) {
+      console.error('Error fetching pending approvals:', err)
+      setError(err instanceof Error ? err.message : 'Failed to fetch pending approvals')
+    } finally {
+      setLoading(false)
+    }
+  }, [profile, projectId, canViewPurchaseRequests])
+
+  const processApproval = useCallback(async (approvalId: string, action: ApprovalAction) => {
+    if (!profile || !canCreatePurchaseRequests()) {
+      throw new Error('Insufficient permissions to process approvals')
+    }
+
+    const response = await fetch(`/api/purchase/approvals/${approvalId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${profile.id}`,
+      },
+      body: JSON.stringify(action)
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || 'Failed to process approval')
+    }
+
+    const data = await response.json()
+    if (data.success) {
+      await fetchPendingApprovals()
+      return data.data.approval
+    } else {
+      throw new Error(data.error || 'Failed to process approval')
+    }
+  }, [profile, canCreatePurchaseRequests, fetchPendingApprovals])
+
+  const fetchApprovalHistory = useCallback(async (requestId: string) => {
+    if (!profile || !canViewPurchaseRequests()) return []
+
+    try {
+      const response = await fetch(`/api/purchase/requests/${requestId}/approvals`, {
+        headers: {
+          'Authorization': `Bearer ${profile.id}`,
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch approval history')
+      }
+
+      const data = await response.json()
+      
+      if (data.success) {
+        return data.data.approvals
+      } else {
+        throw new Error(data.error || 'Failed to fetch approval history')
+      }
+    } catch (err) {
+      console.error('Error fetching approval history:', err)
+      return []
+    }
+  }, [profile, canViewPurchaseRequests])
+
+  return {
+    pendingApprovals,
+    loading,
+    error,
+    fetchPendingApprovals,
+    processApproval,
+    fetchApprovalHistory,
+    canApprove: canCreatePurchaseRequests(),
+    canViewHistory: canViewPurchaseRequests()
+  }
+}
+
+// ============================================================================
+// DELIVERY CONFIRMATIONS HOOK
+// ============================================================================
+
+export const useDeliveryConfirmations = (projectId?: string) => {
+  const { profile } = useAuth()
+  const { canViewPurchaseRequests, canCreatePurchaseRequests } = usePermissions()
+  
+  const [deliveries, setDeliveries] = useState<DeliveryConfirmation[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchPendingDeliveries = useCallback(async () => {
+    if (!profile || !canViewPurchaseRequests()) return
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const queryParams = new URLSearchParams()
+      if (projectId) queryParams.set('project_id', projectId)
+
+      const response = await fetch(`/api/purchase/deliveries/pending?${queryParams.toString()}`, {
+        headers: {
+          'Authorization': `Bearer ${profile.id}`,
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch pending deliveries')
+      }
+
+      const data = await response.json()
+      
+      if (data.success) {
+        setDeliveries(data.data.deliveries)
+      } else {
+        throw new Error(data.error || 'Failed to fetch pending deliveries')
+      }
+    } catch (err) {
+      console.error('Error fetching pending deliveries:', err)
+      setError(err instanceof Error ? err.message : 'Failed to fetch pending deliveries')
+    } finally {
+      setLoading(false)
+    }
+  }, [profile, projectId, canViewPurchaseRequests])
+
+  const confirmDelivery = useCallback(async (orderId: string, confirmationData: DeliveryConfirmationData) => {
+    if (!profile || !canCreatePurchaseRequests()) {
+      throw new Error('Insufficient permissions to confirm deliveries')
+    }
+
+    const response = await fetch(`/api/purchase/deliveries/${orderId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${profile.id}`,
+      },
+      body: JSON.stringify(confirmationData)
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || 'Failed to confirm delivery')
+    }
+
+    const data = await response.json()
+    if (data.success) {
+      await fetchPendingDeliveries()
+      return data.data.confirmation
+    } else {
+      throw new Error(data.error || 'Failed to confirm delivery')
+    }
+  }, [profile, canCreatePurchaseRequests, fetchPendingDeliveries])
+
+  return {
+    deliveries,
+    loading,
+    error,
+    fetchPendingDeliveries,
+    confirmDelivery,
+    canConfirm: canCreatePurchaseRequests()
+  }
+}
+
+// ============================================================================
+// PURCHASE STATISTICS HOOK
+// ============================================================================
+
+export const usePurchaseStatistics = (projectId?: string) => {
+  const { profile } = useAuth()
+  const { canViewPurchaseRequests, canViewPurchaseFinancials } = usePermissions()
+  
+  const [statistics, setStatistics] = useState<PurchaseStatistics | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const refreshStatistics = useCallback(async () => {
+    if (!profile || !canViewPurchaseRequests()) return
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const queryParams = new URLSearchParams()
+      if (projectId) queryParams.set('project_id', projectId)
+      if (canViewPurchaseFinancials()) queryParams.set('include_financials', 'true')
+
+      const response = await fetch(`/api/purchase/statistics?${queryParams.toString()}`, {
+        headers: {
+          'Authorization': `Bearer ${profile.id}`,
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch purchase statistics')
+      }
+
+      const data = await response.json()
+      
+      if (data.success) {
+        setStatistics(data.data.statistics)
+      } else {
+        throw new Error(data.error || 'Failed to fetch purchase statistics')
+      }
+    } catch (err) {
+      console.error('Error fetching statistics:', err)
+      setError(err instanceof Error ? err.message : 'Failed to fetch statistics')
+    } finally {
+      setLoading(false)
+    }
+  }, [profile, projectId, canViewPurchaseRequests, canViewPurchaseFinancials])
+
+  useEffect(() => {
+    refreshStatistics()
+  }, [refreshStatistics])
+
+  return {
+    statistics,
+    loading,
+    error,
+    refreshStatistics,
+    canViewFinancials: canViewPurchaseFinancials()
   }
 }

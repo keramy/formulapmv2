@@ -128,7 +128,7 @@ export function QuickActions() {
       description: 'Submit progress',
       href: '/field/reports/new',
       icon: CheckSquare,
-      requiresRole: ['field_worker', 'subcontractor']
+      requiresRole: ['field_worker']
     }
   ];
 

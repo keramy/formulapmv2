@@ -15,7 +15,6 @@ const UserRoleEnum = z.enum([
   'purchase_specialist',
   'field_worker',
   'client',
-  'subcontractor'
 ])
 
 // Email validation
@@ -279,7 +278,6 @@ export const canAssignRole = (assignerRole: UserRole, targetRole: UserRole): boo
     'technical_engineer': 35,
     'purchase_specialist': 30,
     'field_worker': 20,
-    'subcontractor': 15,
     'client': 10
   }
 

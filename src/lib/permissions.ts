@@ -5,7 +5,7 @@ export const PERMISSIONS = {
   'projects.create': ['company_owner', 'general_manager', 'deputy_general_manager', 'project_manager', 'admin'],
   'projects.read.all': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'],
   'projects.read.assigned': ['project_manager', 'architect', 'technical_engineer', 'purchase_director', 'purchase_specialist'],
-  'projects.read.own': ['client', 'subcontractor', 'field_worker'],
+  'projects.read.own': ['client', 'field_worker'],
   'projects.update': ['company_owner', 'general_manager', 'deputy_general_manager', 'project_manager', 'admin'],
   'projects.delete': ['company_owner', 'general_manager', 'admin'],
   'projects.archive': ['company_owner', 'general_manager', 'deputy_general_manager', 'project_manager', 'admin'],
@@ -92,18 +92,18 @@ export const PERMISSIONS = {
   // Reporting Permissions
   'reports.create.internal': ['project_manager', 'architect', 'technical_engineer'],
   'reports.create.client': ['project_manager'],
-  'reports.create.field': ['field_worker', 'subcontractor'],
+  'reports.create.field': ['field_worker'],
   'reports.read.all': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'],
   'reports.read.project': ['project_manager', 'architect', 'technical_engineer'],
-  'reports.read.own': ['field_worker', 'subcontractor', 'client'],
+  'reports.read.own': ['field_worker', 'client'],
   'reports.approve': ['project_manager', 'general_manager'],
 
   // Task Management Permissions
   'tasks.create': ['deputy_general_manager', 'project_manager', 'technical_director'],
   'tasks.assign': ['deputy_general_manager', 'project_manager'],
   'tasks.read.all': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'],
-  'tasks.read.assigned': ['project_manager', 'architect', 'technical_engineer', 'field_worker', 'subcontractor'],
-  'tasks.update.status': ['project_manager', 'architect', 'technical_engineer', 'field_worker', 'subcontractor'],
+  'tasks.read.assigned': ['project_manager', 'architect', 'technical_engineer', 'field_worker'],
+  'tasks.update.status': ['project_manager', 'architect', 'technical_engineer', 'field_worker'],
   'tasks.approve': ['project_manager', 'deputy_general_manager'],
 
   // User Management Permissions
@@ -115,8 +115,8 @@ export const PERMISSIONS = {
   'users.roles.assign': ['company_owner', 'admin'],
 
   // Global Navigation Permissions
-  'dashboard.view': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'architect', 'technical_engineer', 'purchase_director', 'purchase_specialist', 'field_worker', 'client', 'subcontractor'],
-  'tasks.view': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'architect', 'technical_engineer', 'field_worker', 'subcontractor'],
+  'dashboard.view': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'architect', 'technical_engineer', 'purchase_director', 'purchase_specialist', 'field_worker', 'client'],
+  'tasks.view': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'architect', 'technical_engineer', 'field_worker'],
   'tasks.manage_all': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'],
   'scope.view': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'architect', 'technical_engineer', 'purchase_director', 'purchase_specialist'],
   'shop_drawings.view_all': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'architect', 'technical_engineer'],
@@ -157,7 +157,8 @@ export const PERMISSIONS = {
   'client_portal.admin.manage_access': ['company_owner', 'general_manager', 'deputy_general_manager', 'project_manager', 'admin'],
   'client_portal.admin.manage_permissions': ['company_owner', 'general_manager', 'admin'],
   'client_portal.admin.view_analytics': ['company_owner', 'general_manager', 'deputy_general_manager', 'project_manager', 'admin'],
-  'client_portal.admin.manage_branding': ['company_owner', 'general_manager', 'admin']
+  'client_portal.admin.manage_branding': ['company_owner', 'general_manager', 'admin'],
+
 } as const
 
 export type Permission = keyof typeof PERMISSIONS
@@ -185,11 +186,11 @@ export const isPurchaseRole = (userRole: UserRole): boolean => {
 }
 
 export const isFieldRole = (userRole: UserRole): boolean => {
-  return ['field_worker', 'subcontractor'].includes(userRole)
+  return ['field_worker'].includes(userRole)
 }
 
 export const isExternalRole = (userRole: UserRole): boolean => {
-  return ['client', 'subcontractor'].includes(userRole)
+  return ['client'].includes(userRole)
 }
 
 // Role hierarchy for permission inheritance
@@ -205,7 +206,6 @@ export const ROLE_HIERARCHY: Record<UserRole, number> = {
   'technical_engineer': 45,
   'purchase_specialist': 40,
   'field_worker': 30,
-  'subcontractor': 20,
   'client': 10
 }
 

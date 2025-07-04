@@ -458,8 +458,8 @@ export const getProjectAccessLevel = (userRole: string, assignment?: ProjectAssi
     return assignment?.role === 'project_manager' ? 'full' : 'limited'
   }
   
-  // External roles (client, subcontractor) get read-only for assigned projects
-  if (['client', 'subcontractor'].includes(userRole) && assignment) {
+  // External roles (client) get read-only for assigned projects
+  if (['client'].includes(userRole) && assignment) {
     return 'read_only'
   }
   

@@ -248,14 +248,6 @@ export function generateUserPermissions(role: UserRole): string[] {
       );
       break;
 
-    case 'subcontractor':
-      permissions.push(
-        'projects.read.assigned',
-        'scope.read.assigned',
-        'scope.update.status',
-        'documents.create.report'
-      );
-      break;
   }
 
   return permissions;
@@ -283,7 +275,7 @@ export function filterScopeItemByRole(scopeItem: ScopeItem, userRole: UserRole):
   }
 
   // Field workers and external users get even more limited data
-  if (userRole === 'field_worker' || userRole === 'client' || userRole === 'subcontractor') {
+  if (userRole === 'field_worker' || userRole === 'client') {
     // Keep only essential fields
     return {
       id: filtered.id,

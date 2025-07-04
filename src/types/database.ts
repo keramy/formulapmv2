@@ -23,7 +23,7 @@ export type UserRole =
   | 'purchase_specialist'
   | 'field_worker'
   | 'client'
-  | 'subcontractor';
+;
 
 export type ProjectStatus = 
   | 'planning'
@@ -1323,13 +1323,11 @@ export type ClientMessageType = 'text' | 'file' | 'image' | 'system';
 // External user roles
 export const EXTERNAL_ROLES: UserRole[] = [
   'client',
-  'subcontractor'
 ];
 
 // Field operation roles
 export const FIELD_ROLES: UserRole[] = [
   'field_worker',
-  'subcontractor'
 ];
 
 // Type guards
@@ -1518,4 +1516,380 @@ export interface Database {
       client_message_type: ClientMessageType;
     };
   };
+}
+
+// ============================================================================
+// SUBCONTRACTOR ACCESS SYSTEM DATABASE TYPES
+// ============================================================================
+
+// Subcontractor access system enums matching database
+export type SubcontractorAccessLevel = 'basic' | 'standard' | 'premium' | 'restricted';
+export type SubcontractorStatus = 'active' | 'inactive' | 'suspended' | 'probation' | 'blacklisted';
+export type SubcontractorDocumentAccessLevel = 'none' | 'limited' | 'full';
+export type SubcontractorAssignmentStatus = 'pending' | 'active' | 'in_progress' | 'completed' | 'suspended' | 'terminated';
+export type SubcontractorTaskPriority = 'low' | 'medium' | 'high' | 'urgent';
+export type SubcontractorTaskStatus = 'assigned' | 'accepted' | 'in_progress' | 'pending_materials' | 'pending_inspection' | 'completed' | 'on_hold' | 'cancelled';
+export type SubcontractorInspectionStatus = 'pending' | 'scheduled' | 'completed' | 'failed';
+export type SubcontractorPhotoType = 'progress' | 'quality_control' | 'safety_documentation' | 'before_work' | 'after_work' | 'issue_documentation' | 'material_delivery' | 'equipment_setup';
+export type SubcontractorNotificationPriority = 'low' | 'medium' | 'high' | 'urgent';
+export type SubcontractorNotificationType = 'task_assigned' | 'task_updated' | 'task_reminder' | 'inspection_scheduled' | 'approval_required' | 'safety_alert' | 'weather_notification' | 'schedule_change' | 'payment_update' | 'document_shared' | 'message_received';
+export type SubcontractorActivityType = 'login' | 'logout' | 'task_accept' | 'task_start' | 'task_complete' | 'report_submit' | 'photo_upload' | 'issue_report' | 'document_view' | 'message_send' | 'location_checkin';
+
+// Subcontractor database table interfaces
+export interface SubcontractorUserDB {
+  id: string;
+  user_profile_id: string;
+  company_name: string;
+  company_license: string;
+  insurance_certificate: string;
+  bonding_capacity?: number;
+  primary_contact: Record<string, any>;
+  field_supervisor: Record<string, any>;
+  office_contact: Record<string, any>;
+  access_level: SubcontractorAccessLevel;
+  portal_access_enabled: boolean;
+  trade_specializations: Record<string, any>[];
+  equipment_capabilities: Record<string, any>[];
+  crew_size_range?: Record<string, any>;
+  geographic_coverage: string[];
+  safety_rating: number;
+  quality_rating: number;
+  timeliness_rating: number;
+  communication_rating: number;
+  overall_performance: number;
+  insurance_valid: boolean;
+  license_valid: boolean;
+  safety_training_current: boolean;
+  drug_testing_compliant: boolean;
+  payment_terms?: string;
+  preferred_payment_method?: string;
+  w9_on_file: boolean;
+  credit_approved: boolean;
+  last_login?: string;
+  login_attempts: number;
+  account_locked: boolean;
+  two_factor_enabled: boolean;
+  mobile_pin?: string;
+  device_fingerprints: Record<string, any>[];
+  created_by: string;
+  created_at: string;
+  last_activity?: string;
+  active_status: SubcontractorStatus;
+}
+
+export interface SubcontractorProjectAssignmentDB {
+  id: string;
+  project_id: string;
+  scope_items: string[];
+  work_description: string;
+  contract_value?: number;
+  start_date: string;
+  completion_date: string;
+  work_order_number: string;
+  purchase_order_reference?: string;
+  contract_reference?: string;
+  document_access_level: SubcontractorDocumentAccessLevel;
+  drawing_access: boolean;
+  specification_access: boolean;
+  can_upload_documents: boolean;
+  completion_percentage: number;
+  milestones: Record<string, any>[];
+  deliverables: Record<string, any>[];
+  assignment_status: SubcontractorAssignmentStatus;
+  performance_rating: number;
+  reports_to: string;
+  coordinates_with: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SubcontractorPermissionDB {
+  id: string;
+  resource_type: string;
+  resource_id?: string;
+  actions: string[];
+  project_id?: string;
+  scope_item_id?: string;
+  granted_by: string;
+  granted_at: string;
+  expires_at?: string;
+}
+
+export interface SubcontractorTaskDB {
+  id: string;
+  project_id: string;
+  scope_item_id?: string;
+  task_title: string;
+  task_description: string;
+  work_location: string;
+  priority: SubcontractorTaskPriority;
+  scheduled_start: string;
+  scheduled_end: string;
+  actual_start?: string;
+  actual_end?: string;
+  estimated_hours: number;
+  actual_hours?: number;
+  crew_size_required: number;
+  equipment_required: string[];
+  materials_required: Record<string, any>[];
+  prerequisite_tasks: string[];
+  blocking_tasks: string[];
+  coordinates_with: string[];
+  completion_percentage: number;
+  status: SubcontractorTaskStatus;
+  quality_checkpoints: Record<string, any>[];
+  daily_reports: Record<string, any>[];
+  issues_reported: Record<string, any>[];
+  photos_uploaded: Record<string, any>[];
+  requires_inspection: boolean;
+  inspection_status: SubcontractorInspectionStatus;
+  inspector_notes?: string;
+  created_by: string;
+  assigned_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SubcontractorDailyReportDB {
+  id: string;
+  task_id: string;
+  report_date: string;
+  weather_conditions: Record<string, any>;
+  work_completed: string;
+  percentage_progress: number;
+  hours_worked: number;
+  crew_present: Record<string, any>[];
+  materials_used: Record<string, any>[];
+  equipment_used: Record<string, any>[];
+  safety_incidents: Record<string, any>[];
+  quality_issues: Record<string, any>[];
+  delays_encountered: Record<string, any>[];
+  next_day_plan?: string;
+  photos: string[];
+  submitted_by: string;
+  submitted_at: string;
+  gps_latitude?: number;
+  gps_longitude?: number;
+  gps_accuracy?: number;
+}
+
+export interface SubcontractorPhotoDB {
+  id: string;
+  task_id?: string;
+  daily_report_id?: string;
+  photo_path: string;
+  photo_type: SubcontractorPhotoType;
+  description?: string;
+  location?: string;
+  timestamp: string;
+  gps_coordinates?: Record<string, any>;
+  device_info?: Record<string, any>;
+  tags: string[];
+  uploaded_by: string;
+  file_size_bytes?: number;
+  mime_type?: string;
+}
+
+export interface SubcontractorNotificationDB {
+  id: string;
+  project_id?: string;
+  task_id?: string;
+  title: string;
+  message: string;
+  notification_type: SubcontractorNotificationType;
+  priority: SubcontractorNotificationPriority;
+  delivery_channels: string[];
+  push_sent: boolean;
+  sms_sent: boolean;
+  is_read: boolean;
+  read_at?: string;
+  created_at: string;
+  scheduled_for: string;
+}
+
+export interface SubcontractorActivityLogDB {
+  id: string;
+  project_id?: string;
+  task_id?: string;
+  activity_type: SubcontractorActivityType;
+  resource_type?: string;
+  resource_id?: string;
+  action_details?: string;
+  metadata: Record<string, any>;
+  ip_address?: string;
+  user_agent?: string;
+  device_fingerprint?: string;
+  gps_latitude?: number;
+  gps_longitude?: number;
+  created_at: string;
+}
+
+export interface CreateSubcontractorUser {
+  user_profile_id: string;
+  company_name: string;
+  company_license: string;
+  insurance_certificate: string;
+  bonding_capacity?: number;
+  primary_contact: Record<string, any>;
+  field_supervisor: Record<string, any>;
+  office_contact: Record<string, any>;
+  access_level?: SubcontractorAccessLevel;
+  portal_access_enabled?: boolean;
+  trade_specializations?: Record<string, any>[];
+  equipment_capabilities?: Record<string, any>[];
+  crew_size_range?: Record<string, any>;
+  geographic_coverage?: string[];
+  payment_terms?: string;
+  preferred_payment_method?: string;
+  mobile_pin?: string;
+  created_by: string;
+}
+
+export interface UpdateSubcontractorUser {
+  company_name?: string;
+  company_license?: string;
+  insurance_certificate?: string;
+  bonding_capacity?: number;
+  primary_contact?: Record<string, any>;
+  field_supervisor?: Record<string, any>;
+  office_contact?: Record<string, any>;
+  access_level?: SubcontractorAccessLevel;
+  portal_access_enabled?: boolean;
+  trade_specializations?: Record<string, any>[];
+  equipment_capabilities?: Record<string, any>[];
+  crew_size_range?: Record<string, any>;
+  geographic_coverage?: string[];
+  safety_rating?: number;
+  quality_rating?: number;
+  timeliness_rating?: number;
+  communication_rating?: number;
+  insurance_valid?: boolean;
+  license_valid?: boolean;
+  safety_training_current?: boolean;
+  drug_testing_compliant?: boolean;
+  payment_terms?: string;
+  preferred_payment_method?: string;
+  w9_on_file?: boolean;
+  credit_approved?: boolean;
+  mobile_pin?: string;
+  active_status?: SubcontractorStatus;
+}
+
+export interface CreateSubcontractorProjectAssignment {
+  project_id: string;
+  scope_items?: string[];
+  work_description: string;
+  contract_value?: number;
+  start_date: string;
+  completion_date: string;
+  work_order_number: string;
+  purchase_order_reference?: string;
+  contract_reference?: string;
+  document_access_level?: SubcontractorDocumentAccessLevel;
+  drawing_access?: boolean;
+  specification_access?: boolean;
+  can_upload_documents?: boolean;
+  reports_to: string;
+  coordinates_with?: string[];
+}
+
+export interface UpdateSubcontractorProjectAssignment {
+  scope_items?: string[];
+  work_description?: string;
+  contract_value?: number;
+  start_date?: string;
+  completion_date?: string;
+  document_access_level?: SubcontractorDocumentAccessLevel;
+  drawing_access?: boolean;
+  specification_access?: boolean;
+  can_upload_documents?: boolean;
+  completion_percentage?: number;
+  milestones?: Record<string, any>[];
+  deliverables?: Record<string, any>[];
+  assignment_status?: SubcontractorAssignmentStatus;
+  performance_rating?: number;
+  reports_to?: string;
+  coordinates_with?: string[];
+}
+
+export interface CreateSubcontractorTask {
+  project_id: string;
+  scope_item_id?: string;
+  task_title: string;
+  task_description: string;
+  work_location: string;
+  priority?: SubcontractorTaskPriority;
+  scheduled_start: string;
+  scheduled_end: string;
+  estimated_hours: number;
+  crew_size_required: number;
+  equipment_required?: string[];
+  materials_required?: Record<string, any>[];
+  prerequisite_tasks?: string[];
+  blocking_tasks?: string[];
+  coordinates_with?: string[];
+  requires_inspection?: boolean;
+  created_by: string;
+  assigned_by: string;
+}
+
+export interface UpdateSubcontractorTask {
+  task_title?: string;
+  task_description?: string;
+  work_location?: string;
+  priority?: SubcontractorTaskPriority;
+  scheduled_start?: string;
+  scheduled_end?: string;
+  actual_start?: string;
+  actual_end?: string;
+  estimated_hours?: number;
+  actual_hours?: number;
+  crew_size_required?: number;
+  equipment_required?: string[];
+  materials_required?: Record<string, any>[];
+  prerequisite_tasks?: string[];
+  blocking_tasks?: string[];
+  coordinates_with?: string[];
+  completion_percentage?: number;
+  status?: SubcontractorTaskStatus;
+  quality_checkpoints?: Record<string, any>[];
+  requires_inspection?: boolean;
+  inspection_status?: SubcontractorInspectionStatus;
+  inspector_notes?: string;
+}
+
+export interface CreateSubcontractorDailyReport {
+  task_id: string;
+  report_date: string;
+  weather_conditions: Record<string, any>;
+  work_completed: string;
+  percentage_progress: number;
+  hours_worked: number;
+  crew_present?: Record<string, any>[];
+  materials_used?: Record<string, any>[];
+  equipment_used?: Record<string, any>[];
+  safety_incidents?: Record<string, any>[];
+  quality_issues?: Record<string, any>[];
+  delays_encountered?: Record<string, any>[];
+  next_day_plan?: string;
+  photos?: string[];
+  submitted_by: string;
+  gps_latitude?: number;
+  gps_longitude?: number;
+  gps_accuracy?: number;
+}
+
+export interface CreateSubcontractorPhoto {
+  task_id?: string;
+  daily_report_id?: string;
+  photo_path: string;
+  photo_type?: SubcontractorPhotoType;
+  description?: string;
+  location?: string;
+  gps_coordinates?: Record<string, any>;
+  device_info?: Record<string, any>;
+  tags?: string[];
+  uploaded_by: string;
+  file_size_bytes?: number;
+  mime_type?: string;
 }

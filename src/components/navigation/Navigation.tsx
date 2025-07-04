@@ -133,7 +133,7 @@ export const Navigation = () => {
       href: '/field',
       icon: Hammer,
       description: 'Site work and progress reporting',
-      requiresRole: ['field_worker', 'subcontractor']
+      requiresRole: ['field_worker']
     },
     // Clients Management
     {

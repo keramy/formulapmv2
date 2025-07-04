@@ -12,7 +12,6 @@ export type UserRole =
   | 'purchase_specialist'
   | 'field_worker'
   | 'client'
-  | 'subcontractor'
 
 export interface User {
   id: string

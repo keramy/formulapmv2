@@ -197,7 +197,7 @@ export const useAuth = () => {
     isManagement: profile ? ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'].includes(profile.role) : false,
     isProjectRole: profile ? ['project_manager', 'architect', 'technical_engineer'].includes(profile.role) : false,
     isPurchaseRole: profile ? ['purchase_director', 'purchase_specialist'].includes(profile.role) : false,
-    isFieldRole: profile ? ['field_worker', 'subcontractor'].includes(profile.role) : false,
-    isExternalRole: profile ? ['client', 'subcontractor'].includes(profile.role) : false
+    isFieldRole: profile ? ['field_worker'].includes(profile.role) : false,
+    isExternalRole: profile ? ['client'].includes(profile.role) : false
   }
 }

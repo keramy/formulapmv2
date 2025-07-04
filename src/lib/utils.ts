@@ -20,7 +20,6 @@ export function getRoleColorClass(role: UserRole): string {
     purchase_specialist: 'border-l-purchase',
     field_worker: 'border-l-field',
     client: 'border-l-client',
-    subcontractor: 'border-l-external',
   }
   return roleColors[role] || 'border-l-gray-300'
 }
@@ -53,7 +52,6 @@ export function getRoleBadgeClass(role: UserRole): string {
     purchase_specialist: 'bg-purchase/10 text-purchase border-purchase/20',
     field_worker: 'bg-field/10 text-field border-field/20',
     client: 'bg-client/10 text-client border-client/20',
-    subcontractor: 'bg-external/10 text-external border-external/20',
   }
   return roleColors[role] || 'bg-muted text-muted-foreground'
 }

@@ -39,7 +39,8 @@
       "Bash(echo $PATH)",
       "Bash(genai:*)",
       "WebFetch(domain:www.npmjs.com)",
-      "Bash(rg:*)"
+      "Bash(rg:*)",
+      "Bash(npm run test:db:*)"
     ],
     "deny": []
   }

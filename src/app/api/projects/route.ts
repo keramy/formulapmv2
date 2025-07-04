@@ -113,15 +113,8 @@ export const GET = withAuth(async (request: NextRequest) => {
           query = query.eq('id', 'no-projects') // Return empty
         }
       } else {
-        // Subcontractors see assigned projects
-        const { data: subcontractorProjectIds } = await supabase
-          .from('project_assignments')
-          .select('project_id')
-          .eq('user_id', user.id)
-          .eq('is_active', true)
-        
-        const subcontractorProjectIdsList = subcontractorProjectIds?.map(p => p.project_id) || []
-        query = query.in('id', subcontractorProjectIdsList)
+        // No other external roles - return empty
+        query = query.eq('id', 'no-projects')
       }
     }
 
