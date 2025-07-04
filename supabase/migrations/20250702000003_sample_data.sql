@@ -18,7 +18,7 @@
 -- ============================================================================
 
 -- Insert sample user profiles (using generated UUIDs for testing)
-INSERT INTO user_profiles (id, role, first_name, last_name, email, phone, company, department, is_active) VALUES
+--INSERT INTO user_profiles (id, role, first_name, last_name, email, phone, company, department, is_active) VALUES
 -- Management Level (5 roles)
 ('11111111-1111-1111-1111-111111111111', 'company_owner', 'John', 'Smith', 'john.smith@formulapm.com', '+1-555-0101', 'Formula PM', 'Executive', true),
 ('22222222-2222-2222-2222-222222222222', 'general_manager', 'Sarah', 'Johnson', 'sarah.johnson@formulapm.com', '+1-555-0102', 'Formula PM', 'Management', true),

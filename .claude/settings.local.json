@@ -40,7 +40,13 @@
       "Bash(genai:*)",
       "WebFetch(domain:www.npmjs.com)",
       "Bash(rg:*)",
-      "Bash(npm run test:db:*)"
+      "Bash(npm run test:db:*)",
+      "Bash(chmod:*)",
+      "Bash(supabase status:*)",
+      "Bash(supabase start:*)",
+      "Bash(curl:*)",
+      "Bash(sudo dpkg:*)",
+      "Bash(pkill:*)"
     ],
     "deny": []
   }

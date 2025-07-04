@@ -188,7 +188,7 @@ CREATE TABLE scope_items (
   specifications TEXT,
   unit_of_measure TEXT,
   markup_percentage DECIMAL(5,2) DEFAULT 0,
-  final_price DECIMAL(12,2) GENERATED ALWAYS AS (total_price * (1 + markup_percentage/100)) STORED,
+  final_price DECIMAL(12,2) GENERATED ALWAYS AS (quantity * unit_price * (1 + markup_percentage/100)) STORED,
   
   timeline_start DATE,
   timeline_end DATE,
