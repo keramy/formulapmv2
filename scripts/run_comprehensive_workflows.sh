@@ -40,6 +40,20 @@ fi
 
 print_status "Supabase CLI found"
 
+# Validate SQL migrations first
+print_info "Validating SQL migrations..."
+if command -v npm &> /dev/null && [ -f "scripts/validate-migrations.ts" ]; then
+    if npm run validate-migrations:ci > /dev/null 2>&1; then
+        print_status "SQL migrations validation passed"
+    else
+        print_error "SQL migrations validation failed"
+        print_info "Run 'npm run validate-migrations:verbose' to see issues"
+        exit 1
+    fi
+else
+    print_warning "SQL validator not available, skipping validation"
+fi
+
 # Reset the database to ensure clean state
 print_info "Resetting database to clean state..."
 supabase db reset --local

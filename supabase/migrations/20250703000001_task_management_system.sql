@@ -6,15 +6,8 @@
 -- TASK SYSTEM ENUMS
 -- ============================================================================
 
--- Task status types
-CREATE TYPE task_status AS ENUM (
-  'todo',
-  'in_progress', 
-  'review',
-  'blocked',
-  'done',
-  'cancelled'
-);
+-- Task status types (already defined in audit_system migration)
+-- Using existing task_status enum from audit_system
 
 -- Task priority types
 CREATE TYPE task_priority AS ENUM ('low', 'medium', 'high', 'urgent');

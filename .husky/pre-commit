@@ -1,0 +1,53 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Detect if running on Windows Git Bash
+if [ -n "$WINDIR" ] || [ -n "$SYSTEMROOT" ]; then
+  # Check if cmd.exe is available and use Windows batch file
+  if command -v cmd.exe >/dev/null 2>&1 && [ -f "$(dirname "$0")/pre-commit.cmd" ]; then
+    exec cmd.exe //c "$(dirname "$0")/pre-commit.cmd"
+    exit $?
+  fi
+fi
+
+echo "🔍 Running pre-commit validation..."
+
+# Function to run npm command cross-platform
+run_npm() {
+  # Try different ways to run npm
+  if command -v npm >/dev/null 2>&1; then
+    npm "$@"
+  elif command -v npm.cmd >/dev/null 2>&1; then
+    npm.cmd "$@"
+  elif [ -f "/c/Program Files/nodejs/npm.cmd" ]; then
+    "/c/Program Files/nodejs/npm.cmd" "$@"
+  elif [ -f "/c/Program Files/nodejs/npm" ]; then
+    "/c/Program Files/nodejs/npm" "$@"
+  elif command -v node >/dev/null 2>&1; then
+    # Fallback: use node directly with npx
+    node "$(dirname "$0")/../node_modules/.bin/tsx" scripts/validate-migrations.ts supabase/migrations/ --quiet
+  else
+    echo "❌ npm/node not found. Please ensure Node.js is installed and in PATH"
+    echo "💡 You can skip this hook with: git commit --no-verify"
+    exit 1
+  fi
+}
+
+# Check if any SQL files are being committed
+if git diff --cached --name-only | grep -q "\.sql$"; then
+  echo "📝 SQL files detected in commit, running validation..."
+  run_npm run validate-migrations:ci
+  
+  if [ $? -ne 0 ]; then
+    echo "❌ SQL validation failed!"
+    echo "💡 Run 'npm run validate-migrations:fix' to auto-fix issues"
+    echo "💡 Run 'npm run validate-migrations:verbose' for detailed output"
+    exit 1
+  fi
+  
+  echo "✅ SQL validation passed"
+else
+  echo "ℹ️ No SQL files in commit, skipping validation"
+fi
+
+echo "🚀 Pre-commit checks completed successfully!"

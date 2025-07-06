@@ -1,0 +1,137 @@
+name: SQL Migration Validation
+
+on:
+  pull_request:
+    paths:
+      - 'supabase/migrations/**'
+      - 'scripts/validate-migrations.ts'
+      - '.github/workflows/validate-sql.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'supabase/migrations/**'
+      - 'scripts/validate-migrations.ts'
+
+jobs:
+  validate-sql:
+    name: Validate SQL Migrations
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Validate SQL migrations
+        run: |
+          echo "🔍 Validating SQL migrations..."
+          npm run validate-migrations:ci
+          
+      - name: Generate validation report
+        if: always()
+        run: |
+          echo "📊 Generating detailed validation report..."
+          npm run validate-migrations:json > migration-validation-report.json
+          
+      - name: Upload validation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: migration-validation-report
+          path: migration-validation-report.json
+          
+      - name: Comment PR with validation results
+        if: failure() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let comment = '## ❌ SQL Migration Validation Failed\n\n';
+            
+            try {
+              const report = JSON.parse(fs.readFileSync('migration-validation-report.json', 'utf8'));
+              let hasIssues = false;
+              
+              report.forEach(result => {
+                if (result.issues.length > 0) {
+                  hasIssues = true;
+                  comment += `### 📁 ${result.filePath}\n`;
+                  comment += `**Errors:** ${result.stats.errors} | **Warnings:** ${result.stats.warnings}\n\n`;
+                  
+                  result.issues.forEach(issue => {
+                    const icon = issue.type === 'error' ? '❌' : issue.type === 'warning' ? '⚠️' : 'ℹ️';
+                    const fixable = issue.fixable ? ' *[Auto-fixable]*' : '';
+                    comment += `${icon} **Line ${issue.line}:** ${issue.message}${fixable}\n`;
+                    comment += `   - **Rule:** \`${issue.rule}\`\n`;
+                    comment += `   - **Context:** \`${issue.context}\`\n\n`;
+                  });
+                }
+              });
+              
+              if (!hasIssues) {
+                comment = '## ✅ SQL Migration Validation Passed\n\nAll migrations have been validated successfully!';
+              } else {
+                comment += '\n---\n\n';
+                comment += '💡 **To fix these issues:**\n';
+                comment += '1. Run `npm run validate-migrations:fix` to auto-fix fixable issues\n';
+                comment += '2. Run `npm run validate-migrations:verbose` to see detailed output\n';
+                comment += '3. Manually fix remaining issues and commit changes\n';
+              }
+            } catch (error) {
+              comment += 'Could not read validation report. Please check the workflow logs.\n';
+            }
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  validate-sql-performance:
+    name: SQL Performance Check
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Check for performance issues
+        run: |
+          echo "🚀 Checking for potential performance issues..."
+          
+          # Check for missing indexes on foreign keys
+          if grep -r "REFERENCES" supabase/migrations/ | grep -v "INDEX"; then
+            echo "⚠️ Found foreign key references without corresponding indexes"
+          fi
+          
+          # Check for large table alterations
+          if grep -r "ALTER TABLE" supabase/migrations/ | grep -E "(ADD COLUMN|DROP COLUMN)"; then
+            echo "⚠️ Found table alterations that might affect performance"
+          fi
+          
+          # Check for missing NOT NULL constraints
+          if grep -r "ADD COLUMN" supabase/migrations/ | grep -v "NOT NULL"; then
+            echo "ℹ️ Found nullable columns - consider adding NOT NULL constraints"
+          fi
+          
+          echo "✅ Performance check completed"

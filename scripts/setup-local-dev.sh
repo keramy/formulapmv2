@@ -122,7 +122,18 @@ sleep 10
 
 # Check if migrations need to be applied
 echo
-echo "🔄 Applying database migrations..."
+echo "🔄 Validating and applying database migrations..."
+
+# First, validate all migrations
+echo "🔍 Validating SQL migrations..."
+if npm run validate-migrations:ci; then
+    print_status "Migration validation passed"
+else
+    print_error "Migration validation failed"
+    echo "💡 Run 'npm run validate-migrations:verbose' to see detailed issues"
+    echo "💡 Run 'npm run validate-migrations:fix' to auto-fix issues"
+    exit 1
+fi
 
 # Apply migrations
 supabase db reset --linked=false

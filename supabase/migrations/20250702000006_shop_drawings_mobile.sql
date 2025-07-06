@@ -331,7 +331,7 @@ CREATE INDEX idx_messages_recipient ON messages(recipient_id);
 CREATE INDEX idx_messages_sender ON messages(sender_id);
 CREATE INDEX idx_messages_unread ON messages(recipient_id, is_read) WHERE is_read = false;
 CREATE INDEX idx_announcements_project ON project_announcements(project_id);
-CREATE INDEX idx_announcements_active ON project_announcements(project_id, is_pinned) WHERE expires_at IS NULL OR expires_at > NOW();
+CREATE INDEX idx_announcements_active ON project_announcements(project_id, is_pinned) WHERE expires_at IS NULL;
 
 -- ============================================================================
 -- TRIGGERS

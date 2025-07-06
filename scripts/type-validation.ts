@@ -197,15 +197,15 @@ const validateApplicationTypes = () => {
     preferred_payment_method: 'ACH',
     w9_on_file: true,
     credit_approved: true,
-    last_login: new Date('2025-07-03T10:00:00Z'),
+    last_login: '2025-07-03T10:00:00Z',
     login_attempts: 0,
     account_locked: false,
     two_factor_enabled: true,
     mobile_pin: '123456',
     device_fingerprints: [],
     created_by: 'admin-uuid',
-    created_at: new Date('2025-07-03T08:00:00Z'),
-    last_activity: new Date('2025-07-03T10:00:00Z'),
+    created_at: '2025-07-03T08:00:00Z',
+    last_activity: '2025-07-03T10:00:00Z',
     active_status: 'active'
   };
   

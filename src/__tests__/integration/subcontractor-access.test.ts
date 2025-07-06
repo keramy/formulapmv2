@@ -159,8 +159,8 @@ describe('Subcontractor Access System', () => {
     it('should have proper TypeScript types for subcontractor entities', async () => {
       const types = await import('@/types/subcontractor')
       
-      // Check that main types are exported
-      expect(typeof types.SubcontractorUser).toBe('undefined') // Types don't exist at runtime
+      // Check that the module imports without error
+      expect(types).toBeDefined()
       
       // This test ensures the import doesn't fail, indicating proper TypeScript setup
       expect(true).toBe(true)

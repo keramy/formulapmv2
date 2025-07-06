@@ -1,0 +1,21 @@
+// Jest setup file for global configuration
+// This file is run before each test file
+
+// Mock environment variables
+process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
+process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-key';
+process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-key';
+
+// Mock Next.js runtime
+global.Request = global.Request || require('node-fetch').Request;
+global.Response = global.Response || require('node-fetch').Response;
+global.fetch = global.fetch || require('node-fetch');
+
+// Mock console methods in tests
+global.console = {
+  ...console,
+  log: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  info: jest.fn(),
+};

@@ -129,6 +129,71 @@ Users can access key features directly through the global sidebar:
 - **Clients**: Client relationship management
 - **Procurement**: Purchase orders and supplier management
 
+## 🔍 SQL Migration Validation
+
+Formula PM 2.0 includes a comprehensive SQL migration validation system to ensure database integrity and best practices.
+
+### Features
+- **Automated validation** of SQL migrations before deployment
+- **9 validation rules** covering syntax, references, and naming conventions
+- **Auto-fix capabilities** for common issues
+- **CI/CD integration** with GitHub Actions
+- **Pre-commit hooks** to prevent invalid SQL from being committed
+- **Migration template generator** for consistent migration structure
+
+### Usage
+
+#### Validate all migrations:
+```bash
+npm run validate-migrations
+```
+
+#### Validate with auto-fix:
+```bash
+npm run validate-migrations:fix
+```
+
+#### Validate specific file:
+```bash
+npm run validate-migrations:file path/to/migration.sql
+```
+
+#### Generate new migration:
+```bash
+npm run generate-migration -- "description of migration"
+```
+
+#### Validate before Supabase operations:
+```bash
+npm run supabase:start    # Validates before starting Supabase
+npm run supabase:reset    # Validates before resetting database
+```
+
+### Validation Rules
+1. **Generated Column Syntax** - Ensures proper GENERATED ALWAYS AS syntax
+2. **Foreign Key References** - Validates referenced tables exist
+3. **Subquery Detection** - Prevents subqueries in generated columns
+4. **Missing STORED Keywords** - Ensures generated columns use STORED
+5. **Comma Placement** - Validates proper SQL syntax
+6. **Table References** - Checks for valid table references
+7. **Column Definitions** - Validates data types and constraints
+8. **Index Creation** - Ensures proper naming conventions
+9. **Constraint Naming** - Validates constraint naming standards
+
+### CI/CD Integration
+- **GitHub Actions** automatically validate SQL on pull requests
+- **Pre-commit hooks** prevent committing invalid SQL
+- **Auto-commenting** on PRs with validation results
+- **Performance checks** for potential issues
+
+### Migration Templates
+The generator provides templates for:
+- **Table Creation** - Complete table with RLS, triggers, and policies
+- **Column Addition** - Properly formatted column additions
+- **Index Creation** - Performance-optimized indexes
+- **Constraint Addition** - Various constraint types
+- **Custom Migrations** - Flexible template for complex operations
+
 ## 📖 Documentation
 
 Comprehensive documentation is available in the `Planing App/` directory:

@@ -46,7 +46,10 @@
       "Bash(supabase start:*)",
       "Bash(curl:*)",
       "Bash(sudo dpkg:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(npm run validate-migrations:*)",
+      "Bash(npm run:*)",
+      "Bash(test:*)"
     ],
     "deny": []
   }

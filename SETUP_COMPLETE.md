@@ -42,6 +42,7 @@ Your Formula PM 2.0 local development environment has been successfully configur
 - ✅ **Shop Drawings Mobile Integration** - Field access and reporting
 - ✅ **Subcontractor Access System** - External contractor portals
 - ✅ **Authentication & Permissions** - Role-based access control
+- ✅ **SQL Migration Validation** - Comprehensive database validation system
 
 ## 🚀 Quick Start Instructions
 
@@ -99,6 +100,7 @@ All accounts use password: `password123`
 5. **Document Approval** - Multi-stage approval processes
 6. **Shop Drawings** - Mobile-optimized field interface
 7. **Subcontractor Access** - External contractor portals
+8. **SQL Migration Validation** - Automated database validation for migrations
 
 ## 🏗️ Project Scenarios for Testing
 
@@ -157,16 +159,20 @@ npm run dev
 # Run type checking
 npm run type-check
 
+# Validate SQL migrations
+npm run validate-migrations
+
 # View database
 # Open http://localhost:54323
 ```
 
 ### Adding New Features
 1. **Database Changes**: Create migration in `supabase/migrations/`
-2. **Types**: Update type definitions in `src/types/`
-3. **API**: Add routes in `src/app/api/`
-4. **UI**: Create components in `src/components/`
-5. **Logic**: Add hooks in `src/hooks/`
+2. **Validate SQL**: Run `npm run validate-migrations` before applying
+3. **Types**: Update type definitions in `src/types/`
+4. **API**: Add routes in `src/app/api/`
+5. **UI**: Create components in `src/components/`
+6. **Logic**: Add hooks in `src/hooks/`
 
 ### Testing Different Roles
 - Log in with different user accounts to test role-based access

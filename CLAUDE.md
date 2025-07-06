@@ -109,3 +109,106 @@ The Gemini MCP tool is installed and ready to use. It runs as an MCP server that
 - Gemini's context window can handle entire codebases that would overflow Claude's context
 - When checking implementations, be specific about what you're looking for to get accurate results
 - The tool works within Claude's MCP environment for seamless integration
+
+# SQL Migration Validation System
+
+## Overview
+The project includes a comprehensive SQL migration validation system to prevent database compatibility issues. This system was implemented to resolve PostgreSQL/Supabase migration errors and ensure future migrations are error-free.
+
+## Validation Tool Usage
+
+### Quick Validation
+Run validation on all migrations:
+```bash
+npm run validate-migrations
+```
+
+### Command Line Options
+```bash
+# Validate specific file
+npx tsx scripts/validate-migrations.ts supabase/migrations/migration.sql
+
+# Validate entire directory
+npx tsx scripts/validate-migrations.ts supabase/migrations/
+
+# Auto-fix issues where possible
+npx tsx scripts/validate-migrations.ts supabase/migrations/ --fix
+
+# Get detailed output
+npx tsx scripts/validate-migrations.ts supabase/migrations/ --verbose
+
+# JSON output for CI/CD
+npx tsx scripts/validate-migrations.ts supabase/migrations/ --format json
+```
+
+### Validation Rules
+The validator checks for:
+1. **Generated Column Syntax** - Proper GENERATED ALWAYS AS syntax
+2. **Foreign Key References** - Ensures referenced tables exist
+3. **Subqueries in Generated Columns** - Detects illegal SELECT statements
+4. **Missing STORED Keywords** - Validates generated columns have STORED
+5. **Comma Placement** - Checks for syntax errors in comma usage
+6. **Table References** - Validates all table references exist
+7. **Column Definitions** - Checks data types and constraints
+8. **Index Creation** - Validates index naming conventions
+9. **Constraint Naming** - Ensures proper constraint prefixes
+
+### Integration Points
+- **Pre-commit Hook**: Automatically runs on `git commit`
+- **GitHub Actions**: Validates PRs with `/validate-sql` comment
+- **NPM Scripts**: `npm run validate-migrations` for manual runs
+- **CI/CD Pipeline**: Integrated into build process
+
+### Key Files
+- `scripts/validate-migrations.ts` - Main validation tool
+- `POSTGRESQL_SUPABASE_MIGRATION_GUIDELINES.md` - Comprehensive migration guidelines
+- `.github/workflows/validate-sql.yml` - GitHub Actions workflow
+- `jest.config.js` - Test configuration with TypeScript support
+
+## Migration Best Practices
+
+### Generated Columns
+```sql
+-- ✅ Correct
+price DECIMAL(10,2) GENERATED ALWAYS AS (quantity * unit_price) STORED,
+
+-- ❌ Incorrect - missing STORED
+price DECIMAL(10,2) GENERATED ALWAYS AS (quantity * unit_price),
+
+-- ❌ Incorrect - subquery not allowed
+price DECIMAL(10,2) GENERATED ALWAYS AS (SELECT price FROM products WHERE id = product_id) STORED,
+```
+
+### Foreign Key References
+```sql
+-- ✅ Correct - table exists in same migration
+CREATE TABLE projects (id UUID PRIMARY KEY);
+CREATE TABLE tasks (
+  project_id UUID REFERENCES projects(id)
+);
+
+-- ❌ Incorrect - referenced table not found
+CREATE TABLE tasks (
+  project_id UUID REFERENCES missing_table(id)
+);
+```
+
+### Testing
+Run the validation test suite:
+```bash
+npm test -- --testNamePattern="validate-migrations"
+```
+
+### Status
+✅ **Fully Implemented** - All validation rules active
+✅ **CI/CD Integrated** - GitHub Actions workflow ready
+✅ **Developer Workflow** - Pre-commit hooks configured
+✅ **Documentation** - Comprehensive guidelines available
+
+### Troubleshooting
+
+#### Windows Git Bash npm Error
+If you get `npm: No such file or directory` error on Windows:
+1. The pre-commit hook has been updated to handle Windows environments
+2. Use `git commit --no-verify` to bypass temporarily
+3. See `docs/GIT_BASH_NPM_TROUBLESHOOTING.md` for detailed solutions

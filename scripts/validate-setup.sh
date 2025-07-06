@@ -157,7 +157,22 @@ else
     print_fail "Supabase not running - run 'supabase start'"
 fi
 
-# Test 5: Database validation
+# Test 5: SQL Migration validation
+echo
+echo "🔍 Validating SQL migrations..."
+
+if [ -f "scripts/validate-migrations.ts" ]; then
+    if npm run validate-migrations:ci > /dev/null 2>&1; then
+        print_pass "SQL migrations validation passed"
+    else
+        print_fail "SQL migrations validation failed"
+        print_info "Run 'npm run validate-migrations:verbose' for details"
+    fi
+else
+    print_warning "SQL validator not found"
+fi
+
+# Test 6: Database validation
 echo
 echo "🏗️ Validating database structure..."
 

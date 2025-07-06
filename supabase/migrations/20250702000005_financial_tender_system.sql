@@ -223,9 +223,7 @@ CREATE TABLE tender_submission_items (
   submission_id UUID REFERENCES tender_submissions(id) ON DELETE CASCADE,
   tender_item_id UUID REFERENCES tender_items(id),
   unit_price DECIMAL(10,2) NOT NULL,
-  total_price DECIMAL(12,2) GENERATED ALWAYS AS (
-    (SELECT quantity FROM tender_items WHERE id = tender_item_id) * unit_price
-  ) STORED,
+  total_price DECIMAL(12,2),
   notes TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -318,6 +316,24 @@ CREATE INDEX idx_tender_submissions_supplier ON tender_submissions(supplier_id);
 -- ============================================================================
 -- TRIGGERS
 -- ============================================================================
+
+-- Calculate total_price for tender submission items
+CREATE OR REPLACE FUNCTION calculate_tender_submission_item_total()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- Calculate total_price based on tender_item quantity and unit_price
+  SELECT quantity * NEW.unit_price
+  INTO NEW.total_price
+  FROM tender_items
+  WHERE id = NEW.tender_item_id;
+  
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_calculate_tender_submission_item_total
+  BEFORE INSERT OR UPDATE ON tender_submission_items
+  FOR EACH ROW EXECUTE PROCEDURE calculate_tender_submission_item_total();
 
 -- Auto-generate PO numbers
 CREATE OR REPLACE FUNCTION generate_po_number()
