@@ -10,10 +10,10 @@ import { useAuth } from '@/hooks/useAuth'
 import { useDocumentWorkflow } from '@/hooks/useDocumentWorkflow'
 import { toast } from '@/components/ui/use-toast'
 
-import { ApprovalWorkflowManager } from './ApprovalWorkflowManager'
-import { ApprovalStatusCards } from './ApprovalStatusCards'
-import { PendingApprovalsTable } from './PendingApprovalsTable'
-import { DocumentList } from './DocumentList'
+import ApprovalWorkflowManager from './ApprovalWorkflowManager'
+import ApprovalStatusCards from './ApprovalStatusCards'
+import PendingApprovalsTable from './PendingApprovalsTable'
+import DocumentList from './DocumentList'
 
 interface DocumentApprovalCoordinatorProps {
   projectId?: string

@@ -149,6 +149,19 @@ export function createClientSession(
 }
 
 /**
+ * Invalidate client session
+ */
+export function invalidateClientSession(sessionId: string): boolean {
+  const session = clientSessions.get(sessionId)
+  if (session) {
+    session.is_active = false
+    clientSessions.set(sessionId, session)
+    return true
+  }
+  return false
+}
+
+/**
  * Generate secure session ID
  */
 function generateSecureSessionId(): string {

@@ -17,7 +17,7 @@ import {
   X, 
   Search, 
   Filter,
-  MarkAsRead,
+  Check,
   Trash2,
   Eye,
   Calendar,
@@ -317,7 +317,7 @@ export const ClientNotificationCenter: React.FC<ClientNotificationCenterProps> =
                   size="sm"
                   onClick={markAllAsRead}
                 >
-                  <MarkAsRead className="w-4 h-4 mr-2" />
+                  <Check className="w-4 h-4 mr-2" />
                   Mark All Read
                 </Button>
               )}
@@ -541,7 +541,7 @@ export const ClientNotificationCenter: React.FC<ClientNotificationCenterProps> =
               </span>
               <div className="flex gap-2">
                 <Button size="sm" variant="outline" onClick={handleBulkMarkAsRead}>
-                  <MarkAsRead className="w-4 h-4 mr-2" />
+                  <Check className="w-4 h-4 mr-2" />
                   Mark as Read
                 </Button>
                 <Button size="sm" variant="outline" onClick={() => setSelectedNotifications([])}>

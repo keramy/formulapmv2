@@ -10,11 +10,11 @@ import { useAuth } from '@/hooks/useAuth'
 import { useResponsive } from '@/hooks/useResponsive'
 import { toast } from '@/components/ui/use-toast'
 
-import { ShopDrawingsList } from './ShopDrawingsList'
-import { ShopDrawingViewer } from './ShopDrawingViewer'
-import { MobileDrawingCard } from './mobile/MobileDrawingCard'
+import ShopDrawingsList from './ShopDrawingsList'
+import ShopDrawingViewer from './ShopDrawingViewer'
+import MobileDrawingCard from './mobile/MobileDrawingCard'
 import { ApprovalWorkflow } from './approvals/ApprovalWorkflow'
-import { ProgressPhotoUpload } from './progress/ProgressPhotoUpload'
+import ProgressPhotoUpload from './progress/ProgressPhotoUpload'
 import { DrawingFilters } from './filters/DrawingFilters'
 
 interface ShopDrawingsCoordinatorProps {
