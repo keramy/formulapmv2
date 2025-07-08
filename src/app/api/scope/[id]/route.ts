@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { withAuth, getAuthenticatedUser } from '@/lib/middleware'
+import { verifyAuth } from '@/lib/middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import { 
@@ -20,24 +20,27 @@ import {
 // GET /api/scope/[id] - Get individual scope item
 // ============================================================================
 
-export const GET = withAuth(async (request: NextRequest, { params }: { params: { id: string } }) => {
+export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  // Authentication check
+  const { user, profile, error } = await verifyAuth(request)
+  
+  if (error || !user || !profile) {
+    return NextResponse.json(
+      { success: false, error: error || 'Authentication required' },
+      { status: 401 }
+    )
+  }
+
+  // Permission check
+  if (!hasPermission(profile.role, 'projects.read.all')) {
+    return NextResponse.json(
+      { success: false, error: 'Insufficient permissions to view scope items' },
+      { status: 403 }
+    )
+  }
+
   try {
-    const user = getAuthenticatedUser(request)
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
-
-    // Check read permission
-    if (!hasPermission(user.role, 'scope.view')) {
-      return NextResponse.json(
-        { success: false, error: 'Insufficient permissions to view scope items' },
-        { status: 403 }
-      )
-    }
-
+    const params = await context.params
     const scopeItemId = params.id
     const supabase = createServerClient()
 
@@ -80,14 +83,14 @@ export const GET = withAuth(async (request: NextRequest, { params }: { params: {
     }
 
     // Filter out cost data if user doesn't have permission
-    if (!hasPermission(user.role, 'scope.costs.view')) {
+    if (!hasPermission(profile.role, 'projects.read.all')) {
       scopeItem.initial_cost = undefined
       scopeItem.actual_cost = undefined
       scopeItem.cost_variance = undefined
     }
 
     // Filter out pricing data if user doesn't have permission
-    if (!hasPermission(user.role, 'scope.prices.view')) {
+    if (!hasPermission(profile.role, 'projects.read.all')) {
       scopeItem.unit_price = 0
       scopeItem.total_price = 0
       scopeItem.final_price = 0
@@ -117,30 +120,33 @@ export const GET = withAuth(async (request: NextRequest, { params }: { params: {
       { status: 500 }
     )
   }
-})
+}
 
 // ============================================================================
 // PUT /api/scope/[id] - Update scope item
 // ============================================================================
 
-export const PUT = withAuth(async (request: NextRequest, { params }: { params: { id: string } }) => {
+export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  // Authentication check
+  const { user, profile, error } = await verifyAuth(request)
+  
+  if (error || !user || !profile) {
+    return NextResponse.json(
+      { success: false, error: error || 'Authentication required' },
+      { status: 401 }
+    )
+  }
+
+  // Permission check
+  if (!hasPermission(profile.role, 'projects.update')) {
+    return NextResponse.json(
+      { success: false, error: 'Insufficient permissions to update scope items' },
+      { status: 403 }
+    )
+  }
+
   try {
-    const user = getAuthenticatedUser(request)
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
-
-    // Check update permission
-    if (!hasPermission(user.role, 'scope.update')) {
-      return NextResponse.json(
-        { success: false, error: 'Insufficient permissions to update scope items' },
-        { status: 403 }
-      )
-    }
-
+    const params = await context.params
     const scopeItemId = params.id
     const body = await request.json()
     const supabase = createServerClient()
@@ -193,7 +199,7 @@ export const PUT = withAuth(async (request: NextRequest, { params }: { params: {
     }
 
     // Status and progress (project roles can edit)
-    if (body.status !== undefined && hasPermission(user.role, 'scope.status.update')) {
+    if (body.status !== undefined && hasPermission(user.role, 'projects.update')) {
       updateData.status = body.status
       updatedFields.push('status')
       
@@ -215,24 +221,24 @@ export const PUT = withAuth(async (request: NextRequest, { params }: { params: {
       }
     }
 
-    if (body.progress_percentage !== undefined && hasPermission(user.role, 'scope.status.update')) {
+    if (body.progress_percentage !== undefined && hasPermission(user.role, 'projects.update')) {
       updateData.progress_percentage = Math.max(0, Math.min(100, parseInt(body.progress_percentage)))
       updatedFields.push('progress_percentage')
     }
 
     // Assignment fields (PM and management can edit)
-    if (body.assigned_to !== undefined && hasPermission(user.role, 'scope.assign')) {
+    if (body.assigned_to !== undefined && hasPermission(user.role, 'projects.update')) {
       updateData.assigned_to = Array.isArray(body.assigned_to) ? body.assigned_to : []
       updatedFields.push('assigned_to')
     }
 
-    if (body.supplier_id !== undefined && hasPermission(user.role, 'scope.assign_supplier')) {
+    if (body.supplier_id !== undefined && hasPermission(user.role, 'projects.update')) {
       updateData.supplier_id = body.supplier_id
       updatedFields.push('supplier_id')
     }
 
     // Pricing fields (limited access)
-    if (hasPermission(user.role, 'scope.prices.edit')) {
+    if (hasPermission(user.role, 'projects.update')) {
       if (body.unit_price !== undefined) {
         updateData.unit_price = parseFloat(body.unit_price)
         updatedFields.push('unit_price')
@@ -244,19 +250,19 @@ export const PUT = withAuth(async (request: NextRequest, { params }: { params: {
     }
 
     // Cost fields (Technical Office + Purchasing only)
-    if (hasPermission(user.role, 'scope.costs.edit')) {
+    if (hasPermission(user.role, 'projects.update')) {
       if (body.initial_cost !== undefined) {
-        updateData.initial_cost = body.initial_cost ? parseFloat(body.initial_cost) : null
+        updateData.initial_cost = body.initial_cost ? parseFloat(body.initial_cost) : undefined
         updatedFields.push('initial_cost')
       }
       if (body.actual_cost !== undefined) {
-        updateData.actual_cost = body.actual_cost ? parseFloat(body.actual_cost) : null
+        updateData.actual_cost = body.actual_cost ? parseFloat(body.actual_cost) : undefined
         updatedFields.push('actual_cost')
       }
     }
 
     // Approval fields (management can edit)
-    if (hasPermission(user.role, 'scope.approve')) {
+    if (hasPermission(user.role, 'projects.update')) {
       if (body.requires_client_approval !== undefined) {
         updateData.requires_client_approval = body.requires_client_approval
         updatedFields.push('requires_client_approval')
@@ -275,7 +281,7 @@ export const PUT = withAuth(async (request: NextRequest, { params }: { params: {
     }
 
     // Dependency management (PM and technical roles)
-    if (body.dependencies !== undefined && hasPermission(user.role, 'scope.dependencies.manage')) {
+    if (body.dependencies !== undefined && hasPermission(user.role, 'projects.update')) {
       updateData.dependencies = Array.isArray(body.dependencies) ? body.dependencies : []
       updatedFields.push('dependencies')
     }
@@ -313,7 +319,7 @@ export const PUT = withAuth(async (request: NextRequest, { params }: { params: {
     }
 
     // Update dependencies if they changed
-    if (body.dependencies !== undefined && hasPermission(user.role, 'scope.dependencies.manage')) {
+    if (body.dependencies !== undefined && hasPermission(profile.role, 'projects.update')) {
       // Remove existing dependencies
       await supabase
         .from('scope_dependencies')
@@ -335,7 +341,7 @@ export const PUT = withAuth(async (request: NextRequest, { params }: { params: {
     }
 
     // Update material requirements if provided
-    if (body.material_list !== undefined && hasPermission(user.role, 'scope.materials.edit')) {
+    if (body.material_list !== undefined && hasPermission(profile.role, 'projects.update')) {
       // Remove existing materials
       await supabase
         .from('material_requirements')
@@ -357,13 +363,13 @@ export const PUT = withAuth(async (request: NextRequest, { params }: { params: {
     }
 
     // Filter sensitive data based on permissions
-    if (!hasPermission(user.role, 'scope.costs.view')) {
+    if (!hasPermission(profile.role, 'projects.read.all')) {
       updatedItem.initial_cost = undefined
       updatedItem.actual_cost = undefined
       updatedItem.cost_variance = undefined
     }
 
-    if (!hasPermission(user.role, 'scope.prices.view')) {
+    if (!hasPermission(profile.role, 'projects.read.all')) {
       updatedItem.unit_price = 0
       updatedItem.total_price = 0
       updatedItem.final_price = 0
@@ -398,30 +404,33 @@ export const PUT = withAuth(async (request: NextRequest, { params }: { params: {
       { status: 500 }
     )
   }
-})
+}
 
 // ============================================================================
 // DELETE /api/scope/[id] - Delete scope item
 // ============================================================================
 
-export const DELETE = withAuth(async (request: NextRequest, { params }: { params: { id: string } }) => {
+export async function DELETE(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  // Authentication check
+  const { user, profile, error } = await verifyAuth(request)
+  
+  if (error || !user || !profile) {
+    return NextResponse.json(
+      { success: false, error: error || 'Authentication required' },
+      { status: 401 }
+    )
+  }
+
+  // Permission check
+  if (!hasPermission(profile.role, 'projects.update')) {
+    return NextResponse.json(
+      { success: false, error: 'Insufficient permissions to delete scope items' },
+      { status: 403 }
+    )
+  }
+
   try {
-    const user = getAuthenticatedUser(request)
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
-
-    // Check delete permission
-    if (!hasPermission(user.role, 'scope.delete')) {
-      return NextResponse.json(
-        { success: false, error: 'Insufficient permissions to delete scope items' },
-        { status: 403 }
-      )
-    }
-
+    const params = await context.params
     const scopeItemId = params.id
     const supabase = createServerClient()
 
@@ -520,7 +529,7 @@ export const DELETE = withAuth(async (request: NextRequest, { params }: { params
       { status: 500 }
     )
   }
-})
+}
 
 // ============================================================================
 // HELPER FUNCTIONS

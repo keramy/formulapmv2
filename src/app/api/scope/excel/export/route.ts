@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { withAuth, getAuthenticatedUser } from '@/lib/middleware'
+import { verifyAuth } from '@/lib/middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import * as XLSX from 'xlsx'
@@ -16,23 +16,26 @@ import { ScopeFilters } from '@/types/scope'
 // GET /api/scope/excel/export - Export scope items to Excel
 // ============================================================================
 
-export const GET = withAuth(async (request: NextRequest) => {
-  try {
-    const user = getAuthenticatedUser(request)
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
+export async function GET(request: NextRequest) {
+  // Authentication check
+  const { user, profile, error } = await verifyAuth(request)
+  
+  if (error || !user || !profile) {
+    return NextResponse.json(
+      { success: false, error: error || 'Authentication required' },
+      { status: 401 }
+    )
+  }
 
-    // Check export permission
-    if (!hasPermission(user.role, 'scope.export_excel')) {
-      return NextResponse.json(
-        { success: false, error: 'Insufficient permissions to export Excel files' },
-        { status: 403 }
-      )
-    }
+  // Permission check
+  if (!hasPermission(profile.role, 'projects.read.all')) {
+    return NextResponse.json(
+      { success: false, error: 'Insufficient permissions to export Excel files' },
+      { status: 403 }
+    )
+  }
+
+  try {
 
     const url = new URL(request.url)
     const projectId = url.searchParams.get('project_id')
@@ -115,8 +118,8 @@ export const GET = withAuth(async (request: NextRequest) => {
     }
 
     // Determine what data to include based on permissions
-    const canViewPricing = hasPermission(user.role, 'scope.prices.view')
-    const canViewCosts = hasPermission(user.role, 'scope.costs.view')
+    const canViewPricing = hasPermission(user.role, 'projects.read.all')
+    const canViewCosts = hasPermission(user.role, 'projects.read.all')
 
     // Create Excel workbook
     const workbook = XLSX.utils.book_new()
@@ -354,7 +357,7 @@ export const GET = withAuth(async (request: NextRequest) => {
       { status: 500 }
     )
   }
-})
+}
 
 // ============================================================================
 // HELPER FUNCTIONS

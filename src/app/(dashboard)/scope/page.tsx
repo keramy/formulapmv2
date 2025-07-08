@@ -355,10 +355,10 @@ export default function GlobalScopePage() {
           globalView={true}
           initialCategory={selectedCategory}
           userPermissions={{
-            canEdit: checkPermission('scope.update'),
-            canDelete: checkPermission('scope.delete'),
-            canViewPricing: checkPermission('scope.prices.view'),
-            canAssignSupplier: checkPermission('scope.assign_supplier')
+            canEdit: checkPermission('projects.update'),
+            canDelete: checkPermission('projects.delete'),
+            canViewPricing: checkPermission('projects.read.all'),
+            canAssignSupplier: checkPermission('projects.update')
           }}
         />
       </div>

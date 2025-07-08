@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { withAuth, getAuthenticatedUser } from '@/lib/middleware'
+import { verifyAuth } from '@/lib/middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import { ScopeApiResponse } from '@/types/scope'
@@ -15,24 +15,27 @@ import { ScopeApiResponse } from '@/types/scope'
 // GET /api/scope/[id]/dependencies - Get scope item dependencies
 // ============================================================================
 
-export const GET = withAuth(async (request: NextRequest, { params }: { params: { id: string } }) => {
+export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  // Authentication check
+  const { user, profile, error } = await verifyAuth(request)
+  
+  if (error || !user || !profile) {
+    return NextResponse.json(
+      { success: false, error: error || 'Authentication required' },
+      { status: 401 }
+    )
+  }
+
+  // Permission check
+  if (!hasPermission(profile.role, 'projects.read.all')) {
+    return NextResponse.json(
+      { success: false, error: 'Insufficient permissions to view scope dependencies' },
+      { status: 403 }
+    )
+  }
+
   try {
-    const user = getAuthenticatedUser(request)
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
-
-    // Check read permission
-    if (!hasPermission(user.role, 'scope.view')) {
-      return NextResponse.json(
-        { success: false, error: 'Insufficient permissions to view scope dependencies' },
-        { status: 403 }
-      )
-    }
-
+    const params = await context.params
     const scopeItemId = params.id
     const supabase = createServerClient()
 
@@ -84,7 +87,7 @@ export const GET = withAuth(async (request: NextRequest, { params }: { params: {
         summary: {
           total_dependencies: (dependsOn || []).length,
           total_blocked_items: (blocks || []).length,
-          blocking_dependencies: (dependsOn || []).filter(dep => 
+          blocking_dependencies: (dependsOn || []).filter((dep: any) => 
             dep.depends_on_item?.status !== 'completed'
           ).length
         }
@@ -100,30 +103,33 @@ export const GET = withAuth(async (request: NextRequest, { params }: { params: {
       { status: 500 }
     )
   }
-})
+}
 
 // ============================================================================
 // POST /api/scope/[id]/dependencies - Add dependency
 // ============================================================================
 
-export const POST = withAuth(async (request: NextRequest, { params }: { params: { id: string } }) => {
+export async function POST(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  // Authentication check
+  const { user, profile, error } = await verifyAuth(request)
+  
+  if (error || !user || !profile) {
+    return NextResponse.json(
+      { success: false, error: error || 'Authentication required' },
+      { status: 401 }
+    )
+  }
+
+  // Permission check
+  if (!hasPermission(profile.role, 'projects.update')) {
+    return NextResponse.json(
+      { success: false, error: 'Insufficient permissions to manage dependencies' },
+      { status: 403 }
+    )
+  }
+
   try {
-    const user = getAuthenticatedUser(request)
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
-
-    // Check dependency management permission
-    if (!hasPermission(user.role, 'scope.dependencies.manage')) {
-      return NextResponse.json(
-        { success: false, error: 'Insufficient permissions to manage dependencies' },
-        { status: 403 }
-      )
-    }
-
+    const params = await context.params
     const scopeItemId = params.id
     const body = await request.json()
     
@@ -236,30 +242,33 @@ export const POST = withAuth(async (request: NextRequest, { params }: { params: 
       { status: 500 }
     )
   }
-})
+}
 
 // ============================================================================
 // DELETE /api/scope/[id]/dependencies?depends_on_id=X - Remove dependency
 // ============================================================================
 
-export const DELETE = withAuth(async (request: NextRequest, { params }: { params: { id: string } }) => {
+export async function DELETE(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  // Authentication check
+  const { user, profile, error } = await verifyAuth(request)
+  
+  if (error || !user || !profile) {
+    return NextResponse.json(
+      { success: false, error: error || 'Authentication required' },
+      { status: 401 }
+    )
+  }
+
+  // Permission check
+  if (!hasPermission(profile.role, 'projects.update')) {
+    return NextResponse.json(
+      { success: false, error: 'Insufficient permissions to manage dependencies' },
+      { status: 403 }
+    )
+  }
+
   try {
-    const user = getAuthenticatedUser(request)
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
-
-    // Check dependency management permission
-    if (!hasPermission(user.role, 'scope.dependencies.manage')) {
-      return NextResponse.json(
-        { success: false, error: 'Insufficient permissions to manage dependencies' },
-        { status: 403 }
-      )
-    }
-
+    const params = await context.params
     const scopeItemId = params.id
     const url = new URL(request.url)
     const dependsOnId = url.searchParams.get('depends_on_id')
@@ -307,7 +316,7 @@ export const DELETE = withAuth(async (request: NextRequest, { params }: { params
       { status: 500 }
     )
   }
-})
+}
 
 // ============================================================================
 // HELPER FUNCTIONS

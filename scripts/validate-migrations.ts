@@ -467,7 +467,7 @@ class SQLValidator {
                   rule: 'index-creation',
                   message: `Potential duplicate index on ${tableName}(${currentColumns})`,
                   line: lineIndex + 1,
-                  column: match.index || 0,
+                  column: match?.index || 0,
                   context: line.trim(),
                   fixable: false
                 });

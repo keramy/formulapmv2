@@ -10,12 +10,11 @@ import { FolderOpen, CheckSquare, Users, DollarSign, AlertTriangle, Clock } from
 interface DashboardStatsData {
   totalProjects: number;
   activeProjects: number;
-  totalTasks: number;
-  completedTasks: number;
-  overdueTasks: number;
+  totalScopeItems: number;
+  completedScopeItems: number;
+  overdueScopeItems: number;
   teamMembers: number;
   budget: number;
-  pendingApprovals: number;
 }
 
 export function DashboardStats() {
@@ -56,12 +55,12 @@ export function DashboardStats() {
         const [
           { count: totalProjects },
           { count: activeProjects },
-          { data: scopeItems, count: totalTasks },
+          { data: scopeItems, count: totalScopeItems },
           { data: teamData, count: teamMembers },
           { data: tenderData }
         ] = await Promise.all([
-          projectQuery.eq('is_active', true),
-          projectQuery.eq('status', 'active').eq('is_active', true),
+          projectQuery.in('status', ['planning', 'active', 'bidding']),
+          projectQuery.eq('status', 'active'),
           supabase.from('scope_items').select('*', { count: 'exact' }),
           hasPermission('users.read.all') 
             ? supabase.from('user_profiles').select('*', { count: 'exact' }).eq('is_active', true)
@@ -71,9 +70,9 @@ export function DashboardStats() {
             : { data: [] }
         ]);
 
-        // Calculate task statistics
-        const completedTasks = scopeItems?.filter(item => item.status === 'completed').length || 0;
-        const overdueTasks = scopeItems?.filter(item => 
+        // Calculate scope item statistics
+        const completedScopeItems = scopeItems?.filter(item => item.status === 'completed').length || 0;
+        const overdueScopeItems = scopeItems?.filter(item => 
           item.timeline_end && 
           new Date(item.timeline_end) < new Date() && 
           item.status !== 'completed'
@@ -84,21 +83,14 @@ export function DashboardStats() {
           return sum + (tender.estimated_value || 0);
         }, 0) || 0;
 
-        // Calculate pending approvals (shop drawings with pending status)
-        const { count: pendingApprovals } = await supabase
-          .from('shop_drawings_mobile')
-          .select('*', { count: 'exact' })
-          .eq('status', 'pending');
-
         setStats({
           totalProjects: totalProjects || 0,
           activeProjects: activeProjects || 0,
-          totalTasks: totalTasks || 0,
-          completedTasks,
-          overdueTasks,
+          totalScopeItems: totalScopeItems || 0,
+          completedScopeItems,
+          overdueScopeItems,
           teamMembers: teamMembers || 0,
-          budget,
-          pendingApprovals: pendingApprovals || 0
+          budget
         });
       } catch (error) {
         console.error('Error fetching dashboard stats:', error);
@@ -140,21 +132,21 @@ export function DashboardStats() {
       show: hasPermission('projects.read.all') || hasPermission('projects.read.assigned')
     },
     {
-      title: 'Tasks Completed',
-      value: stats.completedTasks,
-      total: stats.totalTasks,
+      title: 'Scope Items Completed',
+      value: stats.completedScopeItems,
+      total: stats.totalScopeItems,
       icon: CheckSquare,
       color: 'text-green-600',
       bgColor: 'bg-green-100',
-      show: hasPermission('tasks.view')
+      show: hasPermission('projects.read.all') || hasPermission('projects.read.assigned')
     },
     {
-      title: 'Overdue Tasks',
-      value: stats.overdueTasks,
+      title: 'Overdue Items',
+      value: stats.overdueScopeItems,
       icon: AlertTriangle,
       color: 'text-red-600',
       bgColor: 'bg-red-100',
-      show: hasPermission('tasks.view')
+      show: hasPermission('projects.read.all') || hasPermission('projects.read.assigned')
     },
     {
       title: 'Team Members',
@@ -171,14 +163,6 @@ export function DashboardStats() {
       color: 'text-green-600',
       bgColor: 'bg-green-100',
       show: hasPermission('financials.view')
-    },
-    {
-      title: 'Pending Approvals',
-      value: stats.pendingApprovals,
-      icon: Clock,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-100',
-      show: hasPermission('documents.read.all') || hasPermission('documents.read.project')
     }
   ].filter(card => card.show);
 

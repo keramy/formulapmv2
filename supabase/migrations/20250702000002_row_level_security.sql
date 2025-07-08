@@ -21,26 +21,42 @@ ALTER TABLE document_approvals ENABLE ROW LEVEL SECURITY;
 -- ============================================================================
 
 -- Function to check if current user has management role
+-- Uses JWT claims to avoid RLS policy recursion
 CREATE OR REPLACE FUNCTION is_management_role()
 RETURNS BOOLEAN AS $$
+DECLARE
+  user_role text;
 BEGIN
-  RETURN EXISTS (
-    SELECT 1 FROM user_profiles 
-    WHERE id = auth.uid() 
-    AND role IN ('company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin')
-  );
+  -- Get role from JWT claims to avoid recursion
+  user_role := auth.jwt() ->> 'user_role';
+  
+  -- If no role in JWT, return false (user not authenticated properly)
+  IF user_role IS NULL THEN
+    RETURN FALSE;
+  END IF;
+  
+  -- Check if user has management role
+  RETURN user_role IN ('company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin');
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Function to check if current user has cost tracking access
+-- Uses JWT claims to avoid RLS policy recursion
 CREATE OR REPLACE FUNCTION has_cost_tracking_access()
 RETURNS BOOLEAN AS $$
+DECLARE
+  user_role text;
 BEGIN
-  RETURN EXISTS (
-    SELECT 1 FROM user_profiles 
-    WHERE id = auth.uid() 
-    AND role IN ('company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'technical_engineer', 'purchase_director', 'purchase_specialist')
-  );
+  -- Get role from JWT claims to avoid recursion
+  user_role := auth.jwt() ->> 'user_role';
+  
+  -- If no role in JWT, return false (user not authenticated properly)
+  IF user_role IS NULL THEN
+    RETURN FALSE;
+  END IF;
+  
+  -- Check if user has cost tracking access
+  RETURN user_role IN ('company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'technical_engineer', 'purchase_director', 'purchase_specialist');
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
@@ -68,15 +84,25 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Function to check if current user is client with access to project
+-- Uses JWT claims to avoid RLS policy recursion
 CREATE OR REPLACE FUNCTION is_client_with_project_access(project_uuid UUID)
 RETURNS BOOLEAN AS $$
+DECLARE
+  user_role text;
 BEGIN
+  -- Get role from JWT claims to avoid recursion
+  user_role := auth.jwt() ->> 'user_role';
+  
+  -- If not a client, return false
+  IF user_role != 'client' THEN
+    RETURN FALSE;
+  END IF;
+  
+  -- Check if client has access to this project
   RETURN EXISTS (
-    SELECT 1 FROM user_profiles up
-    JOIN clients c ON c.user_id = up.id
+    SELECT 1 FROM clients c
     JOIN projects p ON p.client_id = c.id
-    WHERE up.id = auth.uid() 
-    AND up.role = 'client'
+    WHERE c.user_id = auth.uid() 
     AND p.id = project_uuid
   );
 END;
@@ -146,24 +172,18 @@ CREATE POLICY "PM client access" ON clients
 -- ============================================================================
 
 -- Management and purchase department full access
+-- Uses JWT claims to avoid RLS policy recursion
 CREATE POLICY "Management supplier access" ON suppliers
   FOR ALL USING (
     is_management_role() OR
-    EXISTS (
-      SELECT 1 FROM user_profiles 
-      WHERE id = auth.uid() 
-      AND role IN ('purchase_director', 'purchase_specialist')
-    )
+    (auth.jwt() ->> 'user_role' IN ('purchase_director', 'purchase_specialist'))
   );
 
 -- Project team can view suppliers (read-only)
+-- Uses JWT claims to avoid RLS policy recursion
 CREATE POLICY "Project team supplier read" ON suppliers
   FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM user_profiles 
-      WHERE id = auth.uid() 
-      AND role IN ('project_manager', 'technical_engineer', 'architect')
-    )
+    (auth.jwt() ->> 'user_role' IN ('project_manager', 'technical_engineer', 'architect'))
   );
 
 -- ============================================================================
@@ -241,27 +261,24 @@ CREATE POLICY "Project team scope access" ON scope_items
   FOR SELECT USING (has_project_access(project_id));
 
 -- Field workers limited access to assigned scope items only
+-- Uses JWT claims to avoid RLS policy recursion
 CREATE POLICY "Field worker scope access" ON scope_items
   FOR SELECT USING (
+    (auth.jwt() ->> 'user_role' = 'field_worker') AND
     EXISTS (
-      SELECT 1 FROM user_profiles up
-      JOIN project_assignments pa ON pa.user_id = up.id
-      WHERE up.id = auth.uid()
-      AND up.role = 'field_worker'
+      SELECT 1 FROM project_assignments pa
+      WHERE pa.user_id = auth.uid()
       AND pa.project_id = scope_items.project_id
       AND (auth.uid() = ANY(scope_items.assigned_to) OR pa.is_active = true)
     )
   );
 
 -- Field workers can update status and assigned items
+-- Uses JWT claims to avoid RLS policy recursion
 CREATE POLICY "Field worker scope update" ON scope_items
   FOR UPDATE USING (
-    EXISTS (
-      SELECT 1 FROM user_profiles up
-      WHERE up.id = auth.uid()
-      AND up.role = 'field_worker'
-      AND auth.uid() = ANY(scope_items.assigned_to)
-    )
+    (auth.jwt() ->> 'user_role' = 'field_worker') AND
+    (auth.uid() = ANY(scope_items.assigned_to))
   )
   WITH CHECK (
     -- Field workers can only update specific columns (enforced in application)
@@ -275,14 +292,11 @@ CREATE POLICY "Client scope limited access" ON scope_items
   );
 
 -- Subcontractors access to assigned scope items only
+-- Uses JWT claims to avoid RLS policy recursion
 CREATE POLICY "Subcontractor scope access" ON scope_items
   FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM user_profiles up
-      WHERE up.id = auth.uid()
-      AND up.role = 'subcontractor'
-      AND auth.uid() = ANY(scope_items.assigned_to)
-    )
+    (auth.jwt() ->> 'user_role' = 'subcontractor') AND
+    (auth.uid() = ANY(scope_items.assigned_to))
   );
 
 -- ============================================================================
@@ -319,13 +333,13 @@ CREATE POLICY "Client document access" ON documents
   );
 
 -- Field workers can create reports and photos
+-- Uses JWT claims to avoid RLS policy recursion
 CREATE POLICY "Field worker document create" ON documents
   FOR INSERT WITH CHECK (
+    (auth.jwt() ->> 'user_role' = 'field_worker') AND
     EXISTS (
-      SELECT 1 FROM user_profiles up
-      JOIN project_assignments pa ON pa.user_id = up.id
-      WHERE up.id = auth.uid()
-      AND up.role = 'field_worker'
+      SELECT 1 FROM project_assignments pa
+      WHERE pa.user_id = auth.uid()
       AND pa.project_id = documents.project_id
       AND pa.is_active = true
       AND document_type IN ('report', 'photo')
@@ -333,27 +347,24 @@ CREATE POLICY "Field worker document create" ON documents
   );
 
 -- Field workers can view and update their own documents
+-- Uses JWT claims to avoid RLS policy recursion
 CREATE POLICY "Field worker own documents" ON documents
   FOR ALL USING (
     uploaded_by = auth.uid() AND
-    EXISTS (
-      SELECT 1 FROM user_profiles 
-      WHERE id = auth.uid() 
-      AND role = 'field_worker'
-    )
+    (auth.jwt() ->> 'user_role' = 'field_worker')
   );
 
 -- Subcontractors limited document access
+-- Uses JWT claims to avoid RLS policy recursion
 CREATE POLICY "Subcontractor document access" ON documents
   FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM user_profiles up
-      JOIN project_assignments pa ON pa.user_id = up.id
-      WHERE up.id = auth.uid()
-      AND up.role = 'subcontractor'
-      AND pa.project_id = documents.project_id
-      AND pa.is_active = true
-    ) OR uploaded_by = auth.uid()
+    ((auth.jwt() ->> 'user_role' = 'subcontractor') AND
+     EXISTS (
+       SELECT 1 FROM project_assignments pa
+       WHERE pa.user_id = auth.uid()
+       AND pa.project_id = documents.project_id
+       AND pa.is_active = true
+     )) OR uploaded_by = auth.uid()
   );
 
 -- ============================================================================
@@ -388,16 +399,13 @@ CREATE POLICY "Client approval access" ON document_approvals
 -- ============================================================================
 
 -- Prevent unauthorized role changes
+-- Uses JWT claims to avoid RLS policy recursion
 CREATE POLICY "Restrict role changes" ON user_profiles
   FOR UPDATE USING (
-    -- Only company owner and admin can change roles
-    EXISTS (
-      SELECT 1 FROM user_profiles up
-      WHERE up.id = auth.uid()
-      AND up.role IN ('company_owner', 'admin')
-    ) OR
+    -- Only company owner and admin can change roles (check JWT claims)
+    (auth.jwt() ->> 'user_role' IN ('company_owner', 'admin')) OR
     -- Users can update their own profile but not role
-    (id = auth.uid() AND role = (SELECT role FROM user_profiles WHERE id = auth.uid()))
+    (id = auth.uid() AND role::text = (auth.jwt() ->> 'user_role'))
   );
 
 -- Prevent financial data access for unauthorized users

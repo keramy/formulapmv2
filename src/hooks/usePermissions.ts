@@ -435,6 +435,7 @@ export const usePermissions = () => {
 
   return {
     // Permission checking
+    hasPermission,
     checkPermission,
     
     // Project access

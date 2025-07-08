@@ -1,8 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { withAuth } from '@/lib/middleware'
+import { verifyAuth } from '@/lib/middleware'
 import { ChangePasswordData } from '@/types/auth'
 
-export const POST = withAuth(async (request: NextRequest) => {
+export async function POST(request: NextRequest) {
+  // Authentication check
+  const { user, profile, error } = await verifyAuth(request)
+  
+  if (error || !user || !profile) {
+    return NextResponse.json(
+      { error: error || 'Authentication required' },
+      { status: 401 }
+    )
+  }
+
   try {
     const body = await request.json()
     const { currentPassword, newPassword, confirmPassword }: ChangePasswordData = body
@@ -112,4 +122,4 @@ export const POST = withAuth(async (request: NextRequest) => {
       { status: 500 }
     )
   }
-})
+}

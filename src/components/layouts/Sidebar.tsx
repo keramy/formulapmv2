@@ -9,6 +9,7 @@ import {
   Home, 
   Briefcase,
   Settings,
+  Building,
   X
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -42,6 +43,12 @@ export const Sidebar = ({ className, onClose }: SidebarProps = {}) => {
       label: 'Projects',
       href: '/projects',
       icon: Briefcase
+    },
+    {
+      id: 'suppliers',
+      label: 'Suppliers',
+      href: '/suppliers',
+      icon: Building
     },
     {
       id: 'settings',

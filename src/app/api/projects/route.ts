@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { withAuth, getAuthenticatedUser } from '@/lib/middleware'
+import { verifyAuth } from '@/lib/middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import { 
@@ -20,25 +20,28 @@ import { ProjectWithDetails, ProjectListResponse } from '@/types/projects'
 // GET /api/projects - List projects with filtering and pagination
 // ============================================================================
 
-export const GET = withAuth(async (request: NextRequest) => {
-  try {
-    const user = getAuthenticatedUser(request)
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
+export async function GET(request: NextRequest) {
+  // Authentication check
+  const { user, profile, error } = await verifyAuth(request)
+  
+  if (error || !user || !profile) {
+    return NextResponse.json(
+      { success: false, error: error || 'Authentication required' },
+      { status: 401 }
+    )
+  }
 
-    // Check read permission
-    if (!hasPermission(user.role, 'projects.read.all') && 
-        !hasPermission(user.role, 'projects.read.assigned') &&
-        !hasPermission(user.role, 'projects.read.own')) {
-      return NextResponse.json(
-        { success: false, error: 'Insufficient permissions to view projects' },
-        { status: 403 }
-      )
-    }
+  // Permission check
+  if (!hasPermission(profile.role, 'projects.read.all') && 
+      !hasPermission(profile.role, 'projects.read.assigned') &&
+      !hasPermission(profile.role, 'projects.read.own')) {
+    return NextResponse.json(
+      { success: false, error: 'Insufficient permissions to view projects' },
+      { status: 403 }
+    )
+  }
+
+  try {
 
     const url = new URL(request.url)
     const queryParams = {
@@ -86,9 +89,9 @@ export const GET = withAuth(async (request: NextRequest) => {
       `, { count: 'exact' })
 
     // Apply role-based filtering
-    if (hasPermission(user.role, 'projects.read.all')) {
+    if (hasPermission(profile.role, 'projects.read.all')) {
       // Management can see all projects - no additional filtering
-    } else if (hasPermission(user.role, 'projects.read.assigned')) {
+    } else if (hasPermission(profile.role, 'projects.read.assigned')) {
       // Project roles can see assigned projects
       const { data: assignedProjectIds } = await supabase
         .from('project_assignments')
@@ -98,7 +101,7 @@ export const GET = withAuth(async (request: NextRequest) => {
       
       const projectIds = assignedProjectIds?.map(p => p.project_id) || []
       query = query.in('id', projectIds)
-    } else if (hasPermission(user.role, 'projects.read.own')) {
+    } else if (hasPermission(profile.role, 'projects.read.own')) {
       // External roles can see their own projects
       if (user.role === 'client') {
         const { data: clientInfo } = await supabase
@@ -232,29 +235,32 @@ export const GET = withAuth(async (request: NextRequest) => {
       { status: 500 }
     )
   }
-})
+}
 
 // ============================================================================
 // POST /api/projects - Create new project
 // ============================================================================
 
-export const POST = withAuth(async (request: NextRequest) => {
-  try {
-    const user = getAuthenticatedUser(request)
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
+export async function POST(request: NextRequest) {
+  // Authentication check
+  const { user, profile, error } = await verifyAuth(request)
+  
+  if (error || !user || !profile) {
+    return NextResponse.json(
+      { success: false, error: error || 'Authentication required' },
+      { status: 401 }
+    )
+  }
 
-    // Check create permission
-    if (!hasPermission(user.role, 'projects.create')) {
-      return NextResponse.json(
-        { success: false, error: 'Insufficient permissions to create projects' },
-        { status: 403 }
-      )
-    }
+  // Permission check
+  if (!hasPermission(profile.role, 'projects.create')) {
+    return NextResponse.json(
+      { success: false, error: 'Insufficient permissions to create projects' },
+      { status: 403 }
+    )
+  }
+
+  try {
 
     const body = await request.json()
     
@@ -370,7 +376,7 @@ export const POST = withAuth(async (request: NextRequest) => {
       { status: 500 }
     )
   }
-})
+}
 
 // ============================================================================
 // HELPER FUNCTIONS

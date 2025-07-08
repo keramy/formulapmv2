@@ -2,13 +2,14 @@
 
 import { useAuth } from '@/hooks/useAuth';
 import { usePermissions } from '@/hooks/usePermissions';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { DashboardStats } from './DashboardStats';
 import { ProjectOverview } from './ProjectOverview';
 import { RecentActivity } from './RecentActivity';
 import { QuickActions } from './QuickActions';
 import { TaskSummary } from './TaskSummary';
-import { ClientPortalCard } from './ClientPortalCard';
-import { SubcontractorPortalCard } from './SubcontractorPortalCard';
+import Link from 'next/link';
 
 export function DashboardContent() {
   const { user } = useAuth();
@@ -18,6 +19,27 @@ export function DashboardContent() {
 
   return (
     <div className="space-y-6">
+      {/* New Dashboard Test Banner */}
+      {hasPermission('projects.read.all') || hasPermission('projects.read.assigned') ? (
+        <Card className="bg-blue-50 border-blue-200">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-medium text-blue-800">Try the New Simplified Dashboard</h3>
+                <p className="text-sm text-blue-600 mt-1">
+                  Experience our redesigned Project Manager Dashboard with a cleaner, more focused interface.
+                </p>
+              </div>
+              <Button asChild>
+                <Link href="/dashboard/project-manager">
+                  Try New Dashboard
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      ) : null}
+
       {/* Dashboard Statistics */}
       <DashboardStats />
 
@@ -34,12 +56,6 @@ export function DashboardContent() {
 
         {/* Right Column - Sidebar */}
         <div className="space-y-6">
-          {/* Client Portal Card - Only for admin users */}
-          {canViewClientPortalAdmin() && <ClientPortalCard />}
-          
-          {/* Subcontractor Portal Card - Only for admin users */}
-          {canViewClientPortalAdmin() && <SubcontractorPortalCard />}
-          
           {/* Recent Activity */}
           <RecentActivity />
           

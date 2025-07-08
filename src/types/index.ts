@@ -73,29 +73,6 @@ export interface ProjectMember {
   user?: UserProfile
 }
 
-// Task Types
-export type TaskStatus = 'todo' | 'in_progress' | 'review' | 'done'
-export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent'
-
-export interface Task {
-  id: string
-  title: string
-  description?: string
-  status: TaskStatus
-  priority: TaskPriority
-  due_date?: string
-  project_id: string
-  assigned_to: string[]
-  created_by: string
-  created_at: string
-  updated_at: string
-
-  // Relations
-  project?: Project
-  assignees?: UserProfile[]
-  creator?: UserProfile
-}
-
 // Client Types
 export interface Client {
   id: string
@@ -107,44 +84,6 @@ export interface Client {
   company_id: string
   created_at: string
   updated_at: string
-}
-
-// Document Types
-export type DocumentType = 'drawing' | 'specification' | 'contract' | 'report' | 'photo' | 'other'
-export type ApprovalStatus = 'pending' | 'approved' | 'rejected' | 'revision_requested'
-
-export interface Document {
-  id: string
-  name: string
-  file_path: string
-  file_size: number
-  file_type: string
-  document_type: DocumentType
-  project_id: string
-  uploaded_by: string
-  requires_approval: boolean
-  approval_status?: ApprovalStatus
-  created_at: string
-  updated_at: string
-
-  // Relations
-  project?: Project
-  uploader?: UserProfile
-  approvals?: DocumentApproval[]
-}
-
-export interface DocumentApproval {
-  id: string
-  document_id: string
-  approver_id: string
-  status: ApprovalStatus
-  comments?: string
-  approved_at?: string
-  created_at: string
-
-  // Relations
-  document?: Document
-  approver?: UserProfile
 }
 
 // Navigation Types
@@ -204,35 +143,68 @@ export interface LoadingState {
 
 // Permission Types
 export type Permission = 
-  | 'dashboard.view'
-  | 'projects.view'
+  // Project Management
   | 'projects.create'
-  | 'projects.edit'
+  | 'projects.read.all'
+  | 'projects.read.assigned'
+  | 'projects.read.own'
+  | 'projects.update'
   | 'projects.delete'
-  | 'tasks.view'
-  | 'tasks.create'
-  | 'tasks.edit'
-  | 'tasks.delete'
-  | 'scope.view'
+  | 'projects.archive'
+  
+  // Scope Management
   | 'scope.create'
-  | 'scope.edit'
-  | 'scope.delete'
-  | 'drawings.view'
-  | 'drawings.upload'
-  | 'drawings.approve'
-  | 'clients.view'
-  | 'clients.create'
-  | 'clients.edit'
-  | 'procurement.view'
-  | 'procurement.create'
-  | 'procurement.edit'
-  | 'users.view'
+  | 'scope.read.full'
+  | 'scope.read.limited'
+  | 'scope.update'
+  | 'scope.pricing.set'
+  | 'scope.supplier.assign'
+  | 'scope.prices.view'
+  
+  // User Management
   | 'users.create'
-  | 'users.edit'
-  | 'reports.view'
-  | 'reports.create'
-  | 'settings.view'
-  | 'settings.edit'
+  | 'users.read.all'
+  | 'users.read.limited'
+  | 'users.update'
+  | 'users.delete'
+  | 'users.assign.projects'
+  
+  // Purchase Management
+  | 'purchase.create'
+  | 'purchase.read.all'
+  | 'purchase.read.assigned'
+  | 'purchase.update'
+  | 'purchase.delete'
+  | 'purchase.approve'
+  | 'purchase.orders.create'
+  | 'purchase.orders.approve'
+  | 'purchase.deliveries.confirm'
+  | 'purchase.invoices.process'
+  | 'purchase.vendors.manage'
+  
+  // Financial Management
+  | 'financials.view'
+  | 'financials.edit'
+  | 'financials.budgets.manage'
+  | 'financials.costs.track'
+  | 'financials.reports.generate'
+  
+  // Client Portal
+  | 'client_portal.access'
+  | 'client_portal.projects.view'
+  | 'client_portal.documents.view'
+  | 'client_portal.communications.access'
+  | 'client_portal.notifications.receive'
+  | 'client_portal.admin.manage_users'
+  | 'client_portal.admin.manage_projects'
+  | 'client_portal.admin.manage_communications'
+  | 'client_portal.admin.manage_settings'
+  | 'client_portal.admin.manage_branding'
+  
+  // System Administration
+  | 'system.admin'
+  | 'system.settings'
+  | 'system.audit.view'
 
 export interface RolePermissions {
   role: UserRole

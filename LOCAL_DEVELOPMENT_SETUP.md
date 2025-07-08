@@ -133,17 +133,17 @@ npm run dev
 
 All test users have the password: `password123`
 
-#### Management Users
-- **Company Owner**: `robert.construction@premiumbuild.com`
+#### Core Test Accounts (@formulapm.com)
+- **Admin**: `admin@formulapm.com`
+- **Company Owner**: `owner@formulapm.com`
+- **Project Manager**: `pm@formulapm.com`
+- **Client**: `client@formulapm.com`
+- **Subcontractor**: `subcontractor@formulapm.com`
+
+#### Additional Sample Users (Legacy - for reference)
 - **General Manager**: `sarah.mitchell@premiumbuild.com`
 - **Technical Director**: `jennifer.chen@premiumbuild.com`
-- **Admin**: `david.admin@premiumbuild.com`
-
-#### Project Managers
-- **Residential PM**: `lisa.thompson@premiumbuild.com`
 - **Commercial PM**: `james.williams@premiumbuild.com`
-
-#### Design Team
 - **Architect**: `emily.design@premiumbuild.com`
 - **Engineer**: `carlos.structural@premiumbuild.com`
 
@@ -154,14 +154,16 @@ All test users have the password: `password123`
 - **Construction Foreman**: `tony.foreman@premiumbuild.com`
 
 #### Client Representatives
-- **Luxury Client**: `william.luxury@highendliving.com`
-- **Corporate Client**: `jessica.corporate@innovativeoffice.com`
-- **Restaurant Client**: `marcus.restaurant@culinarygroup.com`
+- **Primary Client**: `client@formulapm.com` (recommended for testing)
+- **Luxury Client**: `william.luxury@highendliving.com` (legacy)
+- **Corporate Client**: `jessica.corporate@innovativeoffice.com` (legacy)
+- **Restaurant Client**: `marcus.restaurant@culinarygroup.com` (legacy)
 
 #### Subcontractors
-- **Electrical**: `elena.electrical@powerpro.com`
-- **Plumbing**: `roberto.plumbing@aquaflow.com`
-- **HVAC**: `isabella.hvac@climatecontrol.com`
+- **Primary Subcontractor**: `subcontractor@formulapm.com` (recommended for testing)
+- **Electrical**: `elena.electrical@powerpro.com` (legacy)
+- **Plumbing**: `roberto.plumbing@aquaflow.com` (legacy)
+- **HVAC**: `isabella.hvac@climatecontrol.com` (legacy)
 
 ## Project Data Overview
 

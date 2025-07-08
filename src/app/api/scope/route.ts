@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { withAuth, getAuthenticatedUser } from '@/lib/middleware'
+import { verifyAuth } from '@/lib/middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import { 
@@ -23,23 +23,26 @@ import {
 // GET /api/scope - List scope items with filtering and pagination
 // ============================================================================
 
-export const GET = withAuth(async (request: NextRequest) => {
-  try {
-    const user = getAuthenticatedUser(request)
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
+export async function GET(request: NextRequest) {
+  // Authentication check
+  const { user, profile, error } = await verifyAuth(request)
+  
+  if (error || !user || !profile) {
+    return NextResponse.json(
+      { success: false, error: error || 'Authentication required' },
+      { status: 401 }
+    )
+  }
 
-    // Check read permission
-    if (!hasPermission(user.role, 'scope.view')) {
-      return NextResponse.json(
-        { success: false, error: 'Insufficient permissions to view scope items' },
-        { status: 403 }
-      )
-    }
+  // Permission check
+  if (!hasPermission(profile.role, 'projects.read.all')) {
+    return NextResponse.json(
+      { success: false, error: 'Insufficient permissions to view scope items' },
+      { status: 403 }
+    )
+  }
+
+  try {
 
     const url = new URL(request.url)
     const queryParams: ScopeListParams = {
@@ -83,7 +86,7 @@ export const GET = withAuth(async (request: NextRequest) => {
       `, { count: 'exact' })
 
     // Apply role-based filtering for project access
-    if (!hasPermission(user.role, 'scope.view_all')) {
+    if (!hasPermission(profile.role, 'projects.read.all')) {
       // Get accessible projects for this user
       const accessibleProjects = await getAccessibleProjects(supabase, user)
       if (accessibleProjects.length === 0) {
@@ -254,7 +257,7 @@ export const GET = withAuth(async (request: NextRequest) => {
     }
 
     // Filter out cost data if user doesn't have permission
-    if (!hasPermission(user.role, 'scope.costs.view')) {
+    if (!hasPermission(profile.role, 'projects.read.all')) {
       enhancedItems = enhancedItems.map(item => ({
         ...item,
         initial_cost: undefined,
@@ -264,7 +267,7 @@ export const GET = withAuth(async (request: NextRequest) => {
     }
 
     // Filter out pricing data if user doesn't have permission
-    if (!hasPermission(user.role, 'scope.prices.view')) {
+    if (!hasPermission(profile.role, 'projects.read.all')) {
       enhancedItems = enhancedItems.map(item => ({
         ...item,
         unit_price: 0,
@@ -278,7 +281,7 @@ export const GET = withAuth(async (request: NextRequest) => {
       supabase, 
       queryParams.project_id, 
       queryParams.filters,
-      hasPermission(user.role, 'scope.costs.view')
+      hasPermission(profile.role, 'projects.read.all')
     )
 
     const response: ScopeApiResponse<ScopeListResponse> = {
@@ -306,29 +309,32 @@ export const GET = withAuth(async (request: NextRequest) => {
       { status: 500 }
     )
   }
-})
+}
 
 // ============================================================================
 // POST /api/scope - Create new scope item
 // ============================================================================
 
-export const POST = withAuth(async (request: NextRequest) => {
-  try {
-    const user = getAuthenticatedUser(request)
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
+export async function POST(request: NextRequest) {
+  // Authentication check
+  const { user, profile, error } = await verifyAuth(request)
+  
+  if (error || !user || !profile) {
+    return NextResponse.json(
+      { success: false, error: error || 'Authentication required' },
+      { status: 401 }
+    )
+  }
 
-    // Check create permission
-    if (!hasPermission(user.role, 'scope.create')) {
-      return NextResponse.json(
-        { success: false, error: 'Insufficient permissions to create scope items' },
-        { status: 403 }
-      )
-    }
+  // Permission check
+  if (!hasPermission(profile.role, 'projects.update')) {
+    return NextResponse.json(
+      { success: false, error: 'Insufficient permissions to create scope items' },
+      { status: 403 }
+    )
+  }
+
+  try {
 
     const body = await request.json()
     
@@ -375,9 +381,9 @@ export const POST = withAuth(async (request: NextRequest) => {
       unit_of_measure: body.unit_of_measure || 'pcs',
       unit_price: parseFloat(body.unit_price || '0'),
       markup_percentage: parseFloat(body.markup_percentage || '0'),
-      initial_cost: hasPermission(user.role, 'scope.costs.edit') && body.initial_cost ? 
+      initial_cost: hasPermission(profile.role, 'projects.update') && body.initial_cost ? 
         parseFloat(body.initial_cost) : null,
-      actual_cost: hasPermission(user.role, 'scope.costs.edit') && body.actual_cost ? 
+      actual_cost: hasPermission(profile.role, 'projects.update') && body.actual_cost ? 
         parseFloat(body.actual_cost) : null,
       timeline_start: body.timeline_start || null,
       timeline_end: body.timeline_end || null,
@@ -459,7 +465,7 @@ export const POST = withAuth(async (request: NextRequest) => {
       { status: 500 }
     )
   }
-})
+}
 
 // ============================================================================
 // HELPER FUNCTIONS
@@ -570,6 +576,12 @@ async function calculateScopeStatistics(
       items_requiring_approval: 0,
       items_pending_quality_check: 0,
       items_approved: 0
+    },
+    financial: {
+      total_budget: 0,
+      actual_cost: 0,
+      cost_variance: 0,
+      items_over_budget: 0
     }
   }
 
@@ -579,11 +591,13 @@ async function calculateScopeStatistics(
     stats.by_status[item.status as keyof typeof stats.by_status]++
 
     // By category
-    const catStats = stats.by_category[item.category]
-    catStats.total++
-    if (item.status === 'completed') catStats.completed++
-    if (item.status === 'in_progress') catStats.in_progress++
-    if (item.status === 'blocked') catStats.blocked++
+    const catStats = stats.by_category[item.category as keyof typeof stats.by_category]
+    if (catStats) {
+      catStats.total++
+      if (item.status === 'completed') catStats.completed++
+      if (item.status === 'in_progress') catStats.in_progress++
+      if (item.status === 'blocked') catStats.blocked++
+    }
 
     // By priority
     const priority = `priority_${item.priority}`
@@ -680,6 +694,12 @@ function getEmptyStatistics(): ScopeStatistics {
       items_requiring_approval: 0,
       items_pending_quality_check: 0,
       items_approved: 0
+    },
+    financial: {
+      total_budget: 0,
+      actual_cost: 0,
+      cost_variance: 0,
+      items_over_budget: 0
     }
   }
 }

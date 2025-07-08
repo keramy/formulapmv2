@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { withAuth, getAuthenticatedUser } from '@/lib/middleware'
+import { verifyAuth } from '@/lib/middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import { validateProjectAssignments } from '@/lib/validation/projects'
@@ -15,17 +15,19 @@ import { validateProjectAssignments } from '@/lib/validation/projects'
 // GET /api/projects/[id]/assignments - Get project team assignments
 // ============================================================================
 
-export const GET = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }) => {
-  const params = await context.params
-  try {
-    const user = getAuthenticatedUser(request)
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
+export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  // Authentication check
+  const { user, profile, error } = await verifyAuth(request)
+  
+  if (error || !user || !profile) {
+    return NextResponse.json(
+      { success: false, error: error || 'Authentication required' },
+      { status: 401 }
+    )
+  }
 
+  try {
+    const params = await context.params
     const projectId = params.id
 
     // Validate UUID format
@@ -93,23 +95,25 @@ export const GET = withAuth(async (request: NextRequest, context: { params: Prom
       { status: 500 }
     )
   }
-})
+}
 
 // ============================================================================
 // POST /api/projects/[id]/assignments - Add/update project team assignments
 // ============================================================================
 
-export const POST = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }) => {
-  const params = await context.params
-  try {
-    const user = getAuthenticatedUser(request)
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
+export async function POST(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  // Authentication check
+  const { user, profile, error } = await verifyAuth(request)
+  
+  if (error || !user || !profile) {
+    return NextResponse.json(
+      { success: false, error: error || 'Authentication required' },
+      { status: 401 }
+    )
+  }
 
+  try {
+    const params = await context.params
     const projectId = params.id
 
     // Validate UUID format
@@ -122,8 +126,8 @@ export const POST = withAuth(async (request: NextRequest, context: { params: Pro
     }
 
     // Check permissions - project managers and management can assign team members
-    const canManageTeam = hasPermission(user.role, 'projects.update') || 
-                         ['company_owner', 'general_manager', 'deputy_general_manager', 'project_manager'].includes(user.role)
+    const canManageTeam = hasPermission(profile.role, 'projects.update') || 
+                         ['company_owner', 'general_manager', 'deputy_general_manager', 'project_manager'].includes(profile.role)
     
     if (!canManageTeam) {
       return NextResponse.json(
@@ -272,23 +276,25 @@ export const POST = withAuth(async (request: NextRequest, context: { params: Pro
       { status: 500 }
     )
   }
-})
+}
 
 // ============================================================================
 // DELETE /api/projects/[id]/assignments - Remove team member from project
 // ============================================================================
 
-export const DELETE = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }) => {
-  const params = await context.params
-  try {
-    const user = getAuthenticatedUser(request)
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
+export async function DELETE(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  // Authentication check
+  const { user, profile, error } = await verifyAuth(request)
+  
+  if (error || !user || !profile) {
+    return NextResponse.json(
+      { success: false, error: error || 'Authentication required' },
+      { status: 401 }
+    )
+  }
 
+  try {
+    const params = await context.params
     const projectId = params.id
 
     // Validate UUID format
@@ -301,8 +307,8 @@ export const DELETE = withAuth(async (request: NextRequest, context: { params: P
     }
 
     // Check permissions
-    const canManageTeam = hasPermission(user.role, 'projects.update') || 
-                         ['company_owner', 'general_manager', 'deputy_general_manager', 'project_manager'].includes(user.role)
+    const canManageTeam = hasPermission(profile.role, 'projects.update') || 
+                         ['company_owner', 'general_manager', 'deputy_general_manager', 'project_manager'].includes(profile.role)
     
     if (!canManageTeam) {
       return NextResponse.json(
@@ -377,7 +383,7 @@ export const DELETE = withAuth(async (request: NextRequest, context: { params: P
       { status: 500 }
     )
   }
-})
+}
 
 // ============================================================================
 // HELPER FUNCTIONS

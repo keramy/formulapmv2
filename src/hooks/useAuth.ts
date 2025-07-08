@@ -48,13 +48,51 @@ export const useAuth = () => {
 
   const fetchUserProfile = async (userId: string) => {
     try {
+      // First try direct query with RLS
       const { data, error } = await supabase
         .from('user_profiles')
         .select('*')
         .eq('id', userId)
         .single()
 
-      if (error) throw error
+      if (error) {
+        console.error('Error fetching user profile with RLS:', error)
+        // If RLS fails, try using API endpoint
+        try {
+          const response = await fetch('/api/auth/profile', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          })
+          
+          if (response.ok) {
+            const result = await response.json()
+            const profileData = result.profile || result // Handle both formats
+            setProfile({
+              id: profileData.id,
+              role: profileData.role as UserRole,
+              first_name: profileData.first_name,
+              last_name: profileData.last_name,
+              email: profileData.email,
+              phone: profileData.phone,
+              company: profileData.company,
+              department: profileData.department,
+              permissions: profileData.permissions || {},
+              is_active: profileData.is_active,
+              created_at: profileData.created_at,
+              updated_at: profileData.updated_at
+            })
+            return
+          }
+        } catch (apiError) {
+          console.error('Error fetching profile via API:', apiError)
+        }
+        
+        // If both fail, set profile to null
+        setProfile(null)
+        return
+      }
       
       setProfile({
         id: data.id,

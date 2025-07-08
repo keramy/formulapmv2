@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { withAuth, getAuthenticatedUser } from '@/lib/middleware'
+import { verifyAuth } from '@/lib/middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import * as XLSX from 'xlsx'
@@ -21,23 +21,26 @@ import {
 // POST /api/scope/excel/import - Import scope items from Excel
 // ============================================================================
 
-export const POST = withAuth(async (request: NextRequest) => {
-  try {
-    const user = getAuthenticatedUser(request)
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
+export async function POST(request: NextRequest) {
+  // Authentication check
+  const { user, profile, error } = await verifyAuth(request)
+  
+  if (error || !user || !profile) {
+    return NextResponse.json(
+      { success: false, error: error || 'Authentication required' },
+      { status: 401 }
+    )
+  }
 
-    // Check import permission
-    if (!hasPermission(user.role, 'scope.import_excel')) {
-      return NextResponse.json(
-        { success: false, error: 'Insufficient permissions to import Excel files' },
-        { status: 403 }
-      )
-    }
+  // Permission check
+  if (!hasPermission(profile.role, 'projects.update')) {
+    return NextResponse.json(
+      { success: false, error: 'Insufficient permissions to import Excel files' },
+      { status: 403 }
+    )
+  }
+
+  try {
 
     const formData = await request.formData()
     const file = formData.get('file') as File
@@ -191,7 +194,7 @@ export const POST = withAuth(async (request: NextRequest) => {
       { status: 500 }
     )
   }
-})
+}
 
 // ============================================================================
 // HELPER FUNCTIONS
@@ -242,7 +245,7 @@ function mapRowToScopeItem(
   const item: Partial<ScopeItem> = {
     project_id: projectId,
     item_no: itemNo,
-    category: normalizeCategory(getValue('category')),
+    category: normalizeCategory(getValue('category')) as any,
     item_code: getValue('item_code')?.toString() || null,
     description: getValue('description')?.toString() || '',
     title: getValue('title')?.toString() || getValue('description')?.toString() || '',
@@ -251,14 +254,14 @@ function mapRowToScopeItem(
     unit_of_measure: getValue('unit_of_measure')?.toString() || 'pcs',
     unit_price: parseFloat(getValue('unit_price')) || 0,
     markup_percentage: parseFloat(getValue('markup_percentage')) || 0,
-    initial_cost: getValue('initial_cost') ? parseFloat(getValue('initial_cost')) : null,
-    actual_cost: getValue('actual_cost') ? parseFloat(getValue('actual_cost')) : null,
-    timeline_start: parseDate(getValue('timeline_start')),
-    timeline_end: parseDate(getValue('timeline_end')),
+    initial_cost: getValue('initial_cost') ? parseFloat(getValue('initial_cost')) : undefined,
+    actual_cost: getValue('actual_cost') ? parseFloat(getValue('actual_cost')) : undefined,
+    timeline_start: parseDate(getValue('timeline_start')) || undefined,
+    timeline_end: parseDate(getValue('timeline_end')) || undefined,
     priority: parseInt(getValue('priority')) || 1,
-    risk_level: normalizeRiskLevel(getValue('risk_level')),
-    installation_method: getValue('installation_method')?.toString() || null,
-    drawing_reference: getValue('drawing_reference')?.toString() || null,
+    risk_level: normalizeRiskLevel(getValue('risk_level')) as any,
+    installation_method: getValue('installation_method')?.toString() || undefined,
+    drawing_reference: getValue('drawing_reference')?.toString() || undefined,
     status: 'not_started',
     progress_percentage: 0,
     assigned_to: [],

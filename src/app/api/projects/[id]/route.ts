@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { withAuth, getAuthenticatedUser } from '@/lib/middleware'
+import { verifyAuth } from '@/lib/middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import { 
@@ -19,16 +19,27 @@ import { ProjectWithDetails, ProjectDetailResponse } from '@/types/projects'
 // GET /api/projects/[id] - Get individual project
 // ============================================================================
 
-export const GET = withAuth(async (request: NextRequest, { params }: { params: { id: string } }) => {
-  try {
-    const user = getAuthenticatedUser(request)
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
+export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  // Authentication check
+  const { user, profile, error } = await verifyAuth(request)
+  
+  if (error || !user || !profile) {
+    return NextResponse.json(
+      { error: error || 'Authentication required' },
+      { status: 401 }
+    )
+  }
 
+  // Permission check
+  if (!hasPermission(profile.role, 'projects.read.all')) {
+    return NextResponse.json(
+      { error: 'Insufficient permissions' },
+      { status: 403 }
+    )
+  }
+
+  try {
+    const params = await context.params
     const projectId = params.id
 
     // Validate UUID format
@@ -205,22 +216,33 @@ export const GET = withAuth(async (request: NextRequest, { params }: { params: {
       { status: 500 }
     )
   }
-})
+}
 
 // ============================================================================
 // PUT /api/projects/[id] - Update project
 // ============================================================================
 
-export const PUT = withAuth(async (request: NextRequest, { params }: { params: { id: string } }) => {
-  try {
-    const user = getAuthenticatedUser(request)
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
+export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  // Authentication check
+  const { user, profile, error } = await verifyAuth(request)
+  
+  if (error || !user || !profile) {
+    return NextResponse.json(
+      { error: error || 'Authentication required' },
+      { status: 401 }
+    )
+  }
 
+  // Permission check
+  if (!hasPermission(profile.role, 'projects.update')) {
+    return NextResponse.json(
+      { error: 'Insufficient permissions' },
+      { status: 403 }
+    )
+  }
+
+  try {
+    const params = await context.params
     const projectId = params.id
 
     // Validate UUID format
@@ -330,22 +352,33 @@ export const PUT = withAuth(async (request: NextRequest, { params }: { params: {
       { status: 500 }
     )
   }
-})
+}
 
 // ============================================================================
 // DELETE /api/projects/[id] - Delete project
 // ============================================================================
 
-export const DELETE = withAuth(async (request: NextRequest, { params }: { params: { id: string } }) => {
-  try {
-    const user = getAuthenticatedUser(request)
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
+export async function DELETE(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  // Authentication check
+  const { user, profile, error } = await verifyAuth(request)
+  
+  if (error || !user || !profile) {
+    return NextResponse.json(
+      { error: error || 'Authentication required' },
+      { status: 401 }
+    )
+  }
 
+  // Permission check
+  if (!hasPermission(profile.role, 'projects.delete')) {
+    return NextResponse.json(
+      { error: 'Insufficient permissions' },
+      { status: 403 }
+    )
+  }
+
+  try {
+    const params = await context.params
     const projectId = params.id
 
     // Validate UUID format
@@ -451,7 +484,7 @@ export const DELETE = withAuth(async (request: NextRequest, { params }: { params
       { status: 500 }
     )
   }
-})
+}
 
 // ============================================================================
 // HELPER FUNCTIONS

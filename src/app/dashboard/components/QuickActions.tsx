@@ -33,16 +33,11 @@ export function QuickActions() {
   const { 
     hasPermission,
     canCreateProject,
-    canCreateTasks,
-    canCreateDocuments,
     canCreateUsers,
-    canViewProcurement,
-    canViewShopDrawings,
     canViewFinancials,
     canAccessSystemSettings,
     isManagement,
     isProject,
-    isPurchase,
     isField,
     isExternal
   } = usePermissions();
@@ -58,20 +53,6 @@ export function QuickActions() {
       icon: FolderOpen,
       variant: 'default',
       requiresPermission: canCreateProject
-    },
-    {
-      title: 'Create Task',
-      description: 'Add a new task',
-      href: '/tasks/new',
-      icon: CheckSquare,
-      requiresPermission: canCreateTasks
-    },
-    {
-      title: 'Upload Document',
-      description: 'Upload project files',
-      href: '/documents/upload',
-      icon: Upload,
-      requiresPermission: canCreateDocuments
     },
     
     // Management actions
@@ -99,36 +80,20 @@ export function QuickActions() {
     
     // Role-specific actions
     {
-      title: 'Shop Drawings',
-      description: 'Create new drawing',
-      href: '/shop-drawings/new',
-      icon: PenTool,
-      requiresPermission: canViewShopDrawings
-    },
-    {
-      title: 'Procurement',
+      title: 'Suppliers',
       description: 'Manage suppliers',
-      href: '/procurement',
+      href: '/suppliers',
       icon: ShoppingCart,
-      requiresPermission: canViewProcurement
-    },
-    
-    // Client-specific actions
-    {
-      title: 'Review Documents',
-      description: 'Pending approvals',
-      href: '/client/approvals',
-      icon: FileText,
-      requiresRole: ['client']
+      requiresPermission: () => isManagement()
     },
     
     // Field worker actions
     {
-      title: 'Field Report',
-      description: 'Submit progress',
-      href: '/field/reports/new',
+      title: 'Scope Items',
+      description: 'View project scope',
+      href: '/scope',
       icon: CheckSquare,
-      requiresRole: ['field_worker']
+      requiresPermission: () => hasPermission('projects.read.all') || hasPermission('projects.read.assigned')
     }
   ];
 
@@ -200,7 +165,6 @@ export function QuickActions() {
           <p className="text-xs text-gray-500 text-center">
             {isManagement() && "Management Dashboard"}
             {isProject() && !isManagement() && "Project Team Dashboard"}
-            {isPurchase() && !isManagement() && "Procurement Dashboard"}
             {isField() && !isManagement() && "Field Operations Dashboard"}
             {isExternal() && "External User Dashboard"}
           </p>

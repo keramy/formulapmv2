@@ -66,15 +66,16 @@ npm run dev
 ### 3. Test User Accounts
 All accounts use password: `password123`
 
-**Management Users:**
-- Company Owner: `robert.construction@premiumbuild.com`
-- Admin: `david.admin@premiumbuild.com`
+**Core Test Accounts (@formulapm.com):**
+- Admin: `admin@formulapm.com`
+- Company Owner: `owner@formulapm.com`
+- Project Manager: `pm@formulapm.com`
+- Client: `client@formulapm.com`
+- Subcontractor: `subcontractor@formulapm.com`
 
-**Project Managers:**
+**Legacy Test Accounts (for reference):**
 - Residential PM: `lisa.thompson@premiumbuild.com`
 - Commercial PM: `james.williams@premiumbuild.com`
-
-**Client Users:**
 - Luxury Client: `william.luxury@highendliving.com`
 - Corporate Client: `jessica.corporate@innovativeoffice.com`
 

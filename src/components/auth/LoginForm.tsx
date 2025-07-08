@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import Input from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -17,7 +17,7 @@ interface LoginFormProps {
   showForgotPassword?: boolean
 }
 
-export const LoginForm = ({ 
+const LoginForm = ({ 
   redirectTo = '/dashboard',
   showSignupLink = false,
   showForgotPassword = true
@@ -204,3 +204,6 @@ export const LoginForm = ({
     </div>
   )
 }
+
+export default LoginForm
+export { LoginForm }

@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { withAuth, getAuthenticatedUser } from '@/lib/middleware'
+import { verifyAuth } from '@/lib/middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import { 
@@ -19,23 +19,26 @@ import {
 // POST /api/scope/bulk - Bulk update scope items
 // ============================================================================
 
-export const POST = withAuth(async (request: NextRequest) => {
-  try {
-    const user = getAuthenticatedUser(request)
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
+export async function POST(request: NextRequest) {
+  // Authentication check
+  const { user, profile, error } = await verifyAuth(request)
+  
+  if (error || !user || !profile) {
+    return NextResponse.json(
+      { success: false, error: error || 'Authentication required' },
+      { status: 401 }
+    )
+  }
 
-    // Check bulk update permission
-    if (!hasPermission(user.role, 'scope.bulk_edit')) {
-      return NextResponse.json(
-        { success: false, error: 'Insufficient permissions for bulk operations' },
-        { status: 403 }
-      )
-    }
+  // Permission check
+  if (!hasPermission(profile.role, 'projects.update')) {
+    return NextResponse.json(
+      { success: false, error: 'Insufficient permissions for bulk operations' },
+      { status: 403 }
+    )
+  }
+
+  try {
 
     const body: BulkScopeUpdate = await request.json()
     
@@ -97,7 +100,7 @@ export const POST = withAuth(async (request: NextRequest) => {
     // Validate and apply updates based on permissions and update type
     switch (body.update_type) {
       case 'status':
-        if (!hasPermission(user.role, 'scope.status.update')) {
+        if (!hasPermission(profile.role, 'projects.update')) {
           return NextResponse.json(
             { success: false, error: 'Insufficient permissions to update status' },
             { status: 403 }
@@ -112,7 +115,7 @@ export const POST = withAuth(async (request: NextRequest) => {
         break
 
       case 'assignment':
-        if (!hasPermission(user.role, 'scope.assign')) {
+        if (!hasPermission(profile.role, 'projects.update')) {
           return NextResponse.json(
             { success: false, error: 'Insufficient permissions to update assignments' },
             { status: 403 }
@@ -139,17 +142,17 @@ export const POST = withAuth(async (request: NextRequest) => {
         break
 
       case 'pricing':
-        if (!hasPermission(user.role, 'scope.prices.edit')) {
+        if (!hasPermission(profile.role, 'projects.update')) {
           return NextResponse.json(
             { success: false, error: 'Insufficient permissions to update pricing' },
             { status: 403 }
           )
         }
         if (body.updates.unit_price !== undefined) {
-          updateData.unit_price = parseFloat(body.updates.unit_price as string)
+          updateData.unit_price = parseFloat(body.updates.unit_price as unknown as string)
         }
         if (body.updates.markup_percentage !== undefined) {
-          updateData.markup_percentage = parseFloat(body.updates.markup_percentage as string)
+          updateData.markup_percentage = parseFloat(body.updates.markup_percentage as unknown as string)
         }
         break
 
@@ -165,25 +168,25 @@ export const POST = withAuth(async (request: NextRequest) => {
               break
             case 'initial_cost':
             case 'actual_cost':
-              if (hasPermission(user.role, 'scope.costs.edit')) {
+              if (hasPermission(profile.role, 'projects.update')) {
                 updateData[field] = body.updates[field as keyof typeof body.updates]
               }
               break
             case 'unit_price':
             case 'markup_percentage':
-              if (hasPermission(user.role, 'scope.prices.edit')) {
+              if (hasPermission(profile.role, 'projects.update')) {
                 updateData[field] = body.updates[field as keyof typeof body.updates]
               }
               break
             case 'status':
             case 'progress_percentage':
-              if (hasPermission(user.role, 'scope.status.update')) {
+              if (hasPermission(profile.role, 'projects.update')) {
                 updateData[field] = body.updates[field as keyof typeof body.updates]
               }
               break
             case 'assigned_to':
             case 'supplier_id':
-              if (hasPermission(user.role, 'scope.assign')) {
+              if (hasPermission(profile.role, 'projects.update')) {
                 updateData[field] = body.updates[field as keyof typeof body.updates]
               }
               break
@@ -243,13 +246,13 @@ export const POST = withAuth(async (request: NextRequest) => {
     const filteredItems = updatedItems.map(item => {
       const filtered = { ...item }
       
-      if (!hasPermission(user.role, 'scope.costs.view')) {
+      if (!hasPermission(profile.role, 'projects.read.all')) {
         filtered.initial_cost = undefined
         filtered.actual_cost = undefined
         filtered.cost_variance = undefined
       }
 
-      if (!hasPermission(user.role, 'scope.prices.view')) {
+      if (!hasPermission(profile.role, 'projects.read.all')) {
         filtered.unit_price = 0
         filtered.total_price = 0
         filtered.final_price = 0
@@ -280,29 +283,32 @@ export const POST = withAuth(async (request: NextRequest) => {
       { status: 500 }
     )
   }
-})
+}
 
 // ============================================================================
 // DELETE /api/scope/bulk - Bulk delete scope items
 // ============================================================================
 
-export const DELETE = withAuth(async (request: NextRequest) => {
-  try {
-    const user = getAuthenticatedUser(request)
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
+export async function DELETE(request: NextRequest) {
+  // Authentication check
+  const { user, profile, error } = await verifyAuth(request)
+  
+  if (error || !user || !profile) {
+    return NextResponse.json(
+      { success: false, error: error || 'Authentication required' },
+      { status: 401 }
+    )
+  }
 
-    // Check bulk delete permission
-    if (!hasPermission(user.role, 'scope.delete')) {
-      return NextResponse.json(
-        { success: false, error: 'Insufficient permissions for bulk delete' },
-        { status: 403 }
-      )
-    }
+  // Permission check
+  if (!hasPermission(profile.role, 'projects.update')) {
+    return NextResponse.json(
+      { success: false, error: 'Insufficient permissions for bulk delete' },
+      { status: 403 }
+    )
+  }
+
+  try {
 
     const body = await request.json()
     
@@ -434,7 +440,7 @@ export const DELETE = withAuth(async (request: NextRequest) => {
       { status: 500 }
     )
   }
-})
+}
 
 // ============================================================================
 // HELPER FUNCTIONS

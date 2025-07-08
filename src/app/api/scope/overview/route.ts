@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { withAuth, getAuthenticatedUser } from '@/lib/middleware'
+import { verifyAuth } from '@/lib/middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 
@@ -14,23 +14,26 @@ import { hasPermission } from '@/lib/permissions'
 // GET /api/scope/overview - Get scope overview for global navigation
 // ============================================================================
 
-export const GET = withAuth(async (request: NextRequest) => {
-  try {
-    const user = getAuthenticatedUser(request)
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
+export async function GET(request: NextRequest) {
+  // Authentication check
+  const { user, profile, error } = await verifyAuth(request)
+  
+  if (error || !user || !profile) {
+    return NextResponse.json(
+      { success: false, error: error || 'Authentication required' },
+      { status: 401 }
+    )
+  }
 
-    // Check read permission
-    if (!hasPermission(user.role, 'scope.view')) {
-      return NextResponse.json(
-        { success: false, error: 'Insufficient permissions to view scope overview' },
-        { status: 403 }
-      )
-    }
+  // Permission check
+  if (!hasPermission(profile.role, 'projects.read.all')) {
+    return NextResponse.json(
+      { success: false, error: 'Insufficient permissions to view scope overview' },
+      { status: 403 }
+    )
+  }
+
+  try {
 
     const supabase = createServerClient()
 
@@ -103,7 +106,7 @@ export const GET = withAuth(async (request: NextRequest) => {
       // Pending approvals (items requiring client approval that aren't approved yet)
       if (item.requires_client_approval && !item.client_approved) {
         // Check if user can approve (management roles can approve)
-        if (hasPermission(user.role, 'scope.approve')) {
+        if (hasPermission(user.role, 'projects.update')) {
           pendingApprovals++
         }
       }
@@ -134,7 +137,7 @@ export const GET = withAuth(async (request: NextRequest) => {
       .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
       .slice(0, 10)
       .map(item => ({
-        project_name: item.project?.name || 'Unknown Project',
+        project_name: (item as any).project?.name || 'Unknown Project',
         item_title: item.title,
         action: 'Updated',
         timestamp: item.updated_at
@@ -163,7 +166,7 @@ export const GET = withAuth(async (request: NextRequest) => {
       { status: 500 }
     )
   }
-})
+}
 
 // ============================================================================
 // HELPER FUNCTIONS

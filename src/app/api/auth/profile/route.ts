@@ -1,23 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { withAuth, getAuthenticatedUser } from '@/lib/middleware'
+import { verifyAuth } from '@/lib/middleware'
 import { UserProfile } from '@/types/auth'
 
-export const GET = withAuth(async (request: NextRequest) => {
+export async function GET(request: NextRequest) {
+  // Authentication check
+  const { user, profile, error } = await verifyAuth(request)
+  
+  if (error || !user || !profile) {
+    return NextResponse.json(
+      { error: error || 'Authentication required' },
+      { status: 401 }
+    )
+  }
+
   try {
-    const user = getAuthenticatedUser(request)
-    
-    if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      )
-    }
 
-    const { createServerClient } = require('@/lib/supabase')
-    const supabase = createServerClient()
+    const { supabaseAdmin } = require('@/lib/supabase')
 
-    // Get user profile
-    const { data: profile, error } = await supabase
+    // Get user profile using admin client to bypass RLS
+    const { data: profile, error } = await supabaseAdmin
       .from('user_profiles')
       .select('*')
       .eq('id', user.id)
@@ -63,18 +64,20 @@ export const GET = withAuth(async (request: NextRequest) => {
       { status: 500 }
     )
   }
-})
+}
 
-export const PUT = withAuth(async (request: NextRequest) => {
+export async function PUT(request: NextRequest) {
+  // Authentication check
+  const { user, profile, error } = await verifyAuth(request)
+  
+  if (error || !user || !profile) {
+    return NextResponse.json(
+      { error: error || 'Authentication required' },
+      { status: 401 }
+    )
+  }
+
   try {
-    const user = getAuthenticatedUser(request)
-    
-    if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      )
-    }
 
     const body = await request.json()
     const updates: Partial<UserProfile> = body
@@ -163,4 +166,4 @@ export const PUT = withAuth(async (request: NextRequest) => {
       { status: 500 }
     )
   }
-})
+}

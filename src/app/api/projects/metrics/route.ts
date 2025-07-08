@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { withAuth, getAuthenticatedUser } from '@/lib/middleware'
+import { verifyAuth } from '@/lib/middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import { ProjectMetrics, ProjectMetricsResponse } from '@/types/projects'
@@ -15,36 +15,39 @@ import { ProjectMetrics, ProjectMetricsResponse } from '@/types/projects'
 // GET /api/projects/metrics - Get project metrics and analytics
 // ============================================================================
 
-export const GET = withAuth(async (request: NextRequest) => {
-  try {
-    const user = getAuthenticatedUser(request)
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
+export async function GET(request: NextRequest) {
+  // Authentication check
+  const { user, profile, error } = await verifyAuth(request)
+  
+  if (error || !user || !profile) {
+    return NextResponse.json(
+      { success: false, error: error || 'Authentication required' },
+      { status: 401 }
+    )
+  }
 
-    // Check read permission
-    if (!hasPermission(user.role, 'projects.read.all') && 
-        !hasPermission(user.role, 'projects.read.assigned') &&
-        !hasPermission(user.role, 'projects.read.own')) {
-      return NextResponse.json(
-        { success: false, error: 'Insufficient permissions to view project metrics' },
-        { status: 403 }
-      )
-    }
+  // Permission check
+  if (!hasPermission(profile.role, 'projects.read.all') && 
+      !hasPermission(profile.role, 'projects.read.assigned') &&
+      !hasPermission(profile.role, 'projects.read.own')) {
+    return NextResponse.json(
+      { success: false, error: 'Insufficient permissions to view project metrics' },
+      { status: 403 }
+    )
+  }
+
+  try {
 
     const url = new URL(request.url)
     const includeFinancials = url.searchParams.get('include_financials') === 'true' && 
-                             hasPermission(user.role, 'financials.view')
+                             hasPermission(profile.role, 'financials.view')
 
     const supabase = createServerClient()
 
     // Get projects data based on user permissions
     let projects: any[] = []
     
-    if (hasPermission(user.role, 'projects.read.all')) {
+    if (hasPermission(profile.role, 'projects.read.all')) {
       // Management can see all projects
       const { data, error } = await supabase
         .from('projects')
@@ -58,7 +61,7 @@ export const GET = withAuth(async (request: NextRequest) => {
         )
       }
       projects = data || []
-    } else if (hasPermission(user.role, 'projects.read.assigned')) {
+    } else if (hasPermission(profile.role, 'projects.read.assigned')) {
       // Project roles can see assigned projects
       const { data: assignedProjectIds } = await supabase
         .from('project_assignments')
@@ -83,7 +86,7 @@ export const GET = withAuth(async (request: NextRequest) => {
         }
         projects = data || []
       }
-    } else if (hasPermission(user.role, 'projects.read.own')) {
+    } else if (hasPermission(profile.role, 'projects.read.own')) {
       // External roles can see their own projects
       if (user.role === 'client') {
         const { data: clientInfo } = await supabase
@@ -269,29 +272,32 @@ export const GET = withAuth(async (request: NextRequest) => {
       { status: 500 }
     )
   }
-})
+}
 
 // ============================================================================
 // GET /api/projects/metrics/dashboard - Get dashboard-specific metrics
 // ============================================================================
 
-export const POST = withAuth(async (request: NextRequest) => {
-  try {
-    const user = getAuthenticatedUser(request)
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
+export async function POST(request: NextRequest) {
+  // Authentication check
+  const { user, profile, error } = await verifyAuth(request)
+  
+  if (error || !user || !profile) {
+    return NextResponse.json(
+      { success: false, error: error || 'Authentication required' },
+      { status: 401 }
+    )
+  }
 
-    // Check dashboard view permission
-    if (!hasPermission(user.role, 'dashboard.view')) {
-      return NextResponse.json(
-        { success: false, error: 'Insufficient permissions to view dashboard metrics' },
-        { status: 403 }
-      )
-    }
+  // Permission check
+  if (!hasPermission(profile.role, 'dashboard.view')) {
+    return NextResponse.json(
+      { success: false, error: 'Insufficient permissions to view dashboard metrics' },
+      { status: 403 }
+    )
+  }
+
+  try {
 
     const body = await request.json()
     const { 
@@ -331,8 +337,8 @@ export const POST = withAuth(async (request: NextRequest) => {
       .lte('created_at', endDate.toISOString())
 
     // Apply role-based filtering
-    if (!hasPermission(user.role, 'projects.read.all')) {
-      if (hasPermission(user.role, 'projects.read.assigned')) {
+    if (!hasPermission(profile.role, 'projects.read.all')) {
+      if (hasPermission(profile.role, 'projects.read.assigned')) {
         const { data: assignedProjectIds } = await supabase
           .from('project_assignments')
           .select('project_id')
@@ -358,7 +364,7 @@ export const POST = withAuth(async (request: NextRequest) => {
 
     // Get forecasting data
     let forecastData = null
-    if (include_forecasting && hasPermission(user.role, 'financials.view')) {
+    if (include_forecasting && hasPermission(profile.role, 'financials.view')) {
       // This would implement budget forecasting, timeline predictions, etc.
       forecastData = {
         budget_forecast: {
@@ -395,4 +401,4 @@ export const POST = withAuth(async (request: NextRequest) => {
       { status: 500 }
     )
   }
-})
+}

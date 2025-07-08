@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@/lib/supabase'
+import { createServerClient, supabaseAdmin } from '@/lib/supabase'
 import { LoginCredentials } from '@/types/auth'
 
 export async function POST(request: NextRequest) {
@@ -32,8 +32,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get user profile
-    const { data: profile, error: profileError } = await supabase
+    // Get user profile using admin client to bypass RLS
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from('user_profiles')
       .select('*')
       .eq('id', data.user.id)
@@ -53,6 +53,29 @@ export async function POST(request: NextRequest) {
         { error: 'Account is deactivated. Please contact administrator.' },
         { status: 403 }
       )
+    }
+
+    // Update JWT claims with user role information
+    try {
+      const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
+        data.user.id,
+        {
+          app_metadata: {
+            user_role: profile.role,
+            user_id: profile.id,
+            is_active: profile.is_active,
+            updated_at: new Date().toISOString()
+          }
+        }
+      )
+
+      if (updateError) {
+        console.error('JWT claims update error:', updateError)
+        // Don't fail the login, just log the error
+      }
+    } catch (jwtError) {
+      console.error('JWT update error:', jwtError)
+      // Don't fail the login, just log the error
     }
 
     return NextResponse.json({
