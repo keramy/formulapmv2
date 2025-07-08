@@ -64,7 +64,9 @@
       "Bash(timeout:*)",
       "Bash(git reset:*)",
       "Bash(npm config:*)",
-      "Bash(touch:*)"
+      "Bash(touch:*)",
+      "Bash(git remote set-url:*)",
+      "Bash(gh auth:*)"
     ],
     "deny": []
   }
