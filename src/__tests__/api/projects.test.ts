@@ -1,6 +1,6 @@
 import { describe, it, expect, jest, beforeEach } from '@jest/globals'
 import { NextRequest } from 'next/server'
-import { GET, POST, PUT, DELETE } from '@/app/api/projects/route'
+import { GET, POST } from '@/app/api/projects/route'
 
 // Mock authentication middleware
 jest.mock('@/lib/middleware', () => ({
