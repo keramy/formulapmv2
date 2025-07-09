@@ -18,6 +18,20 @@ jest.mock('@/lib/supabase', () => ({
       })),
     })),
   })),
+  supabaseAdmin: {
+    from: jest.fn(() => ({
+      select: jest.fn(() => ({
+        eq: jest.fn(() => ({
+          single: jest.fn(),
+        })),
+      })),
+    })),
+    auth: {
+      admin: {
+        updateUserById: jest.fn(),
+      },
+    },
+  },
 }))
 
 // Mock bcrypt
@@ -31,7 +45,7 @@ describe('/api/auth/login', () => {
   })
 
   it('should authenticate user with valid credentials', async () => {
-    const { createServerClient } = require('@/lib/supabase')
+    const { createServerClient, supabaseAdmin } = require('@/lib/supabase')
     const bcrypt = require('bcryptjs')
     
     const mockSupabase = createServerClient()
@@ -43,13 +57,19 @@ describe('/api/auth/login', () => {
       error: null
     })
 
-    mockSupabase.from().select().eq().single.mockResolvedValue({
+    supabaseAdmin.from().select().eq().single.mockResolvedValue({
       data: {
         id: 'profile-123',
         user_id: 'user-123',
         role: 'project_manager',
-        email: 'test@example.com'
+        email: 'test@example.com',
+        is_active: true
       },
+      error: null
+    })
+
+    supabaseAdmin.auth.admin.updateUserById.mockResolvedValue({
+      data: { user: { id: 'user-123' } },
       error: null
     })
 

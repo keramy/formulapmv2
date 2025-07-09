@@ -1,4 +1,4 @@
-import { User } from '@supabase/supabase-js'
+import { User as SupabaseUser } from '@supabase/supabase-js'
 
 export type UserRole = 
   | 'company_owner'
@@ -13,6 +13,11 @@ export type UserRole =
   | 'purchase_specialist'
   | 'field_worker'
   | 'client'
+
+// Re-export Supabase User as our User type
+export interface User extends SupabaseUser {
+  // Add any custom user properties here if needed
+}
 
 export interface UserProfile {
   id: string
@@ -31,7 +36,7 @@ export interface UserProfile {
 }
 
 export interface AuthContextType {
-  user: User | null
+  user: SupabaseUser | null
   profile: UserProfile | null
   loading: boolean
   signIn: (email: string, password: string) => Promise<any>

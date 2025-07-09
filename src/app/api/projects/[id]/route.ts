@@ -25,7 +25,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
   
   if (error || !user || !profile) {
     return NextResponse.json(
-      { error: error || 'Authentication required' },
+      { success: false, error: error || 'Authentication required' },
       { status: 401 }
     )
   }
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
   // Permission check
   if (!hasPermission(profile.role, 'projects.read.all')) {
     return NextResponse.json(
-      { error: 'Insufficient permissions' },
+      { success: false, error: 'Insufficient permissions' },
       { status: 403 }
     )
   }
@@ -228,7 +228,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
   
   if (error || !user || !profile) {
     return NextResponse.json(
-      { error: error || 'Authentication required' },
+      { success: false, error: error || 'Authentication required' },
       { status: 401 }
     )
   }
@@ -236,7 +236,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
   // Permission check
   if (!hasPermission(profile.role, 'projects.update')) {
     return NextResponse.json(
-      { error: 'Insufficient permissions' },
+      { success: false, error: 'Insufficient permissions' },
       { status: 403 }
     )
   }
@@ -255,7 +255,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
     }
 
     // Check update permission
-    if (!hasPermission(user.role, 'projects.update')) {
+    if (!hasPermission(profile.role, 'projects.update')) {
       return NextResponse.json(
         { success: false, error: 'Insufficient permissions to update projects' },
         { status: 403 }
@@ -296,8 +296,8 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
 
     if (hasSensitiveUpdates) {
       // Require management permissions for sensitive updates
-      const isManagement = ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'].includes(user.role)
-      const isProjectManager = user.role === 'project_manager'
+      const isManagement = ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'].includes(profile.role)
+      const isProjectManager = profile.role === 'project_manager'
       
       if (!isManagement && !isProjectManager) {
         return NextResponse.json(
@@ -364,7 +364,7 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
   
   if (error || !user || !profile) {
     return NextResponse.json(
-      { error: error || 'Authentication required' },
+      { success: false, error: error || 'Authentication required' },
       { status: 401 }
     )
   }
@@ -372,7 +372,7 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
   // Permission check
   if (!hasPermission(profile.role, 'projects.delete')) {
     return NextResponse.json(
-      { error: 'Insufficient permissions' },
+      { success: false, error: 'Insufficient permissions' },
       { status: 403 }
     )
   }
@@ -391,7 +391,7 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
     }
 
     // Check delete permission - only high-level roles can delete
-    if (!hasPermission(user.role, 'projects.delete')) {
+    if (!hasPermission(profile.role, 'projects.delete')) {
       return NextResponse.json(
         { success: false, error: 'Insufficient permissions to delete projects' },
         { status: 403 }
@@ -493,7 +493,7 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
 async function checkProjectAccess(supabase: any, user: any, projectId: string): Promise<boolean> {
   try {
     // Management roles can access all projects
-    if (['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'].includes(user.role)) {
+    if (['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'].includes(user.profile?.role || user.role)) {
       return true
     }
 
@@ -522,7 +522,7 @@ async function checkProjectAccess(supabase: any, user: any, projectId: string): 
     }
 
     // Check if user is a client assigned to this project
-    if (user.role === 'client') {
+    if ((user.profile?.role || user.role) === 'client') {
       const { data: clientProject } = await supabase
         .from('projects')
         .select('client_id')

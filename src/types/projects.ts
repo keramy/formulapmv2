@@ -16,6 +16,9 @@ import {
   Document
 } from '@/types/database'
 
+// Re-export base Project type for other modules
+export type { BaseProject as Project, ProjectStatus }
+
 // ============================================================================
 // EXTENDED PROJECT TYPES
 // ============================================================================

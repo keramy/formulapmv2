@@ -472,14 +472,14 @@ export async function POST(request: NextRequest) {
 // ============================================================================
 
 async function getAccessibleProjects(supabase: any, user: any): Promise<string[]> {
-  if (hasPermission(user.role, 'projects.read.all')) {
+  if (hasPermission(user.profile?.role || user.role, 'projects.read.all')) {
     const { data: allProjects } = await supabase
       .from('projects')
       .select('id')
     return allProjects?.map((p: any) => p.id) || []
   }
 
-  if (hasPermission(user.role, 'projects.read.assigned')) {
+  if (hasPermission(user.profile?.role || user.role, 'projects.read.assigned')) {
     const { data: assignedProjects } = await supabase
       .from('project_assignments')
       .select('project_id')
@@ -488,7 +488,7 @@ async function getAccessibleProjects(supabase: any, user: any): Promise<string[]
     return assignedProjects?.map((p: any) => p.project_id) || []
   }
 
-  if (hasPermission(user.role, 'projects.read.own') && user.role === 'client') {
+  if (hasPermission(user.profile?.role || user.role, 'projects.read.own') && (user.profile?.role || user.role) === 'client') {
     const { data: clientProjects } = await supabase
       .from('projects')
       .select('id')

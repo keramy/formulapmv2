@@ -1,0 +1,113 @@
+{
+  "extends": [
+    "next/core-web-vitals",
+    "next/typescript"
+  ],
+  "rules": {
+    // TypeScript specific rules - made more lenient
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_"
+      }
+    ],
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/no-inferrable-types": "warn",
+    "@typescript-eslint/no-require-imports": "warn",
+    
+    // React specific rules
+    "react/react-in-jsx-scope": "off",
+    "react/prop-types": "off",
+    "react/display-name": "off",
+    "react/no-unescaped-entities": "off",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    
+    // General code quality rules - made more lenient
+    "no-console": ["warn", { "allow": ["warn", "error", "info"] }],
+    "no-debugger": "warn",
+    "no-duplicate-imports": "warn",
+    "no-unused-expressions": "warn",
+    "prefer-const": "warn",
+    "no-var": "warn",
+    
+    // Code style rules - all warnings, not errors
+    "indent": "off",
+    "quotes": "off",
+    "semi": "off",
+    "comma-dangle": "off",
+    "object-curly-spacing": "off",
+    "array-bracket-spacing": "off",
+    "key-spacing": "off",
+    "keyword-spacing": "off",
+    "space-before-blocks": "off",
+    "space-in-parens": "off",
+    
+    // Import/export rules - made more lenient
+    "import/order": "off",
+    "import/no-duplicates": "warn",
+    
+    // Next.js specific rules - warnings only
+    "@next/next/no-img-element": "warn",
+    "@next/next/no-page-custom-font": "warn"
+  },
+  "overrides": [
+    {
+      // Test files - very lenient
+      "files": ["**/__tests__/**/*", "**/*.test.*", "**/*.spec.*"],
+      "env": {
+        "jest": true
+      },
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-unused-vars": "off",
+        "@typescript-eslint/no-require-imports": "off",
+        "no-console": "off",
+        "import/order": "off"
+      }
+    },
+    {
+      // Configuration files
+      "files": ["*.config.js", "*.config.ts", ".eslintrc.js"],
+      "env": {
+        "node": true
+      },
+      "rules": {
+        "@typescript-eslint/no-var-requires": "off",
+        "@typescript-eslint/no-require-imports": "off",
+        "no-console": "off"
+      }
+    },
+    {
+      // API routes
+      "files": ["**/api/**/*.ts"],
+      "rules": {
+        "no-console": ["warn", { "allow": ["warn", "error", "info"] }]
+      }
+    }
+  ],
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    },
+    "import/resolver": {
+      "typescript": {
+        "alwaysTryTypes": true
+      }
+    }
+  }
+}

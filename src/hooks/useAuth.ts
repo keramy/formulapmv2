@@ -11,6 +11,12 @@ export const useAuth = () => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // Set a timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      console.warn('Auth loading timeout reached, setting loading to false')
+      setLoading(false)
+    }, 5000) // 5 second timeout
+
     // Get initial session
     const getInitialSession = async () => {
       try {
@@ -23,6 +29,7 @@ export const useAuth = () => {
       } catch (error) {
         console.error('Error loading session:', error)
       } finally {
+        clearTimeout(timeoutId)
         setLoading(false)
       }
     }
@@ -39,11 +46,15 @@ export const useAuth = () => {
         } else {
           setProfile(null)
         }
+        clearTimeout(timeoutId)
         setLoading(false)
       }
     )
 
-    return () => subscription.unsubscribe()
+    return () => {
+      clearTimeout(timeoutId)
+      subscription.unsubscribe()
+    }
   }, [])
 
   const fetchUserProfile = async (userId: string) => {

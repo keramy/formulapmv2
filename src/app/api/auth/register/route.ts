@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
     // Validate required fields
     if (!email || !password || !first_name || !last_name || !role) {
       return NextResponse.json(
-        { error: 'Email, password, first name, last name, and role are required' },
+        { success: false, error: 'Email, password, first name, last name, and role are required' },
         { status: 400 }
       )
     }
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     // Validate password strength
     if (password.length < 8) {
       return NextResponse.json(
-        { error: 'Password must be at least 8 characters long' },
+        { success: false, error: 'Password must be at least 8 characters long' },
         { status: 400 }
       )
     }
@@ -27,13 +27,14 @@ export async function POST(request: NextRequest) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
       return NextResponse.json(
-        { error: 'Invalid email format' },
+        { success: false, error: 'Invalid email format' },
         { status: 400 }
       )
     }
 
-    // Create server client
-    const supabase = createServerClient()
+    // Create server client with service role for user creation
+    const { supabaseAdmin } = await import('@/lib/supabase')
+    const supabase = supabaseAdmin
 
     // Check if user already exists
     const { data: existingUser } = await supabase
@@ -44,35 +45,34 @@ export async function POST(request: NextRequest) {
 
     if (existingUser) {
       return NextResponse.json(
-        { error: 'User with this email already exists' },
+        { success: false, error: 'User with this email already exists' },
         { status: 409 }
       )
     }
 
-    // Create auth user
-    const { data: authData, error: authError } = await supabase.auth.signUp({
+    // Create auth user using admin client
+    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
       email: email.trim().toLowerCase(),
       password,
-      options: {
-        data: {
-          first_name,
-          last_name,
-          role
-        }
+      email_confirm: true,
+      user_metadata: {
+        first_name,
+        last_name,
+        role
       }
     })
 
     if (authError) {
       console.error('Auth signup error:', authError)
       return NextResponse.json(
-        { error: authError.message },
+        { success: false, error: authError.message },
         { status: 400 }
       )
     }
 
     if (!authData.user) {
       return NextResponse.json(
-        { error: 'Failed to create user account' },
+        { success: false, error: 'Failed to create user account' },
         { status: 500 }
       )
     }
@@ -100,13 +100,16 @@ export async function POST(request: NextRequest) {
       
       // Try to clean up auth user if profile creation failed
       try {
-        await supabase.auth.admin.deleteUser(authData.user.id)
+        const { error: deleteError } = await supabase.auth.admin.deleteUser(authData.user.id)
+        if (deleteError) {
+          console.error('Failed to cleanup auth user:', deleteError)
+        }
       } catch (cleanupError) {
         console.error('Failed to cleanup auth user:', cleanupError)
       }
       
       return NextResponse.json(
-        { error: 'Failed to create user profile' },
+        { success: false, error: 'Failed to create user profile' },
         { status: 500 }
       )
     }
@@ -126,7 +129,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Register API error:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { success: false, error: 'Internal server error' },
       { status: 500 }
     )
   }

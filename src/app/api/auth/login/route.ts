@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
     // Validate input
     if (!email || !password) {
       return NextResponse.json(
-        { error: 'Email and password are required' },
+        { success: false, error: 'Email and password are required' },
         { status: 400 }
       )
     }
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error('Login error:', error)
       return NextResponse.json(
-        { error: error.message },
+        { success: false, error: error.message },
         { status: 401 }
       )
     }
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     if (profileError) {
       console.error('Profile fetch error:', profileError)
       return NextResponse.json(
-        { error: 'Failed to fetch user profile' },
+        { success: false, error: 'Failed to fetch user profile' },
         { status: 500 }
       )
     }
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     // Check if user is active
     if (!profile.is_active) {
       return NextResponse.json(
-        { error: 'Account is deactivated. Please contact administrator.' },
+        { success: false, error: 'Account is deactivated. Please contact administrator.' },
         { status: 403 }
       )
     }
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Login API error:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { success: false, error: 'Internal server error' },
       { status: 500 }
     )
   }

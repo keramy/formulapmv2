@@ -1,6 +1,7 @@
 'use client';
 
 import { useProject } from '@/hooks/useProjects';
+import { useMilestones } from '@/hooks/useMilestones';
 import { useAuth } from '@/hooks/useAuth';
 import { usePermissions } from '@/hooks/usePermissions';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,7 +16,8 @@ import {
   BarChart3,
   AlertTriangle,
   CheckCircle,
-  XCircle
+  XCircle,
+  Target
 } from 'lucide-react';
 
 interface OverviewTabProps {
@@ -26,6 +28,7 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
   const { user } = useAuth();
   const { hasPermission } = usePermissions();
   const { project, loading, error } = useProject(projectId);
+  const { milestones, statistics: milestoneStats, loading: milestonesLoading } = useMilestones(projectId);
 
   if (loading) {
     return (
@@ -62,7 +65,7 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
     );
   }
 
-  // Mock data for demonstration - in real app, this would come from API
+  // Mock data for tasks and other metrics - will be replaced with real data as APIs are implemented
   const mockStats = {
     totalTasks: 42,
     completedTasks: 28,
@@ -70,10 +73,13 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
     documents: 15,
     budgetSpent: project.budget ? project.budget * 0.65 : 0,
     budgetRemaining: project.budget ? project.budget * 0.35 : 0,
-    riskLevel: 'medium',
-    nextMilestone: 'Foundation Complete',
-    milestoneDate: '2024-08-15'
+    riskLevel: 'medium'
   };
+
+  // Get next milestone from real data
+  const nextMilestone = milestones
+    .filter(m => m.status === 'upcoming' || m.status === 'in_progress')
+    .sort((a, b) => new Date(a.target_date).getTime() - new Date(b.target_date).getTime())[0];
 
   const getRiskColor = (risk: string) => {
     switch (risk) {
@@ -193,6 +199,35 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
                 <div className="text-sm text-gray-600">Documents</div>
               </div>
             </div>
+
+            {/* Milestone Summary */}
+            {milestoneStats && (
+              <div className="mt-4 pt-4 border-t">
+                <h4 className="font-medium mb-3 flex items-center gap-2">
+                  <Target className="w-4 h-4" />
+                  Milestone Progress
+                </h4>
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="text-center">
+                    <div className="text-xl font-bold text-green-600">{milestoneStats.completed}</div>
+                    <div className="text-xs text-gray-600">Completed</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-xl font-bold text-blue-600">{milestoneStats.byStatus.in_progress}</div>
+                    <div className="text-xs text-gray-600">In Progress</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-xl font-bold text-red-600">{milestoneStats.overdue}</div>
+                    <div className="text-xs text-gray-600">Overdue</div>
+                  </div>
+                </div>
+                <div className="mt-2 text-center">
+                  <div className="text-sm text-gray-600">
+                    {milestoneStats.completionRate}% milestone completion rate
+                  </div>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -243,21 +278,44 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Calendar className="w-5 h-5" />
+              <Target className="w-5 h-5" />
               Next Milestone
             </CardTitle>
             <CardDescription>Upcoming project milestone and deadline</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              <div>
-                <div className="font-medium text-lg">{mockStats.nextMilestone}</div>
-                <div className="text-sm text-gray-600">Target Date: {new Date(mockStats.milestoneDate).toLocaleDateString()}</div>
+            {milestonesLoading ? (
+              <div className="space-y-3">
+                <Skeleton className="h-6 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+                <Skeleton className="h-4 w-1/3" />
               </div>
-              <div className="text-sm text-gray-600">
-                {Math.ceil((new Date(mockStats.milestoneDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} days remaining
+            ) : nextMilestone ? (
+              <div className="space-y-3">
+                <div>
+                  <div className="font-medium text-lg">{nextMilestone.name}</div>
+                  <div className="text-sm text-gray-600">
+                    Target Date: {new Date(nextMilestone.target_date).toLocaleDateString()}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant={nextMilestone.status === 'in_progress' ? 'default' : 'secondary'}>
+                    {nextMilestone.status === 'in_progress' ? 'In Progress' : 'Upcoming'}
+                  </Badge>
+                  <div className="text-sm text-gray-600">
+                    {Math.ceil((new Date(nextMilestone.target_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} days remaining
+                  </div>
+                </div>
+                {nextMilestone.description && (
+                  <p className="text-sm text-gray-600 mt-2">{nextMilestone.description}</p>
+                )}
               </div>
-            </div>
+            ) : (
+              <div className="text-center py-4">
+                <Target className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                <p className="text-gray-600">No upcoming milestones</p>
+              </div>
+            )}
           </CardContent>
         </Card>
 

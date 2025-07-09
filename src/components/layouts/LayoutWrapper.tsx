@@ -9,14 +9,21 @@ import { usePathname } from 'next/navigation'
 
 export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const { user, loading } = useAuth()
   const pathname = usePathname()
+  
+  // Always call useAuth hook to avoid conditional hook calls
+  const { user, loading } = useAuth()
 
   // List of paths that should not show the sidebar/header
   const noLayoutPaths = ['/', '/auth/login', '/auth/register', '/auth/reset-password']
-  const shouldShowLayout = user && !noLayoutPaths.includes(pathname)
+  const isNoLayoutPath = noLayoutPaths.includes(pathname)
 
-  // If loading, show a loading state
+  // If on a no-layout path, render children directly without auth loading
+  if (isNoLayoutPath) {
+    return <>{children}</>
+  }
+
+  // If loading auth for protected paths, show loading state
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -28,8 +35,8 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
     )
   }
 
-  // If not authenticated or on a no-layout path, render children directly
-  if (!shouldShowLayout) {
+  // If not authenticated and on a protected path, render children (might be login redirect)
+  if (!user) {
     return <>{children}</>
   }
 

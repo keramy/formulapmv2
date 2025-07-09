@@ -167,6 +167,11 @@ export interface ScopeItem {
   actual_cost?: number;
   cost_variance?: number; // Computed field
   
+  // Material Spec Integration Fields
+  scope_item?: string; // Reference to scope item name/title
+  quantity_needed?: number; // Quantity needed for material specs
+  notes?: string; // Additional notes for material integration
+  
   // Additional Fields
   title?: string;
   specifications?: string;

@@ -47,6 +47,11 @@ export interface ScopeItem {
   unit_price: number // Base unit pricing
   total_price: number // Auto-calculated (quantity × unit_price)
   
+  // Material Spec Integration Fields
+  scope_item?: string // Reference to scope item name/title
+  quantity_needed?: number // Quantity needed for material specs
+  notes?: string // Additional notes for material integration
+  
   // Cost Tracking (Technical Office + Purchasing Access Only)
   initial_cost?: number // Original estimated cost
   actual_cost?: number // Real incurred cost

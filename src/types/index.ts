@@ -1,90 +1,29 @@
-// User and Authentication Types
-export type UserRole = 
-  | 'company_owner'
-  | 'general_manager'
-  | 'deputy_general_manager'
-  | 'technical_director'
-  | 'admin'
-  | 'project_manager'
-  | 'architect'
-  | 'technical_engineer'
-  | 'purchase_director'
-  | 'purchase_specialist'
-  | 'field_worker'
-  | 'client'
+/**
+ * Formula PM 2.0 Type Definitions Index
+ * 
+ * Central export point for all TypeScript type definitions
+ * Exports from individual type files to avoid duplication
+ */
 
-export interface User {
-  id: string
-  email: string
-  created_at: string
-  updated_at: string
-}
+// Authentication Types
+export * from './auth'
 
-export interface UserProfile {
-  id: string
-  user_id: string
-  first_name: string
-  last_name: string
-  role: UserRole
-  phone?: string
-  avatar_url?: string
-  department?: string
-  company_id?: string
-  created_at: string
-  updated_at: string
-}
+// Project Types  
+export * from './projects'
 
-// Project Types
-export type ProjectStatus = 'planning' | 'active' | 'on_hold' | 'completed' | 'cancelled'
-export type ProjectPriority = 'low' | 'medium' | 'high' | 'urgent'
+// Scope Management Types
+export * from './scope'
 
-export interface Project {
-  id: string
-  name: string
-  description: string
-  status: ProjectStatus
-  priority: ProjectPriority
-  progress: number
-  start_date: string
-  end_date: string
-  budget?: number
-  actual_cost?: number
-  project_manager_id: string
-  client_id: string
-  company_id: string
-  created_at: string
-  updated_at: string
+// Material Specifications Types
+export * from './material-specs'
 
-  // Relations
-  project_manager?: UserProfile
-  client?: Client
-  team_members?: ProjectMember[]
-}
+// Note: database.ts types are included via individual type files to avoid conflicts
 
-export interface ProjectMember {
-  id: string
-  project_id: string
-  user_id: string
-  role: string
-  permissions: string[]
-  joined_at: string
-
-  // Relations
-  user?: UserProfile
-}
-
-// Client Types
-export interface Client {
-  id: string
-  name: string
-  email?: string
-  phone?: string
-  address?: string
-  contact_person?: string
-  company_id: string
-  created_at: string
-  updated_at: string
-}
+// Re-export commonly used types for convenience
+export type { UserRole, User, UserProfile } from './auth'
+export type { Project, ProjectStatus } from './projects'
+export type { ScopeItem, ScopeCategory, ScopeStatus } from './scope'
+export type { MaterialSpec, MaterialStatus, MaterialPriority } from './material-specs'
 
 // Navigation Types
 export interface NavigationItem {
@@ -207,7 +146,7 @@ export type Permission =
   | 'system.audit.view'
 
 export interface RolePermissions {
-  role: UserRole
+  role: import('./auth').UserRole
   permissions: Permission[]
 }
 

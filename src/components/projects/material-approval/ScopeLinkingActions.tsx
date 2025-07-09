@@ -1,0 +1,262 @@
+/**
+ * Formula PM 2.0 Scope Linking Actions Component
+ * V3 Phase 1 Implementation
+ * 
+ * Handles linking and unlinking scope items to material specifications
+ */
+
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { 
+  Link, 
+  Unlink, 
+  MoreHorizontal,
+  Loader2,
+  Package,
+  X
+} from 'lucide-react';
+import { MaterialSpec } from '@/types/material-specs';
+import { useMaterialSpecs } from '@/hooks/useMaterialSpecs';
+import { useScope } from '@/hooks/useScope';
+
+interface ScopeLinkingActionsProps {
+  materialSpec: MaterialSpec;
+  projectId: string;
+  onAction?: (action: string, materialSpec: MaterialSpec) => void;
+}
+
+export function ScopeLinkingActions({ 
+  materialSpec, 
+  projectId, 
+  onAction 
+}: ScopeLinkingActionsProps) {
+  const { 
+    permissions: materialPermissions, 
+    linkScopeItem, 
+    unlinkScopeItem 
+  } = useMaterialSpecs(projectId);
+  
+  const { scopeItems, loading: scopeLoading } = useScope(projectId);
+  
+  const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
+  const [selectedScopeItemId, setSelectedScopeItemId] = useState('');
+  const [quantityNeeded, setQuantityNeeded] = useState(1);
+  const [linkNotes, setLinkNotes] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleLinkScopeItem = async () => {
+    if (!materialPermissions.canLinkScope || !selectedScopeItemId) return;
+    
+    setIsSubmitting(true);
+    try {
+      const success = await linkScopeItem(materialSpec.id, {
+        scope_item_id: selectedScopeItemId,
+        quantity_needed: quantityNeeded,
+        notes: linkNotes || undefined
+      });
+      
+      if (success) {
+        setIsLinkDialogOpen(false);
+        setSelectedScopeItemId('');
+        setQuantityNeeded(1);
+        setLinkNotes('');
+        onAction?.('scope_linked', materialSpec);
+      }
+    } catch (error) {
+      console.error('Error linking scope item:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleUnlinkScopeItem = async (scopeItemId: string) => {
+    if (!materialPermissions.canUnlinkScope) return;
+    
+    setIsSubmitting(true);
+    try {
+      const success = await unlinkScopeItem(materialSpec.id, scopeItemId);
+      
+      if (success) {
+        onAction?.('scope_unlinked', materialSpec);
+      }
+    } catch (error) {
+      console.error('Error unlinking scope item:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const linkedScopeItems = materialSpec.scope_items || [];
+  const linkedScopeItemIds = linkedScopeItems.map(item => {
+    const scopeItem = item.scope_item;
+    return typeof scopeItem === 'string' ? scopeItem : (scopeItem as any)?.id;
+  }).filter(Boolean);
+  const availableScopeItems = scopeItems.filter(item => !linkedScopeItemIds.includes(item.id));
+
+  const canLinkScope = materialPermissions.canLinkScope && availableScopeItems.length > 0;
+  const canUnlinkScope = materialPermissions.canUnlinkScope && linkedScopeItems.length > 0;
+
+  // If no actions are available, don't render the component
+  if (!canLinkScope && !canUnlinkScope) {
+    return null;
+  }
+
+  return (
+    <div className="mt-3">
+      <div className="flex items-center justify-between mb-2">
+        <h4 className="text-sm font-medium text-gray-700">Scope Items</h4>
+        <div className="flex items-center gap-2">
+          {canLinkScope && (
+            <Dialog open={isLinkDialogOpen} onOpenChange={setIsLinkDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Link className="w-4 h-4 mr-2" />
+                  Link Scope
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Link Scope Item</DialogTitle>
+                  <DialogDescription>
+                    Link "{materialSpec.name}" to a scope item in this project.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="scope-item" className="text-right">
+                      Scope Item *
+                    </Label>
+                    <div className="col-span-3">
+                      <Select value={selectedScopeItemId} onValueChange={setSelectedScopeItemId}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select scope item" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {availableScopeItems.map(item => (
+                            <SelectItem key={item.id} value={item.id}>
+                              {item.item_no} - {item.title}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="quantity-needed" className="text-right">
+                      Quantity Needed *
+                    </Label>
+                    <Input
+                      id="quantity-needed"
+                      type="number"
+                      min="1"
+                      value={quantityNeeded}
+                      onChange={(e) => setQuantityNeeded(parseInt(e.target.value))}
+                      className="col-span-3"
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="link-notes" className="text-right">
+                      Notes
+                    </Label>
+                    <Textarea
+                      id="link-notes"
+                      placeholder="Optional notes about this link..."
+                      value={linkNotes}
+                      onChange={(e) => setLinkNotes(e.target.value)}
+                      className="col-span-3"
+                      rows={2}
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setIsLinkDialogOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button 
+                    onClick={handleLinkScopeItem} 
+                    disabled={isSubmitting || !selectedScopeItemId || quantityNeeded < 1}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Linking...
+                      </>
+                    ) : (
+                      <>
+                        <Link className="w-4 h-4 mr-2" />
+                        Link Scope Item
+                      </>
+                    )}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          )}
+        </div>
+      </div>
+      
+      {/* Linked Scope Items */}
+      <div className="space-y-2">
+        {linkedScopeItems.length === 0 ? (
+          <div className="text-center py-4 text-gray-500">
+            <Package className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+            <p className="text-sm">No scope items linked yet</p>
+          </div>
+        ) : (
+          linkedScopeItems.map((link) => (
+            <div key={link.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-medium text-sm">
+                    {typeof link.scope_item === 'string' ? link.scope_item : `${(link.scope_item as any)?.item_no || ''} - ${(link.scope_item as any)?.title || ''}`}
+                  </span>
+                  <Badge variant="outline" className="text-xs">
+                    {link.quantity_needed} {materialSpec.unit_of_measure}
+                  </Badge>
+                </div>
+                {link.notes && (
+                  <p className="text-xs text-gray-600">{link.notes}</p>
+                )}
+              </div>
+              
+              {canUnlinkScope && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleUnlinkScopeItem(typeof link.scope_item === 'string' ? link.scope_item : (link.scope_item as any)?.id || '')}
+                  disabled={isSubmitting}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}

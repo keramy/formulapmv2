@@ -103,7 +103,7 @@ export async function GET(request: NextRequest) {
       query = query.in('id', projectIds)
     } else if (hasPermission(profile.role, 'projects.read.own')) {
       // External roles can see their own projects
-      if (user.role === 'client') {
+      if (profile.role === 'client') {
         const { data: clientInfo } = await supabase
           .from('clients')
           .select('id')

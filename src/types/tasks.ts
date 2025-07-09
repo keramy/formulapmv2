@@ -87,6 +87,11 @@ export interface TaskFilters {
   due_date_end?: string
   scope_item_id?: string
   tags?: string[]
+  overdue_only?: boolean
+  assigned_to_me?: boolean
+  assigned_by_me?: boolean
+  completed_only?: boolean
+  created_by?: string
 }
 
 export interface TaskSortOptions {

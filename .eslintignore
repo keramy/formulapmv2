@@ -1,0 +1,53 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+.next/
+out/
+dist/
+build/
+
+# Environment files
+.env*
+
+# Generated files
+*.generated.*
+*.d.ts
+
+# Temporary files
+*.tmp
+*.temp
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Database
+*.db
+*.sqlite
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Supabase
+supabase/.temp/
+supabase/config.toml
+
+# Migration scripts (they use different style rules)
+supabase/migrations/*.sql
+
+# Test coverage
+__coverage__/

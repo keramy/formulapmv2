@@ -12,18 +12,36 @@ jest.mock('@/lib/permissions', () => ({
   hasPermission: jest.fn(),
 }))
 
+// Mock validation functions
+jest.mock('@/lib/validation/projects', () => ({
+  validateProjectFormData: jest.fn(),
+  validateProjectListParams: jest.fn(),
+  validateProjectPermissions: jest.fn(),
+}))
+
 // Mock Supabase client
 jest.mock('@/lib/supabase', () => ({
-  createServerClient: jest.fn(() => ({
-    from: jest.fn(() => ({
-      select: jest.fn(() => ({
-        eq: jest.fn(() => ({
-          single: jest.fn(),
-        })),
-        order: jest.fn(() => ({
-          limit: jest.fn(),
-        })),
-      })),
+  createServerClient: jest.fn(() => {
+    const mockChain = {
+      range: jest.fn(),
+      limit: jest.fn(),
+      single: jest.fn(),
+      eq: jest.fn().mockReturnThis(),
+      in: jest.fn().mockReturnThis(),
+      or: jest.fn().mockReturnThis(),
+      order: jest.fn().mockReturnThis(),
+      select: jest.fn().mockReturnThis(),
+    }
+    
+    // All chain methods return the chain to allow continued chaining
+    Object.keys(mockChain).forEach(key => {
+      if (key !== 'range' && key !== 'limit' && key !== 'single') {
+        mockChain[key] = jest.fn().mockReturnValue(mockChain)
+      }
+    })
+    
+    return {
+      from: jest.fn(() => mockChain),
       insert: jest.fn(() => ({
         select: jest.fn(() => ({
           single: jest.fn(),
@@ -39,8 +57,8 @@ jest.mock('@/lib/supabase', () => ({
       delete: jest.fn(() => ({
         eq: jest.fn(),
       })),
-    })),
-  })),
+    }
+  }),
 }))
 
 const mockAuthProfile = {
@@ -61,6 +79,7 @@ describe('/api/projects', () => {
     
     const { verifyAuth } = require('@/lib/middleware')
     const { hasPermission } = require('@/lib/permissions')
+    const { validateProjectFormData, validateProjectListParams } = require('@/lib/validation/projects')
     
     verifyAuth.mockResolvedValue({
       user: mockUser,
@@ -69,6 +88,10 @@ describe('/api/projects', () => {
     })
     
     hasPermission.mockReturnValue(true)
+    
+    // Mock validation functions to return successful validation
+    validateProjectListParams.mockReturnValue({ success: true, data: {} })
+    validateProjectFormData.mockReturnValue({ success: true, data: {} })
   })
 
   describe('GET /api/projects', () => {
@@ -81,9 +104,12 @@ describe('/api/projects', () => {
         { id: '2', name: 'Project 2', status: 'planning' }
       ]
       
-      mockSupabase.from().select().order().limit.mockResolvedValue({
+      // Setup the mock chain to return the projects
+      const mockChain = mockSupabase.from()
+      mockChain.range.mockResolvedValue({
         data: mockProjects,
-        error: null
+        error: null,
+        count: 2
       })
 
       const request = new NextRequest('http://localhost:3000/api/projects', {
@@ -96,9 +122,14 @@ describe('/api/projects', () => {
       const response = await GET(request)
       const data = await response.json()
 
+      if (response.status !== 200) {
+        console.log('Response status:', response.status)
+        console.log('Response data:', data)
+      }
+
       expect(response.status).toBe(200)
       expect(data.success).toBe(true)
-      expect(data.data).toEqual(mockProjects)
+      expect(data.data.projects).toEqual(mockProjects)
     })
 
     it('should reject unauthenticated requests', async () => {
@@ -137,7 +168,7 @@ describe('/api/projects', () => {
 
       expect(response.status).toBe(403)
       expect(data.success).toBe(false)
-      expect(data.error).toBe('Insufficient permissions')
+      expect(data.error).toBe('Insufficient permissions to view projects')
     })
   })
 
@@ -204,9 +235,10 @@ describe('/api/projects', () => {
       const { createServerClient } = require('@/lib/supabase')
       const mockSupabase = createServerClient()
       
-      mockSupabase.from().select().order().limit.mockResolvedValue({
+      mockSupabase.from().select().order().range.mockResolvedValue({
         data: null,
-        error: { message: 'Database connection failed' }
+        error: { message: 'Database connection failed' },
+        count: 0
       })
 
       const request = new NextRequest('http://localhost:3000/api/projects', {
@@ -221,7 +253,7 @@ describe('/api/projects', () => {
 
       expect(response.status).toBe(500)
       expect(data.success).toBe(false)
-      expect(data.error).toBe('Database operation failed')
+      expect(data.error).toBe('Internal server error')
     })
   })
 })

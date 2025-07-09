@@ -1,0 +1,259 @@
+/**
+ * Formula PM 2.0 Material Specifications API - Revision Request Workflow
+ * V3 Phase 1 Implementation
+ * 
+ * Handles material specification revision request workflow
+ * Following exact patterns from approval/rejection workflow for consistency
+ */
+
+import { NextRequest, NextResponse } from 'next/server'
+import { verifyAuth } from '@/lib/middleware'
+import { createServerClient } from '@/lib/supabase'
+import { 
+  validateMaterialRevision,
+  validateMaterialSpecPermissions,
+  validateMaterialStatusTransition,
+  calculateMaterialAvailabilityStatus,
+  calculateMaterialCostVariance,
+  calculateDaysUntilDelivery
+} from '@/lib/validation/material-specs'
+
+// ============================================================================
+// POST /api/material-specs/[id]/request-revision - Request revision for material specification
+// ============================================================================
+
+export async function POST(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  // Authentication check
+  const { user, profile, error } = await verifyAuth(request)
+  
+  if (error || !user || !profile) {
+    return NextResponse.json(
+      { success: false, error: error || 'Authentication required' },
+      { status: 401 }
+    )
+  }
+
+  // Permission check - similar to approve/reject permissions
+  if (!validateMaterialSpecPermissions(profile.role, 'approve')) {
+    return NextResponse.json(
+      { success: false, error: 'Insufficient permissions to request material specification revisions' },
+      { status: 403 }
+    )
+  }
+
+  try {
+    const params = await context.params
+    const materialSpecId = params.id
+
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+    if (!uuidRegex.test(materialSpecId)) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid material specification ID format' },
+        { status: 400 }
+      )
+    }
+
+    const supabase = createServerClient()
+
+    // Check if material spec exists and get current data
+    const { data: existingMaterialSpec, error: fetchError } = await supabase
+      .from('material_specs')
+      .select('*')
+      .eq('id', materialSpecId)
+      .single()
+
+    if (fetchError || !existingMaterialSpec) {
+      return NextResponse.json(
+        { success: false, error: 'Material specification not found' },
+        { status: 404 }
+      )
+    }
+
+    // Check if user has access to this material spec's project
+    const hasProjectAccess = await verifyProjectAccess(supabase, user, existingMaterialSpec.project_id)
+    if (!hasProjectAccess) {
+      return NextResponse.json(
+        { success: false, error: 'Access denied to this material specification' },
+        { status: 403 }
+      )
+    }
+
+    // Validate status transition
+    if (!validateMaterialStatusTransition(existingMaterialSpec.status, 'revision_required')) {
+      return NextResponse.json(
+        { success: false, error: `Cannot request revision for material specification with status: ${existingMaterialSpec.status}` },
+        { status: 400 }
+      )
+    }
+
+    // Prevent self-revision request if created by same user (but allow supervisors to request revision)
+    if (existingMaterialSpec.created_by === user.id && !['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'].includes(profile.role)) {
+      return NextResponse.json(
+        { success: false, error: 'Cannot request revision for your own material specification' },
+        { status: 400 }
+      )
+    }
+
+    const body = await request.json()
+    
+    // Validate revision data
+    const validationResult = validateMaterialRevision(body)
+    if (!validationResult.success) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: 'Invalid revision request data',
+          details: validationResult.error.issues 
+        },
+        { status: 400 }
+      )
+    }
+
+    const revisionData = validationResult.data
+
+    // Update material specification status to revision_required
+    const { data: updatedMaterialSpec, error: updateError } = await supabase
+      .from('material_specs')
+      .update({
+        status: 'revision_required',
+        substitution_notes: revisionData.revision_notes || null,
+        // Clear approval/rejection data
+        approved_by: null,
+        approved_at: null,
+        approval_notes: null,
+        rejected_by: null,
+        rejected_at: null,
+        rejection_reason: null
+      })
+      .eq('id', materialSpecId)
+      .select(`
+        *,
+        project:projects!project_id(id, name, status),
+        supplier:suppliers!supplier_id(id, name, email, phone, contact_person),
+        creator:user_profiles!created_by(id, first_name, last_name, email, avatar_url)
+      `)
+      .single()
+
+    if (updateError) {
+      console.error('Material spec revision request error:', updateError)
+      return NextResponse.json(
+        { success: false, error: 'Failed to request material specification revision' },
+        { status: 500 }
+      )
+    }
+
+    // Add computed fields
+    const enhancedMaterialSpec = {
+      ...updatedMaterialSpec,
+      availability_status: calculateMaterialAvailabilityStatus(
+        updatedMaterialSpec.quantity_required,
+        updatedMaterialSpec.quantity_available,
+        updatedMaterialSpec.minimum_stock_level
+      ),
+      cost_variance: calculateMaterialCostVariance(
+        updatedMaterialSpec.estimated_cost,
+        updatedMaterialSpec.actual_cost
+      ),
+      is_overdue: updatedMaterialSpec.delivery_date && 
+        new Date(updatedMaterialSpec.delivery_date) < new Date() && 
+        !['approved', 'discontinued'].includes(updatedMaterialSpec.status),
+      days_until_delivery: updatedMaterialSpec.delivery_date ? 
+        calculateDaysUntilDelivery(updatedMaterialSpec.delivery_date) : null,
+      approval_required: updatedMaterialSpec.status === 'pending_approval'
+    }
+
+    // Log revision request action for audit trail
+    await supabase
+      .from('material_spec_history')
+      .insert({
+        material_spec_id: materialSpecId,
+        action: 'revision_requested',
+        user_id: user.id,
+        user_name: `${profile.first_name} ${profile.last_name}`,
+        notes: `Revision requested: ${revisionData.revision_reason}${revisionData.revision_notes ? `. Notes: ${revisionData.revision_notes}` : ''}`,
+        old_values: { status: existingMaterialSpec.status },
+        new_values: { status: 'revision_required' }
+      })
+      .single()
+
+    // TODO: Send notification to material spec creator about revision request
+    // This would be handled by a notification service
+
+    return NextResponse.json({
+      success: true,
+      message: `Revision requested for material specification "${existingMaterialSpec.name}"`,
+      data: {
+        material_spec: enhancedMaterialSpec
+      }
+    })
+
+  } catch (error) {
+    console.error('Material spec revision request API error:', error)
+    return NextResponse.json(
+      { success: false, error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+async function verifyProjectAccess(supabase: any, user: any, projectId: string): Promise<boolean> {
+  try {
+    // Management roles can access all projects
+    if (['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'].includes(user.role)) {
+      return true
+    }
+
+    // Check if user is assigned to this project
+    const { data: assignment } = await supabase
+      .from('project_assignments')
+      .select('id')
+      .eq('project_id', projectId)
+      .eq('user_id', user.id)
+      .eq('is_active', true)
+      .single()
+
+    if (assignment) {
+      return true
+    }
+
+    // Check if user is the project manager
+    const { data: project } = await supabase
+      .from('projects')
+      .select('project_manager_id')
+      .eq('id', projectId)
+      .single()
+
+    if (project?.project_manager_id === user.id) {
+      return true
+    }
+
+    // Check if user is a client assigned to this project
+    if (user.role === 'client') {
+      const { data: clientProject } = await supabase
+        .from('projects')
+        .select('client_id')
+        .eq('id', projectId)
+        .single()
+
+      if (clientProject) {
+        const { data: client } = await supabase
+          .from('clients')
+          .select('user_id')
+          .eq('id', clientProject.client_id)
+          .single()
+
+        return client?.user_id === user.id
+      }
+    }
+
+    return false
+  } catch (error) {
+    console.error('Access check error:', error)
+    return false
+  }
+}

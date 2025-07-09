@@ -3,7 +3,7 @@
  */
 
 import { NextRequest } from 'next/server'
-import { GET as AuthLogin } from '@/app/api/auth/login/route'
+import { POST as AuthLogin } from '@/app/api/auth/login/route'
 import { GET as ProjectsGet } from '@/app/api/projects/route'
 
 // Mock Supabase

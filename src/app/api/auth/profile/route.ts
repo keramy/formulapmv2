@@ -8,14 +8,13 @@ export async function GET(request: NextRequest) {
   
   if (error || !user || !profile) {
     return NextResponse.json(
-      { error: error || 'Authentication required' },
+      { success: false, error: error || 'Authentication required' },
       { status: 401 }
     )
   }
 
   try {
-
-    const { supabaseAdmin } = require('@/lib/supabase')
+    const { supabaseAdmin } = await import('@/lib/supabase')
 
     // Get user profile using admin client to bypass RLS
     const { data: profile, error } = await supabaseAdmin
@@ -27,14 +26,14 @@ export async function GET(request: NextRequest) {
     if (error) {
       console.error('Profile fetch error:', error)
       return NextResponse.json(
-        { error: 'Failed to fetch user profile' },
+        { success: false, error: 'Failed to fetch user profile' },
         { status: 500 }
       )
     }
 
     if (!profile) {
       return NextResponse.json(
-        { error: 'User profile not found' },
+        { success: false, error: 'User profile not found' },
         { status: 404 }
       )
     }
@@ -60,7 +59,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Profile API error:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { success: false, error: 'Internal server error' },
       { status: 500 }
     )
   }
@@ -72,7 +71,7 @@ export async function PUT(request: NextRequest) {
   
   if (error || !user || !profile) {
     return NextResponse.json(
-      { error: error || 'Authentication required' },
+      { success: false, error: error || 'Authentication required' },
       { status: 401 }
     )
   }
@@ -95,14 +94,14 @@ export async function PUT(request: NextRequest) {
     // Validate required fields
     if (filteredUpdates.first_name !== undefined && !filteredUpdates.first_name?.trim()) {
       return NextResponse.json(
-        { error: 'First name is required' },
+        { success: false, error: 'First name is required' },
         { status: 400 }
       )
     }
 
     if (filteredUpdates.last_name !== undefined && !filteredUpdates.last_name?.trim()) {
       return NextResponse.json(
-        { error: 'Last name is required' },
+        { success: false, error: 'Last name is required' },
         { status: 400 }
       )
     }
@@ -112,13 +111,13 @@ export async function PUT(request: NextRequest) {
       const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/
       if (!phoneRegex.test(filteredUpdates.phone.replace(/[-\s\(\)]/g, ''))) {
         return NextResponse.json(
-          { error: 'Invalid phone number format' },
+          { success: false, error: 'Invalid phone number format' },
           { status: 400 }
         )
       }
     }
 
-    const { createServerClient } = require('@/lib/supabase')
+    const { createServerClient } = await import('@/lib/supabase')
     const supabase = createServerClient()
 
     // Update user profile
@@ -135,7 +134,7 @@ export async function PUT(request: NextRequest) {
     if (error) {
       console.error('Profile update error:', error)
       return NextResponse.json(
-        { error: 'Failed to update profile' },
+        { success: false, error: 'Failed to update profile' },
         { status: 500 }
       )
     }
@@ -162,7 +161,7 @@ export async function PUT(request: NextRequest) {
   } catch (error) {
     console.error('Profile update API error:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { success: false, error: 'Internal server error' },
       { status: 500 }
     )
   }
