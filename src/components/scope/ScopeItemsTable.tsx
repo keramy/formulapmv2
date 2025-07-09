@@ -116,7 +116,6 @@ export const ScopeItemsTable: React.FC<ScopeItemsTableProps> = ({
         columns={columns}
         data={items}
         searchable={false} // Search is handled in parent component
-        filterable={false} // Filtering is handled in parent component
       />
 
       {/* Empty State */}

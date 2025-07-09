@@ -133,7 +133,7 @@ export const useScope = (projectId?: string) => {
         },
         body: JSON.stringify({
           ...itemData,
-          project_id: projectId || itemData.project_id
+          project_id: projectId
         })
       })
 
@@ -210,7 +210,7 @@ export const useScope = (projectId?: string) => {
 
   // Delete scope item
   const deleteScopeItem = useCallback(async (itemId: string, forceDelete = false) => {
-    if (!profile || !checkPermission('scope.delete')) {
+    if (!profile || !checkPermission('projects.delete')) {
       throw new Error('Insufficient permissions to delete scope items')
     }
 
@@ -260,7 +260,7 @@ export const useScope = (projectId?: string) => {
 
   // Bulk update scope items
   const bulkUpdateScopeItems = useCallback(async (bulkUpdate: BulkScopeUpdate) => {
-    if (!profile || !checkPermission('scope.bulk_edit')) {
+    if (!profile || !checkPermission('projects.update')) {
       throw new Error('Insufficient permissions for bulk operations')
     }
 
@@ -373,9 +373,9 @@ export const useScope = (projectId?: string) => {
     // Permissions
     canCreate: canCreateScope(),
     canEdit: canEditScope(),
-    canDelete: checkPermission('scope.delete'),
+    canDelete: checkPermission('projects.delete'),
     canViewFinancials: canViewPricing(),
-    canBulkEdit: checkPermission('scope.bulk_edit')
+    canBulkEdit: checkPermission('projects.update')
   }
 }
 
@@ -519,7 +519,7 @@ export const useScopeExcel = (projectId: string) => {
 
   // Import scope items from Excel
   const importFromExcel = useCallback(async (file: File) => {
-    if (!profile || !checkPermission('scope.import_excel')) {
+    if (!profile || !checkPermission('projects.update')) {
       throw new Error('Insufficient permissions to import Excel files')
     }
 
@@ -563,7 +563,7 @@ export const useScopeExcel = (projectId: string) => {
 
   // Export scope items to Excel
   const exportToExcel = useCallback(async (filters?: ScopeFilters) => {
-    if (!profile || !checkPermission('scope.export_excel')) {
+    if (!profile || !checkPermission('projects.read.all')) {
       throw new Error('Insufficient permissions to export Excel files')
     }
 
@@ -624,8 +624,8 @@ export const useScopeExcel = (projectId: string) => {
     error,
     importFromExcel,
     exportToExcel,
-    canImport: checkPermission('scope.import_excel'),
-    canExport: checkPermission('scope.export_excel')
+    canImport: checkPermission('projects.update'),
+    canExport: checkPermission('projects.read.all')
   }
 }
 

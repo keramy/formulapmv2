@@ -508,7 +508,7 @@ export const useProjectMetrics = () => {
 
     try {
       const queryParams = new URLSearchParams()
-      if (includeFinancials && canViewFinancials) {
+      if (includeFinancials && canViewFinancials()) {
         queryParams.set('include_financials', 'true')
       }
 

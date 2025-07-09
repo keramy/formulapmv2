@@ -81,12 +81,12 @@ export const ScopeItemEditor: React.FC<ScopeItemEditorProps> = ({
   const { toast } = useToast()
 
   // Permission checks
-  const canViewCosts = checkPermission('scope.costs.view')
-  const canEditCosts = checkPermission('scope.costs.edit')
-  const canViewPricing = checkPermission('scope.prices.view')
-  const canEditPricing = checkPermission('scope.prices.edit')
-  const canAssign = checkPermission('scope.assign')
-  const canManageDependencies = checkPermission('scope.dependencies.manage')
+  const canViewCosts = checkPermission('projects.read.all')
+  const canEditCosts = checkPermission('projects.update')
+  const canViewPricing = checkPermission('projects.read.all')
+  const canEditPricing = checkPermission('projects.update')
+  const canAssign = checkPermission('projects.update')
+  const canManageDependencies = checkPermission('projects.update')
 
   // Form setup
   const form = useForm<ScopeItemFormData>({

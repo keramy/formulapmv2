@@ -197,7 +197,7 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
         </Card>
 
         {/* Budget Summary */}
-        {project.budget && hasPermission('projects.view.budget') && (
+        {project.budget && hasPermission('projects.read.all') && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">

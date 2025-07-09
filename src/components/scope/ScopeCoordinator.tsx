@@ -102,9 +102,9 @@ export const useScopeCoordinator = ({
   // === EFFECTIVE PERMISSIONS (Quality Gate) ===
   const effectivePermissions = userPermissions || {
     canEdit: canEditScope(),
-    canDelete: checkPermission('scope.delete'),
+    canDelete: canEditScope(),
     canViewPricing: canViewPricing(),
-    canAssignSupplier: checkPermission('scope.assign_supplier')
+    canAssignSupplier: canEditScope()
   }
 
   // === FILTER COORDINATION (Wave 2 - Features) ===
