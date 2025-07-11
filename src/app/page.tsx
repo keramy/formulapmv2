@@ -1,22 +1,8 @@
-'use client';
-
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
-declare global {
-  interface Window {
-    Sentry: any;
-  }
-}
-
 export default function HomePage() {
-  const testSentryError = () => {
-    // This snippet contains an intentional error and can be used as a test 
-    // to make sure that everything's working as expected.
-    (window as any).myUndefinedFunction();
-  };
-
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -42,16 +28,6 @@ export default function HomePage() {
                 Login to Dashboard
               </Button>
             </Link>
-            
-            <Button 
-              onClick={testSentryError}
-              variant="destructive" 
-              className="w-full" 
-              size="sm"
-            >
-              Test Sentry Error (myUndefinedFunction)
-            </Button>
-            
             <p className="text-center text-sm text-gray-500">
               Sign in to access your projects and manage your construction workflow
             </p>

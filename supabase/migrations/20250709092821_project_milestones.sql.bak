@@ -6,14 +6,18 @@
 -- ENUMS
 -- ============================================================================
 
--- Create milestone status enum
-CREATE TYPE milestone_status AS ENUM (
-    'upcoming',
-    'in_progress', 
-    'completed',
-    'overdue',
-    'cancelled'
-);
+-- Create milestone status enum (only if it doesn't exist)
+DO $$ BEGIN
+    CREATE TYPE milestone_status AS ENUM (
+        'upcoming',
+        'in_progress',
+        'completed',
+        'overdue',
+        'cancelled'
+    );
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- ============================================================================
 -- TABLES

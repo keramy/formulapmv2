@@ -38,6 +38,7 @@ export interface MilestoneFormData {
   description?: string
   target_date: string
   status: MilestoneStatus
+  project_id?: string  // Optional in form, will be added during submission
 }
 
 export interface MilestoneFilters {

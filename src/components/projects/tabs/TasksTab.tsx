@@ -27,6 +27,7 @@ import {
 } from 'lucide-react'
 import { Task, TaskFormData, TaskFilters, TaskPermissions } from '@/types/tasks'
 import { useTasks } from '@/hooks/useTasks'
+import { useProjectMembers } from '@/hooks/useProjectMembers'
 
 interface TasksTabProps {
   projectId: string
@@ -52,13 +53,8 @@ export function TasksTab({ projectId }: TasksTabProps) {
     refetch
   } = useTasks(projectId, filters)
 
-  // Mock project members for task form (will be replaced with real data later)
-  const mockProjectMembers = [
-    { id: 'user-1', full_name: 'John Doe', email: 'john@example.com' },
-    { id: 'user-2', full_name: 'Jane Smith', email: 'jane@example.com' },
-    { id: 'user-3', full_name: 'Mike Johnson', email: 'mike@example.com' },
-    { id: 'user-4', full_name: 'Sarah Wilson', email: 'sarah@example.com' }
-  ]
+  // Fetch real project members
+  const { members: projectMembers, loading: membersLoading } = useProjectMembers(projectId)
 
   const handleCreateTask = async (data: TaskFormData) => {
     const newTask = await createTask(data)
@@ -137,7 +133,7 @@ export function TasksTab({ projectId }: TasksTabProps) {
                 mode="create"
                 onSave={handleCreateTask}
                 onCancel={() => setCreateDialogOpen(false)}
-                projectMembers={mockProjectMembers}
+                projectMembers={projectMembers}
               />
             </DialogContent>
           </Dialog>
@@ -252,7 +248,7 @@ export function TasksTab({ projectId }: TasksTabProps) {
             onDeleteTask={permissions.canDelete ? handleDeleteTask : undefined}
             onStatusChange={permissions.canChangeStatus ? handleStatusChange : undefined}
             onBulkUpdate={permissions.canEdit ? handleBulkUpdate : undefined}
-            projectMembers={mockProjectMembers}
+            projectMembers={projectMembers}
             initialFilters={filters}
             showBulkActions={permissions.canEdit}
           />
@@ -272,7 +268,7 @@ export function TasksTab({ projectId }: TasksTabProps) {
               mode="edit"
               onSave={handleUpdateTask}
               onCancel={() => setEditingTask(null)}
-              projectMembers={mockProjectMembers}
+              projectMembers={projectMembers}
             />
           </DialogContent>
         </Dialog>

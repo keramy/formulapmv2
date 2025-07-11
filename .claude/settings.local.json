@@ -88,7 +88,8 @@
       "mcp__sentry__create_project",
       "mcp__sentry__get_doc",
       "mcp__sentry__find_issues",
-      "mcp__sentry__find_projects"
+      "mcp__sentry__find_projects",
+      "mcp__linear__linear_search_issues"
     ],
     "deny": []
   }

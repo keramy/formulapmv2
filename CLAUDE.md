@@ -236,12 +236,12 @@ npx supabase start
 # Start Next.js (currently running on port 3003/3004)
 npm run dev
 
-# ✅ Working credentials (password: password123)
-# - Admin: david.admin@formulapm.com (✅ TESTED & WORKING)
-# - Company Owner: owner@formulapm.com
-# - Project Manager: pm@formulapm.com
-# - Client: client@formulapm.com
-# - Subcontractor: subcontractor@formulapm.com
+# ✅ Working credentials (password: testpass123)
+# - Admin/Owner: owner.test@formulapm.com (✅ TESTED & WORKING)
+# - Project Manager: pm.test@formulapm.com (✅ TESTED & WORKING)
+# - General Manager: gm.test@formulapm.com (✅ TESTED & WORKING)
+# - Architect: architect.test@formulapm.com (✅ TESTED & WORKING)
+# - Client: client.test@formulapm.com (✅ TESTED & WORKING)
 ```
 
 ## Current Session Status (July 8, 2025)

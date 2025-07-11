@@ -1,20 +1,21 @@
--- Create suppliers table for supplier management feature
-CREATE TABLE IF NOT EXISTS suppliers (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name VARCHAR(255) NOT NULL,
-  contact_person VARCHAR(255) NOT NULL,
-  email VARCHAR(255) NOT NULL,
-  phone VARCHAR(50),
-  address TEXT,
-  specialties TEXT[] DEFAULT '{}',
-  description TEXT,
-  rating DECIMAL(3,2) DEFAULT 0.0 CHECK (rating >= 0 AND rating <= 5),
-  total_projects INTEGER DEFAULT 0,
-  total_payments DECIMAL(15,2) DEFAULT 0.0,
-  status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
-);
+-- Add missing columns to existing suppliers table
+ALTER TABLE suppliers 
+  ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
+  ADD COLUMN IF NOT EXISTS description TEXT,
+  ADD COLUMN IF NOT EXISTS total_projects INTEGER DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS total_payments DECIMAL(15,2) DEFAULT 0.0;
+
+-- Rename columns to match new schema (only if needed)
+DO $$ 
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'suppliers' AND column_name = 'specializations') THEN
+    ALTER TABLE suppliers RENAME COLUMN specializations TO specialties;
+  END IF;
+  
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'suppliers' AND column_name = 'performance_rating') THEN
+    ALTER TABLE suppliers RENAME COLUMN performance_rating TO rating;
+  END IF;
+END $$;
 
 -- Add indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_suppliers_status ON suppliers(status);
@@ -32,7 +33,7 @@ CREATE POLICY "Users can view active suppliers" ON suppliers
 CREATE POLICY "Project managers can manage suppliers" ON suppliers
   FOR ALL USING (
     auth.uid() IN (
-      SELECT user_id FROM user_profiles 
+      SELECT id FROM user_profiles 
       WHERE role IN ('company_owner', 'general_manager', 'deputy_general_manager', 'project_manager')
     )
   );

@@ -62,7 +62,8 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
           email,
           role,
           department,
-          phone
+          phone,
+          avatar_url
         ),
         assigned_by_user:user_profiles!assigned_by(
           first_name,

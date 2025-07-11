@@ -47,8 +47,8 @@ CREATE POLICY "Users own profile access" ON user_profiles
 -- Restrict role changes (simplified)
 CREATE POLICY "Restrict role changes" ON user_profiles
   FOR UPDATE USING (
-    (auth.jwt() ->> 'user_role' IN ('company_owner', 'admin')) OR
-    (id = auth.uid() AND role = (auth.jwt() ->> 'user_role'))
+    ((auth.jwt() ->> 'user_role')::user_role IN ('company_owner', 'admin')) OR
+    (id = auth.uid() AND role = (auth.jwt() ->> 'user_role')::user_role)
   );
 
 -- PROJECTS - Simple policies

@@ -54,31 +54,6 @@ CREATE TYPE tender_status AS ENUM (
 -- FINANCIAL TABLES
 -- ============================================================================
 
--- Purchase orders table
-CREATE TABLE purchase_orders (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  po_number TEXT UNIQUE NOT NULL,
-  project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
-  supplier_id UUID REFERENCES suppliers(id),
-  scope_item_id UUID REFERENCES scope_items(id),
-  description TEXT NOT NULL,
-  quantity DECIMAL(10,2) NOT NULL,
-  unit_price DECIMAL(10,2) NOT NULL,
-  total_amount DECIMAL(12,2) GENERATED ALWAYS AS (quantity * unit_price) STORED,
-  tax_rate DECIMAL(5,2) DEFAULT 0,
-  tax_amount DECIMAL(12,2) GENERATED ALWAYS AS (quantity * unit_price * tax_rate / 100) STORED,
-  final_amount DECIMAL(12,2) GENERATED ALWAYS AS (quantity * unit_price * (1 + tax_rate / 100)) STORED,
-  delivery_date DATE,
-  payment_terms TEXT,
-  notes TEXT,
-  status payment_status DEFAULT 'pending',
-  created_by UUID REFERENCES user_profiles(id),
-  approved_by UUID REFERENCES user_profiles(id),
-  approved_at TIMESTAMPTZ,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
 -- Invoices table
 CREATE TABLE invoices (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -86,7 +61,6 @@ CREATE TABLE invoices (
   project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
   client_id UUID REFERENCES clients(id),
   supplier_id UUID REFERENCES suppliers(id),
-  purchase_order_id UUID REFERENCES purchase_orders(id),
   invoice_type TEXT CHECK (invoice_type IN ('client', 'supplier')),
   description TEXT NOT NULL,
   subtotal DECIMAL(12,2) NOT NULL,
@@ -122,7 +96,6 @@ CREATE TABLE payments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   payment_number TEXT UNIQUE NOT NULL,
   invoice_id UUID REFERENCES invoices(id),
-  purchase_order_id UUID REFERENCES purchase_orders(id),
   project_id UUID REFERENCES projects(id),
   amount DECIMAL(12,2) NOT NULL,
   payment_method payment_method NOT NULL,
@@ -259,26 +232,17 @@ SELECT
   COALESCE(SUM(pb.spent_amount), 0) as total_spent,
   COALESCE(SUM(pb.committed_amount), 0) as total_committed,
   COALESCE(SUM(pb.remaining_amount), 0) as total_remaining,
-  COUNT(DISTINCT po.id) as purchase_orders_count,
   COUNT(DISTINCT i.id) as invoices_count,
   COALESCE(SUM(CASE WHEN i.invoice_type = 'client' THEN i.total_amount ELSE 0 END), 0) as total_receivables,
   COALESCE(SUM(CASE WHEN i.invoice_type = 'supplier' THEN i.total_amount ELSE 0 END), 0) as total_payables
 FROM projects p
 LEFT JOIN project_budgets pb ON pb.project_id = p.id
-LEFT JOIN purchase_orders po ON po.project_id = p.id
 LEFT JOIN invoices i ON i.project_id = p.id
 GROUP BY p.id, p.name, p.budget, p.actual_cost;
 
 -- ============================================================================
 -- INDEXES FOR PERFORMANCE
 -- ============================================================================
-
--- Purchase orders indexes
-CREATE INDEX idx_purchase_orders_project ON purchase_orders(project_id);
-CREATE INDEX idx_purchase_orders_supplier ON purchase_orders(supplier_id);
-CREATE INDEX idx_purchase_orders_scope ON purchase_orders(scope_item_id);
-CREATE INDEX idx_purchase_orders_status ON purchase_orders(status);
-CREATE INDEX idx_purchase_orders_number ON purchase_orders(po_number);
 
 -- Invoices indexes
 CREATE INDEX idx_invoices_project ON invoices(project_id);
@@ -294,7 +258,6 @@ CREATE INDEX idx_invoice_items_scope ON invoice_items(scope_item_id);
 
 -- Payments indexes
 CREATE INDEX idx_payments_invoice ON payments(invoice_id);
-CREATE INDEX idx_payments_po ON payments(purchase_order_id);
 CREATE INDEX idx_payments_project ON payments(project_id);
 CREATE INDEX idx_payments_status ON payments(status);
 CREATE INDEX idx_payments_date ON payments(payment_date);
@@ -339,18 +302,12 @@ CREATE TRIGGER trigger_calculate_tender_submission_item_total
 CREATE OR REPLACE FUNCTION generate_po_number()
 RETURNS TRIGGER AS $$
 BEGIN
-  IF NEW.po_number IS NULL THEN
-    NEW.po_number := 'PO-' || TO_CHAR(NOW(), 'YYYYMM') || '-' || 
-                     LPAD((SELECT COUNT(*) + 1 FROM purchase_orders 
-                           WHERE created_at >= DATE_TRUNC('month', NOW()))::TEXT, 4, '0');
-  END IF;
+  -- PO number generation moved to purchase_department_workflow migration
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER auto_generate_po_number
-  BEFORE INSERT ON purchase_orders
-  FOR EACH ROW EXECUTE PROCEDURE generate_po_number();
+-- PO trigger moved to purchase_department_workflow migration
 
 -- Auto-generate invoice numbers
 CREATE OR REPLACE FUNCTION generate_invoice_number()
@@ -428,9 +385,7 @@ CREATE TRIGGER trigger_update_project_cost
   FOR EACH ROW EXECUTE PROCEDURE update_project_actual_cost();
 
 -- Apply update triggers to financial tables
-CREATE TRIGGER update_purchase_orders_updated_at 
-  BEFORE UPDATE ON purchase_orders 
-  FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+-- Purchase orders trigger moved to purchase_department_workflow migration
 
 CREATE TRIGGER update_invoices_updated_at 
   BEFORE UPDATE ON invoices 
@@ -457,7 +412,7 @@ CREATE TRIGGER update_tender_submissions_updated_at
 -- ============================================================================
 
 -- Enable RLS on financial tables
-ALTER TABLE purchase_orders ENABLE ROW LEVEL SECURITY;
+-- Purchase orders RLS moved to purchase_department_workflow migration
 ALTER TABLE invoices ENABLE ROW LEVEL SECURITY;
 ALTER TABLE invoice_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
@@ -468,27 +423,7 @@ ALTER TABLE tender_submissions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tender_submission_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tender_evaluations ENABLE ROW LEVEL SECURITY;
 
--- Purchase orders policies
-CREATE POLICY "Management PO access" ON purchase_orders
-  FOR ALL USING (is_management_role());
-
-CREATE POLICY "Purchase team PO access" ON purchase_orders
-  FOR ALL USING (
-    EXISTS (
-      SELECT 1 FROM user_profiles
-      WHERE id = auth.uid()
-      AND role IN ('purchase_director', 'purchase_specialist')
-    )
-  );
-
-CREATE POLICY "PM PO read access" ON purchase_orders
-  FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM projects p
-      WHERE p.id = purchase_orders.project_id
-      AND p.project_manager_id = auth.uid()
-    )
-  );
+-- Purchase orders policies moved to purchase_department_workflow migration
 
 -- Invoices policies
 CREATE POLICY "Management invoice access" ON invoices

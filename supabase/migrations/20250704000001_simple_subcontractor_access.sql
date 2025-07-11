@@ -18,7 +18,7 @@ CREATE TYPE report_status AS ENUM ('submitted', 'reviewed', 'approved');
 -- Subcontractor users table
 CREATE TABLE subcontractor_users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_profile_id UUID NOT NULL REFERENCES user_profiles(user_id),
+  user_profile_id UUID NOT NULL REFERENCES user_profiles(id),
   
   -- Basic Information
   company_name VARCHAR(200) NOT NULL,
@@ -35,7 +35,7 @@ CREATE TABLE subcontractor_users (
   account_locked BOOLEAN DEFAULT false,
   
   -- Tracking
-  created_by UUID NOT NULL REFERENCES user_profiles(user_id),
+  created_by UUID NOT NULL REFERENCES user_profiles(id),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -70,7 +70,7 @@ CREATE TABLE subcontractor_scope_access (
   can_download BOOLEAN DEFAULT true,
   
   -- Tracking
-  granted_by UUID NOT NULL REFERENCES user_profiles(user_id),
+  granted_by UUID NOT NULL REFERENCES user_profiles(id),
   granted_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   last_accessed TIMESTAMP WITH TIME ZONE,
   
@@ -108,7 +108,7 @@ CREATE POLICY "Internal users can view subcontractor profiles"
   USING (
     EXISTS (
       SELECT 1 FROM user_profiles 
-      WHERE user_id = auth.uid() 
+      WHERE id = auth.uid() 
       AND role IN ('admin', 'project_manager', 'technical_director')
     )
   );
@@ -118,7 +118,7 @@ CREATE POLICY "Admins can insert subcontractor profiles"
   WITH CHECK (
     EXISTS (
       SELECT 1 FROM user_profiles 
-      WHERE user_id = auth.uid() 
+      WHERE id = auth.uid() 
       AND role IN ('admin', 'project_manager', 'technical_director')
     )
   );
@@ -128,7 +128,7 @@ CREATE POLICY "Admins can update subcontractor profiles"
   USING (
     EXISTS (
       SELECT 1 FROM user_profiles 
-      WHERE user_id = auth.uid() 
+      WHERE id = auth.uid() 
       AND role IN ('admin', 'project_manager', 'technical_director')
     )
   );
@@ -148,7 +148,7 @@ CREATE POLICY "Project managers can view project reports"
   USING (
     EXISTS (
       SELECT 1 FROM user_profiles 
-      WHERE user_id = auth.uid() 
+      WHERE id = auth.uid() 
       AND role IN ('admin', 'project_manager', 'technical_director')
     )
   );
@@ -177,7 +177,7 @@ CREATE POLICY "Project managers can manage scope access"
   USING (
     EXISTS (
       SELECT 1 FROM user_profiles 
-      WHERE user_id = auth.uid() 
+      WHERE id = auth.uid() 
       AND role IN ('admin', 'project_manager', 'technical_director')
     )
   );

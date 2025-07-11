@@ -15,7 +15,7 @@ module.exports = {
       moduleNameMapper: {
         '^@/(.*)$': '<rootDir>/src/$1',
       },
-      setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+      setupFilesAfterEnv: ['<rootDir>/jest.setup.js', '<rootDir>/jest.setup.node.js'],
     },
     // Component Testing (jsdom environment)
     {
@@ -33,7 +33,7 @@ module.exports = {
       },
       setupFilesAfterEnv: ['<rootDir>/jest.setup.js', '<rootDir>/jest.setup.dom.js'],
     },
-    // Integration Testing (Node environment)
+    // Integration Testing (Node environment for API integration)
     {
       displayName: 'Integration',
       testEnvironment: 'node',
@@ -47,8 +47,24 @@ module.exports = {
       moduleNameMapper: {
         '^@/(.*)$': '<rootDir>/src/$1',
       },
-      setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+      setupFilesAfterEnv: ['<rootDir>/jest.setup.js', '<rootDir>/jest.setup.node.js'],
       testTimeout: 30000, // Longer timeout for integration tests
+    },
+    // Hooks Testing (jsdom environment)
+    {
+      displayName: 'Hooks',
+      testEnvironment: 'jsdom',
+      preset: 'ts-jest',
+      testMatch: ['<rootDir>/src/__tests__/hooks/**/*.test.ts'],
+      transform: {
+        '^.+\\.(ts|tsx)$': ['ts-jest', {
+          tsconfig: 'tsconfig.json',
+        }],
+      },
+      moduleNameMapper: {
+        '^@/(.*)$': '<rootDir>/src/$1',
+      },
+      setupFilesAfterEnv: ['<rootDir>/jest.setup.js', '<rootDir>/jest.setup.dom.js'],
     },
   ],
   // Global coverage settings

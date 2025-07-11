@@ -3,7 +3,7 @@
  * Configuration for React component testing with jsdom
  */
 
-import '@testing-library/jest-dom';
+require('@testing-library/jest-dom');
 
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {

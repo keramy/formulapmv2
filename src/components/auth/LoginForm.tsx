@@ -195,9 +195,11 @@ const LoginForm = ({
             <div>
               <strong>Test Accounts:</strong>
             </div>
-            <div>Admin: admin@formulapm.com / password123</div>
-            <div>PM: pm@formulapm.com / password123</div>
-            <div>Architect: architect@formulapm.com / password123</div>
+            <div>Admin: owner.test@formulapm.com / testpass123</div>
+            <div>PM: pm.test@formulapm.com / testpass123</div>
+            <div>GM: gm.test@formulapm.com / testpass123</div>
+            <div>Architect: architect.test@formulapm.com / testpass123</div>
+            <div>Client: client.test@formulapm.com / testpass123</div>
           </CardContent>
         </Card>
       )}

@@ -7,9 +7,16 @@ process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-key';
 process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-key';
 
 // Mock Next.js runtime
-global.Request = global.Request || require('node-fetch').Request;
-global.Response = global.Response || require('node-fetch').Response;
-global.fetch = global.fetch || require('node-fetch');
+// Using a different approach to avoid ESM import issues
+if (typeof global.fetch === 'undefined') {
+  global.fetch = jest.fn();
+}
+if (typeof global.Request === 'undefined') {
+  global.Request = jest.fn();
+}
+if (typeof global.Response === 'undefined') {
+  global.Response = jest.fn();
+}
 
 // Mock console methods in tests
 global.console = {

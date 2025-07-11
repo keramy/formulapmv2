@@ -307,7 +307,7 @@ CREATE TABLE client_notifications (
   priority client_priority DEFAULT 'medium',
   
   -- Delivery
-  delivery_method client_delivery_method[] DEFAULT ARRAY['in_app'],
+  delivery_method client_delivery_method[] DEFAULT ARRAY['in_app']::client_delivery_method[],
   email_sent BOOLEAN DEFAULT false,
   sms_sent BOOLEAN DEFAULT false,
   
@@ -627,7 +627,7 @@ CREATE OR REPLACE FUNCTION create_client_notification(
   p_message TEXT,
   p_notification_type client_notification_type,
   p_priority client_priority DEFAULT 'medium',
-  p_delivery_methods client_delivery_method[] DEFAULT ARRAY['in_app']
+  p_delivery_methods client_delivery_method[] DEFAULT ARRAY['in_app']::client_delivery_method[]
 )
 RETURNS UUID AS $$
 DECLARE

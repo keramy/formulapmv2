@@ -56,10 +56,15 @@ export function MilestonesTab({ projectId }: MilestonesTabProps) {
   } = useMilestones(projectId, filters)
 
   const handleCreateMilestone = async (data: MilestoneFormData) => {
-    const newMilestone = await createMilestone(data)
-    if (newMilestone) {
-      setCreateDialogOpen(false)
-      // Optionally show success message
+    try {
+      const newMilestone = await createMilestone(data)
+      if (newMilestone) {
+        setCreateDialogOpen(false)
+        // Show success message could be added here
+      }
+    } catch (error) {
+      console.error('Error creating milestone:', error)
+      // Error is already handled in the hook and will be displayed in the UI
     }
   }
 
@@ -70,28 +75,48 @@ export function MilestonesTab({ projectId }: MilestonesTabProps) {
   const handleUpdateMilestone = async (data: MilestoneFormData) => {
     if (!editingMilestone) return
     
-    const updatedMilestone = await updateMilestone(editingMilestone.id, data)
-    if (updatedMilestone) {
-      setEditingMilestone(null)
-      // Optionally show success message
+    try {
+      const updatedMilestone = await updateMilestone(editingMilestone.id, data)
+      if (updatedMilestone) {
+        setEditingMilestone(null)
+        // Show success message could be added here
+      }
+    } catch (error) {
+      console.error('Error updating milestone:', error)
+      // Error is already handled in the hook and will be displayed in the UI
     }
   }
 
   const handleDeleteMilestone = async (milestone: Milestone) => {
     if (window.confirm('Are you sure you want to delete this milestone?')) {
-      const success = await deleteMilestone(milestone.id)
-      if (success) {
-        // Optionally show success message
+      try {
+        const success = await deleteMilestone(milestone.id)
+        if (success) {
+          // Show success message could be added here
+        }
+      } catch (error) {
+        console.error('Error deleting milestone:', error)
+        // Error is already handled in the hook and will be displayed in the UI
       }
     }
   }
 
   const handleStatusChange = async (milestoneId: string, status: Milestone['status']) => {
-    await updateMilestoneStatus(milestoneId, status)
+    try {
+      await updateMilestoneStatus(milestoneId, status)
+    } catch (error) {
+      console.error('Error updating milestone status:', error)
+      // Error is already handled in the hook and will be displayed in the UI
+    }
   }
 
   const handleBulkUpdate = async (milestoneIds: string[], updates: any) => {
-    await bulkUpdateMilestones(milestoneIds, updates)
+    try {
+      await bulkUpdateMilestones(milestoneIds, updates)
+    } catch (error) {
+      console.error('Error bulk updating milestones:', error)
+      // Error is already handled in the hook and will be displayed in the UI
+    }
   }
 
   if (error) {

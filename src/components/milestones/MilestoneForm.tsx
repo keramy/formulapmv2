@@ -76,7 +76,12 @@ export const MilestoneForm: React.FC<MilestoneFormProps> = ({
   const handleSubmit = async (data: MilestoneFormData) => {
     setIsLoading(true)
     try {
-      await onSave(data)
+      // Include project_id in the form data
+      const formDataWithProject = {
+        ...data,
+        project_id: projectId
+      }
+      await onSave(formDataWithProject)
     } catch (error) {
       toast({
         title: "Save Failed",
