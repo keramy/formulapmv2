@@ -33,7 +33,7 @@ import {
 // ============================================================================
 
 export const useScope = (projectId?: string) => {
-  const { profile } = useAuth()
+  const { profile, getAccessToken } = useAuth()
   const { 
     canViewScope,
     canCreateScope,
@@ -86,9 +86,14 @@ export const useScope = (projectId?: string) => {
         queryParams.set('sort_direction', params.sort.direction)
       }
 
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
       const response = await fetch(`/api/scope?${queryParams.toString()}`, {
         headers: {
-          'Authorization': `Bearer ${profile.id}`,
+          'Authorization': `Bearer ${token}`,
         }
       })
 
@@ -113,7 +118,7 @@ export const useScope = (projectId?: string) => {
     } finally {
       setLoading(false)
     }
-  }, [profile, projectId, canViewScope])
+  }, [profile, projectId, canViewScope, getAccessToken])
 
   // Create new scope item
   const createScopeItem = useCallback(async (itemData: ScopeItemFormData) => {
@@ -125,11 +130,16 @@ export const useScope = (projectId?: string) => {
     setError(null)
 
     try {
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
       const response = await fetch('/api/scope', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${profile.id}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           ...itemData,
@@ -171,11 +181,16 @@ export const useScope = (projectId?: string) => {
     setError(null)
 
     try {
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
       const response = await fetch(`/api/scope/${itemId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${profile.id}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(updates)
       })
@@ -218,11 +233,16 @@ export const useScope = (projectId?: string) => {
     setError(null)
 
     try {
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
       const url = forceDelete ? `/api/scope/${itemId}?force=true` : `/api/scope/${itemId}`
       const response = await fetch(url, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${profile.id}`,
+          'Authorization': `Bearer ${token}`,
         }
       })
 
@@ -268,11 +288,16 @@ export const useScope = (projectId?: string) => {
     setError(null)
 
     try {
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
       const response = await fetch('/api/scope/bulk', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${profile.id}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(bulkUpdate)
       })
@@ -384,7 +409,7 @@ export const useScope = (projectId?: string) => {
 // ============================================================================
 
 export const useScopeItem = (itemId: string) => {
-  const { profile } = useAuth()
+  const { profile, getAccessToken } = useAuth()
   const { canViewScope } = usePermissions()
   
   const [scopeItem, setScopeItem] = useState<ScopeItem | null>(null)
@@ -399,9 +424,14 @@ export const useScopeItem = (itemId: string) => {
     setError(null)
 
     try {
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
       const response = await fetch(`/api/scope/${itemId}`, {
         headers: {
-          'Authorization': `Bearer ${profile.id}`,
+          'Authorization': `Bearer ${token}`,
         }
       })
 
@@ -446,7 +476,7 @@ export const useScopeItem = (itemId: string) => {
 // ============================================================================
 
 export const useScopeStatistics = (projectId?: string) => {
-  const { profile } = useAuth()
+  const { profile, getAccessToken } = useAuth()
   const { canViewScope, canViewPricing } = usePermissions()
   
   const [statistics, setStatistics] = useState<ScopeStatistics | null>(null)
@@ -465,9 +495,14 @@ export const useScopeStatistics = (projectId?: string) => {
       if (projectId) queryParams.set('project_id', projectId)
       if (canViewPricing()) queryParams.set('include_financials', 'true')
 
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
       const response = await fetch(`/api/scope/statistics?${queryParams.toString()}`, {
         headers: {
-          'Authorization': `Bearer ${profile.id}`,
+          'Authorization': `Bearer ${token}`,
         }
       })
 
@@ -510,7 +545,7 @@ export const useScopeStatistics = (projectId?: string) => {
 // ============================================================================
 
 export const useScopeExcel = (projectId: string) => {
-  const { profile } = useAuth()
+  const { profile, getAccessToken } = useAuth()
   const { checkPermission } = usePermissions()
   
   const [importing, setImporting] = useState(false)
@@ -531,10 +566,15 @@ export const useScopeExcel = (projectId: string) => {
       formData.append('file', file)
       formData.append('project_id', projectId)
 
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
       const response = await fetch('/api/scope/excel/import', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${profile.id}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: formData
       })
@@ -586,9 +626,14 @@ export const useScopeExcel = (projectId: string) => {
         })
       }
 
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
       const response = await fetch(`/api/scope/excel/export?${queryParams.toString()}`, {
         headers: {
-          'Authorization': `Bearer ${profile.id}`,
+          'Authorization': `Bearer ${token}`,
         }
       })
 
@@ -635,7 +680,7 @@ export const useScopeExcel = (projectId: string) => {
 
 // Hook for scope dependencies
 export const useScopeDependencies = (itemId: string) => {
-  const { profile } = useAuth()
+  const { profile, getAccessToken } = useAuth()
   const [dependencies, setDependencies] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
 
@@ -644,9 +689,14 @@ export const useScopeDependencies = (itemId: string) => {
 
     setLoading(true)
     try {
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
       const response = await fetch(`/api/scope/${itemId}/dependencies`, {
         headers: {
-          'Authorization': `Bearer ${profile.id}`,
+          'Authorization': `Bearer ${token}`,
         }
       })
 

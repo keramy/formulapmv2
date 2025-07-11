@@ -27,7 +27,7 @@ import {
 // ============================================================================
 
 export const useProjects = () => {
-  const { profile } = useAuth()
+  const { profile, getAccessToken } = useAuth()
   const { 
     canCreateProject, 
     canViewPricing, 
@@ -75,14 +75,45 @@ export const useProjects = () => {
         queryParams.set('sort_direction', params.sort.direction)
       }
 
+      const token = await getAccessToken()
+      if (!token) {
+        console.error('❌ [useProjects:fetchProjects] No access token available', {
+          profileId: profile?.id,
+          profileRole: profile?.role,
+          profileActive: profile?.is_active
+        })
+        throw new Error('No access token available')
+      }
+
+      console.log('📡 [useProjects:fetchProjects] Making API call', {
+        url: `/api/projects?${queryParams.toString()}`,
+        tokenLength: token.length,
+        tokenPrefix: token.substring(0, 20) + '...',
+        queryParams: Object.fromEntries(queryParams.entries())
+      })
+
       const response = await fetch(`/api/projects?${queryParams.toString()}`, {
         headers: {
-          'Authorization': `Bearer ${profile.id}`, // This would be the actual auth token
+          'Authorization': `Bearer ${token}`,
         }
       })
 
+      console.log('📡 [useProjects:fetchProjects] API response', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+        headers: Object.fromEntries(response.headers.entries())
+      })
+
       if (!response.ok) {
-        throw new Error('Failed to fetch projects')
+        const errorText = await response.text()
+        console.error('❌ [useProjects:fetchProjects] API call failed', {
+          status: response.status,
+          statusText: response.statusText,
+          errorText,
+          url: `/api/projects?${queryParams.toString()}`
+        })
+        throw new Error(`Failed to fetch projects: ${response.status} ${response.statusText}`)
       }
 
       const data = await response.json()
@@ -105,7 +136,20 @@ export const useProjects = () => {
 
   // Create new project
   const createProject = useCallback(async (projectData: ProjectFormData) => {
+    console.log('🏗️ [createProject] Starting project creation', {
+      hasProfile: !!profile,
+      profileRole: profile?.role,
+      profileActive: profile?.is_active,
+      canCreate: canCreateProject(),
+      projectName: projectData.name
+    })
+
     if (!profile || !canCreateProject()) {
+      console.error('❌ [createProject] Permission check failed', {
+        hasProfile: !!profile,
+        canCreate: canCreateProject(),
+        profileRole: profile?.role
+      })
       throw new Error('Insufficient permissions to create projects')
     }
 
@@ -113,17 +157,36 @@ export const useProjects = () => {
     setError(null)
 
     try {
+      console.log('🔑 [createProject] Getting access token')
+      const token = await getAccessToken()
+      if (!token) {
+        console.error('❌ [createProject] No access token available')
+        throw new Error('No access token available')
+      }
+      
+      console.log('🔑 [createProject] Token obtained, making API call')
+
       const response = await fetch('/api/projects', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${profile.id}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(projectData)
       })
 
+      console.log('📡 [createProject] API response received', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok
+      })
+
       if (!response.ok) {
         const errorData = await response.json()
+        console.error('❌ [createProject] API error response', {
+          status: response.status,
+          errorData
+        })
         throw new Error(errorData.error || 'Failed to create project')
       }
 
@@ -188,7 +251,7 @@ export const useProjects = () => {
 // ============================================================================
 
 export const useProject = (projectId: string) => {
-  const { profile } = useAuth()
+  const { profile, getAccessToken } = useAuth()
   const { canViewPricing } = usePermissions()
   
   const [project, setProject] = useState<ProjectWithDetails | null>(null)
@@ -204,9 +267,14 @@ export const useProject = (projectId: string) => {
     setError(null)
 
     try {
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
       const response = await fetch(`/api/projects/${projectId}`, {
         headers: {
-          'Authorization': `Bearer ${profile.id}`,
+          'Authorization': `Bearer ${token}`,
         }
       })
 
@@ -246,11 +314,16 @@ export const useProject = (projectId: string) => {
     setError(null)
 
     try {
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
       const response = await fetch(`/api/projects/${projectId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${profile.id}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(updates)
       })
@@ -288,10 +361,15 @@ export const useProject = (projectId: string) => {
     setError(null)
 
     try {
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
       const response = await fetch(`/api/projects/${projectId}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${profile.id}`,
+          'Authorization': `Bearer ${token}`,
         }
       })
 

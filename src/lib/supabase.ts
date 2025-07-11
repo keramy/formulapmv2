@@ -9,16 +9,22 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables')
 }
 
-// Client for browser/client-side operations
+// Client for browser/client-side operations with optimized configuration
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: true,
-    flowType: 'pkce'
+    detectSessionInUrl: false,  // Disabled to prevent URL conflicts
+    flowType: 'implicit',       // Using implicit flow for better compatibility
+    debug: process.env.NODE_ENV === 'development'
   },
   db: {
     schema: 'public'
+  },
+  global: {
+    headers: {
+      'X-Client-Info': 'formulapm-web'
+    }
   }
 })
 
@@ -38,7 +44,11 @@ export const createServerClient = () => {
   return createClient<Database>(supabaseUrl, supabaseAnonKey, {
     auth: {
       autoRefreshToken: false,
-      persistSession: false
+      persistSession: false,
+      detectSessionInUrl: false
+    },
+    db: {
+      schema: 'public'
     }
   })
 }

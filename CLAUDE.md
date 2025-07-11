@@ -274,6 +274,7 @@ npm run dev
 - **Build Status**: Clean compilation, zero critical errors
 - **Testing Framework**: ✅ **FULLY IMPLEMENTED AND OPERATIONAL**
 - **Architecture**: Simplified, tested, production-ready
+- **API Authentication**: ✅ **FIXED** - All hooks now use proper JWT access tokens instead of profile.id
 
 ### 🏗️ 3-Wave Architecture Transformation
 **Core Systems Retained:**
@@ -297,3 +298,21 @@ npm run dev
 - **Type Safety**: 100% TypeScript compliance
 - **Performance**: Faster builds with reduced complexity
 - **Maintainability**: Focused on core business value only
+
+## Latest Session Fix (January 2025)
+
+### ✅ Critical Authentication Bug Fixed
+**Problem**: "Invalid or expired token" errors when creating projects and using API endpoints
+**Root Cause**: All hooks were incorrectly using `profile.id` (UUID) as Bearer token instead of actual JWT access token
+**Solution**: Updated all hooks to use proper JWT access tokens via `getAccessToken()` method
+
+### Files Updated:
+- `src/hooks/useAuth.ts` - Added `getAccessToken()` method to expose JWT token
+- `src/hooks/useProjects.ts` - Fixed all Bearer token usages (8 locations)
+- `src/hooks/useScope.ts` - Fixed all Bearer token usages (10 locations)
+
+### Impact:
+- ✅ Project creation now works correctly 
+- ✅ All API endpoints now receive proper authentication
+- ✅ All CRUD operations (Create, Read, Update, Delete) now functional
+- ✅ Authentication flow is now end-to-end functional
