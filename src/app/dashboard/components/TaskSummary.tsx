@@ -6,7 +6,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { usePermissions } from '@/hooks/usePermissions';
-import { supabase } from '@/lib/supabase';
 import { ScopeItem } from '@/types/database';
 import { CheckSquare, Clock, AlertTriangle, User, Plus, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
@@ -17,47 +16,38 @@ interface TaskSummaryData extends ScopeItem {
 }
 
 export function TaskSummary() {
-  const { user } = useAuth();
-  const { hasPermission, canAccess, isManagement, isProject, isField } = usePermissions();
+  const { getAccessToken, isAuthenticated } = useAuth();
+  const { hasPermission, isManagement } = usePermissions();
   const [tasks, setTasks] = useState<TaskSummaryData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchTasks() {
-      if (!user) return;
+      if (!isAuthenticated) return;
 
       try {
         setLoading(true);
 
-        let query = supabase
-          .from('scope_items')
-          .select(`
-            *,
-            projects!inner(name)
-          `)
-          .order('updated_at', { ascending: false })
-          .limit(5);
-
-        // Apply role-based filtering for tasks
-        if (!canAccess(['admin', 'project_manager', 'general_manager', 'company_owner'])) {
-          // For non-management roles, show only assigned tasks
-          query = query.contains('assigned_to', [user.id]);
+        // Get access token for authenticated API call
+        const token = await getAccessToken();
+        if (!token) {
+          throw new Error('No access token available');
         }
 
-        const { data, error } = await query;
+        // Fetch tasks from authenticated API endpoint
+        const response = await fetch('/api/dashboard/tasks?limit=5', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
 
-        if (error) {
-          console.error('Error fetching tasks:', error);
-          return;
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        // Transform data to include project names
-        const transformedTasks: TaskSummaryData[] = (data || []).map(item => ({
-          ...item,
-          project_name: (item.projects as any)?.name || 'Unknown Project'
-        }));
-
-        setTasks(transformedTasks);
+        const tasksData = await response.json();
+        setTasks(tasksData);
       } catch (error) {
         console.error('Error fetching tasks:', error);
       } finally {
@@ -66,7 +56,7 @@ export function TaskSummary() {
     }
 
     fetchTasks();
-  }, [user, canAccess]);
+  }, [isAuthenticated, getAccessToken]);
 
   const getStatusVariant = (status: string) => {
     switch (status) {

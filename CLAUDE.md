@@ -1,3 +1,64 @@
+# Critical Debugging Guidelines - MUST READ FIRST
+
+## Authentication and Database Debugging
+
+### BEFORE Making Any Code Changes:
+1. **Check Database First**
+   - Verify user exists in auth.users table
+   - Verify profile exists in user_profiles table
+   - Check which database is being used (local vs cloud)
+   
+2. **Verify Environment Configuration**
+   ```bash
+   # Check current database connection
+   echo $NEXT_PUBLIC_SUPABASE_URL
+   
+   # For local development, should be:
+   # http://localhost:54321 (NOT cloud URL)
+   ```
+
+3. **Common 401 Error Root Causes**
+   - Database mismatch (local vs cloud)
+   - Missing user profiles in database
+   - Wrong environment variables
+   - **NOT usually code complexity**
+
+### Development Best Practices:
+1. **Local-First Development**
+   - Use local Supabase for development
+   - Keep cloud for production only
+   - Ensure .env.local points to local URLs
+   
+2. **Simple Solutions First**
+   - Avoid complex patterns (circuit breakers, mutex locks)
+   - Use basic React state management
+   - Don't overengineer authentication flows
+
+3. **Debugging Approach**
+   ```bash
+   # 1. Check database state
+   SELECT * FROM auth.users WHERE email = 'test@example.com';
+   SELECT * FROM user_profiles WHERE email = 'test@example.com';
+   
+   # 2. Test with curl (bypass frontend)
+   curl -H "Authorization: Bearer <token>" localhost:3003/api/test
+   
+   # 3. Only then modify code
+   ```
+
+## Project Status Notes
+
+### Authentication System
+- Simplified useAuth hook implemented (303 lines, down from 504)
+- Removed complex circuit breaker patterns
+- Fixed token usage in all hooks (using getAccessToken() not profile.id)
+
+### V3 Scope Updates
+- Shop drawing workflow IS included (see /docs/v3-plans/gemini-designs/)
+- Core systems: Project, Scope, Purchase, Financial, Client Portal, User Management
+
+---
+
 # Using Gemini MCP Tool for Large Codebase Analysis
 
 When analyzing large codebases or multiple files that might exceed context limits, use the Gemini MCP Tool with its massive context window. This tool bridges Claude with Google Gemini's large context capacity through natural language commands.

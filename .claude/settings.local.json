@@ -89,7 +89,11 @@
       "mcp__sentry__get_doc",
       "mcp__sentry__find_issues",
       "mcp__sentry__find_projects",
-      "mcp__linear__linear_search_issues"
+      "mcp__linear__linear_search_issues",
+      "Bash(kill:*)",
+      "WebFetch(domain:supabase.com)",
+      "mcp__supabase__list_projects",
+      "mcp__supabase__execute_sql"
     ],
     "deny": []
   }

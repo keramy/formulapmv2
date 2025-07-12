@@ -40,10 +40,7 @@ export interface AuthContextType {
   profile: UserProfile | null
   loading: boolean
   signIn: (email: string, password: string) => Promise<any>
-  signUp: (email: string, password: string, userData: Partial<UserProfile>) => Promise<any>
   signOut: () => Promise<void>
-  updateProfile: (updates: Partial<UserProfile>) => Promise<void>
-  refreshProfile: () => Promise<void>
 }
 
 export interface LoginCredentials {
@@ -71,7 +68,10 @@ export interface ChangePasswordData {
 }
 
 export interface AuthError {
+  code: string
   message: string
-  code?: string
-  details?: string
+  timestamp: number
+  retryCount: number
+  category: 'AUTH' | 'NETWORK' | 'PROFILE' | 'TOKEN' | 'CIRCUIT_BREAKER'
+  isRecoverable: boolean
 }

@@ -34,8 +34,9 @@ export default function LoginPage() {
         <div className="mt-4 text-center text-sm text-gray-600">
           <p>Test Accounts (password: password123)</p>
           <p className="mt-2">
-            Admin: david.admin@premiumbuild.com<br />
-            PM: lisa.thompson@premiumbuild.com
+            Admin: owner.test@formulapm.com<br />
+            PM: pm.test@formulapm.com<br />
+            Architect: architect.test@formulapm.com
           </p>
         </div>
       </div>

@@ -33,10 +33,10 @@ module.exports = {
       },
       setupFilesAfterEnv: ['<rootDir>/jest.setup.js', '<rootDir>/jest.setup.dom.js'],
     },
-    // Integration Testing (Node environment for API integration)
+    // Integration Testing (jsdom environment for auth testing)
     {
       displayName: 'Integration',
-      testEnvironment: 'node',
+      testEnvironment: 'jsdom',
       preset: 'ts-jest',
       testMatch: ['<rootDir>/src/__tests__/integration/**/*.test.ts'],
       transform: {
@@ -47,8 +47,11 @@ module.exports = {
       moduleNameMapper: {
         '^@/(.*)$': '<rootDir>/src/$1',
       },
-      setupFilesAfterEnv: ['<rootDir>/jest.setup.js', '<rootDir>/jest.setup.node.js'],
+      setupFilesAfterEnv: ['<rootDir>/jest.setup.js', '<rootDir>/jest.setup.dom.js'],
       testTimeout: 30000, // Longer timeout for integration tests
+      transformIgnorePatterns: [
+        'node_modules/(?!(isows|@supabase|@testing-library)/)'
+      ],
     },
     // Hooks Testing (jsdom environment)
     {
@@ -65,6 +68,9 @@ module.exports = {
         '^@/(.*)$': '<rootDir>/src/$1',
       },
       setupFilesAfterEnv: ['<rootDir>/jest.setup.js', '<rootDir>/jest.setup.dom.js'],
+      transformIgnorePatterns: [
+        'node_modules/(?!(isows|@supabase|@testing-library)/)'
+      ],
     },
   ],
   // Global coverage settings

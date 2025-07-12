@@ -2,41 +2,165 @@
 
 import { Sidebar } from '@/components/layouts/Sidebar'
 import { Header } from '@/components/layouts/Header'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/hooks/useAuth'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Loader2, AlertCircle, WifiOff, RefreshCw } from 'lucide-react'
 
 export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
   
   // Always call useAuth hook to avoid conditional hook calls
-  const { user, loading } = useAuth()
+  const { 
+    user, 
+    authState, 
+    authError, 
+    isError, 
+    isRecoveringSession,
+    isAuthenticated,
+    clearAuthError,
+    signOut,
+    debugInfo 
+  } = useAuth()
 
   // List of paths that should not show the sidebar/header
   const noLayoutPaths = ['/', '/auth/login', '/auth/register', '/auth/reset-password']
   const isNoLayoutPath = noLayoutPaths.includes(pathname)
+
+  // Handle authentication redirection for protected routes
+  useEffect(() => {
+    // Only redirect if we're on a protected route, not authenticated, and auth is stable (not loading)
+    const shouldRedirect = !isNoLayoutPath && !isAuthenticated && authState === 'idle' && !user
+    
+    if (shouldRedirect) {
+      console.log('🔐 [LayoutWrapper] Redirecting to login from protected route:', {
+        pathname,
+        authState,
+        isAuthenticated,
+        hasUser: !!user
+      })
+      router.push('/auth/login')
+    }
+  }, [isNoLayoutPath, isAuthenticated, authState, pathname, router, user])
 
   // If on a no-layout path, render children directly without auth loading
   if (isNoLayoutPath) {
     return <>{children}</>
   }
 
-  // If loading auth for protected paths, show loading state
-  if (loading) {
+  // Show loading state for auth operations
+  if (authState === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading...</p>
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
+          <p className="text-muted-foreground">Loading your session...</p>
         </div>
       </div>
     )
   }
 
+  // Show recovery state
+  if (isRecoveringSession) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <WifiOff className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+            <CardTitle>Recovering Session</CardTitle>
+            <CardDescription>
+              We're attempting to recover your session. Please wait...
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-center">
+            <div className="flex items-center justify-center gap-2">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span className="text-sm text-muted-foreground">
+                Attempt {debugInfo?.recoveryAttempts || 0} of 3
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  // Show error state with recovery options
+  if (isError && authError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <AlertCircle className="w-12 h-12 mx-auto mb-4 text-destructive" />
+            <CardTitle>Authentication Error</CardTitle>
+            <CardDescription>
+              There was a problem with your session
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                {authError.message || 'An authentication error occurred'}
+              </AlertDescription>
+            </Alert>
+            
+            <div className="grid grid-cols-2 gap-2">
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  clearAuthError()
+                  router.push('/auth/login')
+                }}
+              >
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Try Again
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  clearAuthError()
+                  router.push('/auth/login')
+                }}
+              >
+                Sign In Again
+              </Button>
+            </div>
+            
+            <Button 
+              variant="destructive" 
+              className="w-full"
+              onClick={async () => {
+                await signOut()
+                router.push('/auth/login')
+              }}
+            >
+              Sign Out & Retry
+            </Button>
+            
+            {process.env.NODE_ENV === 'development' && (
+              <div className="mt-4 p-2 bg-muted rounded text-xs">
+                <div><strong>Debug Info:</strong></div>
+                <div>State: {authState}</div>
+                <div>Error Code: {authError.code}</div>
+                <div>Recovery Attempts: {debugInfo?.recoveryAttempts}</div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
   // If not authenticated and on a protected path, render children (might be login redirect)
-  if (!user) {
+  if (!user || !isAuthenticated) {
     return <>{children}</>
   }
 

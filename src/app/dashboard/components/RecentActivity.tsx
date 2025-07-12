@@ -4,8 +4,6 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
-import { usePermissions } from '@/hooks/usePermissions';
-import { supabase } from '@/lib/supabase';
 import { User, FileText, CheckSquare, FolderOpen, Clock } from 'lucide-react';
 
 interface ActivityItem {
@@ -20,113 +18,37 @@ interface ActivityItem {
 }
 
 export function RecentActivity() {
-  const { user } = useAuth();
-  const { canAccess } = usePermissions();
+  const { getAccessToken, isAuthenticated } = useAuth();
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchRecentActivity() {
-      if (!user) return;
+      if (!isAuthenticated) return;
 
       try {
         setLoading(true);
-        const activities: ActivityItem[] = [];
 
-        // Fetch recent projects (limited based on access)
-        let projectQuery = supabase
-          .from('projects')
-          .select('id, name, status, updated_at')
-          .order('updated_at', { ascending: false })
-          .limit(3);
-
-        if (!canAccess(['admin', 'project_manager', 'general_manager', 'company_owner'])) {
-          // For non-management, only show projects they're assigned to
-          const { data: memberProjects } = await supabase
-            .from('project_members')
-            .select('project_id')
-            .eq('user_id', user.id);
-          
-          const projectIds = memberProjects?.map(pm => pm.project_id) || [];
-          if (projectIds.length > 0) {
-            projectQuery = projectQuery.in('id', projectIds);
-          } else {
-            projectQuery = projectQuery.eq('id', 'none'); // No projects
-          }
+        // Get access token for authenticated API call
+        const token = await getAccessToken();
+        if (!token) {
+          throw new Error('No access token available');
         }
 
-        const { data: projects } = await projectQuery;
-
-        // Add project activities
-        projects?.forEach(project => {
-          activities.push({
-            id: `project-${project.id}`,
-            type: 'project',
-            title: `Project updated: ${project.name}`,
-            description: `Status: ${project.status}`,
-            timestamp: project.updated_at,
-            status: project.status
-          });
+        // Fetch recent activity from authenticated API endpoint
+        const response = await fetch('/api/dashboard/recent-activity', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
         });
 
-        // Fetch recent scope items (tasks)
-        let scopeQuery = supabase
-          .from('scope_items')
-          .select(`
-            id, description, status, updated_at,
-            projects!inner(name)
-          `)
-          .order('updated_at', { ascending: false })
-          .limit(3);
-
-        if (!canAccess(['admin', 'project_manager', 'general_manager', 'company_owner'])) {
-          scopeQuery = scopeQuery.contains('assigned_to', [user.id]);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const { data: scopeItems } = await scopeQuery;
-
-        // Add scope item activities
-        scopeItems?.forEach(item => {
-          activities.push({
-            id: `scope-${item.id}`,
-            type: 'scope_item',
-            title: `Task updated: ${item.description.substring(0, 50)}...`,
-            description: `Project: ${(item.projects as any)?.name || 'Unknown'}`,
-            timestamp: item.updated_at,
-            status: item.status
-          });
-        });
-
-        // Fetch recent documents
-        let documentQuery = supabase
-          .from('documents')
-          .select(`
-            id, title, status, updated_at,
-            projects!inner(name)
-          `)
-          .order('updated_at', { ascending: false })
-          .limit(3);
-
-        const { data: documents } = await documentQuery;
-
-        // Add document activities
-        documents?.forEach(doc => {
-          activities.push({
-            id: `doc-${doc.id}`,
-            type: 'document',
-            title: `Document updated: ${doc.title}`,
-            description: `Project: ${(doc.projects as any)?.name || 'Unknown'}`,
-            timestamp: doc.updated_at,
-            status: doc.status
-          });
-        });
-
-        // Sort all activities by timestamp and take the 5 most recent
-        const sortedActivities = activities
-          .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-          .slice(0, 5);
-
-        setActivities(sortedActivities);
+        const activitiesData = await response.json();
+        setActivities(activitiesData);
       } catch (error) {
         console.error('Error fetching recent activity:', error);
       } finally {
@@ -135,7 +57,7 @@ export function RecentActivity() {
     }
 
     fetchRecentActivity();
-  }, [user, canAccess]);
+  }, [isAuthenticated, getAccessToken]);
 
   const getActivityIcon = (type: string) => {
     switch (type) {

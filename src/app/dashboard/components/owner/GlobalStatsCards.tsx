@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/hooks/useAuth';
 import { 
   Building2, 
   DollarSign, 
@@ -27,49 +27,45 @@ export function GlobalStatsCards() {
     atRiskProjects: 0
   });
   const [loading, setLoading] = useState(true);
+  const { getAccessToken, isAuthenticated, user, profile } = useAuth();
 
   useEffect(() => {
-    fetchCompanyStats();
-  }, []);
+    // Enhanced authentication check
+    if (isAuthenticated && user && profile && profile.is_active) {
+      fetchCompanyStats();
+    } else {
+      console.log('🔐 [GlobalStatsCards] Not ready for API call:', {
+        isAuthenticated,
+        hasUser: !!user,
+        hasProfile: !!profile,
+        profileActive: profile?.is_active
+      });
+      setLoading(false);
+    }
+  }, [isAuthenticated, user, profile]);
 
   const fetchCompanyStats = async () => {
     try {
-      // Fetch active projects count and budget data
-      const { data: projects, error: projectError } = await supabase
-        .from('projects')
-        .select('id, budget, actual_cost, status, end_date')
-        .in('status', ['active', 'planning', 'bidding']);
+      // Get access token for authenticated API call
+      const token = await getAccessToken();
+      if (!token) {
+        throw new Error('No access token available');
+      }
 
-      if (projectError) throw projectError;
-
-      // Calculate stats from projects
-      const activeCount = projects?.filter(p => p.status === 'active').length || 0;
-      const totalBudget = projects?.reduce((sum, p) => sum + (p.budget || 0), 0) || 0;
-      const actualSpent = projects?.reduce((sum, p) => sum + (p.actual_cost || 0), 0) || 0;
-      
-      // Calculate at-risk projects (budget overrun or past deadline)
-      const today = new Date();
-      const atRiskCount = projects?.filter(p => {
-        const isOverBudget = p.actual_cost > p.budget * 0.9; // 90% budget threshold
-        const isPastDeadline = p.end_date && new Date(p.end_date) < today && p.status === 'active';
-        return isOverBudget || isPastDeadline;
-      }).length || 0;
-
-      // Fetch pending approvals count
-      const { count: approvalCount, error: approvalError } = await supabase
-        .from('documents')
-        .select('id', { count: 'exact', head: true })
-        .eq('status', 'review');
-
-      if (approvalError) throw approvalError;
-
-      setStats({
-        activeProjects: activeCount,
-        totalBudget,
-        actualSpent,
-        pendingApprovals: approvalCount || 0,
-        atRiskProjects: atRiskCount
+      // Fetch stats from authenticated API endpoint
+      const response = await fetch('/api/dashboard/stats', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const stats = await response.json();
+      setStats(stats);
     } catch (error) {
       console.error('Error fetching company stats:', error);
     } finally {

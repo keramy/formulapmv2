@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, ReactNode } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { hasPermission, Permission } from '@/lib/permissions'
 import { UserRole } from '@/types/auth'
@@ -36,14 +36,13 @@ export const AuthGuard = ({
   redirectToLogin = true,
   redirectPath = '/login'
 }: AuthGuardProps) => {
-  const { user, profile, loading } = useAuth()
+  const { user, profile, loading, authState } = useAuth()
   const router = useRouter()
+  const pathname = usePathname()
 
-  useEffect(() => {
-    if (!loading && !user && redirectToLogin) {
-      router.push(redirectPath)
-    }
-  }, [user, loading, router, redirectToLogin, redirectPath])
+  // NOTE: Redirect logic removed to prevent conflicts with LayoutWrapper
+  // LayoutWrapper handles authentication redirects at the application level
+  // AuthGuard focuses purely on permission checking and UI feedback
 
   // Show loading spinner while auth is loading
   if (loading) {
@@ -57,12 +56,9 @@ export const AuthGuard = ({
     )
   }
 
-  // Not authenticated
+  // Not authenticated - show user-friendly message
+  // LayoutWrapper handles redirects, so we just show feedback here
   if (!user) {
-    if (redirectToLogin) {
-      return null // Will redirect to login
-    }
-    
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Alert className="max-w-md">

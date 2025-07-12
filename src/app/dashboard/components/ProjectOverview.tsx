@@ -6,56 +6,48 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { usePermissions } from '@/hooks/usePermissions';
-import { supabase } from '@/lib/supabase';
 import { Project } from '@/types/database';
 import { Calendar, MapPin, User, Plus, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 export function ProjectOverview() {
-  const { user } = useAuth();
-  const { hasPermission, canAccess } = usePermissions();
+  const { getAccessToken, isAuthenticated } = useAuth();
+  const { hasPermission } = usePermissions();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchProjects() {
-      if (!user) return;
+      if (!isAuthenticated) return;
 
       try {
         setLoading(true);
 
-        let query = supabase
-          .from('projects')
-          .select('*')
-          .order('updated_at', { ascending: false })
-          .limit(6);
-
-        // Apply role-based filtering (Temporarily disabled to prevent crash)
-        // if (!canAccess(['admin', 'project_manager'])) {
-        //   // For non-admin/PM roles, only show projects they're members of
-        //   const { data: memberProjects } = await supabase
-        //     .from('project_assignments')
-        //     .select('project_id')
-        //     .eq('user_id', user.id);
-        //   
-        //   const projectIds = memberProjects?.map(pm => pm.project_id) || [];
-        //   if (projectIds.length > 0) {
-        //     query = query.in('id', projectIds);
-        //   } else {
-        //     setProjects([]);
-        //     setLoading(false);
-        //     return;
-        //   }
-        // }
-
-        const { data, error } = await query;
-
-        if (error) {
-          console.error('Error fetching projects:', error);
-          return;
+        // Get access token for authenticated API call
+        const token = await getAccessToken();
+        if (!token) {
+          throw new Error('No access token available');
         }
 
-        setProjects(data || []);
+        // Fetch projects from authenticated API endpoint
+        const response = await fetch('/api/projects?limit=6&sort_field=updated_at&sort_direction=desc', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const apiResponse = await response.json();
+        
+        if (!apiResponse.success) {
+          throw new Error(apiResponse.error || 'Failed to fetch projects');
+        }
+
+        setProjects(apiResponse.data?.projects || []);
       } catch (error) {
         console.error('Error fetching projects:', error);
       } finally {
@@ -64,7 +56,7 @@ export function ProjectOverview() {
     }
 
     fetchProjects();
-  }, [user, canAccess]);
+  }, [isAuthenticated, getAccessToken]);
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {

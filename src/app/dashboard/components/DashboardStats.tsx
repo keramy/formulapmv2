@@ -3,8 +3,6 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
-import { usePermissions } from '@/hooks/usePermissions';
-import { supabase } from '@/lib/supabase';
 import { FolderOpen, CheckSquare, Users, DollarSign, AlertTriangle, Clock } from 'lucide-react';
 
 interface DashboardStatsData {
@@ -15,83 +13,80 @@ interface DashboardStatsData {
   overdueScopeItems: number;
   teamMembers: number;
   budget: number;
+  permissions: {
+    canViewProjects: boolean;
+    canViewUsers: boolean;
+    canViewFinancials: boolean;
+  };
 }
 
 export function DashboardStats() {
-  const { user } = useAuth();
-  const { hasPermission, canAccess } = usePermissions();
+  const { getAccessToken, isAuthenticated, user, profile } = useAuth();
   const [stats, setStats] = useState<DashboardStatsData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchStats() {
-      if (!user) return;
+      // Enhanced authentication readiness check
+      if (!isAuthenticated || !user || !profile) {
+        console.log('🔐 [DashboardStats] Not fully authenticated:', { 
+          isAuthenticated, 
+          hasUser: !!user, 
+          hasProfile: !!profile 
+        });
+        setLoading(false); // Stop loading when auth is incomplete
+        return;
+      }
+
+      // Additional check: ensure profile has required fields
+      if (!profile.is_active || !profile.role) {
+        console.log('🔐 [DashboardStats] Invalid profile:', { 
+          isActive: profile.is_active, 
+          role: profile.role 
+        });
+        setLoading(false);
+        return;
+      }
       
       try {
         setLoading(true);
 
-        // Fetch projects based on user role
-        let projectQuery = supabase
-          .from('projects')
-          .select('*', { count: 'exact' });
-
-        // Apply role-based filtering
-        if (!canAccess(['admin', 'project_manager'])) {
-          // For non-admin/PM roles, only show projects they're members of
-          const { data: memberProjects } = await supabase
-            .from('project_assignments')
-            .select('project_id')
-            .eq('user_id', user.id);
-          
-          const projectIds = memberProjects?.map(pm => pm.project_id) || [];
-          if (projectIds.length > 0) {
-            projectQuery = projectQuery.in('id', projectIds);
-          } else {
-            // No projects for this user
-            projectQuery = projectQuery.eq('id', 'none');
-          }
+        // Get access token for authenticated API call
+        const token = await getAccessToken();
+        console.log('🔐 [DashboardStats] Token check:', { 
+          hasToken: !!token, 
+          tokenLength: token?.length,
+          userId: user?.id
+        });
+        if (!token) {
+          console.log('🔐 [DashboardStats] No token available');
+          return;
         }
 
-        const [
-          { count: totalProjects },
-          { count: activeProjects },
-          { data: scopeItems, count: totalScopeItems },
-          { data: teamData, count: teamMembers },
-          { data: tenderData }
-        ] = await Promise.all([
-          projectQuery.in('status', ['planning', 'active', 'bidding']),
-          projectQuery.eq('status', 'active'),
-          supabase.from('scope_items').select('*', { count: 'exact' }),
-          hasPermission('users.read.all') 
-            ? supabase.from('user_profiles').select('*', { count: 'exact' }).eq('is_active', true)
-            : { data: [], count: 0 },
-          hasPermission('financials.view')
-            ? supabase.from('financial_tenders').select('estimated_value, currency')
-            : { data: [] }
-        ]);
-
-        // Calculate scope item statistics
-        const completedScopeItems = scopeItems?.filter(item => item.status === 'completed').length || 0;
-        const overdueScopeItems = scopeItems?.filter(item => 
-          item.timeline_end && 
-          new Date(item.timeline_end) < new Date() && 
-          item.status !== 'completed'
-        ).length || 0;
-
-        // Calculate budget (sum of estimated tender values)
-        const budget = tenderData?.reduce((sum, tender) => {
-          return sum + (tender.estimated_value || 0);
-        }, 0) || 0;
-
-        setStats({
-          totalProjects: totalProjects || 0,
-          activeProjects: activeProjects || 0,
-          totalScopeItems: totalScopeItems || 0,
-          completedScopeItems,
-          overdueScopeItems,
-          teamMembers: teamMembers || 0,
-          budget
+        // Fetch stats from authenticated API endpoint
+        const response = await fetch('/api/dashboard/comprehensive-stats', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
         });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            console.error('🔐 [DashboardStats] 401 Unauthorized - User profile might be missing or inactive');
+            console.error('🔐 [DashboardStats] User details:', {
+              userId: user?.id,
+              userEmail: user?.email,
+              profileId: profile?.id,
+              profileRole: profile?.role,
+              profileActive: profile?.is_active
+            });
+          }
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const statsData = await response.json();
+        setStats(statsData);
       } catch (error) {
         console.error('Error fetching dashboard stats:', error);
       } finally {
@@ -100,7 +95,7 @@ export function DashboardStats() {
     }
 
     fetchStats();
-  }, [user, hasPermission, canAccess]);
+  }, [isAuthenticated, user, profile, getAccessToken]);
 
   if (loading) {
     return (
@@ -129,7 +124,7 @@ export function DashboardStats() {
       icon: FolderOpen,
       color: 'text-blue-600',
       bgColor: 'bg-blue-100',
-      show: hasPermission('projects.read.all') || hasPermission('projects.read.assigned')
+      show: stats.permissions.canViewProjects
     },
     {
       title: 'Scope Items Completed',
@@ -138,7 +133,7 @@ export function DashboardStats() {
       icon: CheckSquare,
       color: 'text-green-600',
       bgColor: 'bg-green-100',
-      show: hasPermission('projects.read.all') || hasPermission('projects.read.assigned')
+      show: stats.permissions.canViewProjects
     },
     {
       title: 'Overdue Items',
@@ -146,7 +141,7 @@ export function DashboardStats() {
       icon: AlertTriangle,
       color: 'text-red-600',
       bgColor: 'bg-red-100',
-      show: hasPermission('projects.read.all') || hasPermission('projects.read.assigned')
+      show: stats.permissions.canViewProjects
     },
     {
       title: 'Team Members',
@@ -154,7 +149,7 @@ export function DashboardStats() {
       icon: Users,
       color: 'text-purple-600',
       bgColor: 'bg-purple-100',
-      show: hasPermission('users.read.all')
+      show: stats.permissions.canViewUsers
     },
     {
       title: 'Total Budget',
@@ -162,7 +157,7 @@ export function DashboardStats() {
       icon: DollarSign,
       color: 'text-green-600',
       bgColor: 'bg-green-100',
-      show: hasPermission('financials.view')
+      show: stats.permissions.canViewFinancials
     }
   ].filter(card => card.show);
 

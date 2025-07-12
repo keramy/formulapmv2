@@ -19,26 +19,6 @@ export function DashboardContent() {
 
   return (
     <div className="space-y-6">
-      {/* New Dashboard Test Banner */}
-      {hasPermission('projects.read.all') || hasPermission('projects.read.assigned') ? (
-        <Card className="bg-blue-50 border-blue-200">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-medium text-blue-800">Try the New Simplified Dashboard</h3>
-                <p className="text-sm text-blue-600 mt-1">
-                  Experience our redesigned Project Manager Dashboard with a cleaner, more focused interface.
-                </p>
-              </div>
-              <Button asChild>
-                <Link href="/dashboard/project-manager">
-                  Try New Dashboard
-                </Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      ) : null}
 
       {/* Dashboard Statistics */}
       <DashboardStats />

@@ -26,10 +26,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     profile: auth.profile,
     loading: auth.loading,
     signIn: auth.signIn,
-    signUp: auth.signUp,
-    signOut: auth.signOut,
-    updateProfile: auth.updateProfile,
-    refreshProfile: auth.refreshProfile
+    signOut: auth.signOut
   }
 
   return (

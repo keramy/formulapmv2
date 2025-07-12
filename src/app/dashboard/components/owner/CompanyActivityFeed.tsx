@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/hooks/useAuth';
 import {
   FileText,
   UserPlus,
@@ -32,58 +32,36 @@ interface ActivityItem {
 export function CompanyActivityFeed() {
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const { getAccessToken, isAuthenticated } = useAuth();
 
   useEffect(() => {
-    fetchRecentActivities();
-
-    // Set up real-time subscription
-    const channel = supabase
-      .channel('activity-feed')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'audit_logs'
-        },
-        (payload) => {
-          fetchRecentActivities();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
+    if (isAuthenticated) {
+      fetchRecentActivities();
+    }
+  }, [isAuthenticated]);
 
   const fetchRecentActivities = async () => {
     try {
-      const { data, error } = await supabase
-        .from('audit_logs')
-        .select(`
-          id,
-          user_id,
-          action,
-          entity_type,
-          entity_name,
-          created_at,
-          metadata,
-          user:user_profiles!audit_logs_user_id_fkey(
-            first_name,
-            last_name
-          )
-        `)
-        .order('created_at', { ascending: false })
-        .limit(20);
+      // Get access token for authenticated API call
+      const token = await getAccessToken();
+      if (!token) {
+        throw new Error('No access token available');
+      }
 
-      if (error) throw error;
+      // Fetch activities from authenticated API endpoint
+      const response = await fetch('/api/dashboard/activity', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
 
-      const formattedActivities = (data || []).map(item => ({
-        ...item,
-        user: item.user ? item.user : null
-      }));
-      setActivities(formattedActivities as ActivityItem[]);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const activities = await response.json();
+      setActivities(activities as ActivityItem[]);
     } catch (error) {
       console.error('Error fetching activities:', error);
     } finally {

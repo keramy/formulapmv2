@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link';
 import { 
   Calendar,
@@ -31,41 +31,46 @@ interface Project {
 export function ProjectsOverview() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const { getAccessToken, isAuthenticated } = useAuth();
 
   useEffect(() => {
-    fetchProjects();
-  }, []);
+    if (isAuthenticated) {
+      fetchProjects();
+    }
+  }, [isAuthenticated]);
 
   const fetchProjects = async () => {
     try {
-      const { data, error } = await supabase
-        .from('projects')
-        .select(`
-          id,
-          name,
-          status,
-          project_manager_id,
-          start_date,
-          end_date,
-          budget,
-          actual_cost,
-          project_manager:user_profiles!projects_project_manager_id_fkey(
-            first_name,
-            last_name
-          )
-        `)
-        .in('status', ['active', 'planning', 'bidding'])
-        .order('created_at', { ascending: false })
-        .limit(10);
+      // Get access token for authenticated API call
+      const token = await getAccessToken();
+      if (!token) {
+        throw new Error('No access token available');
+      }
 
-      if (error) throw error;
+      // Fetch projects from authenticated API endpoint
+      const response = await fetch('/api/projects?status=active,planning,bidding&limit=10&include_details=true', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const apiResponse = await response.json();
+      
+      if (!apiResponse.success) {
+        throw new Error(apiResponse.error || 'Failed to fetch projects');
+      }
 
       // Calculate progress for each project
-      const projectsWithProgress = data?.map(project => {
-        let progress = 0;
+      const projectsWithProgress = apiResponse.data.projects?.map((project: any) => {
+        let progress = project.progress_percentage || 0;
         
-        // Simple progress calculation based on date range
-        if (project.start_date && project.end_date) {
+        // If no progress from API, calculate based on date range
+        if (!progress && project.start_date && project.end_date) {
           const start = new Date(project.start_date);
           const end = new Date(project.end_date);
           const today = new Date();

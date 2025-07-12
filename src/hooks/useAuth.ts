@@ -4,12 +4,19 @@ import { useEffect, useState, useCallback } from 'react'
 import { User } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
 import { UserProfile, UserRole } from '@/types/auth'
+import { useImpersonation } from './useImpersonation'
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<UserProfile | null>(null)
+  const [originalProfile, setOriginalProfile] = useState<UserProfile | null>(null) // Store original admin profile
   const [loading, setLoading] = useState(true)
   const [authError, setAuthError] = useState<string | null>(null)
+  const [isUserInitiated, setIsUserInitiated] = useState(false)
+  const [sessionState, setSessionState] = useState<'checking' | 'idle' | 'signing_in' | 'authenticated'>('checking')
+
+  // Integrate impersonation system
+  const { isImpersonating, impersonatedUser, originalAdmin, stopImpersonation, canImpersonate } = useImpersonation()
 
   const fetchUserProfile = useCallback(async (userId: string): Promise<boolean> => {
     try {
@@ -119,30 +126,59 @@ export const useAuth = () => {
     }
   }, [])
 
+  // Effect to handle impersonation changes
+  useEffect(() => {
+    if (isImpersonating && impersonatedUser && originalAdmin) {
+      console.log('🎭 [useAuth] Applying impersonation:', {
+        originalAdmin: originalAdmin.email,
+        impersonatedUser: impersonatedUser.email
+      })
+      
+      // Store original profile if not already stored
+      if (!originalProfile && profile) {
+        setOriginalProfile(profile)
+      }
+      
+      // Use impersonated user's profile
+      setProfile(impersonatedUser)
+    } else if (!isImpersonating && originalProfile) {
+      console.log('🎭 [useAuth] Restoring original profile')
+      
+      // Restore original profile when impersonation stops
+      setProfile(originalProfile)
+      setOriginalProfile(null)
+    }
+  }, [isImpersonating, impersonatedUser, originalAdmin, originalProfile, profile])
+
   useEffect(() => {
     console.log('🔐 [useAuth] Initializing auth hook')
     
     const initializeAuth = async () => {
       try {
         setLoading(true)
+        setSessionState('checking')
         const { data: { session }, error } = await supabase.auth.getSession()
         
         if (error) {
           console.error('🔐 [useAuth] Session error:', error)
           setAuthError(error.message)
+          setSessionState('idle')
           return
         }
 
         if (session?.user) {
-          console.log('🔐 [useAuth] Existing session found:', session.user.id)
+          console.log('🔐 [useAuth] Existing session found (auto-recovery):', session.user.id)
           setUser(session.user)
-          await fetchUserProfile(session.user.id)
+          const profileSuccess = await fetchUserProfile(session.user.id)
+          setSessionState(profileSuccess ? 'authenticated' : 'idle')
         } else {
           console.log('🔐 [useAuth] No existing session')
+          setSessionState('idle')
         }
       } catch (error) {
         console.error('🔐 [useAuth] Auth initialization failed:', error)
         setAuthError(error instanceof Error ? error.message : 'Authentication failed')
+        setSessionState('idle')
       } finally {
         setLoading(false)
       }
@@ -160,8 +196,13 @@ export const useAuth = () => {
             case 'SIGNED_IN':
               if (session?.user) {
                 setUser(session.user)
-                await fetchUserProfile(session.user.id)
+                const profileSuccess = await fetchUserProfile(session.user.id)
                 setAuthError(null)
+                setSessionState(profileSuccess ? 'authenticated' : 'idle')
+                // Only reset user-initiated flag after successful auth
+                if (profileSuccess) {
+                  setIsUserInitiated(false)
+                }
               }
               break
               
@@ -169,11 +210,17 @@ export const useAuth = () => {
               setUser(null)
               setProfile(null)
               setAuthError(null)
+              setSessionState('idle')
+              setIsUserInitiated(false)
               break
               
             case 'TOKEN_REFRESHED':
               if (session?.user) {
                 setUser(session.user)
+                // Don't change session state for token refresh unless we're checking
+                if (sessionState === 'checking') {
+                  setSessionState('authenticated')
+                }
               }
               break
               
@@ -198,9 +245,11 @@ export const useAuth = () => {
   }, [fetchUserProfile])
 
   const signIn = useCallback(async (email: string, password: string) => {
-    console.log('🔐 [useAuth] Starting sign in')
+    console.log('🔐 [useAuth] Starting user-initiated sign in')
     setLoading(true)
     setAuthError(null)
+    setIsUserInitiated(true)
+    setSessionState('signing_in')
     
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -211,6 +260,8 @@ export const useAuth = () => {
       if (error) {
         console.error('🔐 [useAuth] Sign in failed:', error)
         setAuthError(error.message)
+        setSessionState('idle')
+        setIsUserInitiated(false)
         throw error
       }
       
@@ -222,6 +273,8 @@ export const useAuth = () => {
       console.error('🔐 [useAuth] Sign in exception:', error)
       const errorMessage = error instanceof Error ? error.message : 'Sign in failed'
       setAuthError(errorMessage)
+      setSessionState('idle')
+      setIsUserInitiated(false)
       throw error
     } finally {
       setLoading(false)
@@ -265,6 +318,26 @@ export const useAuth = () => {
     setAuthError(null)
   }, [])
 
+  const clearStaleSession = useCallback(async () => {
+    console.log('🔐 [useAuth] Clearing stale session')
+    try {
+      setLoading(true)
+      setSessionState('checking')
+      await supabase.auth.signOut()
+      setUser(null)
+      setProfile(null)
+      setAuthError(null)
+      setIsUserInitiated(false)
+      setSessionState('idle')
+    } catch (error) {
+      console.error('🔐 [useAuth] Error clearing session:', error)
+      setAuthError('Failed to clear session')
+      setSessionState('idle')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
   return {
     // Core auth state
     user,
@@ -277,14 +350,27 @@ export const useAuth = () => {
     signOut,
     getAccessToken,
     clearAuthError,
+    clearStaleSession,
     
-    // Computed auth state
+    // Impersonation system
+    isImpersonating,
+    impersonatedUser,
+    originalAdmin,
+    originalProfile,
+    stopImpersonation,
+    canImpersonate,
+    
+    // Enhanced auth state
     isAuthenticated: !!user && !!profile && profile.is_active,
-    authState: loading ? 'loading' : (user && profile ? 'authenticated' : 'idle'),
+    authState: sessionState === 'authenticated' ? 'authenticated' : 
+               sessionState === 'signing_in' ? 'loading' :
+               sessionState === 'checking' ? (isUserInitiated ? 'loading' : 'recovering') : 'idle',
     isError: !!authError,
-    isRecoveringSession: false,
+    isRecoveringSession: sessionState === 'checking' && !isUserInitiated,
+    isUserInitiated,
+    sessionState,
     
-    // Role checks
+    // Role checks (based on current effective profile - original or impersonated)
     isManagement: profile ? ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'].includes(profile.role) : false,
     isProjectRole: profile ? ['project_manager', 'architect', 'technical_engineer'].includes(profile.role) : false,
     isPurchaseRole: profile ? ['purchase_director', 'purchase_specialist'].includes(profile.role) : false,
@@ -293,11 +379,16 @@ export const useAuth = () => {
     
     // Debug info
     debugInfo: {
-      authState: loading ? 'loading' : (user && profile ? 'authenticated' : 'idle'),
+      authState: sessionState,
       recoveryAttempts: 0,
       hasError: !!authError,
       errorCode: authError ? 'AUTH_ERROR' : undefined,
-      isRecovering: false
+      isRecovering: sessionState === 'checking' && !isUserInitiated,
+      isUserInitiated,
+      sessionState,
+      isImpersonating,
+      impersonatedUserEmail: impersonatedUser?.email,
+      originalAdminEmail: originalAdmin?.email
     }
   }
 }
