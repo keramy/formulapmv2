@@ -44,7 +44,18 @@ export function RecentActivity() {
         });
 
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          // Get detailed error from server response
+          let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+          try {
+            const errorData = await response.json();
+            if (errorData.error) {
+              errorMessage = `${errorMessage} - ${errorData.error}`;
+            }
+            console.error('📈 [RecentActivity] API Error Details:', errorData);
+          } catch (parseError) {
+            console.error('📈 [RecentActivity] Failed to parse error response:', parseError);
+          }
+          throw new Error(errorMessage);
         }
 
         const activitiesData = await response.json();

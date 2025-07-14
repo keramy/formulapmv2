@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import { 
@@ -19,23 +19,15 @@ import { ProjectWithDetails, ProjectDetailResponse } from '@/types/projects'
 // GET /api/projects/[id] - Get individual project
 // ============================================================================
 
-export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const GET = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+,
       { status: 401 }
     )
   }
 
   // Permission check
   if (!hasPermission(profile.role, 'projects.read.all')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions' , 403)
   }
 
   try {
@@ -45,10 +37,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
     // Validate UUID format
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     if (!uuidRegex.test(projectId)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid project ID format' },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid project ID format' , 400)
     }
 
     const supabase = createServerClient()
@@ -56,10 +45,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
     // Check if user has access to this project
     const hasAccess = await checkProjectAccess(supabase, user, projectId)
     if (!hasAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Project not found or access denied' },
-        { status: 404 }
-      )
+      return createErrorResponse('Project not found or access denied' , 404)
     }
 
     // Get project with all related data
@@ -79,10 +65,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
 
     if (error || !project) {
       console.error('Project fetch error:', error)
-      return NextResponse.json(
-        { success: false, error: 'Project not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('Project not found' , 404)
     }
 
     // Get project statistics
@@ -211,10 +194,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
 
   } catch (error) {
     console.error('Project detail API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 
@@ -222,23 +202,15 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
 // PUT /api/projects/[id] - Update project
 // ============================================================================
 
-export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const PUT = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+,
       { status: 401 }
     )
   }
 
   // Permission check
   if (!hasPermission(profile.role, 'projects.update')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions' , 403)
   }
 
   try {
@@ -248,18 +220,12 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
     // Validate UUID format
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     if (!uuidRegex.test(projectId)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid project ID format' },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid project ID format' , 400)
     }
 
     // Check update permission
     if (!hasPermission(profile.role, 'projects.update')) {
-      return NextResponse.json(
-        { success: false, error: 'Insufficient permissions to update projects' },
-        { status: 403 }
-      )
+      return createErrorResponse('Insufficient permissions to update projects' , 403)
     }
 
     const supabase = createServerClient()
@@ -267,10 +233,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
     // Check if user has access to this project
     const hasAccess = await checkProjectAccess(supabase, user, projectId)
     if (!hasAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Project not found or access denied' },
-        { status: 404 }
-      )
+      return createErrorResponse('Project not found or access denied' , 404)
     }
 
     const body = await request.json()
@@ -278,14 +241,9 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
     // Validate update data
     const validationResult = validateProjectUpdate(body)
     if (!validationResult.success) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Invalid update data',
+      return createErrorResponse('Invalid update data',
           details: validationResult.error.issues 
-        },
-        { status: 400 }
-      )
+        , 400)
     }
 
     const updateData = validationResult.data
@@ -300,10 +258,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
       const isProjectManager = profile.role === 'project_manager'
       
       if (!isManagement && !isProjectManager) {
-        return NextResponse.json(
-          { success: false, error: 'Insufficient permissions for this type of update' },
-          { status: 403 }
-        )
+        return createErrorResponse('Insufficient permissions for this type of update' , 403)
       }
     }
 
@@ -328,10 +283,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
 
     if (updateError) {
       console.error('Project update error:', updateError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to update project' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to update project' , 500)
     }
 
     // Log the update for audit trail
@@ -347,10 +299,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
 
   } catch (error) {
     console.error('Project update API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 
@@ -358,23 +307,15 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
 // DELETE /api/projects/[id] - Delete project
 // ============================================================================
 
-export async function DELETE(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const DELETE = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+,
       { status: 401 }
     )
   }
 
   // Permission check
   if (!hasPermission(profile.role, 'projects.delete')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions' , 403)
   }
 
   try {
@@ -384,18 +325,12 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
     // Validate UUID format
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     if (!uuidRegex.test(projectId)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid project ID format' },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid project ID format' , 400)
     }
 
     // Check delete permission - only high-level roles can delete
     if (!hasPermission(profile.role, 'projects.delete')) {
-      return NextResponse.json(
-        { success: false, error: 'Insufficient permissions to delete projects' },
-        { status: 403 }
-      )
+      return createErrorResponse('Insufficient permissions to delete projects' , 403)
     }
 
     const supabase = createServerClient()
@@ -408,21 +343,13 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
       .single()
 
     if (fetchError || !project) {
-      return NextResponse.json(
-        { success: false, error: 'Project not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('Project not found' , 404)
     }
 
     // Prevent deletion of active projects
     if (project.status === 'active') {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Cannot delete active projects. Please change status to "cancelled" or "completed" first.' 
-        },
-        { status: 400 }
-      )
+      return createErrorResponse('Cannot delete active projects. Please change status to "cancelled" or "completed" first.' 
+        , 400)
     }
 
     // Check for dependencies (scope items, documents, etc.)
@@ -439,13 +366,8 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
     ])
 
     if ((scopeItemsCount.count || 0) > 0 || (documentsCount.count || 0) > 0) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Cannot delete project with existing scope items or documents. Please remove them first or archive the project instead.' 
-        },
-        { status: 400 }
-      )
+      return createErrorResponse('Cannot delete project with existing scope items or documents. Please remove them first or archive the project instead.' 
+        , 400)
     }
 
     // Delete project (cascading deletes will handle assignments)
@@ -456,10 +378,7 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
 
     if (deleteError) {
       console.error('Project deletion error:', deleteError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to delete project' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to delete project' , 500)
     }
 
     // Clean up project storage
@@ -472,17 +391,12 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
       // Don't fail the operation for storage cleanup issues
     }
 
-    return NextResponse.json({
-      success: true,
-      message: 'Project deleted successfully'
-    })
+    return createSuccessResponse({ message: 'Project deleted successfully'
+     })
 
   } catch (error) {
     console.error('Project deletion API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 

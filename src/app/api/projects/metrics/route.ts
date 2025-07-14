@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import { ProjectMetrics, ProjectMetricsResponse } from '@/types/projects'
@@ -15,13 +15,8 @@ import { ProjectMetrics, ProjectMetricsResponse } from '@/types/projects'
 // GET /api/projects/metrics - Get project metrics and analytics
 // ============================================================================
 
-export async function GET(request: NextRequest) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
+,
       { status: 401 }
     )
   }
@@ -30,10 +25,7 @@ export async function GET(request: NextRequest) {
   if (!hasPermission(profile.role, 'projects.read.all') && 
       !hasPermission(profile.role, 'projects.read.assigned') &&
       !hasPermission(profile.role, 'projects.read.own')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to view project metrics' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to view project metrics' , 403)
   }
 
   try {
@@ -55,10 +47,7 @@ export async function GET(request: NextRequest) {
       
       if (error) {
         console.error('Projects metrics fetch error:', error)
-        return NextResponse.json(
-          { success: false, error: 'Failed to fetch project metrics' },
-          { status: 500 }
-        )
+        return createErrorResponse('Failed to fetch project metrics' , 500)
       }
       projects = data || []
     } else if (hasPermission(profile.role, 'projects.read.assigned')) {
@@ -79,10 +68,7 @@ export async function GET(request: NextRequest) {
         
         if (error) {
           console.error('Projects metrics fetch error:', error)
-          return NextResponse.json(
-            { success: false, error: 'Failed to fetch project metrics' },
-            { status: 500 }
-          )
+          return createErrorResponse('Failed to fetch project metrics' , 500)
         }
         projects = data || []
       }
@@ -103,10 +89,7 @@ export async function GET(request: NextRequest) {
           
           if (error) {
             console.error('Projects metrics fetch error:', error)
-            return NextResponse.json(
-              { success: false, error: 'Failed to fetch project metrics' },
-              { status: 500 }
-            )
+            return createErrorResponse('Failed to fetch project metrics' , 500)
           }
           projects = data || []
         }
@@ -128,10 +111,7 @@ export async function GET(request: NextRequest) {
           
           if (error) {
             console.error('Projects metrics fetch error:', error)
-            return NextResponse.json(
-              { success: false, error: 'Failed to fetch project metrics' },
-              { status: 500 }
-            )
+            return createErrorResponse('Failed to fetch project metrics' , 500)
           }
           projects = data || []
         }
@@ -267,10 +247,7 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('Project metrics API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 
@@ -278,23 +255,15 @@ export async function GET(request: NextRequest) {
 // GET /api/projects/metrics/dashboard - Get dashboard-specific metrics
 // ============================================================================
 
-export async function POST(request: NextRequest) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const POST = withAuth(async (request: NextRequest, { user, profile }) => {
+,
       { status: 401 }
     )
   }
 
   // Permission check
   if (!hasPermission(profile.role, 'dashboard.view')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to view dashboard metrics' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to view dashboard metrics' , 403)
   }
 
   try {
@@ -396,9 +365,6 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Dashboard metrics API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }

@@ -133,6 +133,11 @@ export const UserImpersonationModal = ({ open, onOpenChange }: UserImpersonation
         // Reset form state
         setSearchTerm('')
         setSelectedRole('all')
+        
+        // Refresh the page to ensure all components reflect the new user state
+        setTimeout(() => {
+          window.location.reload()
+        }, 100)
       } else {
         setError('Failed to start impersonation')
       }
@@ -208,7 +213,7 @@ export const UserImpersonationModal = ({ open, onOpenChange }: UserImpersonation
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[80vh] flex flex-col">
+      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Zap className="h-5 w-5 text-blue-600" />
@@ -253,7 +258,7 @@ export const UserImpersonationModal = ({ open, onOpenChange }: UserImpersonation
         )}
 
         {/* Users List */}
-        <ScrollArea className="flex-1 -mx-6 px-6">
+        <ScrollArea className="flex-1 -mx-6 px-6 min-h-0">
           {loading ? (
             <div className="flex items-center justify-center py-8">
               <Loader2 className="h-8 w-8 animate-spin text-blue-600" />

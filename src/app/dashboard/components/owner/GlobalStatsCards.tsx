@@ -61,7 +61,18 @@ export function GlobalStatsCards() {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        // Get detailed error from server response
+        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          if (errorData.error) {
+            errorMessage = `${errorMessage} - ${errorData.error}`;
+          }
+          console.error('📈 [GlobalStatsCards] API Error Details:', errorData);
+        } catch (parseError) {
+          console.error('📈 [GlobalStatsCards] Failed to parse error response:', parseError);
+        }
+        throw new Error(errorMessage);
       }
 
       const stats = await response.json();

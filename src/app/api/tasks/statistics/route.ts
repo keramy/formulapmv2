@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import { 
@@ -19,23 +19,15 @@ import { TaskStatistics } from '@/types/tasks'
 // GET /api/tasks/statistics - Get task statistics
 // ============================================================================
 
-export async function GET(request: NextRequest) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
+,
       { status: 401 }
     )
   }
 
   // Permission check
   if (!validateTaskPermissions(profile.role, 'read')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to view task statistics' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to view task statistics' , 403)
   }
 
   try {
@@ -54,14 +46,9 @@ export async function GET(request: NextRequest) {
     // Validate parameters
     const validationResult = validateTaskStatisticsParams(queryParams)
     if (!validationResult.success) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Invalid parameters',
+      return createErrorResponse('Invalid parameters',
           details: validationResult.error.issues 
-        },
-        { status: 400 }
-      )
+        , 400)
     }
 
     const supabase = createServerClient()
@@ -70,10 +57,7 @@ export async function GET(request: NextRequest) {
     if (queryParams.project_id) {
       const hasProjectAccess = await verifyProjectAccess(supabase, user, queryParams.project_id)
       if (!hasProjectAccess) {
-        return NextResponse.json(
-          { success: false, error: 'Access denied to this project' },
-          { status: 403 }
-        )
+        return createErrorResponse('Access denied to this project' , 403)
       }
     }
 
@@ -115,10 +99,7 @@ export async function GET(request: NextRequest) {
 
     if (fetchError) {
       console.error('Task statistics fetch error:', fetchError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to fetch task statistics' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to fetch task statistics' , 500)
     }
 
     // Calculate comprehensive statistics
@@ -131,17 +112,12 @@ export async function GET(request: NextRequest) {
       supabase
     )
 
-    return NextResponse.json({
-      success: true,
-      data: statistics
-    })
+    return createSuccessResponse(statistics
+    )
 
   } catch (error) {
     console.error('Task statistics API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 

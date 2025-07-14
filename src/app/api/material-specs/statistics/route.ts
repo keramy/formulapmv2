@@ -7,7 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import { 
@@ -20,23 +20,14 @@ import { MaterialSpecStatistics } from '@/types/material-specs'
 // GET /api/material-specs/statistics - Get material specifications statistics
 // ============================================================================
 
-export async function GET(request: NextRequest) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
-      { status: 401 }
-    )
+export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
+  if (!user || !profile) {
+    return createErrorResponse('Authentication required', 401)
   }
 
   // Permission check
   if (!validateMaterialSpecPermissions(profile.role, 'read')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to view material specification statistics' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to view material specification statistics' , 403)
   }
 
   try {
@@ -55,14 +46,9 @@ export async function GET(request: NextRequest) {
     // Validate parameters
     const validationResult = validateMaterialSpecStatisticsParams(queryParams)
     if (!validationResult.success) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Invalid statistics parameters',
-          details: validationResult.error.issues 
-        },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid statistics parameters', 400, {
+        details: validationResult.error.issues
+      })
     }
 
     const supabase = createServerClient()
@@ -71,10 +57,7 @@ export async function GET(request: NextRequest) {
     if (queryParams.project_id) {
       const hasProjectAccess = await verifyProjectAccess(supabase, user, queryParams.project_id)
       if (!hasProjectAccess) {
-        return NextResponse.json(
-          { success: false, error: 'Access denied to this project' },
-          { status: 403 }
-        )
+        return createErrorResponse('Access denied to this project' , 403)
       }
     }
 
@@ -107,10 +90,7 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('Material spec statistics API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 
@@ -118,23 +98,15 @@ export async function GET(request: NextRequest) {
 // POST /api/material-specs/statistics - Get custom statistics with filters
 // ============================================================================
 
-export async function POST(request: NextRequest) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const POST = withAuth(async (request: NextRequest, { user, profile }) => {
+,
       { status: 401 }
     )
   }
 
   // Permission check
   if (!validateMaterialSpecPermissions(profile.role, 'read')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to view material specification statistics' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to view material specification statistics' , 403)
   }
 
   try {
@@ -143,14 +115,9 @@ export async function POST(request: NextRequest) {
     // Validate parameters
     const validationResult = validateMaterialSpecStatisticsParams(body)
     if (!validationResult.success) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Invalid statistics parameters',
-          details: validationResult.error.issues 
-        },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid statistics parameters', 400, {
+        details: validationResult.error.issues
+      })
     }
 
     const params = validationResult.data
@@ -160,10 +127,7 @@ export async function POST(request: NextRequest) {
     if (params.project_id) {
       const hasProjectAccess = await verifyProjectAccess(supabase, user, params.project_id)
       if (!hasProjectAccess) {
-        return NextResponse.json(
-          { success: false, error: 'Access denied to this project' },
-          { status: 403 }
-        )
+        return createErrorResponse('Access denied to this project' , 403)
       }
     }
 
@@ -205,10 +169,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Material spec custom statistics API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 

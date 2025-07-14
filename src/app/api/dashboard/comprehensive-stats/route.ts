@@ -1,18 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAuth } from '@/lib/middleware';
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware';
 import { createServerClient } from '@/lib/supabase';
 import { hasPermission } from '@/lib/permissions';
 
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
   try {
-    // Verify authentication
-    const { user, profile, error: authError } = await verifyAuth(request);
-    if (authError || !user || !profile) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
 
     const supabase = createServerClient();
 
@@ -86,12 +78,9 @@ export async function GET(request: NextRequest) {
       }
     };
 
-    return NextResponse.json(stats);
+    return createSuccessResponse(stats);
   } catch (error) {
     console.error('Dashboard comprehensive stats API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return createErrorResponse('Internal server error', 500);
   }
-}
+})

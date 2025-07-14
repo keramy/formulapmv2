@@ -7,7 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse, parseQueryParams } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import { 
@@ -25,26 +25,7 @@ import { MaterialSpec, MaterialSpecFilters, MaterialSpecStatistics } from '@/typ
 // GET /api/material-specs - List material specifications with filtering and pagination
 // ============================================================================
 
-export async function GET(request: NextRequest) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
-      { status: 401 }
-    )
-  }
-
-  // Permission check
-  if (!hasPermission(profile.role, 'projects.read.all') && 
-      !hasPermission(profile.role, 'projects.read.assigned') &&
-      !hasPermission(profile.role, 'projects.read.own')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to view material specifications' },
-      { status: 403 }
-    )
-  }
+export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
 
   try {
     const url = new URL(request.url)
@@ -304,51 +285,29 @@ export async function GET(request: NextRequest) {
       user.id
     )
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        material_specs: enhancedMaterialSpecs,
-        statistics
-      },
-      pagination: {
-        page: queryParams.page,
-        limit: queryParams.limit,
-        total: count || 0,
-        has_more: queryParams.page * queryParams.limit < (count || 0)
-      }
+    return createSuccessResponse({
+      material_specs: enhancedMaterialSpecs,
+      statistics
+    }, {
+      page: queryParams.page,
+      limit: queryParams.limit,
+      total: count || 0,
+      has_more: queryParams.page * queryParams.limit < (count || 0)
     })
 
   } catch (error) {
     console.error('Material specs API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error', 500)
   }
-}
+}, {
+  permission: 'projects.read.all'
+})
 
 // ============================================================================
 // POST /api/material-specs - Create new material specification
 // ============================================================================
 
-export async function POST(request: NextRequest) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
-      { status: 401 }
-    )
-  }
-
-  // Permission check
-  if (!validateMaterialSpecPermissions(profile.role, 'create')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to create material specifications' },
-      { status: 403 }
-    )
-  }
+export const POST = withAuth(async (request: NextRequest, { user, profile }) => {
 
   try {
     const body = await request.json()
@@ -356,14 +315,7 @@ export async function POST(request: NextRequest) {
     // Validate material spec data
     const validationResult = validateMaterialSpecFormData(body)
     if (!validationResult.success) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Invalid material specification data',
-          details: validationResult.error.issues 
-        },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid material specification data', 400, validationResult.error.issues)
     }
 
     const materialSpecData = validationResult.data
@@ -505,22 +457,17 @@ export async function POST(request: NextRequest) {
       approval_required: materialSpec.status === 'pending_approval'
     }
 
-    return NextResponse.json({
-      success: true,
-      message: 'Material specification created successfully',
-      data: {
-        material_spec: enhancedMaterialSpec
-      }
-    }, { status: 201 })
+    return createSuccessResponse({
+      material_spec: enhancedMaterialSpec
+    })
 
   } catch (error) {
     console.error('Material spec creation API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error', 500)
   }
-}
+}, {
+  permission: 'projects.create'
+})
 
 // ============================================================================
 // HELPER FUNCTIONS

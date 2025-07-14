@@ -93,7 +93,9 @@
       "Bash(kill:*)",
       "WebFetch(domain:supabase.com)",
       "mcp__supabase__list_projects",
-      "mcp__supabase__execute_sql"
+      "mcp__supabase__execute_sql",
+      "Bash(docker logs:*)",
+      "Bash(echo:*)"
     ],
     "deny": []
   }

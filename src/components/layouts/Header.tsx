@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import dynamic from 'next/dynamic'
 import { useAuth } from '@/hooks/useAuth'
 import { useRouter, usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -14,7 +15,17 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { User, Settings, LogOut, ChevronDown, Menu, Zap, UserCheck, RotateCcw } from 'lucide-react'
-import { UserImpersonationModal } from '@/components/admin/UserImpersonationModal'
+
+// Dynamic import for admin-only modal - reduces bundle size for non-admin users
+const UserImpersonationModal = dynamic(
+  () => import('@/components/admin/UserImpersonationModal').then(mod => ({ 
+    default: mod.UserImpersonationModal 
+  })),
+  { 
+    ssr: false,
+    loading: () => null // No loading state needed for modals
+  }
+)
 
 interface HeaderProps {
   onMenuClick?: () => void
@@ -78,12 +89,20 @@ export const Header = ({ onMenuClick }: HeaderProps = {}) => {
 
   const handleStopImpersonation = async () => {
     try {
+      console.log('🎭 [Header] Attempting to stop impersonation...')
       const success = stopImpersonation()
+      
       if (success) {
-        console.log('🎭 [Header] Stopped impersonation successfully')
+        console.log('🎭 [Header] Stopped impersonation successfully - refreshing page')
+        // Refresh the page to ensure all components reset to admin state
+        setTimeout(() => {
+          window.location.reload()
+        }, 100)
+      } else {
+        console.error('🎭 [Header] Failed to stop impersonation')
       }
     } catch (error) {
-      console.error('Error stopping impersonation:', error)
+      console.error('🎭 [Header] Error stopping impersonation:', error)
     }
   }
 
@@ -154,7 +173,7 @@ export const Header = ({ onMenuClick }: HeaderProps = {}) => {
                       {effectiveProfile.first_name} {effectiveProfile.last_name}
                     </p>
                     {isImpersonating && (
-                      <Zap className="h-3 w-3 text-blue-600" title="Impersonating" />
+                      <Zap className="h-3 w-3 text-blue-600" aria-label="Impersonating" />
                     )}
                   </div>
                   <p className="text-xs text-gray-500">
@@ -181,7 +200,7 @@ export const Header = ({ onMenuClick }: HeaderProps = {}) => {
                       {effectiveProfile.first_name} {effectiveProfile.last_name}
                     </p>
                     {isImpersonating && (
-                      <Zap className="h-3 w-3 text-blue-600" title="Impersonating" />
+                      <Zap className="h-3 w-3 text-blue-600" aria-label="Impersonating" />
                     )}
                   </div>
                   <p className="text-xs text-gray-500">

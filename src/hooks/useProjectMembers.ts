@@ -9,6 +9,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from './useAuth'
+import { useAdvancedApiQuery } from './useAdvancedApiQuery'
 
 interface ProjectMember {
   id: string
@@ -93,5 +94,46 @@ export function useProjectMembers(projectId: string | null): UseProjectMembersRe
     loading,
     error,
     refetch: fetchMembers
+  }
+}
+
+/**
+ * Enhanced Project Members hook using advanced API query patterns
+ * This demonstrates the optimized approach with caching and real-time updates
+ */
+export function useProjectMembersAdvanced(projectId: string) {
+  const { user } = useAuth()
+
+  // Use advanced API query for project members
+  const {
+    data: members = [],
+    loading,
+    error,
+    refetch,
+    mutate
+  } = useAdvancedApiQuery<ProjectMember[]>({
+    queryKey: ['project-members', projectId],
+    queryFn: async () => {
+      if (!projectId || !user) return []
+
+      const response = await fetch(`/api/projects/${projectId}/members`)
+      if (!response.ok) throw new Error('Failed to fetch project members')
+
+      const result = await response.json()
+      return result.success ? result.data : []
+    },
+    enabled: !!projectId && !!user,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    cacheTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnWindowFocus: true,
+    refetchInterval: 2 * 60 * 1000 // 2 minutes for team updates
+  })
+
+  return {
+    members,
+    loading,
+    error,
+    refetch,
+    mutate
   }
 }

@@ -7,7 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import { 
@@ -24,13 +24,8 @@ import { MaterialSpecStatistics } from '@/types/material-specs'
 // GET /api/projects/[id]/material-specs - List material specifications for a specific project
 // ============================================================================
 
-export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const GET = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+,
       { status: 401 }
     )
   }
@@ -39,10 +34,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
   if (!hasPermission(profile.role, 'projects.read.all') && 
       !hasPermission(profile.role, 'projects.read.assigned') &&
       !hasPermission(profile.role, 'projects.read.own')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to view project material specifications' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to view project material specifications' , 403)
   }
 
   try {
@@ -52,10 +44,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
     // Validate UUID format
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     if (!uuidRegex.test(projectId)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid project ID format' },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid project ID format' , 400)
     }
 
     const supabase = createServerClient()
@@ -63,10 +52,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
     // Check if user has access to this project
     const hasProjectAccess = await verifyProjectAccess(supabase, user, projectId)
     if (!hasProjectAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied to this project' },
-        { status: 403 }
-      )
+      return createErrorResponse('Access denied to this project' , 403)
     }
 
     // Verify project exists
@@ -77,10 +63,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
       .single()
 
     if (projectError || !project) {
-      return NextResponse.json(
-        { success: false, error: 'Project not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('Project not found' , 404)
     }
 
     const url = new URL(request.url)
@@ -127,14 +110,9 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
     // Validate parameters
     const validationResult = validateMaterialSpecListParams(queryParams)
     if (!validationResult.success) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Invalid parameters',
+      return createErrorResponse('Invalid parameters',
           details: validationResult.error.issues 
-        },
-        { status: 400 }
-      )
+        , 400)
     }
 
     // Build query for project-specific material specs
@@ -254,10 +232,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
 
     if (fetchError) {
       console.error('Project material specs fetch error:', fetchError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to fetch project material specifications' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to fetch project material specifications' , 500)
     }
 
     // Calculate additional fields for material specs
@@ -326,10 +301,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
 
   } catch (error) {
     console.error('Project material specs API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 
@@ -337,23 +309,15 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
 // POST /api/projects/[id]/material-specs - Create new material specification for a specific project
 // ============================================================================
 
-export async function POST(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const POST = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+,
       { status: 401 }
     )
   }
 
   // Permission check
   if (!validateMaterialSpecPermissions(profile.role, 'create')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to create material specifications' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to create material specifications' , 403)
   }
 
   try {
@@ -363,10 +327,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
     // Validate UUID format
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     if (!uuidRegex.test(projectId)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid project ID format' },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid project ID format' , 400)
     }
 
     const supabase = createServerClient()
@@ -374,10 +335,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
     // Check if user has access to this project
     const hasProjectAccess = await verifyProjectAccess(supabase, user, projectId)
     if (!hasProjectAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied to this project' },
-        { status: 403 }
-      )
+      return createErrorResponse('Access denied to this project' , 403)
     }
 
     // Verify project exists
@@ -388,10 +346,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
       .single()
 
     if (projectError || !project) {
-      return NextResponse.json(
-        { success: false, error: 'Project not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('Project not found' , 404)
     }
 
     const body = await request.json()
@@ -405,14 +360,9 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
     // Validate material spec data
     const validationResult = validateMaterialSpecFormData(materialSpecData)
     if (!validationResult.success) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Invalid material specification data',
+      return createErrorResponse('Invalid material specification data',
           details: validationResult.error.issues 
-        },
-        { status: 400 }
-      )
+        , 400)
     }
 
     const validatedData = validationResult.data
@@ -426,10 +376,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
         .single()
 
       if (supplierError || !supplier) {
-        return NextResponse.json(
-          { success: false, error: 'Supplier not found' },
-          { status: 404 }
-        )
+        return createErrorResponse('Supplier not found' , 404)
       }
     }
 
@@ -442,10 +389,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
         .eq('project_id', projectId)
 
       if (scopeError || !scopeItems || scopeItems.length !== validatedData.scope_item_ids.length) {
-        return NextResponse.json(
-          { success: false, error: 'One or more scope items not found in this project' },
-          { status: 404 }
-        )
+        return createErrorResponse('One or more scope items not found in this project' , 404)
       }
     }
 
@@ -485,10 +429,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
 
     if (insertError) {
       console.error('Project material spec creation error:', insertError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to create material specification' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to create material specification' , 500)
     }
 
     // Create scope item links if provided
@@ -544,10 +485,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
 
   } catch (error) {
     console.error('Project material spec creation API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 

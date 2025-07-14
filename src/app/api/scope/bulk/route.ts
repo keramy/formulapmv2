@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import { 
@@ -19,23 +19,15 @@ import {
 // POST /api/scope/bulk - Bulk update scope items
 // ============================================================================
 
-export async function POST(request: NextRequest) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const POST = withAuth(async (request: NextRequest, { user, profile }) => {
+,
       { status: 401 }
     )
   }
 
   // Permission check
   if (!hasPermission(profile.role, 'projects.update')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions for bulk operations' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions for bulk operations' , 403)
   }
 
   try {
@@ -44,17 +36,11 @@ export async function POST(request: NextRequest) {
     
     // Validate request body
     if (!body.item_ids || !Array.isArray(body.item_ids) || body.item_ids.length === 0) {
-      return NextResponse.json(
-        { success: false, error: 'item_ids array is required and cannot be empty' },
-        { status: 400 }
-      )
+      return createErrorResponse('item_ids array is required and cannot be empty' , 400)
     }
 
     if (!body.updates || typeof body.updates !== 'object') {
-      return NextResponse.json(
-        { success: false, error: 'updates object is required' },
-        { status: 400 }
-      )
+      return createErrorResponse('updates object is required' , 400)
     }
 
     const supabase = createServerClient()
@@ -67,17 +53,11 @@ export async function POST(request: NextRequest) {
 
     if (fetchError) {
       console.error('Bulk fetch error:', fetchError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to fetch scope items' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to fetch scope items' , 500)
     }
 
     if (!existingItems || existingItems.length === 0) {
-      return NextResponse.json(
-        { success: false, error: 'No scope items found with provided IDs' },
-        { status: 404 }
-      )
+      return createErrorResponse('No scope items found with provided IDs' , 404)
     }
 
     // Verify access to all projects
@@ -86,10 +66,7 @@ export async function POST(request: NextRequest) {
     
     const inaccessibleProjects = projectIds.filter(pid => !accessibleProjects.includes(pid))
     if (inaccessibleProjects.length > 0) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied to some projects in the selection' },
-        { status: 403 }
-      )
+      return createErrorResponse('Access denied to some projects in the selection' , 403)
     }
 
     // Prepare update data with permission validation
@@ -101,10 +78,7 @@ export async function POST(request: NextRequest) {
     switch (body.update_type) {
       case 'status':
         if (!hasPermission(profile.role, 'projects.update')) {
-          return NextResponse.json(
-            { success: false, error: 'Insufficient permissions to update status' },
-            { status: 403 }
-          )
+          return createErrorResponse('Insufficient permissions to update status' , 403)
         }
         if (body.updates.status) {
           updateData.status = body.updates.status
@@ -116,10 +90,7 @@ export async function POST(request: NextRequest) {
 
       case 'assignment':
         if (!hasPermission(profile.role, 'projects.update')) {
-          return NextResponse.json(
-            { success: false, error: 'Insufficient permissions to update assignments' },
-            { status: 403 }
-          )
+          return createErrorResponse('Insufficient permissions to update assignments' , 403)
         }
         if (body.updates.assigned_to !== undefined) {
           updateData.assigned_to = body.updates.assigned_to
@@ -143,10 +114,7 @@ export async function POST(request: NextRequest) {
 
       case 'pricing':
         if (!hasPermission(profile.role, 'projects.update')) {
-          return NextResponse.json(
-            { success: false, error: 'Insufficient permissions to update pricing' },
-            { status: 403 }
-          )
+          return createErrorResponse('Insufficient permissions to update pricing' , 403)
         }
         if (body.updates.unit_price !== undefined) {
           updateData.unit_price = parseFloat(body.updates.unit_price as unknown as string)
@@ -195,10 +163,7 @@ export async function POST(request: NextRequest) {
         break
 
       default:
-        return NextResponse.json(
-          { success: false, error: 'Invalid update_type' },
-          { status: 400 }
-        )
+        return createErrorResponse('Invalid update_type' , 400)
     }
 
     // Perform bulk update
@@ -278,10 +243,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Bulk update API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 
@@ -289,23 +251,15 @@ export async function POST(request: NextRequest) {
 // DELETE /api/scope/bulk - Bulk delete scope items
 // ============================================================================
 
-export async function DELETE(request: NextRequest) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const DELETE = withAuth(async (request: NextRequest, { user, profile }) => {
+,
       { status: 401 }
     )
   }
 
   // Permission check
   if (!hasPermission(profile.role, 'projects.update')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions for bulk delete' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions for bulk delete' , 403)
   }
 
   try {
@@ -313,10 +267,7 @@ export async function DELETE(request: NextRequest) {
     const body = await request.json()
     
     if (!body.item_ids || !Array.isArray(body.item_ids) || body.item_ids.length === 0) {
-      return NextResponse.json(
-        { success: false, error: 'item_ids array is required and cannot be empty' },
-        { status: 400 }
-      )
+      return createErrorResponse('item_ids array is required and cannot be empty' , 400)
     }
 
     const supabase = createServerClient()
@@ -329,10 +280,7 @@ export async function DELETE(request: NextRequest) {
       .in('id', body.item_ids)
 
     if (fetchError || !existingItems) {
-      return NextResponse.json(
-        { success: false, error: 'Failed to fetch scope items' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to fetch scope items' , 500)
     }
 
     // Verify access to all projects
@@ -341,10 +289,7 @@ export async function DELETE(request: NextRequest) {
     
     const inaccessibleProjects = projectIds.filter(pid => !accessibleProjects.includes(pid))
     if (inaccessibleProjects.length > 0) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied to some projects in the selection' },
-        { status: 403 }
-      )
+      return createErrorResponse('Access denied to some projects in the selection' , 403)
     }
 
     // Check for dependencies if force delete
@@ -435,10 +380,7 @@ export async function DELETE(request: NextRequest) {
 
   } catch (error) {
     console.error('Bulk delete API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 

@@ -16,6 +16,9 @@ module.exports = {
         '^@/(.*)$': '<rootDir>/src/$1',
       },
       setupFilesAfterEnv: ['<rootDir>/jest.setup.js', '<rootDir>/jest.setup.node.js'],
+      transformIgnorePatterns: [
+        'node_modules/(?!(isows|@supabase|@testing-library|ws|@react-hook|@babel|@supabase/realtime-js)/)'
+      ],
     },
     // Component Testing (jsdom environment)
     {
@@ -32,6 +35,9 @@ module.exports = {
         '^@/(.*)$': '<rootDir>/src/$1',
       },
       setupFilesAfterEnv: ['<rootDir>/jest.setup.js', '<rootDir>/jest.setup.dom.js'],
+      transformIgnorePatterns: [
+        'node_modules/(?!(isows|@supabase|@testing-library|ws|@react-hook|@babel)/)'
+      ],
     },
     // Integration Testing (jsdom environment for auth testing)
     {
@@ -50,7 +56,7 @@ module.exports = {
       setupFilesAfterEnv: ['<rootDir>/jest.setup.js', '<rootDir>/jest.setup.dom.js'],
       testTimeout: 30000, // Longer timeout for integration tests
       transformIgnorePatterns: [
-        'node_modules/(?!(isows|@supabase|@testing-library)/)'
+        'node_modules/(?!(isows|@supabase|@testing-library|ws|@react-hook|@babel|@supabase/realtime-js)/)'
       ],
     },
     // Hooks Testing (jsdom environment)
@@ -69,7 +75,7 @@ module.exports = {
       },
       setupFilesAfterEnv: ['<rootDir>/jest.setup.js', '<rootDir>/jest.setup.dom.js'],
       transformIgnorePatterns: [
-        'node_modules/(?!(isows|@supabase|@testing-library)/)'
+        'node_modules/(?!(isows|@supabase|@testing-library|ws|@react-hook|@babel)/)'
       ],
     },
   ],

@@ -19,6 +19,7 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Checkbox } from '@/components/ui/checkbox'
+import { DataStateWrapper } from '@/components/ui/loading-states'
 import { cn } from '@/lib/utils'
 import { 
   Search, 
@@ -200,27 +201,28 @@ export const MilestoneList: React.FC<MilestoneListProps> = ({
     }
   }
 
-  if (loading) {
-    return (
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="h-8 w-48 bg-gray-200 rounded animate-pulse" />
-          <div className="h-8 w-32 bg-gray-200 rounded animate-pulse" />
-        </div>
-        {showProgress && (
-          <div className="h-20 bg-gray-100 rounded animate-pulse" />
-        )}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-48 bg-gray-100 rounded animate-pulse" />
-          ))}
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div className="space-y-6">
+    <DataStateWrapper
+      loading={loading}
+      error={null}
+      data={milestones}
+      emptyComponent={
+        <div className="text-center py-12">
+          <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-semibold mb-2">No milestones yet</h3>
+          <p className="text-muted-foreground mb-4">
+            Create your first milestone to track project progress.
+          </p>
+          {permissions.canCreate && onCreateMilestone && (
+            <Button onClick={onCreateMilestone}>
+              <Plus className="h-4 w-4 mr-2" />
+              Create Milestone
+            </Button>
+          )}
+        </div>
+      }
+    >
+      <div className="space-y-6">
       {/* Progress Bar */}
       {showProgress && milestones.length > 0 && (
         <MilestoneProgressBar
@@ -520,6 +522,7 @@ export const MilestoneList: React.FC<MilestoneListProps> = ({
           )}
         </div>
       )}
-    </div>
+      </div>
+    </DataStateWrapper>
   )
 }

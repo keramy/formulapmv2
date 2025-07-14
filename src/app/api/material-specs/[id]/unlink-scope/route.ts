@@ -7,7 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { 
   validateScopeUnlink,
@@ -18,23 +18,14 @@ import {
 // DELETE /api/material-specs/[id]/unlink-scope - Unlink material specification from scope item
 // ============================================================================
 
-export async function DELETE(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
-      { status: 401 }
-    )
+export const DELETE = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+  if (!user || !profile) {
+    return createErrorResponse('Authentication required', 401)
   }
 
   // Permission check
   if (!validateMaterialSpecPermissions(profile.role, 'unlink')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to unlink material specifications from scope items' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to unlink material specifications from scope items' , 403)
   }
 
   try {
@@ -44,10 +35,7 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
     // Validate UUID format
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     if (!uuidRegex.test(materialSpecId)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid material specification ID format' },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid material specification ID format' , 400)
     }
 
     const supabase = createServerClient()
@@ -60,19 +48,13 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
       .single()
 
     if (fetchError || !existingMaterialSpec) {
-      return NextResponse.json(
-        { success: false, error: 'Material specification not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('Material specification not found' , 404)
     }
 
     // Check if user has access to this material spec's project
     const hasProjectAccess = await verifyProjectAccess(supabase, user, existingMaterialSpec.project_id)
     if (!hasProjectAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied to this material specification' },
-        { status: 403 }
-      )
+      return createErrorResponse('Access denied to this material specification' , 403)
     }
 
     const body = await request.json()
@@ -80,14 +62,9 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
     // Validate scope unlink data
     const validationResult = validateScopeUnlink(body)
     if (!validationResult.success) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Invalid scope unlink data',
-          details: validationResult.error.issues 
-        },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid scope unlink data', 400, {
+        details: validationResult.error.issues
+      })
     }
 
     const unlinkData = validationResult.data
@@ -104,18 +81,12 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
       .single()
 
     if (linkError || !existingLink) {
-      return NextResponse.json(
-        { success: false, error: 'Material specification is not linked to this scope item' },
-        { status: 404 }
-      )
+      return createErrorResponse('Material specification is not linked to this scope item' , 404)
     }
 
     // Verify scope item belongs to the same project as material spec
     if ((existingLink as any).scope_item.project_id !== existingMaterialSpec.project_id) {
-      return NextResponse.json(
-        { success: false, error: 'Scope item must belong to the same project as the material specification' },
-        { status: 400 }
-      )
+      return createErrorResponse('Scope item must belong to the same project as the material specification' , 400)
     }
 
     // Delete the scope material link
@@ -126,10 +97,7 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
 
     if (deleteError) {
       console.error('Scope material link deletion error:', deleteError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to unlink material specification from scope item' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to unlink material specification from scope item' , 500)
     }
 
     // Log unlink action for audit trail
@@ -156,10 +124,7 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
 
   } catch (error) {
     console.error('Material spec scope unlinking API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 
@@ -167,23 +132,15 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
 // POST /api/material-specs/[id]/unlink-scope - Alternative POST endpoint for unlinking (for complex scenarios)
 // ============================================================================
 
-export async function POST(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const POST = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+,
       { status: 401 }
     )
   }
 
   // Permission check
   if (!validateMaterialSpecPermissions(profile.role, 'unlink')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to unlink material specifications from scope items' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to unlink material specifications from scope items' , 403)
   }
 
   try {
@@ -193,10 +150,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
     // Validate UUID format
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     if (!uuidRegex.test(materialSpecId)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid material specification ID format' },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid material specification ID format' , 400)
     }
 
     const supabase = createServerClient()
@@ -209,19 +163,13 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
       .single()
 
     if (fetchError || !existingMaterialSpec) {
-      return NextResponse.json(
-        { success: false, error: 'Material specification not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('Material specification not found' , 404)
     }
 
     // Check if user has access to this material spec's project
     const hasProjectAccess = await verifyProjectAccess(supabase, user, existingMaterialSpec.project_id)
     if (!hasProjectAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied to this material specification' },
-        { status: 403 }
-      )
+      return createErrorResponse('Access denied to this material specification' , 403)
     }
 
     const body = await request.json()
@@ -316,14 +264,9 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
     // Single unlink validation
     const validationResult = validateScopeUnlink(body)
     if (!validationResult.success) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Invalid scope unlink data',
-          details: validationResult.error.issues 
-        },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid scope unlink data', 400, {
+        details: validationResult.error.issues
+      })
     }
 
     const unlinkData = validationResult.data
@@ -340,18 +283,12 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
       .single()
 
     if (linkError || !existingLink) {
-      return NextResponse.json(
-        { success: false, error: 'Material specification is not linked to this scope item' },
-        { status: 404 }
-      )
+      return createErrorResponse('Material specification is not linked to this scope item' , 404)
     }
 
     // Verify scope item belongs to the same project as material spec
     if ((existingLink as any).scope_item.project_id !== existingMaterialSpec.project_id) {
-      return NextResponse.json(
-        { success: false, error: 'Scope item must belong to the same project as the material specification' },
-        { status: 400 }
-      )
+      return createErrorResponse('Scope item must belong to the same project as the material specification' , 400)
     }
 
     // Delete the scope material link
@@ -362,10 +299,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
 
     if (deleteError) {
       console.error('Scope material link deletion error:', deleteError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to unlink material specification from scope item' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to unlink material specification from scope item' , 500)
     }
 
     // Log unlink action for audit trail
@@ -392,10 +326,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
 
   } catch (error) {
     console.error('Material spec scope unlinking API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 

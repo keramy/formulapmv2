@@ -12,6 +12,7 @@ import { useMilestones } from '@/hooks/useMilestones'
 import { MilestoneList } from '@/components/milestones/MilestoneList'
 import { MilestoneForm } from '@/components/milestones/MilestoneForm'
 import { MilestoneCalendar } from '@/components/milestones/MilestoneCalendar'
+import { DataStateWrapper } from '@/components/ui/loading-states'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -119,17 +120,30 @@ export function MilestonesTab({ projectId }: MilestonesTabProps) {
     }
   }
 
-  if (error) {
-    return (
-      <Alert variant="destructive">
-        <AlertTriangle className="h-4 w-4" />
-        <AlertDescription>{error}</AlertDescription>
-      </Alert>
-    )
-  }
+
 
   return (
-    <div className="space-y-6">
+    <DataStateWrapper
+      loading={loading}
+      error={error}
+      data={milestones}
+      emptyComponent={
+        <div className="text-center py-12">
+          <Target className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-semibold mb-2">No milestones yet</h3>
+          <p className="text-muted-foreground mb-4">
+            Create your first milestone to track project progress.
+          </p>
+          {permissions.canCreate && (
+            <Button onClick={() => setCreateDialogOpen(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Create Milestone
+            </Button>
+          )}
+        </div>
+      }
+    >
+      <div className="space-y-6">
       {/* Header with Key Metrics */}
       <div className="flex items-center justify-between">
         <div>
@@ -355,6 +369,7 @@ export function MilestonesTab({ projectId }: MilestonesTabProps) {
           </DialogContent>
         </Dialog>
       )}
-    </div>
+      </div>
+    </DataStateWrapper>
   )
 }

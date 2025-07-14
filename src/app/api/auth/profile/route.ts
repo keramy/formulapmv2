@@ -1,16 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { UserProfile } from '@/types/auth'
 
-export async function GET(request: NextRequest) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
-      { status: 401 }
-    )
+export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
+  if (!user || !profile) {
+    return createErrorResponse('Authentication required', 401)
   }
 
   try {
@@ -25,17 +19,11 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error('Profile fetch error:', error)
-      return NextResponse.json(
-        { success: false, error: 'Failed to fetch user profile' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to fetch user profile', 500)
     }
 
     if (!profile) {
-      return NextResponse.json(
-        { success: false, error: 'User profile not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('User profile not found', 404)
     }
 
     return NextResponse.json({
@@ -58,22 +46,13 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('Profile API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error', 500)
   }
-}
+})
 
-export async function PUT(request: NextRequest) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
-      { status: 401 }
-    )
+export const PUT = withAuth(async (request: NextRequest, { user, profile }) => {
+  if (!user || !profile) {
+    return createErrorResponse('Authentication required', 401)
   }
 
   try {
@@ -93,27 +72,18 @@ export async function PUT(request: NextRequest) {
 
     // Validate required fields
     if (filteredUpdates.first_name !== undefined && !filteredUpdates.first_name?.trim()) {
-      return NextResponse.json(
-        { success: false, error: 'First name is required' },
-        { status: 400 }
-      )
+      return createErrorResponse('First name is required', 400)
     }
 
     if (filteredUpdates.last_name !== undefined && !filteredUpdates.last_name?.trim()) {
-      return NextResponse.json(
-        { success: false, error: 'Last name is required' },
-        { status: 400 }
-      )
+      return createErrorResponse('Last name is required', 400)
     }
 
     // Validate phone format if provided
     if (filteredUpdates.phone) {
       const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/
       if (!phoneRegex.test(filteredUpdates.phone.replace(/[-\s\(\)]/g, ''))) {
-        return NextResponse.json(
-          { success: false, error: 'Invalid phone number format' },
-          { status: 400 }
-        )
+        return createErrorResponse('Invalid phone number format', 400)
       }
     }
 
@@ -133,10 +103,7 @@ export async function PUT(request: NextRequest) {
 
     if (error) {
       console.error('Profile update error:', error)
-      return NextResponse.json(
-        { success: false, error: 'Failed to update profile' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to update profile', 500)
     }
 
     return NextResponse.json({
@@ -160,9 +127,6 @@ export async function PUT(request: NextRequest) {
 
   } catch (error) {
     console.error('Profile update API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error', 500)
   }
-}
+})

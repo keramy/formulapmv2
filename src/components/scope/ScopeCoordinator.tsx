@@ -13,6 +13,7 @@ import { useScope, useScopeExcel, useScopeProgress } from '@/hooks/useScope'
 import { usePermissions } from '@/hooks/usePermissions'
 import { useToast } from '@/components/ui/use-toast'
 import { ScopeCategory, ScopeFilters, ScopeStatus, ScopeItem } from '@/types/scope'
+import { DataStateWrapper } from '@/components/ui/loading-states'
 
 interface ScopeCoordinatorProps {
   projectId: string
@@ -335,3 +336,82 @@ export const useScopeCoordinator = ({
 }
 
 export type ScopeCoordinatorReturn = ReturnType<typeof useScopeCoordinator>
+
+/**
+ * Enhanced ScopeCoordinator with DataStateWrapper integration
+ * This provides consistent loading states and error handling for scope operations
+ */
+export function ScopeCoordinatorEnhanced(props: ScopeCoordinatorProps) {
+  const coordinator = useScopeCoordinator(props)
+
+  return (
+    <DataStateWrapper
+      loading={coordinator.loading}
+      error={coordinator.error}
+      data={coordinator.scopeItems}
+      onRetry={coordinator.coordinateDataFetch}
+      emptyComponent={
+        <Card>
+          <CardContent className="text-center py-12">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-2xl">📋</span>
+            </div>
+            <h3 className="text-lg font-semibold mb-2">No scope items yet</h3>
+            <p className="text-muted-foreground mb-4">
+              Get started by creating your first scope item or importing from Excel.
+            </p>
+            {coordinator.canCreateScope && (
+              <Button onClick={coordinator.handleCreateItem}>
+                Create First Item
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+      }
+    >
+      {/* Render scope coordinator content here */}
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold">Scope Management</h2>
+          <div className="flex gap-2">
+            {coordinator.canCreateScope && (
+              <Button onClick={coordinator.handleCreateItem}>
+                Create Item
+              </Button>
+            )}
+            {coordinator.canImportScope && (
+              <Button variant="outline" onClick={coordinator.handleImportExcel}>
+                Import Excel
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* Statistics Cards */}
+        {coordinator.statistics && (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Card>
+              <CardContent className="p-4">
+                <div className="text-2xl font-bold">{coordinator.totalCount}</div>
+                <div className="text-sm text-muted-foreground">Total Items</div>
+              </CardContent>
+            </Card>
+            {/* Add more statistics cards as needed */}
+          </div>
+        )}
+
+        {/* Scope Items Display */}
+        <div className="space-y-4">
+          {coordinator.scopeItems.map((item) => (
+            <Card key={item.id}>
+              <CardContent className="p-4">
+                <h3 className="font-semibold">{item.name}</h3>
+                <p className="text-sm text-muted-foreground">{item.description}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </DataStateWrapper>
+  )
+}

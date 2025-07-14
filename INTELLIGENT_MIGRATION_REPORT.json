@@ -1,0 +1,24 @@
+{
+  "timestamp": "2025-07-14T11:39:19.811Z",
+  "summary": {
+    "totalRoutes": 56,
+    "successful": 0,
+    "failed": 31,
+    "successRate": 0,
+    "linesReduced": 0,
+    "complexityReduced": 0
+  },
+  "impact": {
+    "codeReduction": "0 lines eliminated",
+    "complexityReduction": "0 complexity points reduced",
+    "maintainabilityImprovement": "Significant",
+    "consistencyImprovement": "High"
+  },
+  "nextSteps": [
+    "Run TypeScript compilation check",
+    "Execute test suite",
+    "Review failed migrations manually",
+    "Monitor API performance",
+    "Update documentation"
+  ]
+}

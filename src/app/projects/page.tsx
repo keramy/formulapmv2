@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useProjects } from '@/hooks/useProjects';
@@ -24,9 +24,22 @@ import {
 import Link from 'next/link';
 
 export default function ProjectsPage() {
-  const { user } = useAuth();
+  const { user, profile, authState, isAuthenticated } = useAuth();
   const { hasPermission } = usePermissions();
   const { projects, loading, error, fetchProjects } = useProjects();
+
+  // Debug authentication state
+  useEffect(() => {
+    console.log('🔗 [ProjectsPage] Auth Debug:', {
+      hasUser: !!user,
+      userEmail: user?.email,
+      hasProfile: !!profile,
+      profileRole: profile?.role,
+      authState,
+      isAuthenticated,
+      timestamp: new Date().toISOString()
+    });
+  }, [user, profile, authState, isAuthenticated]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
 

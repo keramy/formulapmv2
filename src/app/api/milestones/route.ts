@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import { 
@@ -22,13 +22,8 @@ import { Milestone, MilestoneFilters, MilestoneStatistics } from '@/types/milest
 // GET /api/milestones - List milestones with filtering and pagination
 // ============================================================================
 
-export async function GET(request: NextRequest) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
+,
       { status: 401 }
     )
   }
@@ -37,10 +32,7 @@ export async function GET(request: NextRequest) {
   if (!hasPermission(profile.role, 'projects.read.all') && 
       !hasPermission(profile.role, 'projects.read.assigned') &&
       !hasPermission(profile.role, 'projects.read.own')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to view milestones' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to view milestones' , 403)
   }
 
   try {
@@ -70,14 +62,9 @@ export async function GET(request: NextRequest) {
     // Validate parameters
     const validationResult = validateMilestoneListParams(queryParams)
     if (!validationResult.success) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Invalid parameters',
+      return createErrorResponse('Invalid parameters',
           details: validationResult.error.issues 
-        },
-        { status: 400 }
-      )
+        , 400)
     }
 
     const supabase = createServerClient()
@@ -119,10 +106,7 @@ export async function GET(request: NextRequest) {
       // Verify user has access to this project
       const hasProjectAccess = await verifyProjectAccess(supabase, user, queryParams.project_id)
       if (!hasProjectAccess) {
-        return NextResponse.json(
-          { success: false, error: 'Access denied to this project' },
-          { status: 403 }
-        )
+        return createErrorResponse('Access denied to this project' , 403)
       }
       query = query.eq('project_id', queryParams.project_id)
     }
@@ -186,10 +170,7 @@ export async function GET(request: NextRequest) {
 
     if (fetchError) {
       console.error('Milestones fetch error:', fetchError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to fetch milestones' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to fetch milestones' , 500)
     }
 
     // Update overdue status for milestones
@@ -228,10 +209,7 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('Milestones API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 
@@ -239,23 +217,15 @@ export async function GET(request: NextRequest) {
 // POST /api/milestones - Create new milestone
 // ============================================================================
 
-export async function POST(request: NextRequest) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const POST = withAuth(async (request: NextRequest, { user, profile }) => {
+,
       { status: 401 }
     )
   }
 
   // Permission check
   if (!validateMilestonePermissions(profile.role, 'create')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to create milestones' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to create milestones' , 403)
   }
 
   try {
@@ -264,14 +234,9 @@ export async function POST(request: NextRequest) {
     // Validate milestone data
     const validationResult = validateMilestoneFormData(body)
     if (!validationResult.success) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Invalid milestone data',
+      return createErrorResponse('Invalid milestone data',
           details: validationResult.error.issues 
-        },
-        { status: 400 }
-      )
+        , 400)
     }
 
     const milestoneData = validationResult.data
@@ -280,10 +245,7 @@ export async function POST(request: NextRequest) {
     // Verify user has access to the project
     const hasProjectAccess = await verifyProjectAccess(supabase, user, milestoneData.project_id)
     if (!hasProjectAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied to this project' },
-        { status: 403 }
-      )
+      return createErrorResponse('Access denied to this project' , 403)
     }
 
     // Check if project exists
@@ -294,10 +256,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (projectError || !project) {
-      return NextResponse.json(
-        { success: false, error: 'Project not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('Project not found' , 404)
     }
 
     // Calculate automatic status based on target date
@@ -325,10 +284,7 @@ export async function POST(request: NextRequest) {
 
     if (insertError) {
       console.error('Milestone creation error:', insertError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to create milestone' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to create milestone' , 500)
     }
 
     // Add computed fields
@@ -348,10 +304,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Milestone creation API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 

@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { UserRole } from '@/types/auth'
 
@@ -12,24 +12,15 @@ import { UserRole } from '@/types/auth'
 // GET /api/admin/users - List all users for impersonation
 // ============================================================================
 
-export async function GET(request: NextRequest) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
-      { status: 401 }
-    )
+export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
+  if (!user || !profile) {
+    return createErrorResponse('Authentication required', 401)
   }
 
   // Authorization check - only company owners and admins can list users
   const adminRoles: UserRole[] = ['company_owner', 'admin']
   if (!adminRoles.includes(profile.role)) {
-    return NextResponse.json(
-      { success: false, error: 'Admin access required' },
-      { status: 403 }
-    )
+    return createErrorResponse('Admin access required', 403)
   }
 
   try {
@@ -62,10 +53,7 @@ export async function GET(request: NextRequest) {
 
     if (fetchError) {
       console.error('Users fetch error:', fetchError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to fetch users' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to fetch users', 500)
     }
 
     // Group users by role for better organization
@@ -179,9 +167,6 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('Admin users API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error', 500)
   }
-}
+})

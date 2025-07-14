@@ -1,0 +1,333 @@
+{
+  "timestamp": "2025-07-14T11:36:59.069Z",
+  "metrics": {
+    "filesAnalyzed": 174,
+    "patternsDetected": 630,
+    "optimizationsApplied": 3,
+    "linesReduced": 72,
+    "estimatedTimeReduction": 2905
+  },
+  "impact": {
+    "codeQuality": "IMPROVED",
+    "maintainability": "SIGNIFICANTLY_IMPROVED",
+    "performance": "OPTIMIZED",
+    "developerExperience": "ENHANCED"
+  },
+  "recommendations": [
+    {
+      "pattern": "api-auth",
+      "title": "Migrate API Authentication",
+      "description": "Replace manual auth checks with withAuth middleware",
+      "impact": "CRITICAL",
+      "effort": "LOW",
+      "roi": "VERY_HIGH",
+      "estimatedTimeReduction": 2010,
+      "files": [
+        {
+          "path": "src\\app\\api\\material-specs\\[id]\\route.ts",
+          "occurrences": 3,
+          "linesReduced": 24
+        },
+        {
+          "path": "src\\app\\api\\milestones\\[id]\\route.ts",
+          "occurrences": 3,
+          "linesReduced": 24
+        },
+        {
+          "path": "src\\app\\api\\projects\\[id]\\assignments\\route.ts",
+          "occurrences": 3,
+          "linesReduced": 24
+        },
+        {
+          "path": "src\\app\\api\\projects\\[id]\\route.ts",
+          "occurrences": 3,
+          "linesReduced": 24
+        },
+        {
+          "path": "src\\app\\api\\scope\\[id]\\dependencies\\route.ts",
+          "occurrences": 3,
+          "linesReduced": 24
+        },
+        {
+          "path": "src\\app\\api\\scope\\[id]\\route.ts",
+          "occurrences": 3,
+          "linesReduced": 24
+        },
+        {
+          "path": "src\\app\\api\\tasks\\[id]\\route.ts",
+          "occurrences": 3,
+          "linesReduced": 24
+        },
+        {
+          "path": "src\\lib\\middleware.ts",
+          "occurrences": 3,
+          "linesReduced": 24
+        },
+        {
+          "path": "src\\app\\api\\auth\\profile\\route.ts",
+          "occurrences": 2,
+          "linesReduced": 16
+        },
+        {
+          "path": "src\\app\\api\\material-specs\\bulk\\route.ts",
+          "occurrences": 2,
+          "linesReduced": 16
+        },
+        {
+          "path": "src\\app\\api\\material-specs\\route.ts",
+          "occurrences": 2,
+          "linesReduced": 16
+        },
+        {
+          "path": "src\\app\\api\\material-specs\\[id]\\link-scope\\route.ts",
+          "occurrences": 2,
+          "linesReduced": 16
+        },
+        {
+          "path": "src\\app\\api\\material-specs\\[id]\\unlink-scope\\route.ts",
+          "occurrences": 2,
+          "linesReduced": 16
+        },
+        {
+          "path": "src\\app\\api\\milestones\\bulk\\route.ts",
+          "occurrences": 2,
+          "linesReduced": 16
+        },
+        {
+          "path": "src\\app\\api\\milestones\\route.ts",
+          "occurrences": 2,
+          "linesReduced": 16
+        },
+        {
+          "path": "src\\app\\api\\projects\\metrics\\route.ts",
+          "occurrences": 2,
+          "linesReduced": 16
+        },
+        {
+          "path": "src\\app\\api\\projects\\route.ts",
+          "occurrences": 2,
+          "linesReduced": 16
+        },
+        {
+          "path": "src\\app\\api\\projects\\[id]\\material-specs\\route.ts",
+          "occurrences": 2,
+          "linesReduced": 16
+        },
+        {
+          "path": "src\\app\\api\\projects\\[id]\\milestones\\route.ts",
+          "occurrences": 2,
+          "linesReduced": 16
+        },
+        {
+          "path": "src\\app\\api\\projects\\[id]\\tasks\\route.ts",
+          "occurrences": 2,
+          "linesReduced": 16
+        },
+        {
+          "path": "src\\app\\api\\scope\\bulk\\route.ts",
+          "occurrences": 2,
+          "linesReduced": 16
+        },
+        {
+          "path": "src\\app\\api\\scope\\route.ts",
+          "occurrences": 2,
+          "linesReduced": 16
+        },
+        {
+          "path": "src\\app\\api\\tasks\\route.ts",
+          "occurrences": 2,
+          "linesReduced": 16
+        },
+        {
+          "path": "src\\app\\api\\tasks\\[id]\\comments\\route.ts",
+          "occurrences": 2,
+          "linesReduced": 16
+        },
+        {
+          "path": "src\\app\\api\\admin\\users\\route.ts",
+          "occurrences": 1,
+          "linesReduced": 8
+        },
+        {
+          "path": "src\\app\\api\\auth\\change-password\\route.ts",
+          "occurrences": 1,
+          "linesReduced": 8
+        },
+        {
+          "path": "src\\app\\api\\material-specs\\[id]\\approve\\route.ts",
+          "occurrences": 1,
+          "linesReduced": 8
+        },
+        {
+          "path": "src\\app\\api\\material-specs\\[id]\\reject\\route.ts",
+          "occurrences": 1,
+          "linesReduced": 8
+        },
+        {
+          "path": "src\\app\\api\\material-specs\\[id]\\request-revision\\route.ts",
+          "occurrences": 1,
+          "linesReduced": 8
+        },
+        {
+          "path": "src\\app\\api\\milestones\\statistics\\route.ts",
+          "occurrences": 1,
+          "linesReduced": 8
+        },
+        {
+          "path": "src\\app\\api\\milestones\\[id]\\status\\route.ts",
+          "occurrences": 1,
+          "linesReduced": 8
+        },
+        {
+          "path": "src\\app\\api\\scope\\excel\\export\\route.ts",
+          "occurrences": 1,
+          "linesReduced": 8
+        },
+        {
+          "path": "src\\app\\api\\scope\\excel\\import\\route.ts",
+          "occurrences": 1,
+          "linesReduced": 8
+        },
+        {
+          "path": "src\\app\\api\\scope\\overview\\route.ts",
+          "occurrences": 1,
+          "linesReduced": 8
+        },
+        {
+          "path": "src\\app\\api\\tasks\\statistics\\route.ts",
+          "occurrences": 1,
+          "linesReduced": 8
+        }
+      ]
+    },
+    {
+      "pattern": "duplicate-queries",
+      "title": "Optimize Database Queries",
+      "description": "Use QueryBuilder for consistent database operations",
+      "impact": "HIGH",
+      "effort": "MEDIUM",
+      "roi": "HIGH",
+      "estimatedTimeReduction": 495,
+      "files": [
+        {
+          "path": "src\\app\\api\\dashboard\\comprehensive-stats\\route.ts",
+          "occurrences": 3,
+          "linesReduced": 60
+        },
+        {
+          "path": "src\\app\\api\\material-specs\\statistics\\route.ts",
+          "occurrences": 2,
+          "linesReduced": 40
+        },
+        {
+          "path": "src\\app\\api\\material-specs\\route.ts",
+          "occurrences": 1,
+          "linesReduced": 20
+        },
+        {
+          "path": "src\\app\\api\\milestones\\route.ts",
+          "occurrences": 1,
+          "linesReduced": 20
+        },
+        {
+          "path": "src\\app\\api\\scope\\route.ts",
+          "occurrences": 1,
+          "linesReduced": 20
+        },
+        {
+          "path": "src\\app\\api\\tasks\\route.ts",
+          "occurrences": 1,
+          "linesReduced": 20
+        },
+        {
+          "path": "src\\app\\api\\tasks\\statistics\\route.ts",
+          "occurrences": 1,
+          "linesReduced": 20
+        },
+        {
+          "path": "src\\lib\\database.ts",
+          "occurrences": 1,
+          "linesReduced": 20
+        }
+      ]
+    },
+    {
+      "pattern": "manual-loading",
+      "title": "Standardize Loading States",
+      "description": "Replace custom loading logic with DataStateWrapper",
+      "impact": "HIGH",
+      "effort": "LOW",
+      "roi": "HIGH",
+      "estimatedTimeReduction": 400,
+      "files": [
+        {
+          "path": "src\\hooks\\useProjects.ts",
+          "occurrences": 6,
+          "linesReduced": 90
+        },
+        {
+          "path": "src\\hooks\\useScope.ts",
+          "occurrences": 4,
+          "linesReduced": 60
+        },
+        {
+          "path": "src\\components\\admin\\UserImpersonationModal.tsx",
+          "occurrences": 1,
+          "linesReduced": 15
+        },
+        {
+          "path": "src\\components\\projects\\tabs\\RealtimeScopeListTab.tsx",
+          "occurrences": 1,
+          "linesReduced": 15
+        },
+        {
+          "path": "src\\components\\projects\\tabs\\ReportsTab.tsx",
+          "occurrences": 1,
+          "linesReduced": 15
+        },
+        {
+          "path": "src\\components\\projects\\tabs\\ScopeListTab.tsx",
+          "occurrences": 1,
+          "linesReduced": 15
+        },
+        {
+          "path": "src\\components\\projects\\tabs\\ShopDrawingsTab.tsx",
+          "occurrences": 1,
+          "linesReduced": 15
+        },
+        {
+          "path": "src\\hooks\\useApiQuery.ts",
+          "occurrences": 1,
+          "linesReduced": 15
+        },
+        {
+          "path": "src\\hooks\\useMaterialSpecs.ts",
+          "occurrences": 1,
+          "linesReduced": 15
+        },
+        {
+          "path": "src\\hooks\\useMilestones.ts",
+          "occurrences": 1,
+          "linesReduced": 15
+        },
+        {
+          "path": "src\\hooks\\useProjectMembers.ts",
+          "occurrences": 1,
+          "linesReduced": 15
+        },
+        {
+          "path": "src\\hooks\\useTasks.ts",
+          "occurrences": 1,
+          "linesReduced": 15
+        }
+      ]
+    }
+  ],
+  "nextSteps": [
+    "Run TypeScript compilation to verify migrations",
+    "Execute test suite to ensure functionality",
+    "Monitor performance metrics for improvements",
+    "Continue migration of remaining patterns",
+    "Implement performance monitoring dashboard"
+  ]
+}

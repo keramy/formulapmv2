@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import * as XLSX from 'xlsx'
@@ -16,23 +16,15 @@ import { ScopeFilters } from '@/types/scope'
 // GET /api/scope/excel/export - Export scope items to Excel
 // ============================================================================
 
-export async function GET(request: NextRequest) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
+,
       { status: 401 }
     )
   }
 
   // Permission check
   if (!hasPermission(profile.role, 'projects.read.all')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to export Excel files' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to export Excel files' , 403)
   }
 
   try {
@@ -41,10 +33,7 @@ export async function GET(request: NextRequest) {
     const projectId = url.searchParams.get('project_id')
 
     if (!projectId) {
-      return NextResponse.json(
-        { success: false, error: 'project_id is required' },
-        { status: 400 }
-      )
+      return createErrorResponse('project_id is required' , 400)
     }
 
     const supabase = createServerClient()
@@ -52,10 +41,7 @@ export async function GET(request: NextRequest) {
     // Verify user has access to the project
     const hasProjectAccess = await verifyProjectAccess(supabase, user, projectId)
     if (!hasProjectAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied to this project' },
-        { status: 403 }
-      )
+      return createErrorResponse('Access denied to this project' , 403)
     }
 
     // Parse filters from query parameters
@@ -104,17 +90,11 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error('Scope items fetch error:', error)
-      return NextResponse.json(
-        { success: false, error: 'Failed to fetch scope items' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to fetch scope items' , 500)
     }
 
     if (!scopeItems || scopeItems.length === 0) {
-      return NextResponse.json(
-        { success: false, error: 'No scope items found for export' },
-        { status: 404 }
-      )
+      return createErrorResponse('No scope items found for export' , 404)
     }
 
     // Determine what data to include based on permissions
@@ -352,10 +332,7 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('Excel export API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error during export' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error during export' , 500)
   }
 }
 

@@ -20,6 +20,8 @@ import {
   MapPin,
   Star
 } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { usePermissions } from '@/hooks/usePermissions';
 
 interface Supplier {
   id: string;
@@ -38,6 +40,8 @@ interface Supplier {
 }
 
 export default function SuppliersPage() {
+  const { user, getAccessToken, isAuthenticated } = useAuth();
+  const { hasPermission } = usePermissions();
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
@@ -58,15 +62,42 @@ export default function SuppliersPage() {
   // Fetch suppliers from API
   useEffect(() => {
     fetchSuppliers();
-  }, []);
+  }, [isAuthenticated, getAccessToken]);
 
   const fetchSuppliers = async () => {
+    if (!isAuthenticated) return;
+    
     try {
       setLoading(true);
-      const response = await fetch('/api/suppliers');
-      if (!response.ok) {
-        throw new Error('Failed to fetch suppliers');
+      
+      // Get access token for authenticated API call
+      const token = await getAccessToken();
+      if (!token) {
+        throw new Error('No access token available');
       }
+      
+      const response = await fetch('/api/suppliers', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        // Get detailed error from server response
+        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          if (errorData.error) {
+            errorMessage = `${errorMessage} - ${errorData.error}`;
+          }
+          console.error('🏢 [SuppliersPage] API Error Details:', errorData);
+        } catch (parseError) {
+          console.error('🏢 [SuppliersPage] Failed to parse error response:', parseError);
+        }
+        throw new Error(errorMessage);
+      }
+      
       const data = await response.json();
       setSuppliers(data);
     } catch (err) {
@@ -82,6 +113,29 @@ export default function SuppliersPage() {
     supplier.contact_person.toLowerCase().includes(searchTerm.toLowerCase()) ||
     supplier.specialties.some(spec => spec.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
+  // Check access permissions
+  if (!user) {
+    return (
+      <div className="p-6">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900">Access Denied</h1>
+          <p className="text-gray-600">Please log in to view suppliers.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!hasPermission('suppliers.read')) {
+    return (
+      <div className="p-6">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900">Access Denied</h1>
+          <p className="text-gray-600">You don't have permission to view suppliers.</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

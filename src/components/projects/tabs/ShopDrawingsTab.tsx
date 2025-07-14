@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { DataStateWrapper } from '@/components/ui/loading-states';
 import { 
   Search,
   Filter,
@@ -45,7 +46,7 @@ interface ShopDrawing {
 export function ShopDrawingsTab({ projectId }: ShopDrawingsTabProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
-  const [loading, setLoading] = useState(false);
+
 
   // Mock data for demonstration - in real app, this would come from API
   const mockShopDrawings: ShopDrawing[] = [
@@ -169,40 +170,28 @@ export function ShopDrawingsTab({ projectId }: ShopDrawingsTabProps) {
     return acc;
   }, {} as Record<string, number>);
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {[...Array(4)].map((_, i) => (
-            <Card key={i}>
-              <CardHeader>
-                <Skeleton className="h-6 w-32" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-8 w-16" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-        <div className="space-y-4">
-          {[...Array(5)].map((_, i) => (
-            <Card key={i}>
-              <CardContent className="p-4">
-                <div className="space-y-2">
-                  <Skeleton className="h-6 w-3/4" />
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-1/2" />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-6">
+    <DataStateWrapper
+      loading={false}
+      error={null}
+      data={filteredDrawings}
+      emptyComponent={
+        <Card>
+          <CardContent className="text-center py-12">
+            <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No shop drawings yet</h3>
+            <p className="text-muted-foreground mb-4">
+              Upload your first shop drawing to get started.
+            </p>
+            <Button>
+              <Upload className="h-4 w-4 mr-2" />
+              Upload Drawing
+            </Button>
+          </CardContent>
+        </Card>
+      }
+    >
+      <div className="space-y-6">
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
@@ -388,6 +377,7 @@ export function ShopDrawingsTab({ projectId }: ShopDrawingsTabProps) {
           </div>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </DataStateWrapper>
   );
 }

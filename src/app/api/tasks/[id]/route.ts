@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import { 
@@ -21,13 +21,8 @@ import {
 // GET /api/tasks/[id] - Get individual task
 // ============================================================================
 
-export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const GET = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+,
       { status: 401 }
     )
   }
@@ -36,10 +31,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
   if (!hasPermission(profile.role, 'projects.read.all') && 
       !hasPermission(profile.role, 'projects.read.assigned') &&
       !hasPermission(profile.role, 'projects.read.own')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to view tasks' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to view tasks' , 403)
   }
 
   try {
@@ -49,10 +41,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
     // Validate UUID format
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     if (!uuidRegex.test(taskId)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid task ID format' },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid task ID format' , 400)
     }
 
     const supabase = createServerClient()
@@ -71,19 +60,13 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
       .single()
 
     if (fetchError || !task) {
-      return NextResponse.json(
-        { success: false, error: 'Task not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('Task not found' , 404)
     }
 
     // Check if user has access to this task's project
     const hasProjectAccess = await verifyProjectAccess(supabase, user, task.project_id)
     if (!hasProjectAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied to this task' },
-        { status: 403 }
-      )
+      return createErrorResponse('Access denied to this task' , 403)
     }
 
     // Calculate additional fields
@@ -111,10 +94,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
 
   } catch (error) {
     console.error('Task detail API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 
@@ -122,23 +102,15 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
 // PUT /api/tasks/[id] - Update task
 // ============================================================================
 
-export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const PUT = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+,
       { status: 401 }
     )
   }
 
   // Permission check
   if (!validateTaskPermissions(profile.role, 'update')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to update tasks' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to update tasks' , 403)
   }
 
   try {
@@ -148,10 +120,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
     // Validate UUID format
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     if (!uuidRegex.test(taskId)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid task ID format' },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid task ID format' , 400)
     }
 
     const supabase = createServerClient()
@@ -164,29 +133,20 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
       .single()
 
     if (fetchError || !existingTask) {
-      return NextResponse.json(
-        { success: false, error: 'Task not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('Task not found' , 404)
     }
 
     // Check if user has access to this task's project
     const hasProjectAccess = await verifyProjectAccess(supabase, user, existingTask.project_id)
     if (!hasProjectAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied to this task' },
-        { status: 403 }
-      )
+      return createErrorResponse('Access denied to this task' , 403)
     }
 
     // Additional access check for non-management users
     if (!hasPermission(profile.role, 'projects.read.all')) {
       // Users can only update tasks they created or are assigned to
       if (existingTask.assigned_to !== user.id && existingTask.assigned_by !== user.id) {
-        return NextResponse.json(
-          { success: false, error: 'Access denied to this task' },
-          { status: 403 }
-        )
+        return createErrorResponse('Access denied to this task' , 403)
       }
     }
 
@@ -197,22 +157,14 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
       // Validate status update
       const statusValidation = validateTaskStatusUpdate(body)
       if (!statusValidation.success) {
-        return NextResponse.json(
-          { 
-            success: false, 
-            error: 'Invalid status update data',
+        return createErrorResponse('Invalid status update data',
             details: statusValidation.error.issues 
-          },
-          { status: 400 }
-        )
+          , 400)
       }
 
       // Check permissions for status changes
       if (!validateTaskPermissions(profile.role, 'change_status')) {
-        return NextResponse.json(
-          { success: false, error: 'Insufficient permissions to change task status' },
-          { status: 403 }
-        )
+        return createErrorResponse('Insufficient permissions to change task status' , 403)
       }
 
       // Handle status-specific updates
@@ -248,10 +200,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
 
       if (updateError) {
         console.error('Task status update error:', updateError)
-        return NextResponse.json(
-          { success: false, error: 'Failed to update task status' },
-          { status: 500 }
-        )
+        return createErrorResponse('Failed to update task status' , 500)
       }
 
       // Calculate additional fields
@@ -277,14 +226,9 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
       // Regular update validation
       const validationResult = validateTaskUpdate(body)
       if (!validationResult.success) {
-        return NextResponse.json(
-          { 
-            success: false, 
-            error: 'Invalid update data',
+        return createErrorResponse('Invalid update data',
             details: validationResult.error.issues 
-          },
-          { status: 400 }
-        )
+          , 400)
       }
 
       const updateData = validationResult.data
@@ -298,19 +242,13 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
           .single()
 
         if (assigneeError || !assignee) {
-          return NextResponse.json(
-            { success: false, error: 'Assignee not found' },
-            { status: 404 }
-          )
+          return createErrorResponse('Assignee not found' , 404)
         }
 
         // Check if assignee has access to the project
         const hasAssigneeAccess = await verifyProjectAccess(supabase, { id: updateData.assigned_to }, existingTask.project_id)
         if (!hasAssigneeAccess) {
-          return NextResponse.json(
-            { success: false, error: 'Assignee does not have access to this project' },
-            { status: 400 }
-          )
+          return createErrorResponse('Assignee does not have access to this project' , 400)
         }
       }
 
@@ -324,10 +262,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
           .single()
 
         if (scopeError || !scopeItem) {
-          return NextResponse.json(
-            { success: false, error: 'Scope item not found in this project' },
-            { status: 404 }
-          )
+          return createErrorResponse('Scope item not found in this project' , 404)
         }
       }
 
@@ -355,10 +290,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
 
       if (updateError) {
         console.error('Task update error:', updateError)
-        return NextResponse.json(
-          { success: false, error: 'Failed to update task' },
-          { status: 500 }
-        )
+        return createErrorResponse('Failed to update task' , 500)
       }
 
       // Calculate additional fields
@@ -384,10 +316,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
 
   } catch (error) {
     console.error('Task update API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 
@@ -395,23 +324,15 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
 // DELETE /api/tasks/[id] - Delete task
 // ============================================================================
 
-export async function DELETE(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const DELETE = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+,
       { status: 401 }
     )
   }
 
   // Permission check
   if (!validateTaskPermissions(profile.role, 'delete')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to delete tasks' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to delete tasks' , 403)
   }
 
   try {
@@ -421,10 +342,7 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
     // Validate UUID format
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     if (!uuidRegex.test(taskId)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid task ID format' },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid task ID format' , 400)
     }
 
     const supabase = createServerClient()
@@ -437,41 +355,27 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
       .single()
 
     if (fetchError || !task) {
-      return NextResponse.json(
-        { success: false, error: 'Task not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('Task not found' , 404)
     }
 
     // Check if user has access to this task's project
     const hasProjectAccess = await verifyProjectAccess(supabase, user, task.project_id)
     if (!hasProjectAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied to this task' },
-        { status: 403 }
-      )
+      return createErrorResponse('Access denied to this task' , 403)
     }
 
     // Additional access check for non-management users
     if (!hasPermission(profile.role, 'projects.read.all')) {
       // Users can only delete tasks they created
       if (task.assigned_by !== user.id) {
-        return NextResponse.json(
-          { success: false, error: 'Access denied to this task' },
-          { status: 403 }
-        )
+        return createErrorResponse('Access denied to this task' , 403)
       }
     }
 
     // Prevent deletion of completed tasks (business rule)
     if (task.status === 'completed') {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Cannot delete completed tasks. Consider cancelling instead.' 
-        },
-        { status: 400 }
-      )
+      return createErrorResponse('Cannot delete completed tasks. Consider cancelling instead.' 
+        , 400)
     }
 
     // Delete task (this will also delete related comments due to CASCADE)
@@ -482,23 +386,15 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
 
     if (deleteError) {
       console.error('Task deletion error:', deleteError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to delete task' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to delete task' , 500)
     }
 
-    return NextResponse.json({
-      success: true,
-      message: 'Task deleted successfully'
-    })
+    return createSuccessResponse({ message: 'Task deleted successfully'
+     })
 
   } catch (error) {
     console.error('Task deletion API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 

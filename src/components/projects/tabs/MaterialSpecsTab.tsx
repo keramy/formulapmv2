@@ -26,6 +26,7 @@ import { MaterialSpec, MaterialSpecFilters } from '@/types/material-specs';
 import { MaterialApprovalActions } from '@/components/projects/material-approval/MaterialApprovalActions';
 import { MaterialSpecForm } from '@/components/projects/material-approval/MaterialSpecForm';
 import { ScopeLinkingActions } from '@/components/projects/material-approval/ScopeLinkingActions';
+import { DataStateWrapper } from '@/components/ui/loading-states';
 
 interface MaterialSpecsTabProps {
   projectId: string;
@@ -73,21 +74,7 @@ export function MaterialSpecsTab({ projectId }: MaterialSpecsTabProps) {
     return uniqueCategories.sort();
   }, [materialSpecs]);
   
-  // Display error if there's an issue
-  if (error) {
-    return (
-      <div className="p-6 text-center">
-        <div className="text-red-600 mb-4">
-          <AlertTriangle className="w-12 h-12 mx-auto mb-2" />
-          <h3 className="text-lg font-semibold">Error Loading Material Specifications</h3>
-          <p className="text-sm text-gray-600 mt-2">{error}</p>
-        </div>
-        <Button onClick={refetch} variant="outline">
-          Try Again
-        </Button>
-      </div>
-    );
-  }
+
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -128,40 +115,31 @@ export function MaterialSpecsTab({ projectId }: MaterialSpecsTabProps) {
   const deliveredCount = statistics ? statistics.byStatus.approved : 0;
   const pendingCount = statistics ? statistics.byStatus.pending_approval : 0;
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {[...Array(4)].map((_, i) => (
-            <Card key={i}>
-              <CardHeader>
-                <Skeleton className="h-6 w-32" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-8 w-16" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-        <div className="space-y-4">
-          {[...Array(5)].map((_, i) => (
-            <Card key={i}>
-              <CardContent className="p-4">
-                <div className="space-y-2">
-                  <Skeleton className="h-6 w-3/4" />
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-1/2" />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
-  }
+
 
   return (
-    <div className="space-y-6">
+    <DataStateWrapper
+      loading={loading}
+      error={error}
+      data={materialSpecs}
+      onRetry={refetch}
+      emptyComponent={
+        <div className="text-center py-12">
+          <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-semibold mb-2">No material specifications yet</h3>
+          <p className="text-muted-foreground mb-4">
+            Create your first material specification to get started.
+          </p>
+          {permissions.canCreate && (
+            <Button onClick={() => setIsFormOpen(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Material Spec
+            </Button>
+          )}
+        </div>
+      }
+    >
+      <div className="space-y-6">
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
@@ -435,6 +413,7 @@ export function MaterialSpecsTab({ projectId }: MaterialSpecsTabProps) {
           refetch();
         }}
       />
-    </div>
+      </div>
+    </DataStateWrapper>
   );
 }

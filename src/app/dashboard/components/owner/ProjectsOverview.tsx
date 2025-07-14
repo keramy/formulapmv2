@@ -56,12 +56,32 @@ export function ProjectsOverview() {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        // Get detailed error from server response
+        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          if (errorData.error) {
+            errorMessage = `${errorMessage} - ${errorData.error}`;
+          }
+          if (errorData.details) {
+            console.error('📊 [ProjectsOverview] API Error Details:', errorData.details);
+          }
+        } catch (parseError) {
+          console.error('📊 [ProjectsOverview] Failed to parse error response:', parseError);
+        }
+        console.error('📊 [ProjectsOverview] API Request Failed:', {
+          url: '/api/projects?status=active,planning,bidding&limit=10&include_details=true',
+          status: response.status,
+          statusText: response.statusText,
+          headers: Object.fromEntries(response.headers.entries())
+        });
+        throw new Error(errorMessage);
       }
 
       const apiResponse = await response.json();
       
       if (!apiResponse.success) {
+        console.error('📊 [ProjectsOverview] API Response Error:', apiResponse);
         throw new Error(apiResponse.error || 'Failed to fetch projects');
       }
 

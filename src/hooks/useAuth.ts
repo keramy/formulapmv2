@@ -5,23 +5,23 @@ import { User } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
 import { UserProfile, UserRole } from '@/types/auth'
 import { useImpersonation } from './useImpersonation'
+import { useAdvancedApiQuery } from './useAdvancedApiQuery'
 
 export const useAuth = () => {
+  // Simplified state management - only essential states
   const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<UserProfile | null>(null)
-  const [originalProfile, setOriginalProfile] = useState<UserProfile | null>(null) // Store original admin profile
+  const [originalProfile, setOriginalProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [authError, setAuthError] = useState<string | null>(null)
-  const [isUserInitiated, setIsUserInitiated] = useState(false)
-  const [sessionState, setSessionState] = useState<'checking' | 'idle' | 'signing_in' | 'authenticated'>('checking')
+  const [isSigningIn, setIsSigningIn] = useState(false)
 
   // Integrate impersonation system
   const { isImpersonating, impersonatedUser, originalAdmin, stopImpersonation, canImpersonate } = useImpersonation()
 
-  const fetchUserProfile = useCallback(async (userId: string): Promise<boolean> => {
+  // Optimized profile fetching - async, non-blocking
+  const fetchUserProfile = useCallback(async (userId: string): Promise<void> => {
     try {
-      console.log('🔐 [useAuth] Fetching user profile for:', userId)
-      
       const { data, error } = await supabase
         .from('user_profiles')
         .select('*')
@@ -31,13 +31,12 @@ export const useAuth = () => {
       if (error) {
         console.error('🔐 [useAuth] Profile fetch error:', error)
         
-        // If profile doesn't exist for admin user, try to create it
+        // Handle admin profile creation if needed
         if (error.code === 'PGRST116') {
           const { data: { user } } = await supabase.auth.getUser()
           if (user?.email === 'admin@formulapm.com') {
             console.log('🔐 [useAuth] Creating missing admin profile')
             
-            // Use admin client to bypass RLS
             const { supabaseAdmin } = await import('@/lib/supabase')
             const { data: newProfile, error: createError } = await supabaseAdmin
               .from('user_profiles')
@@ -58,13 +57,7 @@ export const useAuth = () => {
               .select('*')
               .single()
             
-            if (createError) {
-              console.error('🔐 [useAuth] Failed to create admin profile:', createError)
-              setProfile(null)
-              return false
-            }
-            
-            if (newProfile) {
+            if (!createError && newProfile) {
               const profile: UserProfile = {
                 id: newProfile.id,
                 role: newProfile.role as UserRole,
@@ -80,49 +73,37 @@ export const useAuth = () => {
                 updated_at: newProfile.updated_at
               }
               setProfile(profile)
-              return true
+              return
             }
           }
         }
         
-        setProfile(null)
-        return false
+        setAuthError('Failed to load user profile')
+        return
       }
 
-      if (!data) {
-        console.error('🔐 [useAuth] No profile data returned')
-        setProfile(null)
-        return false
+      if (data) {
+        const profile: UserProfile = {
+          id: data.id,
+          role: data.role as UserRole,
+          first_name: data.first_name,
+          last_name: data.last_name,
+          email: data.email,
+          phone: data.phone,
+          company: data.company,
+          department: data.department,
+          permissions: data.permissions || {},
+          is_active: data.is_active,
+          created_at: data.created_at,
+          updated_at: data.updated_at
+        }
+        
+        setProfile(profile)
       }
-      
-      const profile: UserProfile = {
-        id: data.id,
-        role: data.role as UserRole,
-        first_name: data.first_name,
-        last_name: data.last_name,
-        email: data.email,
-        phone: data.phone,
-        company: data.company,
-        department: data.department,
-        permissions: data.permissions || {},
-        is_active: data.is_active,
-        created_at: data.created_at,
-        updated_at: data.updated_at
-      }
-      
-      setProfile(profile)
-      console.log('🔐 [useAuth] Profile fetched successfully:', { 
-        userId, 
-        role: profile.role, 
-        email: profile.email,
-        isActive: profile.is_active 
-      })
-      return true
       
     } catch (error) {
       console.error('🔐 [useAuth] Profile fetch exception:', error)
-      setProfile(null)
-      return false
+      setAuthError('Profile loading failed')
     }
   }, [])
 
@@ -148,38 +129,37 @@ export const useAuth = () => {
       setProfile(originalProfile)
       setOriginalProfile(null)
     }
-  }, [isImpersonating, impersonatedUser, originalAdmin, originalProfile, profile])
+  }, [isImpersonating, impersonatedUser, originalAdmin, originalProfile])
 
   useEffect(() => {
     console.log('🔐 [useAuth] Initializing auth hook')
     
     const initializeAuth = async () => {
       try {
-        setLoading(true)
-        setSessionState('checking')
+        // Session-first pattern: Get session immediately, defer profile loading
         const { data: { session }, error } = await supabase.auth.getSession()
         
         if (error) {
           console.error('🔐 [useAuth] Session error:', error)
           setAuthError(error.message)
-          setSessionState('idle')
+          setLoading(false)
           return
         }
 
         if (session?.user) {
-          console.log('🔐 [useAuth] Existing session found (auto-recovery):', session.user.id)
+          console.log('🔐 [useAuth] Session found, setting user immediately')
           setUser(session.user)
-          const profileSuccess = await fetchUserProfile(session.user.id)
-          setSessionState(profileSuccess ? 'authenticated' : 'idle')
+          setLoading(false) // ✅ Critical: Set loading false immediately for responsive UI
+          
+          // Load profile asynchronously in background
+          fetchUserProfile(session.user.id)
         } else {
-          console.log('🔐 [useAuth] No existing session')
-          setSessionState('idle')
+          console.log('🔐 [useAuth] No session found')
+          setLoading(false)
         }
       } catch (error) {
         console.error('🔐 [useAuth] Auth initialization failed:', error)
         setAuthError(error instanceof Error ? error.message : 'Authentication failed')
-        setSessionState('idle')
-      } finally {
         setLoading(false)
       }
     }
@@ -196,38 +176,31 @@ export const useAuth = () => {
             case 'SIGNED_IN':
               if (session?.user) {
                 setUser(session.user)
-                const profileSuccess = await fetchUserProfile(session.user.id)
                 setAuthError(null)
-                setSessionState(profileSuccess ? 'authenticated' : 'idle')
-                // Only reset user-initiated flag after successful auth
-                if (profileSuccess) {
-                  setIsUserInitiated(false)
-                }
+                setIsSigningIn(false)
+                // Load profile asynchronously
+                fetchUserProfile(session.user.id)
               }
               break
               
             case 'SIGNED_OUT':
               setUser(null)
               setProfile(null)
+              setOriginalProfile(null)
               setAuthError(null)
-              setSessionState('idle')
-              setIsUserInitiated(false)
+              setIsSigningIn(false)
               break
               
             case 'TOKEN_REFRESHED':
               if (session?.user) {
                 setUser(session.user)
-                // Don't change session state for token refresh unless we're checking
-                if (sessionState === 'checking') {
-                  setSessionState('authenticated')
-                }
               }
               break
               
             case 'USER_UPDATED':
               if (session?.user) {
                 setUser(session.user)
-                await fetchUserProfile(session.user.id)
+                fetchUserProfile(session.user.id)
               }
               break
           }
@@ -238,18 +211,13 @@ export const useAuth = () => {
       }
     )
 
-    return () => {
-      console.log('🔐 [useAuth] Cleanup')
-      subscription.unsubscribe()
-    }
-  }, [fetchUserProfile])
+    return () => subscription.unsubscribe()
+  }, []) // ✅ Removed fetchUserProfile dependency to prevent circular re-renders
 
   const signIn = useCallback(async (email: string, password: string) => {
-    console.log('🔐 [useAuth] Starting user-initiated sign in')
-    setLoading(true)
+    console.log('🔐 [useAuth] Starting sign in')
+    setIsSigningIn(true)
     setAuthError(null)
-    setIsUserInitiated(true)
-    setSessionState('signing_in')
     
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -260,8 +228,7 @@ export const useAuth = () => {
       if (error) {
         console.error('🔐 [useAuth] Sign in failed:', error)
         setAuthError(error.message)
-        setSessionState('idle')
-        setIsUserInitiated(false)
+        setIsSigningIn(false)
         throw error
       }
       
@@ -273,11 +240,8 @@ export const useAuth = () => {
       console.error('🔐 [useAuth] Sign in exception:', error)
       const errorMessage = error instanceof Error ? error.message : 'Sign in failed'
       setAuthError(errorMessage)
-      setSessionState('idle')
-      setIsUserInitiated(false)
+      setIsSigningIn(false)
       throw error
-    } finally {
-      setLoading(false)
     }
   }, [])
 
@@ -321,20 +285,14 @@ export const useAuth = () => {
   const clearStaleSession = useCallback(async () => {
     console.log('🔐 [useAuth] Clearing stale session')
     try {
-      setLoading(true)
-      setSessionState('checking')
       await supabase.auth.signOut()
       setUser(null)
       setProfile(null)
+      setOriginalProfile(null)
       setAuthError(null)
-      setIsUserInitiated(false)
-      setSessionState('idle')
     } catch (error) {
       console.error('🔐 [useAuth] Error clearing session:', error)
       setAuthError('Failed to clear session')
-      setSessionState('idle')
-    } finally {
-      setLoading(false)
     }
   }, [])
 
@@ -360,15 +318,17 @@ export const useAuth = () => {
     stopImpersonation,
     canImpersonate,
     
-    // Enhanced auth state
+    // Simplified auth state - compatible with existing components
     isAuthenticated: !!user && !!profile && profile.is_active,
-    authState: sessionState === 'authenticated' ? 'authenticated' : 
-               sessionState === 'signing_in' ? 'loading' :
-               sessionState === 'checking' ? (isUserInitiated ? 'loading' : 'recovering') : 'idle',
+    authState: isSigningIn ? 'loading' : 
+               loading ? 'recovering' :
+               (user && profile) ? 'authenticated' : 'idle',
     isError: !!authError,
-    isRecoveringSession: sessionState === 'checking' && !isUserInitiated,
-    isUserInitiated,
-    sessionState,
+    isRecoveringSession: loading && !isSigningIn,
+    isUserInitiated: isSigningIn,
+    sessionState: isSigningIn ? 'signing_in' : 
+                  loading ? 'checking' :
+                  (user && profile) ? 'authenticated' : 'idle',
     
     // Role checks (based on current effective profile - original or impersonated)
     isManagement: profile ? ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'].includes(profile.role) : false,
@@ -377,18 +337,189 @@ export const useAuth = () => {
     isFieldRole: profile ? ['field_worker'].includes(profile.role) : false,
     isExternalRole: profile ? ['client'].includes(profile.role) : false,
     
-    // Debug info
+    // Simplified debug info
     debugInfo: {
-      authState: sessionState,
+      authState: isSigningIn ? 'signing_in' : loading ? 'checking' : (user && profile) ? 'authenticated' : 'idle',
       recoveryAttempts: 0,
       hasError: !!authError,
       errorCode: authError ? 'AUTH_ERROR' : undefined,
-      isRecovering: sessionState === 'checking' && !isUserInitiated,
-      isUserInitiated,
-      sessionState,
+      isRecovering: loading && !isSigningIn,
+      isUserInitiated: isSigningIn,
+      sessionState: isSigningIn ? 'signing_in' : loading ? 'checking' : (user && profile) ? 'authenticated' : 'idle',
       isImpersonating,
       impersonatedUserEmail: impersonatedUser?.email,
       originalAdminEmail: originalAdmin?.email
+    }
+  }
+}
+
+/**
+ * Enhanced Auth hook using advanced API query patterns
+ * This demonstrates the optimized approach with intelligent caching and real-time updates
+ */
+export function useAuthAdvanced() {
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [authError, setAuthError] = useState<string | null>(null)
+
+  // Use advanced API query for user profile
+  const {
+    data: profile,
+    loading: profileLoading,
+    error: profileError,
+    refetch: refetchProfile,
+    mutate: mutateProfile
+  } = useAdvancedApiQuery<UserProfile | null>({
+    queryKey: ['user-profile', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null
+
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single()
+
+      if (error) {
+        console.error('Error fetching profile:', error)
+        return null
+      }
+
+      return data as UserProfile
+    },
+    enabled: !!user?.id,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    cacheTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnWindowFocus: false,
+    refetchInterval: false // Profile doesn't change often
+  })
+
+  // Enhanced authentication state management
+  useEffect(() => {
+    let mounted = true
+
+    const initializeAuth = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession()
+
+        if (error) {
+          console.error('Error getting session:', error)
+          setAuthError(error.message)
+        } else {
+          setUser(session?.user ?? null)
+        }
+      } catch (error) {
+        console.error('Auth initialization error:', error)
+        setAuthError('Failed to initialize authentication')
+      } finally {
+        if (mounted) {
+          setLoading(false)
+        }
+      }
+    }
+
+    initializeAuth()
+
+    // Enhanced auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (!mounted) return
+
+        console.log('Auth state changed:', event)
+
+        setUser(session?.user ?? null)
+        setAuthError(null)
+
+        // Invalidate profile cache on auth changes
+        if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+          mutateProfile()
+        }
+      }
+    )
+
+    return () => {
+      mounted = false
+      subscription.unsubscribe()
+    }
+  }, [mutateProfile])
+
+  // Enhanced sign in with caching
+  const signIn = useCallback(async (email: string, password: string) => {
+    try {
+      setAuthError(null)
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      })
+
+      if (error) {
+        setAuthError(error.message)
+        return { success: false, error: error.message }
+      }
+
+      // Preload profile data
+      if (data.user) {
+        refetchProfile()
+      }
+
+      return { success: true, user: data.user }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Sign in failed'
+      setAuthError(message)
+      return { success: false, error: message }
+    }
+  }, [refetchProfile])
+
+  // Enhanced sign out with cache cleanup
+  const signOut = useCallback(async () => {
+    try {
+      setAuthError(null)
+      const { error } = await supabase.auth.signOut()
+
+      if (error) {
+        setAuthError(error.message)
+        return { success: false, error: error.message }
+      }
+
+      // Clear profile cache
+      mutateProfile()
+
+      return { success: true }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Sign out failed'
+      setAuthError(message)
+      return { success: false, error: message }
+    }
+  }, [mutateProfile])
+
+  return {
+    // Core auth state
+    user,
+    profile,
+    loading: loading || profileLoading,
+    authError: authError || profileError,
+
+    // Loading states
+    authLoading: loading,
+    profileLoading,
+
+    // Actions
+    signIn,
+    signOut,
+    refetchProfile,
+    mutateProfile,
+
+    // Computed values
+    isAuthenticated: !!user,
+    hasProfile: !!profile,
+    userRole: profile?.role as UserRole,
+
+    // Enhanced debugging
+    debugInfo: {
+      userId: user?.id,
+      profileId: profile?.id,
+      hasSession: !!user,
+      hasProfile: !!profile
     }
   }
 }

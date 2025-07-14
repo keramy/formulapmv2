@@ -1,17 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAuth } from '@/lib/middleware';
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware';
 import { createServerClient } from '@/lib/supabase';
 
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
   try {
-    // Verify authentication
-    const { user, profile, error: authError } = await verifyAuth(request);
-    if (authError || !user || !profile) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
 
     const supabase = createServerClient();
 
@@ -36,10 +28,7 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error('Error fetching activities:', error);
-      return NextResponse.json(
-        { error: 'Failed to fetch activities' },
-        { status: 500 }
-      );
+      return createErrorResponse('Failed to fetch activities', 500);
     }
 
     // Format activities for consistent response
@@ -48,12 +37,9 @@ export async function GET(request: NextRequest) {
       user: item.user ? item.user : null
     }));
 
-    return NextResponse.json(formattedActivities);
+    return createSuccessResponse(formattedActivities);
   } catch (error) {
     console.error('Dashboard activity API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return createErrorResponse('Internal server error', 500);
   }
-}
+})

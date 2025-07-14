@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import { ScopeApiResponse } from '@/types/scope'
@@ -15,23 +15,15 @@ import { ScopeApiResponse } from '@/types/scope'
 // GET /api/scope/[id]/dependencies - Get scope item dependencies
 // ============================================================================
 
-export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const GET = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+,
       { status: 401 }
     )
   }
 
   // Permission check
   if (!hasPermission(profile.role, 'projects.read.all')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to view scope dependencies' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to view scope dependencies' , 403)
   }
 
   try {
@@ -98,10 +90,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
 
   } catch (error) {
     console.error('Dependencies GET error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 
@@ -109,23 +98,15 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
 // POST /api/scope/[id]/dependencies - Add dependency
 // ============================================================================
 
-export async function POST(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const POST = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+,
       { status: 401 }
     )
   }
 
   // Permission check
   if (!hasPermission(profile.role, 'projects.update')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to manage dependencies' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to manage dependencies' , 403)
   }
 
   try {
@@ -134,10 +115,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
     const body = await request.json()
     
     if (!body.depends_on_id) {
-      return NextResponse.json(
-        { success: false, error: 'depends_on_id is required' },
-        { status: 400 }
-      )
+      return createErrorResponse('depends_on_id is required' , 400)
     }
 
     const supabase = createServerClient()
@@ -156,17 +134,11 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
       .single()
 
     if (!sourceItem || !targetItem) {
-      return NextResponse.json(
-        { success: false, error: 'One or both scope items not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('One or both scope items not found' , 404)
     }
 
     if (sourceItem.project_id !== targetItem.project_id) {
-      return NextResponse.json(
-        { success: false, error: 'Dependencies can only be created between items in the same project' },
-        { status: 400 }
-      )
+      return createErrorResponse('Dependencies can only be created between items in the same project' , 400)
     }
 
     // Check for circular dependency
@@ -177,10 +149,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
     )
 
     if (hasCircularDependency) {
-      return NextResponse.json(
-        { success: false, error: 'Cannot create circular dependency' },
-        { status: 400 }
-      )
+      return createErrorResponse('Cannot create circular dependency' , 400)
     }
 
     // Check if dependency already exists
@@ -192,10 +161,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
       .single()
 
     if (existingDep) {
-      return NextResponse.json(
-        { success: false, error: 'Dependency already exists' },
-        { status: 400 }
-      )
+      return createErrorResponse('Dependency already exists' , 400)
     }
 
     // Create the dependency
@@ -215,10 +181,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
 
     if (error) {
       console.error('Dependency creation error:', error)
-      return NextResponse.json(
-        { success: false, error: 'Failed to create dependency' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to create dependency' , 500)
     }
 
     // Update the scope item's dependencies array
@@ -237,10 +200,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
 
   } catch (error) {
     console.error('Dependencies POST error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 
@@ -248,23 +208,15 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
 // DELETE /api/scope/[id]/dependencies?depends_on_id=X - Remove dependency
 // ============================================================================
 
-export async function DELETE(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const DELETE = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+,
       { status: 401 }
     )
   }
 
   // Permission check
   if (!hasPermission(profile.role, 'projects.update')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to manage dependencies' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to manage dependencies' , 403)
   }
 
   try {
@@ -274,10 +226,7 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
     const dependsOnId = url.searchParams.get('depends_on_id')
 
     if (!dependsOnId) {
-      return NextResponse.json(
-        { success: false, error: 'depends_on_id query parameter is required' },
-        { status: 400 }
-      )
+      return createErrorResponse('depends_on_id query parameter is required' , 400)
     }
 
     const supabase = createServerClient()
@@ -291,10 +240,7 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
 
     if (error) {
       console.error('Dependency deletion error:', error)
-      return NextResponse.json(
-        { success: false, error: 'Failed to remove dependency' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to remove dependency' , 500)
     }
 
     // Update the scope item's dependencies array
@@ -304,17 +250,12 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
         dependency_id: dependsOnId
       })
 
-    return NextResponse.json({
-      success: true,
-      message: 'Dependency removed successfully'
-    })
+    return createSuccessResponse({ message: 'Dependency removed successfully'
+     })
 
   } catch (error) {
     console.error('Dependencies DELETE error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 

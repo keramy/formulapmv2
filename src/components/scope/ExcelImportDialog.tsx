@@ -26,6 +26,7 @@ import {
   Info
 } from 'lucide-react'
 import { ExcelImportBatch } from '@/types/scope'
+import { validateData } from '@/lib/form-validation' // For future form validation enhancements
 
 interface ExcelImportDialogProps {
   projectId: string

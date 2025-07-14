@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 
@@ -14,23 +14,15 @@ import { hasPermission } from '@/lib/permissions'
 // GET /api/scope/overview - Get scope overview for global navigation
 // ============================================================================
 
-export async function GET(request: NextRequest) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
+,
       { status: 401 }
     )
   }
 
   // Permission check
   if (!hasPermission(profile.role, 'projects.read.all')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to view scope overview' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to view scope overview' , 403)
   }
 
   try {
@@ -41,10 +33,8 @@ export async function GET(request: NextRequest) {
     const accessibleProjects = await getAccessibleProjects(supabase, user)
     
     if (accessibleProjects.length === 0) {
-      return NextResponse.json({
-        success: true,
-        overview: getEmptyOverview()
-      })
+      return createSuccessResponse({ overview: getEmptyOverview()
+       })
     }
 
     // Get scope items for accessible projects
@@ -68,10 +58,8 @@ export async function GET(request: NextRequest) {
       .in('project_id', accessibleProjects)
 
     if (!scopeItems) {
-      return NextResponse.json({
-        success: true,
-        overview: getEmptyOverview()
-      })
+      return createSuccessResponse({ overview: getEmptyOverview()
+       })
     }
 
     // Calculate category statistics
@@ -154,17 +142,12 @@ export async function GET(request: NextRequest) {
       user_role: user.role
     }
 
-    return NextResponse.json({
-      success: true,
-      overview
-    })
+    return createSuccessResponse({ overview
+     })
 
   } catch (error) {
     console.error('Scope overview API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 

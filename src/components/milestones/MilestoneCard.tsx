@@ -13,6 +13,7 @@ import { Milestone, MilestoneStatus, MilestonePermissions } from '@/types/milest
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { DataStateWrapper } from '@/components/ui/loading-states'
 import { Separator } from '@/components/ui/separator'
 import { Checkbox } from '@/components/ui/checkbox'
 import { cn } from '@/lib/utils'
@@ -333,5 +334,63 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
         </div>
       </CardContent>
     </Card>
+  )
+}
+
+/**
+ * Enhanced MilestoneCard with DataStateWrapper integration
+ * This provides consistent loading states for milestone operations
+ */
+export const MilestoneCardEnhanced = (props: MilestoneCardProps) => {
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const handleStatusChange = async (milestoneId: string, newStatus: MilestoneStatus) => {
+    if (!props.onStatusChange) return
+
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      await props.onStatusChange(milestoneId, newStatus)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update milestone status')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleEdit = (milestone: Milestone) => {
+    if (!props.onEdit || isLoading) return
+    props.onEdit(milestone)
+  }
+
+  const handleDelete = (milestone: Milestone) => {
+    if (!props.onDelete || isLoading) return
+    props.onDelete(milestone)
+  }
+
+  return (
+    <DataStateWrapper
+      loading={isLoading}
+      error={error}
+      data={props.milestone}
+      onRetry={() => setError(null)}
+      emptyComponent={
+        <Card className="border-dashed">
+          <CardContent className="p-6 text-center">
+            <Calendar className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+            <p className="text-sm text-muted-foreground">No milestone data</p>
+          </CardContent>
+        </Card>
+      }
+    >
+      <MilestoneCard
+        {...props}
+        onStatusChange={handleStatusChange}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
+    </DataStateWrapper>
   )
 }

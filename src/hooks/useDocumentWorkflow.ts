@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
+import { useAdvancedApiQuery } from './useAdvancedApiQuery'
 
 interface WorkflowSubscription {
   id: string
@@ -257,6 +258,132 @@ export const useDocumentWorkflow = ({
     createWorkflow,
     refreshData: fetchPendingApprovals,
     
+    // Computed values
+    hasPendingApprovals: pendingApprovals.length > 0,
+    urgentApprovals: pendingApprovals.filter(w => w.priority_level === 4),
+    overdueApprovals: pendingApprovals.filter(w => {
+      if (!w.estimated_completion_date) return false
+      return new Date(w.estimated_completion_date) < new Date()
+    })
+  }
+}
+
+/**
+ * Enhanced Document Workflow hook using advanced API query patterns
+ * This demonstrates the optimized approach with caching and real-time updates
+ */
+export function useDocumentWorkflowAdvanced(props: UseDocumentWorkflowProps = {}) {
+  const { projectId, autoRefresh = true } = props
+  const { user } = useAuth()
+
+  // Use advanced API query for pending approvals
+  const {
+    data: pendingApprovals = [],
+    loading: approvalsLoading,
+    error: approvalsError,
+    refetch: refetchApprovals,
+    mutate: mutateApprovals
+  } = useAdvancedApiQuery<WorkflowSubscription[]>({
+    queryKey: ['pending-approvals', projectId, user?.id],
+    queryFn: async () => {
+      if (!user) return []
+
+      const params = new URLSearchParams()
+      if (projectId) params.append('project', projectId)
+
+      const response = await fetch(`/api/documents/approval/pending?${params}`)
+      if (!response.ok) throw new Error('Failed to fetch pending approvals')
+
+      const data = await response.json()
+      return data.workflows || []
+    },
+    enabled: !!user,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    cacheTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: true,
+    refetchInterval: autoRefresh ? 30 * 1000 : false // 30 seconds if auto-refresh enabled
+  })
+
+  // Use advanced API query for workflow history
+  const {
+    data: workflowHistory = [],
+    loading: historyLoading,
+    error: historyError,
+    refetch: refetchHistory
+  } = useAdvancedApiQuery<ApprovalAction[]>({
+    queryKey: ['workflow-history', projectId, user?.id],
+    queryFn: async () => {
+      if (!user) return []
+
+      const params = new URLSearchParams()
+      if (projectId) params.append('project', projectId)
+
+      const response = await fetch(`/api/documents/approval/history?${params}`)
+      if (!response.ok) throw new Error('Failed to fetch workflow history')
+
+      const data = await response.json()
+      return data.actions || []
+    },
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    cacheTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnWindowFocus: false,
+    refetchInterval: autoRefresh ? 2 * 60 * 1000 : false // 2 minutes if auto-refresh enabled
+  })
+
+  // Optimized approval action with cache invalidation
+  const submitApproval = useCallback(async (workflowId: string, action: string, comments?: string) => {
+    if (!user) throw new Error('User not authenticated')
+
+    try {
+      const response = await fetch('/api/documents/approval/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          workflow_id: workflowId,
+          action,
+          comments,
+          user_id: user.id
+        })
+      })
+
+      if (!response.ok) throw new Error('Failed to submit approval')
+
+      const result = await response.json()
+
+      // Invalidate and refetch related queries
+      await Promise.all([
+        mutateApprovals(),
+        refetchHistory()
+      ])
+
+      return result
+    } catch (error) {
+      console.error('Error submitting approval:', error)
+      throw error
+    }
+  }, [user, mutateApprovals, refetchHistory])
+
+  return {
+    // Data
+    pendingApprovals,
+    workflowHistory,
+
+    // Loading states
+    loading: approvalsLoading || historyLoading,
+    approvalsLoading,
+    historyLoading,
+
+    // Errors
+    error: approvalsError || historyError,
+    approvalsError,
+    historyError,
+
+    // Actions
+    submitApproval,
+    refetchApprovals,
+    refetchHistory,
+
     // Computed values
     hasPendingApprovals: pendingApprovals.length > 0,
     urgentApprovals: pendingApprovals.filter(w => w.priority_level === 4),

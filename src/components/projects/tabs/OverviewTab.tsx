@@ -7,6 +7,7 @@ import { usePermissions } from '@/hooks/usePermissions';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { DataStateWrapper } from '@/components/ui/loading-states';
 import { 
   Calendar, 
   MapPin, 
@@ -30,40 +31,7 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
   const { project, loading, error } = useProject(projectId);
   const { milestones, statistics: milestoneStats, loading: milestonesLoading } = useMilestones(projectId);
 
-  if (loading) {
-    return (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {[...Array(4)].map((_, i) => (
-          <Card key={i}>
-            <CardHeader>
-              <Skeleton className="h-6 w-48" />
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-3/4" />
-                <Skeleton className="h-4 w-1/2" />
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    );
-  }
 
-  if (error || !project) {
-    return (
-      <Card>
-        <CardContent className="text-center py-8">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <AlertTriangle className="w-8 h-8 text-red-500" />
-          </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Unable to Load Project Overview</h3>
-          <p className="text-gray-600">{error || 'Project not found'}</p>
-        </CardContent>
-      </Card>
-    );
-  }
 
   // Mock data for tasks and other metrics - will be replaced with real data as APIs are implemented
   const mockStats = {
@@ -100,7 +68,23 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <DataStateWrapper
+      loading={loading}
+      error={error}
+      data={project}
+      emptyComponent={
+        <Card>
+          <CardContent className="text-center py-8">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Target className="w-8 h-8 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Project Not Found</h3>
+            <p className="text-gray-600">The requested project could not be found.</p>
+          </CardContent>
+        </Card>
+      }
+    >
+      <div className="space-y-6">
       {/* Key Project Information */}
       <Card>
         <CardHeader>
@@ -343,6 +327,7 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
           </CardContent>
         </Card>
       </div>
-    </div>
+      </div>
+    </DataStateWrapper>
   );
 }

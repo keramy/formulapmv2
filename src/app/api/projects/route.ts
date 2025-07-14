@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import { 
@@ -20,16 +20,7 @@ import { ProjectWithDetails, ProjectListResponse } from '@/types/projects'
 // GET /api/projects - List projects with filtering and pagination
 // ============================================================================
 
-export async function GET(request: NextRequest) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
-      { status: 401 }
-    )
-  }
+export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
 
   // Permission check
   if (!hasPermission(profile.role, 'projects.read.all') && 
@@ -148,38 +139,23 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    return NextResponse.json(response)
+    return createSuccessResponse(response)
 
   } catch (error) {
     console.error('Projects API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error', 500)
   }
-}
+})
 
 // ============================================================================
 // POST /api/projects - Create new project
 // ============================================================================
 
-export async function POST(request: NextRequest) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
-      { status: 401 }
-    )
-  }
+export const POST = withAuth(async (request: NextRequest, { user, profile }) => {
 
   // Permission check
   if (!hasPermission(profile.role, 'projects.create')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to create projects' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to create projects', 403)
   }
 
   try {
@@ -189,14 +165,7 @@ export async function POST(request: NextRequest) {
     // Validate project data
     const validationResult = validateProjectFormData(body)
     if (!validationResult.success) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Invalid project data',
-          details: validationResult.error.issues 
-        },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid project data', 400)
     }
 
     const projectData = validationResult.data
@@ -283,22 +252,16 @@ export async function POST(request: NextRequest) {
       .eq('id', project.id)
       .single()
 
-    return NextResponse.json({
-      success: true,
+    return createSuccessResponse({
       message: 'Project created successfully',
-      data: {
-        project: completeProject
-      }
-    }, { status: 201 })
+      project: completeProject
+    })
 
   } catch (error) {
     console.error('Project creation API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error', 500)
   }
-}
+})
 
 // ============================================================================
 // HELPER FUNCTIONS

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAuth } from '@/lib/middleware';
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware';
 import { createServerClient } from '@/lib/supabase';
 import { hasPermission } from '@/lib/permissions';
 
@@ -14,16 +14,8 @@ interface ActivityItem {
   status?: string;
 }
 
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
   try {
-    // Verify authentication
-    const { user, profile, error: authError } = await verifyAuth(request);
-    if (authError || !user || !profile) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
 
     const supabase = createServerClient();
     const activities: ActivityItem[] = [];
@@ -124,12 +116,9 @@ export async function GET(request: NextRequest) {
       .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
       .slice(0, 5);
 
-    return NextResponse.json(sortedActivities);
+    return createSuccessResponse(sortedActivities);
   } catch (error) {
     console.error('Dashboard recent activity API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return createErrorResponse('Internal server error', 500);
   }
-}
+})

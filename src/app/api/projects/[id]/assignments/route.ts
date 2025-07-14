@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import { validateProjectAssignments } from '@/lib/validation/projects'
@@ -15,16 +15,7 @@ import { validateProjectAssignments } from '@/lib/validation/projects'
 // GET /api/projects/[id]/assignments - Get project team assignments
 // ============================================================================
 
-export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
-      { status: 401 }
-    )
-  }
+export const GET = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
 
   try {
     const params = await context.params
@@ -33,10 +24,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
     // Validate UUID format
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     if (!uuidRegex.test(projectId)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid project ID format' },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid project ID format' , 400)
     }
 
     const supabase = createServerClient()
@@ -44,10 +32,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
     // Check if user has access to this project
     const hasAccess = await checkProjectAccess(supabase, user, projectId)
     if (!hasAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Project not found or access denied' },
-        { status: 404 }
-      )
+      return createErrorResponse('Project not found or access denied' , 404)
     }
 
     // Get project assignments with user details
@@ -76,10 +61,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
 
     if (error) {
       console.error('Assignments fetch error:', error)
-      return NextResponse.json(
-        { success: false, error: 'Failed to fetch project assignments' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to fetch project assignments' , 500)
     }
 
     return NextResponse.json({
@@ -91,10 +73,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
 
   } catch (error) {
     console.error('Project assignments API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 
@@ -102,16 +81,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
 // POST /api/projects/[id]/assignments - Add/update project team assignments
 // ============================================================================
 
-export async function POST(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
-      { status: 401 }
-    )
-  }
+export const POST = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
 
   try {
     const params = await context.params
@@ -120,10 +90,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
     // Validate UUID format
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     if (!uuidRegex.test(projectId)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid project ID format' },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid project ID format' , 400)
     }
 
     // Check permissions - project managers and management can assign team members
@@ -131,10 +98,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
                          ['company_owner', 'general_manager', 'deputy_general_manager', 'project_manager'].includes(profile.role)
     
     if (!canManageTeam) {
-      return NextResponse.json(
-        { success: false, error: 'Insufficient permissions to manage project team' },
-        { status: 403 }
-      )
+      return createErrorResponse('Insufficient permissions to manage project team' , 403)
     }
 
     const supabase = createServerClient()
@@ -142,10 +106,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
     // Check if user has access to this project
     const hasAccess = await checkProjectAccess(supabase, user, projectId)
     if (!hasAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Project not found or access denied' },
-        { status: 404 }
-      )
+      return createErrorResponse('Project not found or access denied' , 404)
     }
 
     const body = await request.json()
@@ -153,14 +114,9 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
     // Validate assignment data
     const validationResult = validateProjectAssignments(body)
     if (!validationResult.success) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Invalid assignment data',
+      return createErrorResponse('Invalid assignment data',
           details: validationResult.error.issues 
-        },
-        { status: 400 }
-      )
+        , 400)
     }
 
     const { assignments, replace_existing, notify_assigned_users } = validationResult.data
@@ -174,10 +130,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
 
     if (usersError) {
       console.error('Users validation error:', usersError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to validate users' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to validate users' , 500)
     }
 
     // Check if all users exist and are active
@@ -241,10 +194,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
 
     if (insertError) {
       console.error('Assignment creation error:', insertError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to create assignments' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to create assignments' , 500)
     }
 
     // Send notifications to assigned users if requested
@@ -272,10 +222,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
 
   } catch (error) {
     console.error('Project assignments API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 
@@ -283,16 +230,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
 // DELETE /api/projects/[id]/assignments - Remove team member from project
 // ============================================================================
 
-export async function DELETE(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
-      { status: 401 }
-    )
-  }
+export const DELETE = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
 
   try {
     const params = await context.params
@@ -301,10 +239,7 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
     // Validate UUID format
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     if (!uuidRegex.test(projectId)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid project ID format' },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid project ID format' , 400)
     }
 
     // Check permissions
@@ -312,10 +247,7 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
                          ['company_owner', 'general_manager', 'deputy_general_manager', 'project_manager'].includes(profile.role)
     
     if (!canManageTeam) {
-      return NextResponse.json(
-        { success: false, error: 'Insufficient permissions to manage project team' },
-        { status: 403 }
-      )
+      return createErrorResponse('Insufficient permissions to manage project team' , 403)
     }
 
     const url = new URL(request.url)
@@ -323,10 +255,7 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
     const role = url.searchParams.get('role')
 
     if (!userId) {
-      return NextResponse.json(
-        { success: false, error: 'user_id parameter is required' },
-        { status: 400 }
-      )
+      return createErrorResponse('user_id parameter is required' , 400)
     }
 
     const supabase = createServerClient()
@@ -334,10 +263,7 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
     // Check if user has access to this project
     const hasAccess = await checkProjectAccess(supabase, user, projectId)
     if (!hasAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Project not found or access denied' },
-        { status: 404 }
-      )
+      return createErrorResponse('Project not found or access denied' , 404)
     }
 
     // Deactivate the assignment
@@ -356,10 +282,7 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
 
     if (removeError) {
       console.error('Assignment removal error:', removeError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to remove assignment' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to remove assignment' , 500)
     }
 
     // Log the removal activity
@@ -372,17 +295,12 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
       { removed_user_id: userId, role }
     )
 
-    return NextResponse.json({
-      success: true,
-      message: 'Team member removed successfully'
-    })
+    return createSuccessResponse({ message: 'Team member removed successfully'
+     })
 
   } catch (error) {
     console.error('Assignment removal API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 

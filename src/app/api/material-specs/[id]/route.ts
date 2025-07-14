@@ -7,7 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import { 
@@ -23,15 +23,9 @@ import {
 // GET /api/material-specs/[id] - Get individual material specification
 // ============================================================================
 
-export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
-      { status: 401 }
-    )
+export const GET = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+  if (!user || !profile) {
+    return createErrorResponse('Authentication required', 401)
   }
 
   try {
@@ -41,10 +35,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
     // Validate UUID format
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     if (!uuidRegex.test(materialSpecId)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid material specification ID format' },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid material specification ID format', 400)
     }
 
     const supabase = createServerClient()
@@ -73,27 +64,18 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
       .single() as { data: any; error: any }
 
     if (fetchError || !materialSpec) {
-      return NextResponse.json(
-        { success: false, error: 'Material specification not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('Material specification not found', 404)
     }
 
     // Check if user has access to this material spec's project
     const hasProjectAccess = await verifyProjectAccess(supabase, user, materialSpec.project_id)
     if (!hasProjectAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied to this material specification' },
-        { status: 403 }
-      )
+      return createErrorResponse('Access denied to this material specification', 403)
     }
 
     // Permission check
     if (!validateMaterialSpecPermissions(profile.role, 'read')) {
-      return NextResponse.json(
-        { success: false, error: 'Insufficient permissions to view material specifications' },
-        { status: 403 }
-      )
+      return createErrorResponse('Insufficient permissions to view material specifications', 403)
     }
 
     // Add computed fields
@@ -125,26 +107,17 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
 
   } catch (error) {
     console.error('Material spec fetch API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error', 500)
   }
-}
+})
 
 // ============================================================================
 // PUT /api/material-specs/[id] - Update material specification
 // ============================================================================
 
-export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
-      { status: 401 }
-    )
+export const PUT = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+  if (!user || !profile) {
+    return createErrorResponse('Authentication required', 401)
   }
 
   try {
@@ -154,10 +127,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
     // Validate UUID format
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     if (!uuidRegex.test(materialSpecId)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid material specification ID format' },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid material specification ID format', 400)
     }
 
     const supabase = createServerClient()
@@ -170,27 +140,18 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
       .single()
 
     if (fetchError || !existingMaterialSpec) {
-      return NextResponse.json(
-        { success: false, error: 'Material specification not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('Material specification not found', 404)
     }
 
     // Check if user has access to this material spec's project
     const hasProjectAccess = await verifyProjectAccess(supabase, user, existingMaterialSpec.project_id)
     if (!hasProjectAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied to this material specification' },
-        { status: 403 }
-      )
+      return createErrorResponse('Access denied to this material specification', 403)
     }
 
     // Permission check
     if (!validateMaterialSpecPermissions(profile.role, 'update')) {
-      return NextResponse.json(
-        { success: false, error: 'Insufficient permissions to update material specifications' },
-        { status: 403 }
-      )
+      return createErrorResponse('Insufficient permissions to update material specifications' , 403)
     }
 
     const body = await request.json()
@@ -198,14 +159,9 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
     // Validate update data
     const validationResult = validateMaterialSpecUpdate(body)
     if (!validationResult.success) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Invalid update data',
-          details: validationResult.error.issues 
-        },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid update data', 400, {
+        details: validationResult.error.issues
+      })
     }
 
     const updateData = validationResult.data
@@ -219,10 +175,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
         .single()
 
       if (supplierError || !supplier) {
-        return NextResponse.json(
-          { success: false, error: 'Supplier not found' },
-          { status: 404 }
-        )
+        return createErrorResponse('Supplier not found' , 404)
       }
     }
 
@@ -250,10 +203,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
 
     if (updateError) {
       console.error('Material spec update error:', updateError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to update material specification' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to update material specification', 500)
     }
 
     // Add computed fields
@@ -286,26 +236,17 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
 
   } catch (error) {
     console.error('Material spec update API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error', 500)
   }
-}
+})
 
 // ============================================================================
 // DELETE /api/material-specs/[id] - Delete material specification
 // ============================================================================
 
-export async function DELETE(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
-      { status: 401 }
-    )
+export const DELETE = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+  if (!user || !profile) {
+    return createErrorResponse('Authentication required', 401)
   }
 
   try {
@@ -315,10 +256,7 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
     // Validate UUID format
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     if (!uuidRegex.test(materialSpecId)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid material specification ID format' },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid material specification ID format', 400)
     }
 
     const supabase = createServerClient()
@@ -331,35 +269,23 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
       .single()
 
     if (fetchError || !existingMaterialSpec) {
-      return NextResponse.json(
-        { success: false, error: 'Material specification not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('Material specification not found', 404)
     }
 
     // Check if user has access to this material spec's project
     const hasProjectAccess = await verifyProjectAccess(supabase, user, existingMaterialSpec.project_id)
     if (!hasProjectAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied to this material specification' },
-        { status: 403 }
-      )
+      return createErrorResponse('Access denied to this material specification', 403)
     }
 
     // Permission check
     if (!validateMaterialSpecPermissions(profile.role, 'delete')) {
-      return NextResponse.json(
-        { success: false, error: 'Insufficient permissions to delete material specifications' },
-        { status: 403 }
-      )
+      return createErrorResponse('Insufficient permissions to delete material specifications', 403)
     }
 
     // Check if material spec is approved - prevent deletion of approved materials
     if (existingMaterialSpec.status === 'approved') {
-      return NextResponse.json(
-        { success: false, error: 'Cannot delete approved material specifications' },
-        { status: 400 }
-      )
+      return createErrorResponse('Cannot delete approved material specifications', 400)
     }
 
     // Delete material specification (this will cascade to scope_material_links)
@@ -370,10 +296,7 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
 
     if (deleteError) {
       console.error('Material spec deletion error:', deleteError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to delete material specification' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to delete material specification', 500)
     }
 
     return NextResponse.json({
@@ -383,12 +306,9 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
 
   } catch (error) {
     console.error('Material spec deletion API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error', 500)
   }
-}
+})
 
 // ============================================================================
 // HELPER FUNCTIONS

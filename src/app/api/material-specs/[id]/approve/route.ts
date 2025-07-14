@@ -7,7 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { 
   validateMaterialApproval,
@@ -22,23 +22,14 @@ import {
 // POST /api/material-specs/[id]/approve - Approve material specification
 // ============================================================================
 
-export async function POST(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
-      { status: 401 }
-    )
+export const POST = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+  if (!user || !profile) {
+    return createErrorResponse('Authentication required', 401)
   }
 
   // Permission check
   if (!validateMaterialSpecPermissions(profile.role, 'approve')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to approve material specifications' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to approve material specifications', 403)
   }
 
   try {
@@ -48,10 +39,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
     // Validate UUID format
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     if (!uuidRegex.test(materialSpecId)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid material specification ID format' },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid material specification ID format', 400)
     }
 
     const supabase = createServerClient()
@@ -64,19 +52,13 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
       .single()
 
     if (fetchError || !existingMaterialSpec) {
-      return NextResponse.json(
-        { success: false, error: 'Material specification not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('Material specification not found', 404)
     }
 
     // Check if user has access to this material spec's project
     const hasProjectAccess = await verifyProjectAccess(supabase, user, existingMaterialSpec.project_id)
     if (!hasProjectAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied to this material specification' },
-        { status: 403 }
-      )
+      return createErrorResponse('Access denied to this material specification', 403)
     }
 
     // Validate status transition
@@ -89,10 +71,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
 
     // Prevent self-approval if created by same user
     if (existingMaterialSpec.created_by === user.id) {
-      return NextResponse.json(
-        { success: false, error: 'Cannot approve your own material specification' },
-        { status: 400 }
-      )
+      return createErrorResponse('Cannot approve your own material specification', 400)
     }
 
     const body = await request.json()
@@ -100,14 +79,9 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
     // Validate approval data
     const validationResult = validateMaterialApproval(body)
     if (!validationResult.success) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Invalid approval data',
-          details: validationResult.error.issues 
-        },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid approval data', 400, {
+        details: validationResult.error.issues
+      })
     }
 
     const approvalData = validationResult.data
@@ -137,10 +111,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
 
     if (updateError) {
       console.error('Material spec approval error:', updateError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to approve material specification' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to approve material specification', 500)
     }
 
     // Add computed fields
@@ -190,12 +161,9 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
 
   } catch (error) {
     console.error('Material spec approval API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error', 500)
   }
-}
+})
 
 // ============================================================================
 // HELPER FUNCTIONS

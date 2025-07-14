@@ -139,7 +139,7 @@ describe('Tasks API - Real Supabase', () => {
       
       const response = await GET_PROJECT_TASKS(
         request, 
-        createMockContext({ id: testEnv.project.id })
+        { params: Promise.resolve({ id: testEnv.project.id }) }
       )
       const data = await response.json()
 
@@ -161,7 +161,7 @@ describe('Tasks API - Real Supabase', () => {
         
         const response = await GET_PROJECT_TASKS(
           request,
-          createMockContext({ id: testEnv.project.id })
+          { params: Promise.resolve({ id: testEnv.project.id }) }
         )
         const data = await response.json()
 
@@ -196,7 +196,7 @@ describe('Tasks API - Real Supabase', () => {
       
       const response = await GET_TASK(
         request,
-        createMockContext({ id: task.id })
+        { params: Promise.resolve({ id: task.id }) }
       )
       const data = await response.json()
 
@@ -215,7 +215,7 @@ describe('Tasks API - Real Supabase', () => {
       
       const response = await GET_TASK(
         request,
-        createMockContext({ id: fakeId })
+        { params: Promise.resolve({ id: fakeId }) }
       )
       const data = await response.json()
 
@@ -254,7 +254,7 @@ describe('Tasks API - Real Supabase', () => {
       
       const response = await PUT_TASK(
         request,
-        createMockContext({ id: task.id })
+        { params: Promise.resolve({ id: task.id }) }
       )
       const data = await response.json()
 
@@ -290,7 +290,7 @@ describe('Tasks API - Real Supabase', () => {
       
       const response = await DELETE_TASK(
         request,
-        createMockContext({ id: task.id })
+        { params: Promise.resolve({ id: task.id }) }
       )
       const data = await response.json()
 

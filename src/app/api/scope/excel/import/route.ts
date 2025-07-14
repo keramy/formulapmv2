@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import * as XLSX from 'xlsx'
@@ -21,23 +21,15 @@ import {
 // POST /api/scope/excel/import - Import scope items from Excel
 // ============================================================================
 
-export async function POST(request: NextRequest) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const POST = withAuth(async (request: NextRequest, { user, profile }) => {
+,
       { status: 401 }
     )
   }
 
   // Permission check
   if (!hasPermission(profile.role, 'projects.update')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to import Excel files' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to import Excel files' , 403)
   }
 
   try {
@@ -47,26 +39,17 @@ export async function POST(request: NextRequest) {
     const projectId = formData.get('project_id') as string
 
     if (!file || !projectId) {
-      return NextResponse.json(
-        { success: false, error: 'File and project_id are required' },
-        { status: 400 }
-      )
+      return createErrorResponse('File and project_id are required' , 400)
     }
 
     // Validate file type
     if (!file.name.match(/\.(xlsx|xls)$/)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid file type. Please upload an Excel file (.xlsx or .xls)' },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid file type. Please upload an Excel file (.xlsx or .xls)' , 400)
     }
 
     // Validate file size (10MB limit)
     if (file.size > 10 * 1024 * 1024) {
-      return NextResponse.json(
-        { success: false, error: 'File size too large. Maximum size is 10MB' },
-        { status: 400 }
-      )
+      return createErrorResponse('File size too large. Maximum size is 10MB' , 400)
     }
 
     const supabase = createServerClient()
@@ -74,10 +57,7 @@ export async function POST(request: NextRequest) {
     // Verify user has access to the project
     const hasProjectAccess = await verifyProjectAccess(supabase, user, projectId)
     if (!hasProjectAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied to this project' },
-        { status: 403 }
-      )
+      return createErrorResponse('Access denied to this project' , 403)
     }
 
     // Process Excel file
@@ -87,10 +67,7 @@ export async function POST(request: NextRequest) {
     const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1 })
 
     if (rawData.length < 2) {
-      return NextResponse.json(
-        { success: false, error: 'Excel file must contain at least a header row and one data row' },
-        { status: 400 }
-      )
+      return createErrorResponse('Excel file must contain at least a header row and one data row' , 400)
     }
 
     // Create import batch record
@@ -163,10 +140,7 @@ export async function POST(request: NextRequest) {
 
       if (insertError) {
         console.error('Scope items insert error:', insertError)
-        return NextResponse.json(
-          { success: false, error: 'Failed to save scope items to database' },
-          { status: 500 }
-        )
+        return createErrorResponse('Failed to save scope items to database' , 500)
       }
     }
 
@@ -189,10 +163,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Excel import API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error during import' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error during import' , 500)
   }
 }
 

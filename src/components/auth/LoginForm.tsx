@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, Eye, EyeOff, AlertCircle, RefreshCw, WifiOff } from 'lucide-react'
 import Link from 'next/link'
+import { projectSchemas, validateData } from '@/lib/form-validation'
 
 interface LoginFormProps {
   redirectTo?: string
@@ -39,54 +40,38 @@ const LoginForm = ({
     clearAuthError,
     clearStaleSession,
     isAuthenticated,
+    isUserInitiated,
+    sessionState,
     debugInfo 
   } = useAuth()
   const router = useRouter()
 
-  // Determine loading state early
-  const isLoading = authState === 'loading' || authState === 'recovering'
+  // Simplified loading state management
+  const isLoading = authState === 'loading'
+  const isRecovering = authState === 'recovering'
   
-  // Add component mount logging and clear any existing auth state
+  // Simplified component initialization
   useEffect(() => {
     console.log('🔐 [LoginForm] Component mounted with auth state:', {
       authState,
-      isError,
-      isRecoveringSession,
-      hasError: !!authError,
+      isAuthenticated,
       userEmail: user?.email
     })
     
-    // Clear any existing errors on mount to prevent interference
+    // Clear any existing errors on mount
     if (authError) {
-      console.log('🔐 [LoginForm] Clearing existing auth error on mount')
       clearAuthError()
     }
-  }, [authState, isAuthenticated, isRecoveringSession, authError, isLoading, clearAuthError])
+  }, [])
 
-  // Handle successful authentication - ONLY redirect if user explicitly submitted form
+  // Simplified authentication success handling
   useEffect(() => {
-    console.log('🔐 [LoginForm] Auth state changed:', { 
-      isAuthenticated, 
-      authState, 
-      hasAuthError: !!authError,
-      hasUserInteracted,
-      hasUser: !!user
-    })
-    
-    // Only redirect if:
-    // 1. User is authenticated (has both user and profile)
-    // 2. Auth state is 'authenticated' 
-    // 3. User has actually interacted with the form (not auto-login)
-    // 4. No auth errors
+    // Redirect on successful authentication if user interacted with form
     if (isAuthenticated && authState === 'authenticated' && hasUserInteracted && !authError) {
       console.log('✅ Authentication successful, redirecting to:', redirectTo)
       router.push(redirectTo)
-    } else if (isAuthenticated && authState === 'authenticated' && !hasUserInteracted) {
-      console.log('🔐 [LoginForm] Auto-authentication detected - not redirecting without user interaction')
-    } else if (authState === 'authenticated' && !isAuthenticated) {
-      console.log('🔐 [LoginForm] Auth state is authenticated but isAuthenticated is false - session/profile issue')
     }
-  }, [isAuthenticated, authState, redirectTo, router, authError, hasUserInteracted, user])
+  }, [isAuthenticated, authState, redirectTo, router, authError, hasUserInteracted])
 
   // Clear local error when auth error is cleared
   useEffect(() => {
@@ -96,28 +81,13 @@ const LoginForm = ({
   }, [authError])
 
   const handleSubmit = async (e: React.FormEvent) => {
-    console.log('🔐 [LoginForm] Form submitted!', { 
-      email: email.substring(0, 3) + '***',
-      hasPassword: !!password,
-      authState,
-      isLoading,
-      hasUserInteracted
-    });
-    
     e.preventDefault()
     setLocalError(null)
     clearAuthError()
 
     // Prevent submission during loading states
-    if (isLoading) {
-      console.log('🔐 [LoginForm] Submission blocked - system is loading');
-      return;
-    }
-
-    // Prevent submission if user hasn't interacted with form
-    if (!hasUserInteracted) {
-      console.log('🔐 [LoginForm] Submission blocked - user has not interacted with form');
-      return;
+    if (isLoading || isRecovering) {
+      return
     }
 
     // Basic validation
@@ -139,11 +109,10 @@ const LoginForm = ({
     try {
       console.log('🔐 [LoginForm] Starting login process...')
       await signIn(email.trim().toLowerCase(), password)
-      // Success handling is now done in useEffect above
+      // Success handling is done in useEffect
     } catch (error: any) {
       console.error('Login error:', error)
-      // The useAuth hook now handles error state, but we can still show custom messages
-      // for better UX based on the error type
+      // Enhanced error messages for better UX
       if (error.message?.includes('Invalid login credentials')) {
         setLocalError('Invalid email or password. Please try again.')
       } else if (error.message?.includes('Email not confirmed')) {
@@ -153,7 +122,6 @@ const LoginForm = ({
       } else if (error.message?.includes('deactivated')) {
         setLocalError('Your account has been deactivated. Please contact administrator.')
       }
-      // For other errors, let the authError from useAuth handle it
     }
   }
 
@@ -188,33 +156,53 @@ const LoginForm = ({
     try {
       await clearStaleSession()
       setLocalError(null)
+      setHasUserInteracted(false)
     } catch (error) {
       console.error('Error clearing session:', error)
       setLocalError('Failed to clear session')
     }
   }
 
-  // Determine current recovery state
-  const isRecovering = authState === 'recovering'
+  const handleContinueWithExistingSession = () => {
+    console.log('🔐 [LoginForm] User chose to continue with existing session')
+    setHasUserInteracted(true)
+    // This will trigger the redirect in the useEffect
+  }
+
+  const handleLogoutAndLoginFresh = async () => {
+    console.log('🔐 [LoginForm] User chose to logout and login fresh')
+    try {
+      await clearStaleSession()
+      setHasUserInteracted(false)
+      setLocalError(null)
+      // Clear form fields
+      setEmail('')
+      setPassword('')
+    } catch (error) {
+      console.error('Error logging out:', error)
+      setLocalError('Failed to logout')
+    }
+  }
+
+  // Simplified error handling
   const hasError = isError || authError || localError
-  const canRetry = authError && authError.retryCount < 3
+  const canRetry = authError // Simplified retry logic
 
   // Get appropriate error message
   const getErrorMessage = () => {
     if (localError) return localError
     if (authError) {
-      switch (authError.code) {
-        case 'AUTH_TIMEOUT':
-          return 'Login timed out. Please try again.'
-        case 'SIGNIN_ERROR':
-        case 'SIGNIN_EXCEPTION':
-          return authError.message || 'Authentication failed. Please try again.'
-        case 'PROFILE_FETCH_ERROR':
-          return 'Login successful but failed to load profile. Please refresh the page.'
-        case 'SESSION_ERROR':
-          return 'Session error. Please try signing in again.'
-        default:
-          return authError.message || 'An error occurred. Please try again.'
+      // authError is now a simple string
+      if (authError.includes('Invalid login credentials')) {
+        return 'Invalid email or password. Please try again.'
+      } else if (authError.includes('Email not confirmed')) {
+        return 'Please check your email and click the confirmation link.'
+      } else if (authError.includes('Too many requests')) {
+        return 'Too many login attempts. Please wait a moment and try again.'
+      } else if (authError.includes('deactivated')) {
+        return 'Your account has been deactivated. Please contact administrator.'
+      } else {
+        return authError || 'An error occurred. Please try again.'
       }
     }
     return null
@@ -222,16 +210,24 @@ const LoginForm = ({
 
   const errorMessage = getErrorMessage()
 
+  // Show "Already logged in" state if authenticated but user hasn't chosen to proceed
+  const showAlreadyLoggedIn = isAuthenticated && authState === 'authenticated' && !hasUserInteracted && !isRecovering
+
   return (
     <div className="w-full max-w-md mx-auto">
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Welcome to Formula PM</CardTitle>
           <CardDescription>
-            {false ? (
+            {isRecovering ? (
               <span className="flex items-center justify-center gap-2">
                 <WifiOff className="h-4 w-4 text-muted-foreground" />
-                Recovering your session...
+                Loading...
+              </span>
+            ) : showAlreadyLoggedIn ? (
+              <span className="flex items-center justify-center gap-2">
+                <AlertCircle className="h-4 w-4 text-blue-500" />
+                You are already signed in
               </span>
             ) : (
               'Sign in to your account to continue'
@@ -239,7 +235,39 @@ const LoginForm = ({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          {showAlreadyLoggedIn ? (
+            // Already logged in state
+            <div className="space-y-4">
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  You are already signed in as <strong>{user?.email}</strong>.
+                  Choose an option below to continue.
+                </AlertDescription>
+              </Alert>
+
+              <div className="space-y-3">
+                <Button 
+                  type="button" 
+                  className="w-full" 
+                  onClick={handleContinueWithExistingSession}
+                >
+                  Continue to Dashboard
+                </Button>
+                
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  className="w-full" 
+                  onClick={handleLogoutAndLoginFresh}
+                >
+                  Switch Account
+                </Button>
+              </div>
+            </div>
+          ) : (
+            // Normal login form
+            <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email Address</Label>
               <Input
@@ -251,7 +279,7 @@ const LoginForm = ({
                   setEmail(e.target.value)
                   setHasUserInteracted(true)
                 }}
-                disabled={isLoading || false}
+                disabled={isLoading}
                 autoComplete="email"
               />
             </div>
@@ -308,11 +336,11 @@ const LoginForm = ({
             )}
 
             {/* Recovery state indicator */}
-            {false && (
+            {isRecovering && (
               <Alert>
                 <WifiOff className="h-4 w-4" />
                 <AlertDescription>
-                  Attempting to recover your session... Please wait.
+                  Loading... Please wait.
                 </AlertDescription>
               </Alert>
             )}
@@ -320,34 +348,36 @@ const LoginForm = ({
             <Button 
               type="submit" 
               className="w-full" 
-              disabled={isLoading || !hasUserInteracted}
+              disabled={isLoading || isRecovering}
               onClick={() => setHasUserInteracted(true)}
             >
-              {isLoading && (
+              {(isLoading || isRecovering) && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}
-              {false ? 'Recovering Session...' : 
+              {isRecovering ? 'Loading...' : 
                isLoading ? 'Signing In...' : 'Sign In'}
             </Button>
 
-            {/* Clear error button when there's an error */}
-            {hasError && !isLoading && (
+            {/* Session management controls */}
+            {(hasError || isRecovering) && !isLoading && (
               <div className="space-y-2">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  className="w-full" 
-                  onClick={handleClearError}
-                >
-                  Clear Error & Try Again
-                </Button>
+                {hasError && (
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="w-full" 
+                    onClick={handleClearError}
+                  >
+                    Clear Error & Try Again
+                  </Button>
+                )}
                 <Button 
                   type="button" 
                   variant="outline" 
                   className="w-full" 
                   onClick={handleClearSession}
                 >
-                  Clear Session & Start Fresh
+                  Clear Stored Session
                 </Button>
               </div>
             )}
@@ -375,6 +405,7 @@ const LoginForm = ({
               </div>
             )}
           </form>
+          )}
         </CardContent>
       </Card>
 
@@ -398,8 +429,10 @@ const LoginForm = ({
             <div className="mt-4 pt-2 border-t">
               <strong>Auth Debug Info:</strong>
             </div>
-            <div>State: {authState}</div>
-            <div>Recovery Attempts: {debugInfo.recoveryAttempts}</div>
+            <div>Auth State: {authState}</div>
+            <div>Session State: {sessionState}</div>
+            <div>User Initiated: {isUserInitiated ? 'Yes' : 'No'}</div>
+            <div>Show Already Logged In: {showAlreadyLoggedIn ? 'Yes' : 'No'}</div>
             <div>Has Error: {debugInfo.hasError ? 'Yes' : 'No'}</div>
             {debugInfo.errorCode && <div>Error Code: {debugInfo.errorCode}</div>}
             <div>Is Recovering: {debugInfo.isRecovering ? 'Yes' : 'No'}</div>

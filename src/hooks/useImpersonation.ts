@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { UserProfile } from '@/types/auth'
+import { useAdvancedApiQuery } from './useAdvancedApiQuery'
 
 interface ImpersonationState {
   originalAdmin: UserProfile
@@ -161,5 +162,116 @@ export const useImpersonation = () => {
     // Utilities
     canImpersonate,
     getImpersonationInfo
+  }
+}
+
+/**
+ * Enhanced Impersonation hook using advanced API query patterns
+ * This demonstrates the optimized approach with intelligent caching and validation
+ */
+export function useImpersonationAdvanced() {
+  const [impersonationState, setImpersonationState] = useState<ImpersonationState | null>(null)
+
+  // Use advanced API query for admin validation
+  const {
+    data: adminValidation,
+    loading: validationLoading,
+    error: validationError,
+    refetch: validateAdmin
+  } = useAdvancedApiQuery<{ canImpersonate: boolean; adminLevel: string }>({
+    queryKey: ['admin-validation', impersonationState?.originalAdmin?.id],
+    queryFn: async () => {
+      if (!impersonationState?.originalAdmin) return { canImpersonate: false, adminLevel: 'none' }
+
+      const response = await fetch('/api/admin/validate-impersonation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ adminId: impersonationState.originalAdmin.id })
+      })
+
+      if (!response.ok) throw new Error('Failed to validate admin permissions')
+
+      return response.json()
+    },
+    enabled: !!impersonationState?.originalAdmin,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    cacheTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnWindowFocus: false
+  })
+
+  // Enhanced impersonation state management
+  useEffect(() => {
+    try {
+      const stored = sessionStorage.getItem(IMPERSONATION_KEY)
+      if (stored) {
+        const parsed = JSON.parse(stored)
+        if (parsed.originalAdmin && parsed.impersonatedUser) {
+          setImpersonationState(parsed)
+        }
+      }
+    } catch (error) {
+      console.error('🎭 [useImpersonationAdvanced] Error loading state:', error)
+      sessionStorage.removeItem(IMPERSONATION_KEY)
+    }
+  }, [])
+
+  // Enhanced start impersonation with validation
+  const startImpersonationAdvanced = useCallback(async (originalAdmin: UserProfile, targetUser: UserProfile) => {
+    try {
+      // Validate admin permissions first
+      await validateAdmin()
+
+      if (!adminValidation?.canImpersonate) {
+        throw new Error('Insufficient permissions for impersonation')
+      }
+
+      const newState: ImpersonationState = {
+        originalAdmin,
+        impersonatedUser: targetUser,
+        startedAt: new Date().toISOString()
+      }
+
+      sessionStorage.setItem(IMPERSONATION_KEY, JSON.stringify(newState))
+      setImpersonationState(newState)
+
+      return true
+    } catch (error) {
+      console.error('🎭 [useImpersonationAdvanced] Error starting impersonation:', error)
+      return false
+    }
+  }, [adminValidation, validateAdmin])
+
+  // Enhanced stop impersonation
+  const stopImpersonationAdvanced = useCallback(async () => {
+    try {
+      sessionStorage.removeItem(IMPERSONATION_KEY)
+      setImpersonationState(null)
+      return true
+    } catch (error) {
+      console.error('🎭 [useImpersonationAdvanced] Error stopping impersonation:', error)
+      return false
+    }
+  }, [])
+
+  return {
+    // State
+    isImpersonating: !!impersonationState,
+    impersonatedUser: impersonationState?.impersonatedUser || null,
+    originalAdmin: impersonationState?.originalAdmin || null,
+
+    // Loading states
+    loading: validationLoading,
+    validationError,
+
+    // Actions
+    startImpersonation: startImpersonationAdvanced,
+    stopImpersonation: stopImpersonationAdvanced,
+
+    // Enhanced utilities
+    canImpersonate: adminValidation?.canImpersonate || false,
+    adminLevel: adminValidation?.adminLevel || 'none',
+
+    // Validation
+    validateAdmin
   }
 }

@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, AlertCircle, WifiOff, RefreshCw } from 'lucide-react'
+import { RealtimeProvider } from '@/contexts/RealtimeContext'
 
 export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -107,7 +108,7 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                {authError.message || 'An authentication error occurred'}
+                {authError || 'An authentication error occurred'}
               </AlertDescription>
             </Alert>
             
@@ -149,7 +150,7 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
               <div className="mt-4 p-2 bg-muted rounded text-xs">
                 <div><strong>Debug Info:</strong></div>
                 <div>State: {authState}</div>
-                <div>Error Code: {authError.code}</div>
+                <div>Error: {authError}</div>
                 <div>Recovery Attempts: {debugInfo?.recoveryAttempts}</div>
               </div>
             )}
@@ -165,32 +166,34 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      {/* Mobile sidebar backdrop */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-      
-      {/* Sidebar */}
-      <Sidebar 
-        className={cn(
-          "z-50 transition-transform duration-300 ease-in-out",
-          "lg:translate-x-0",
-          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+    <RealtimeProvider>
+      <div className="flex h-screen overflow-hidden">
+        {/* Mobile sidebar backdrop */}
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
         )}
-        onClose={() => setSidebarOpen(false)}
-      />
-      
-      {/* Main content */}
-      <main className="flex-1 flex flex-col overflow-y-auto lg:ml-64">
-        <Header onMenuClick={() => setSidebarOpen(true)} />
-        <div className="p-4 lg:p-6 flex-1">
-          {children}
-        </div>
-      </main>
-    </div>
+        
+        {/* Sidebar */}
+        <Sidebar 
+          className={cn(
+            "z-50 transition-transform duration-300 ease-in-out",
+            "lg:translate-x-0",
+            sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          )}
+          onClose={() => setSidebarOpen(false)}
+        />
+        
+        {/* Main content */}
+        <main className="flex-1 flex flex-col overflow-y-auto lg:ml-64">
+          <Header onMenuClick={() => setSidebarOpen(true)} />
+          <div className="p-4 lg:p-6 flex-1">
+            {children}
+          </div>
+        </main>
+      </div>
+    </RealtimeProvider>
   )
 }

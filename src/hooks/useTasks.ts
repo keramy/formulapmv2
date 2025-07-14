@@ -11,6 +11,94 @@ import { useState, useEffect, useCallback } from 'react'
 import { Task, TaskFormData, TaskFilters, TaskStatistics, TaskPermissions } from '@/types/tasks'
 import { useAuth } from './useAuth'
 import { hasPermission } from '@/lib/permissions'
+import { useApiQuery } from './useApiQuery'
+
+// ============================================================================
+// OPTIMIZED TASK HOOKS (New Pattern)
+// ============================================================================
+
+/**
+ * Optimized task hook using useApiQuery pattern
+ * This is the new recommended way to fetch tasks
+ */
+export const useTasksOptimized = (projectId: string, filters?: TaskFilters) => {
+  const { profile } = useAuth()
+
+  // Calculate permissions
+  const permissions: TaskPermissions = {
+    canCreate: profile?.role ? (hasPermission(profile.role, 'projects.create') ||
+               hasPermission(profile.role, 'projects.update')) : false,
+    canEdit: profile?.role ? (hasPermission(profile.role, 'projects.update') ||
+             hasPermission(profile.role, 'projects.create')) : false,
+    canDelete: profile?.role ? hasPermission(profile.role, 'projects.delete') : false,
+    canAssign: profile?.role ? (hasPermission(profile.role, 'projects.update') ||
+               hasPermission(profile.role, 'projects.create')) : false,
+    canChangeStatus: profile?.role ? (hasPermission(profile.role, 'projects.update') ||
+                     hasPermission(profile.role, 'projects.create')) : false,
+    canComment: profile?.role ? (hasPermission(profile.role, 'projects.read.all') ||
+                hasPermission(profile.role, 'projects.read.assigned')) : false,
+    canViewAll: profile?.role ? (hasPermission(profile.role, 'projects.read.all') ||
+                hasPermission(profile.role, 'projects.read.assigned')) : false
+  }
+
+  // Use the new useApiQuery hook for data fetching
+  const { data, loading, error, refetch } = useApiQuery({
+    endpoint: `/api/projects/${projectId}/tasks`,
+    params: {
+      ...filters,
+      include_assignee: true,
+      include_project: true
+    },
+    enabled: !!projectId && !!profile,
+    cacheKey: `tasks-${projectId}-${JSON.stringify(filters)}`,
+    dependencies: [projectId, profile?.id]
+  })
+
+  return {
+    tasks: data?.tasks || [],
+    statistics: data?.statistics || null,
+    loading,
+    error,
+    permissions,
+    refetch,
+    // Computed values
+    totalCount: data?.pagination?.total || 0,
+    hasMore: data?.pagination?.has_more || false
+  }
+}
+
+/**
+ * Task statistics hook
+ */
+export const useTaskStatistics = (projectId?: string) => {
+  return useApiQuery({
+    endpoint: projectId ? `/api/projects/${projectId}/tasks/statistics` : '/api/tasks/statistics',
+    enabled: !!projectId,
+    cacheKey: `task-statistics-${projectId || 'all'}`,
+    dependencies: [projectId]
+  })
+}
+
+/**
+ * Single task hook
+ */
+export const useTask = (taskId: string) => {
+  return useApiQuery({
+    endpoint: `/api/tasks/${taskId}`,
+    enabled: !!taskId,
+    cacheKey: `task-${taskId}`,
+    dependencies: [taskId],
+    params: {
+      include_assignee: true,
+      include_project: true,
+      include_comments: true
+    }
+  })
+}
+
+// ============================================================================
+// LEGACY TASK HOOK (Keep for backward compatibility)
+// ============================================================================
 
 interface UseTasksReturn {
   tasks: Task[]

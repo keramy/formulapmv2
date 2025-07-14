@@ -18,6 +18,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
+import { DataStateWrapper } from '@/components/ui/loading-states'
 import { 
   Search, 
   Filter, 
@@ -204,24 +205,28 @@ export const TaskList: React.FC<TaskListProps> = ({
     setFilters(prev => ({ ...prev, search: searchQuery }))
   }
 
-  if (loading) {
-    return (
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="h-8 w-48 bg-gray-200 rounded animate-pulse" />
-          <div className="h-8 w-32 bg-gray-200 rounded animate-pulse" />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-48 bg-gray-100 rounded animate-pulse" />
-          ))}
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div className="space-y-6">
+    <DataStateWrapper
+      loading={loading}
+      error={null}
+      data={tasks}
+      emptyComponent={
+        <div className="text-center py-12">
+          <CheckSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-semibold mb-2">No tasks yet</h3>
+          <p className="text-muted-foreground mb-4">
+            Create your first task to get started.
+          </p>
+          {permissions.canCreate && onCreateTask && (
+            <Button onClick={onCreateTask}>
+              <Plus className="h-4 w-4 mr-2" />
+              Create Task
+            </Button>
+          )}
+        </div>
+      }
+    >
+      <div className="space-y-6">
       {/* Header with statistics */}
       <div className="flex items-center justify-between">
         <div>
@@ -526,6 +531,7 @@ export const TaskList: React.FC<TaskListProps> = ({
           )}
         </div>
       )}
-    </div>
+      </div>
+    </DataStateWrapper>
   )
 }

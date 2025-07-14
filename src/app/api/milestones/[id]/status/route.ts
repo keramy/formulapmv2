@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import { 
@@ -19,23 +19,14 @@ import {
 // PUT /api/milestones/[id]/status - Update milestone status
 // ============================================================================
 
-export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
-      { status: 401 }
-    )
+export const PUT = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+  if (!user || !profile) {
+    return createErrorResponse('Authentication required', 401)
   }
 
   // Permission check
   if (!validateMilestonePermissions(profile.role, 'change_status')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to change milestone status' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to change milestone status' , 403)
   }
 
   try {
@@ -45,10 +36,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
     // Validate UUID format
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     if (!uuidRegex.test(milestoneId)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid milestone ID format' },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid milestone ID format' , 400)
     }
 
     const supabase = createServerClient()
@@ -61,19 +49,13 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
       .single()
 
     if (fetchError || !existingMilestone) {
-      return NextResponse.json(
-        { success: false, error: 'Milestone not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('Milestone not found' , 404)
     }
 
     // Check if user has access to this milestone's project
     const hasProjectAccess = await verifyProjectAccess(supabase, user, existingMilestone.project_id)
     if (!hasProjectAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied to this milestone' },
-        { status: 403 }
-      )
+      return createErrorResponse('Access denied to this milestone' , 403)
     }
 
     const body = await request.json()
@@ -81,14 +63,9 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
     // Validate status update data
     const validationResult = validateMilestoneStatusUpdate(body)
     if (!validationResult.success) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Invalid status update data',
+      return createErrorResponse('Invalid status update data',
           details: validationResult.error.issues 
-        },
-        { status: 400 }
-      )
+        , 400)
     }
 
     const statusData = validationResult.data
@@ -119,10 +96,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
 
     if (updateError) {
       console.error('Milestone status update error:', updateError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to update milestone status' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to update milestone status' , 500)
     }
 
     // Calculate additional fields
@@ -145,10 +119,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
 
   } catch (error) {
     console.error('Milestone status update API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 

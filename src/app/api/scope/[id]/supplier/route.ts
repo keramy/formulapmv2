@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import { z } from 'zod'
@@ -8,19 +8,13 @@ const AssignSupplierSchema = z.object({
   supplier_id: z.string().uuid().nullable()
 })
 
-export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+export const PUT = withAuth(async (request: NextRequest, { user, profile }, context: { params: Promise<{ id: string }> }) => {
   try {
     const { id } = await context.params
     
-    // Verify authentication
-    const { user, profile, error: authError } = await verifyAuth(request)
-    if (authError || !user || !profile) {
-      return NextResponse.json({ error: authError || 'Authentication required' }, { status: 401 })
-    }
-
     // Check permission
     if (!hasPermission(profile.role, 'projects.update')) {
-      return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
+      return createErrorResponse('Insufficient permissions', 403)
     }
 
     const body = await request.json()
@@ -35,7 +29,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
       .single()
 
     if (scopeError || !scopeItem) {
-      return NextResponse.json({ error: 'Scope item not found' }, { status: 404 })
+      return createErrorResponse('Scope item not found', 404)
     }
 
     // If assigning a supplier, verify supplier exists
@@ -48,7 +42,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
         .single()
 
       if (supplierError || !supplier) {
-        return NextResponse.json({ error: 'Supplier not found or inactive' }, { status: 400 })
+        return createErrorResponse('Supplier not found or inactive', 400)
       }
     }
 
@@ -68,12 +62,11 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
 
     if (updateError) {
       console.error('Error updating scope item:', updateError)
-      return NextResponse.json({ error: 'Failed to assign supplier' }, { status: 500 })
+      return createErrorResponse('Failed to assign supplier', 500)
     }
 
-    return NextResponse.json({
-      success: true,
-      data: updatedScope,
+    return createSuccessResponse({
+      ...updatedScope,
       message: validatedData.supplier_id 
         ? 'Supplier assigned successfully' 
         : 'Supplier unassigned successfully'
@@ -81,26 +74,20 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
 
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Invalid input data', details: error.errors }, { status: 400 })
+      return createErrorResponse('Invalid input data', 400, error.errors)
     }
     console.error('Unexpected error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return createErrorResponse('Internal server error', 500)
   }
-}
+})
 
-export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+export const GET = withAuth(async (request: NextRequest, { user, profile }, context: { params: Promise<{ id: string }> }) => {
   try {
     const { id } = await context.params
     
-    // Verify authentication
-    const { user, profile, error: authError } = await verifyAuth(request)
-    if (authError || !user || !profile) {
-      return NextResponse.json({ error: authError || 'Authentication required' }, { status: 401 })
-    }
-
     // Check permission
     if (!hasPermission(profile.role, 'projects.read.all')) {
-      return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
+      return createErrorResponse('Insufficient permissions', 403)
     }
 
     const supabase = createServerClient()
@@ -125,16 +112,13 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
       .single()
 
     if (scopeError || !scopeItem) {
-      return NextResponse.json({ error: 'Scope item not found' }, { status: 404 })
+      return createErrorResponse('Scope item not found', 404)
     }
 
-    return NextResponse.json({
-      success: true,
-      data: scopeItem
-    })
+    return createSuccessResponse(scopeItem)
 
   } catch (error) {
     console.error('Unexpected error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return createErrorResponse('Internal server error', 500)
   }
-}
+})

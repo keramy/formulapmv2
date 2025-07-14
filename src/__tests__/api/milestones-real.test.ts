@@ -154,7 +154,7 @@ describe('Milestones API - Real Supabase', () => {
       
       const response = await GET_PROJECT_MILESTONES(
         request, 
-        createMockContext({ id: testEnv.project.id })
+        { params: Promise.resolve({ id: testEnv.project.id }) }
       )
       const data = await response.json()
 
@@ -176,7 +176,7 @@ describe('Milestones API - Real Supabase', () => {
         
         const response = await GET_PROJECT_MILESTONES(
           request,
-          createMockContext({ id: testEnv.project.id })
+          { params: Promise.resolve({ id: testEnv.project.id }) }
         )
         const data = await response.json()
 
@@ -210,7 +210,7 @@ describe('Milestones API - Real Supabase', () => {
       
       const response = await GET_MILESTONE(
         request,
-        createMockContext({ id: milestone.id })
+        { params: Promise.resolve({ id: milestone.id }) }
       )
       const data = await response.json()
 
@@ -229,7 +229,7 @@ describe('Milestones API - Real Supabase', () => {
       
       const response = await GET_MILESTONE(
         request,
-        createMockContext({ id: fakeId })
+        { params: Promise.resolve({ id: fakeId }) }
       )
       const data = await response.json()
 
@@ -267,7 +267,7 @@ describe('Milestones API - Real Supabase', () => {
       
       const response = await PUT_MILESTONE(
         request,
-        createMockContext({ id: milestone.id })
+        { params: Promise.resolve({ id: milestone.id }) }
       )
       const data = await response.json()
 
@@ -302,7 +302,7 @@ describe('Milestones API - Real Supabase', () => {
       
       const response = await DELETE_MILESTONE(
         request,
-        createMockContext({ id: milestone.id })
+        { params: Promise.resolve({ id: milestone.id }) }
       )
       const data = await response.json()
 
@@ -342,7 +342,7 @@ describe('Milestones API - Real Supabase', () => {
       
       const response = await DELETE_MILESTONE(
         request,
-        createMockContext({ id: milestone.id })
+        { params: Promise.resolve({ id: milestone.id }) }
       )
       const data = await response.json()
 

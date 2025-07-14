@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import { 
@@ -20,23 +20,15 @@ import {
 // GET /api/scope/[id] - Get individual scope item
 // ============================================================================
 
-export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const GET = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+,
       { status: 401 }
     )
   }
 
   // Permission check
   if (!hasPermission(profile.role, 'projects.read.all')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to view scope items' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to view scope items' , 403)
   }
 
   try {
@@ -67,19 +59,13 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
       .single()
 
     if (error || !scopeItem) {
-      return NextResponse.json(
-        { success: false, error: 'Scope item not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('Scope item not found' , 404)
     }
 
     // Verify user has access to this project
     const hasProjectAccess = await verifyProjectAccess(supabase, user, scopeItem.project_id)
     if (!hasProjectAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied to this scope item' },
-        { status: 403 }
-      )
+      return createErrorResponse('Access denied to this scope item' , 403)
     }
 
     // Filter out cost data if user doesn't have permission
@@ -115,10 +101,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
 
   } catch (error) {
     console.error('Scope item GET error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 
@@ -126,23 +109,15 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
 // PUT /api/scope/[id] - Update scope item
 // ============================================================================
 
-export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const PUT = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+,
       { status: 401 }
     )
   }
 
   // Permission check
   if (!hasPermission(profile.role, 'projects.update')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to update scope items' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to update scope items' , 403)
   }
 
   try {
@@ -159,19 +134,13 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
       .single()
 
     if (fetchError || !existingItem) {
-      return NextResponse.json(
-        { success: false, error: 'Scope item not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('Scope item not found' , 404)
     }
 
     // Verify user has access to this project
     const hasProjectAccess = await verifyProjectAccess(supabase, user, existingItem.project_id)
     if (!hasProjectAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied to this scope item' },
-        { status: 403 }
-      )
+      return createErrorResponse('Access denied to this scope item' , 403)
     }
 
     // Prepare update data with permission checks
@@ -312,10 +281,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
 
     if (updateError) {
       console.error('Scope item update error:', updateError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to update scope item' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to update scope item' , 500)
     }
 
     // Update dependencies if they changed
@@ -399,10 +365,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
 
   } catch (error) {
     console.error('Scope item PUT error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 
@@ -410,23 +373,15 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
 // DELETE /api/scope/[id] - Delete scope item
 // ============================================================================
 
-export async function DELETE(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const DELETE = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+,
       { status: 401 }
     )
   }
 
   // Permission check
   if (!hasPermission(profile.role, 'projects.update')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to delete scope items' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to delete scope items' , 403)
   }
 
   try {
@@ -442,19 +397,13 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
       .single()
 
     if (fetchError || !existingItem) {
-      return NextResponse.json(
-        { success: false, error: 'Scope item not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('Scope item not found' , 404)
     }
 
     // Verify user has access to this project
     const hasProjectAccess = await verifyProjectAccess(supabase, user, existingItem.project_id)
     if (!hasProjectAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied to this scope item' },
-        { status: 403 }
-      )
+      return createErrorResponse('Access denied to this scope item' , 403)
     }
 
     // Check if item has dependencies that would be orphaned
@@ -492,10 +441,7 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
 
       if (deleteError) {
         console.error('Scope item delete error:', deleteError)
-        return NextResponse.json(
-          { success: false, error: 'Failed to delete scope item' },
-          { status: 500 }
-        )
+        return createErrorResponse('Failed to delete scope item' , 500)
       }
     } else {
       // Soft delete - mark as cancelled
@@ -510,24 +456,16 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
 
       if (updateError) {
         console.error('Scope item soft delete error:', updateError)
-        return NextResponse.json(
-          { success: false, error: 'Failed to cancel scope item' },
-          { status: 500 }
-        )
+        return createErrorResponse('Failed to cancel scope item' , 500)
       }
     }
 
-    return NextResponse.json({
-      success: true,
-      message: forceDelete ? 'Scope item deleted permanently' : 'Scope item cancelled successfully'
-    })
+    return createSuccessResponse({ message: forceDelete ? 'Scope item deleted permanently' : 'Scope item cancelled successfully'
+     })
 
   } catch (error) {
     console.error('Scope item DELETE error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 

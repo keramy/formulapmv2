@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import { 
@@ -18,23 +18,15 @@ import {
 // GET /api/tasks/[id]/comments - List comments for a specific task
 // ============================================================================
 
-export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const GET = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+,
       { status: 401 }
     )
   }
 
   // Permission check
   if (!validateTaskPermissions(profile.role, 'read')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to view task comments' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to view task comments' , 403)
   }
 
   try {
@@ -44,10 +36,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
     // Validate UUID format
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     if (!uuidRegex.test(taskId)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid task ID format' },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid task ID format' , 400)
     }
 
     const supabase = createServerClient()
@@ -60,29 +49,20 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
       .single()
 
     if (taskError || !task) {
-      return NextResponse.json(
-        { success: false, error: 'Task not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('Task not found' , 404)
     }
 
     // Check if user has access to this task's project
     const hasProjectAccess = await verifyProjectAccess(supabase, user, task.project_id)
     if (!hasProjectAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied to this task' },
-        { status: 403 }
-      )
+      return createErrorResponse('Access denied to this task' , 403)
     }
 
     // Additional access check for non-management users
     if (!hasPermission(profile.role, 'projects.read.all')) {
       // Users can only view comments for tasks they created or are assigned to
       if (task.assigned_to !== user.id && task.assigned_by !== user.id) {
-        return NextResponse.json(
-          { success: false, error: 'Access denied to this task' },
-          { status: 403 }
-        )
+        return createErrorResponse('Access denied to this task' , 403)
       }
     }
 
@@ -106,10 +86,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
 
     if (commentsError) {
       console.error('Task comments fetch error:', commentsError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to fetch task comments' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to fetch task comments' , 500)
     }
 
     // Format comments with user data
@@ -137,10 +114,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
 
   } catch (error) {
     console.error('Task comments API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 
@@ -148,23 +122,15 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
 // POST /api/tasks/[id]/comments - Create new comment for a task
 // ============================================================================
 
-export async function POST(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const POST = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+,
       { status: 401 }
     )
   }
 
   // Permission check
   if (!validateTaskPermissions(profile.role, 'comment')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to comment on tasks' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to comment on tasks' , 403)
   }
 
   try {
@@ -174,10 +140,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
     // Validate UUID format
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     if (!uuidRegex.test(taskId)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid task ID format' },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid task ID format' , 400)
     }
 
     const supabase = createServerClient()
@@ -190,29 +153,20 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
       .single()
 
     if (taskError || !task) {
-      return NextResponse.json(
-        { success: false, error: 'Task not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('Task not found' , 404)
     }
 
     // Check if user has access to this task's project
     const hasProjectAccess = await verifyProjectAccess(supabase, user, task.project_id)
     if (!hasProjectAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied to this task' },
-        { status: 403 }
-      )
+      return createErrorResponse('Access denied to this task' , 403)
     }
 
     // Additional access check for non-management users
     if (!hasPermission(profile.role, 'projects.read.all')) {
       // Users can only comment on tasks they created or are assigned to
       if (task.assigned_to !== user.id && task.assigned_by !== user.id) {
-        return NextResponse.json(
-          { success: false, error: 'Access denied to this task' },
-          { status: 403 }
-        )
+        return createErrorResponse('Access denied to this task' , 403)
       }
     }
 
@@ -221,14 +175,9 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
     // Validate comment data
     const validationResult = validateTaskComment(body)
     if (!validationResult.success) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Invalid comment data',
+      return createErrorResponse('Invalid comment data',
           details: validationResult.error.issues 
-        },
-        { status: 400 }
-      )
+        , 400)
     }
 
     const commentData = validationResult.data
@@ -250,10 +199,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
 
     if (insertError) {
       console.error('Task comment creation error:', insertError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to create comment' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to create comment' , 500)
     }
 
     // Format comment with user data
@@ -272,10 +218,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
 
   } catch (error) {
     console.error('Task comment creation API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 

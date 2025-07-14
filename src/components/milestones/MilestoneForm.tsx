@@ -10,7 +10,7 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
+import { projectSchemas } from '@/lib/form-validation'
 import { format } from 'date-fns'
 import { Milestone, MilestoneFormData } from '@/types/milestones'
 import { Button } from '@/components/ui/button'
@@ -38,12 +38,7 @@ import {
   XCircle
 } from 'lucide-react'
 
-const milestoneSchema = z.object({
-  name: z.string().min(1, 'Name is required').max(200, 'Name must be less than 200 characters'),
-  description: z.string().optional(),
-  target_date: z.string().min(1, 'Target date is required'),
-  status: z.enum(['upcoming', 'in_progress', 'completed', 'overdue', 'cancelled'])
-})
+
 
 interface MilestoneFormProps {
   milestone?: Milestone
@@ -64,7 +59,7 @@ export const MilestoneForm: React.FC<MilestoneFormProps> = ({
   const { toast } = useToast()
 
   const form = useForm<MilestoneFormData>({
-    resolver: zodResolver(milestoneSchema),
+    resolver: zodResolver(projectSchemas.milestone),
     defaultValues: {
       name: milestone?.name || '',
       description: milestone?.description || '',

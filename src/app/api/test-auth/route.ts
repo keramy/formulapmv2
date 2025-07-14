@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
   console.log('🔍 Test Auth Endpoint Called')
   console.log('Headers:', Object.fromEntries(request.headers.entries()))
-  
-  const { user, profile, error } = await verifyAuth(request)
-  
-  return NextResponse.json({
+return NextResponse.json({
     timestamp: new Date().toISOString(),
     authResult: {
       hasUser: !!user,
@@ -23,4 +20,4 @@ export async function GET(request: NextRequest) {
       userAgent: request.headers.get('user-agent')
     }
   })
-}
+})

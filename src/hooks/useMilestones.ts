@@ -11,6 +11,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { Milestone, MilestoneFormData, MilestoneFilters, MilestoneStatistics, MilestonePermissions } from '@/types/milestones'
 import { useAuth } from './useAuth'
 import { hasPermission } from '@/lib/permissions'
+import { useAdvancedApiQuery } from './useAdvancedApiQuery'
 
 interface UseMilestonesReturn {
   milestones: Milestone[]
@@ -303,5 +304,82 @@ export function useMilestones(projectId: string, filters?: MilestoneFilters): Us
     updateMilestoneStatus,
     bulkUpdateMilestones,
     refetch
+  }
+}
+
+/**
+ * Enhanced Milestones hook using advanced API query patterns
+ * This demonstrates the optimized approach with caching and real-time updates
+ */
+export function useMilestonesAdvanced(projectId: string, filters?: MilestoneFilters) {
+  const { user, profile } = useAuth()
+
+  // Use advanced API query for milestones
+  const {
+    data: milestones = [],
+    loading,
+    error,
+    refetch,
+    mutate
+  } = useAdvancedApiQuery<Milestone[]>({
+    queryKey: ['milestones', projectId, filters],
+    queryFn: async () => {
+      if (!projectId || !user) return []
+
+      const params = new URLSearchParams({
+        project_id: projectId,
+        ...(filters?.status && { status: filters.status }),
+        ...(filters?.search && { search: filters.search })
+      })
+
+      const response = await fetch(`/api/projects/${projectId}/milestones?${params}`)
+      if (!response.ok) throw new Error('Failed to fetch milestones')
+
+      const result = await response.json()
+      return result.success ? result.data.milestones : []
+    },
+    enabled: !!projectId && !!user,
+    staleTime: 3 * 60 * 1000, // 3 minutes
+    cacheTime: 8 * 60 * 1000, // 8 minutes
+    refetchOnWindowFocus: true,
+    refetchInterval: 45 * 1000 // 45 seconds for real-time updates
+  })
+
+  // Use advanced API query for statistics
+  const {
+    data: statistics = null
+  } = useAdvancedApiQuery<MilestoneStatistics>({
+    queryKey: ['milestone-statistics', projectId],
+    queryFn: async () => {
+      if (!projectId || !user) return null
+
+      const response = await fetch(`/api/milestones/statistics?project_id=${projectId}`)
+      if (!response.ok) throw new Error('Failed to fetch milestone statistics')
+
+      const result = await response.json()
+      return result.success ? result.data : null
+    },
+    enabled: !!projectId && !!user,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    cacheTime: 5 * 60 * 1000 // 5 minutes
+  })
+
+  // Calculate permissions
+  const permissions: MilestonePermissions = {
+    canView: !!user,
+    canCreate: hasPermission(profile, 'milestones', 'create'),
+    canEdit: hasPermission(profile, 'milestones', 'edit'),
+    canDelete: hasPermission(profile, 'milestones', 'delete'),
+    canUpdateStatus: hasPermission(profile, 'milestones', 'edit')
+  }
+
+  return {
+    milestones,
+    statistics,
+    loading,
+    error,
+    permissions,
+    refetch,
+    mutate
   }
 }

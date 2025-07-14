@@ -1,18 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAuth } from '@/lib/middleware';
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware';
 import { createServerClient } from '@/lib/supabase';
 import { hasPermission } from '@/lib/permissions';
 
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
   try {
-    // Verify authentication
-    const { user, profile, error: authError } = await verifyAuth(request);
-    if (authError || !user || !profile) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
 
     const supabase = createServerClient();
     const url = new URL(request.url);
@@ -39,10 +31,7 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error('Error fetching tasks:', error);
-      return NextResponse.json(
-        { error: 'Failed to fetch tasks' },
-        { status: 500 }
-      );
+      return createErrorResponse('Failed to fetch tasks', 500);
     }
 
     // Transform data to include project names
@@ -51,12 +40,9 @@ export async function GET(request: NextRequest) {
       project_name: item.projects?.name || 'Unknown Project'
     }));
 
-    return NextResponse.json(transformedTasks);
+    return createSuccessResponse(transformedTasks);
   } catch (error) {
     console.error('Dashboard tasks API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return createErrorResponse('Internal server error', 500);
   }
-}
+})

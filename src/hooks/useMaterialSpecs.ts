@@ -9,6 +9,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useAdvancedApiQuery } from './useAdvancedApiQuery'
 import { 
   MaterialSpec, 
   MaterialSpecFormData, 
@@ -517,5 +518,64 @@ export function useMaterialSpecs(projectId: string, filters?: MaterialSpecFilter
     unlinkScopeItem,
     bulkUpdateMaterialSpecs,
     refetch
+  }
+}
+
+/**
+ * Enhanced Material Specs hook using advanced API query patterns
+ * This demonstrates the optimized approach with caching and real-time updates
+ */
+export function useMaterialSpecsAdvanced(projectId: string, filters?: MaterialSpecFilters) {
+  const { user, profile } = useAuth()
+
+  // Use advanced API query for material specs
+  const {
+    data: materialSpecs = [],
+    loading,
+    error,
+    refetch,
+    mutate
+  } = useAdvancedApiQuery<MaterialSpec[]>({
+    queryKey: ['material-specs', projectId, filters],
+    queryFn: async () => {
+      if (!projectId || !user) return []
+
+      const params = new URLSearchParams({
+        project_id: projectId,
+        ...(filters?.status && { status: filters.status }),
+        ...(filters?.category && { category: filters.category }),
+        ...(filters?.search && { search: filters.search })
+      })
+
+      const response = await fetch(`/api/material-specs?${params}`)
+      if (!response.ok) throw new Error('Failed to fetch material specifications')
+
+      const result = await response.json()
+      return result.success ? result.data.materialSpecs : []
+    },
+    enabled: !!projectId && !!user,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    cacheTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnWindowFocus: true,
+    refetchInterval: 30 * 1000 // 30 seconds for real-time updates
+  })
+
+  // Calculate permissions
+  const permissions: MaterialSpecPermissions = {
+    canView: !!user,
+    canCreate: profile?.role === 'admin' || profile?.role === 'project_manager',
+    canEdit: profile?.role === 'admin' || profile?.role === 'project_manager',
+    canDelete: profile?.role === 'admin',
+    canApprove: profile?.role === 'admin' || profile?.role === 'project_manager',
+    canReject: profile?.role === 'admin' || profile?.role === 'project_manager'
+  }
+
+  return {
+    materialSpecs,
+    loading,
+    error,
+    permissions,
+    refetch,
+    mutate
   }
 }

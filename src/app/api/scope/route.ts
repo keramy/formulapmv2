@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import { 
@@ -23,23 +23,15 @@ import {
 // GET /api/scope - List scope items with filtering and pagination
 // ============================================================================
 
-export async function GET(request: NextRequest) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
+,
       { status: 401 }
     )
   }
 
   // Permission check
   if (!hasPermission(profile.role, 'projects.read.all')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to view scope items' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to view scope items' , 403)
   }
 
   try {
@@ -201,10 +193,7 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error('Scope items fetch error:', error)
-      return NextResponse.json(
-        { success: false, error: 'Failed to fetch scope items' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to fetch scope items' , 500)
     }
 
     // Enhance items with additional data if requested
@@ -304,10 +293,7 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('Scope API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 
@@ -315,23 +301,15 @@ export async function GET(request: NextRequest) {
 // POST /api/scope - Create new scope item
 // ============================================================================
 
-export async function POST(request: NextRequest) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const POST = withAuth(async (request: NextRequest, { user, profile }) => {
+,
       { status: 401 }
     )
   }
 
   // Permission check
   if (!hasPermission(profile.role, 'projects.update')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to create scope items' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to create scope items' , 403)
   }
 
   try {
@@ -340,10 +318,7 @@ export async function POST(request: NextRequest) {
     
     // Validate required fields
     if (!body.project_id || !body.category || !body.description || !body.quantity) {
-      return NextResponse.json(
-        { success: false, error: 'Missing required fields: project_id, category, description, quantity' },
-        { status: 400 }
-      )
+      return createErrorResponse('Missing required fields: project_id, category, description, quantity' , 400)
     }
 
     const supabase = createServerClient()
@@ -351,10 +326,7 @@ export async function POST(request: NextRequest) {
     // Verify user has access to the project
     const hasProjectAccess = await verifyProjectAccess(supabase, user, body.project_id)
     if (!hasProjectAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied to this project' },
-        { status: 403 }
-      )
+      return createErrorResponse('Access denied to this project' , 403)
     }
 
     // Generate next item number for this project
@@ -416,10 +388,7 @@ export async function POST(request: NextRequest) {
 
     if (insertError) {
       console.error('Scope item creation error:', insertError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to create scope item' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to create scope item' , 500)
     }
 
     // Create material requirements if provided
@@ -460,10 +429,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Scope creation API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 

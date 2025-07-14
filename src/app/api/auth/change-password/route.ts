@@ -1,16 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { ChangePasswordData } from '@/types/auth'
 
-export async function POST(request: NextRequest) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { error: error || 'Authentication required' },
-      { status: 401 }
-    )
+export const POST = withAuth(async (request: NextRequest, { user, profile }) => {
+  if (!user || !profile) {
+    return createErrorResponse('Authentication required', 401)
   }
 
   try {
@@ -19,32 +13,20 @@ export async function POST(request: NextRequest) {
 
     // Validate input
     if (!currentPassword || !newPassword || !confirmPassword) {
-      return NextResponse.json(
-        { error: 'All password fields are required' },
-        { status: 400 }
-      )
+      return createErrorResponse('All password fields are required', 400)
     }
 
     if (newPassword !== confirmPassword) {
-      return NextResponse.json(
-        { error: 'New passwords do not match' },
-        { status: 400 }
-      )
+      return createErrorResponse('New passwords do not match', 400)
     }
 
     // Validate password strength
     if (newPassword.length < 8) {
-      return NextResponse.json(
-        { error: 'New password must be at least 8 characters long' },
-        { status: 400 }
-      )
+      return createErrorResponse('New password must be at least 8 characters long', 400)
     }
 
     if (currentPassword === newPassword) {
-      return NextResponse.json(
-        { error: 'New password must be different from current password' },
-        { status: 400 }
-      )
+      return createErrorResponse('New password must be different from current password', 400)
     }
 
     // Additional password complexity checks
@@ -54,10 +36,7 @@ export async function POST(request: NextRequest) {
     const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(newPassword)
 
     if (!(hasUpperCase && hasLowerCase && hasNumbers)) {
-      return NextResponse.json(
-        { error: 'Password must contain at least one uppercase letter, one lowercase letter, and one number' },
-        { status: 400 }
-      )
+      return createErrorResponse('Password must contain at least one uppercase letter, one lowercase letter, and one number', 400)
     }
 
     const { createServerClient } = require('@/lib/supabase')
@@ -67,10 +46,7 @@ export async function POST(request: NextRequest) {
     const { data: { session } } = await supabase.auth.getSession()
 
     if (!session) {
-      return NextResponse.json(
-        { error: 'No active session found' },
-        { status: 401 }
-      )
+      return createErrorResponse('No active session found', 401)
     }
 
     // Verify current password by attempting to sign in
@@ -80,10 +56,7 @@ export async function POST(request: NextRequest) {
     })
 
     if (verifyError) {
-      return NextResponse.json(
-        { error: 'Current password is incorrect' },
-        { status: 400 }
-      )
+      return createErrorResponse('Current password is incorrect', 400)
     }
 
     // Update password
@@ -93,10 +66,7 @@ export async function POST(request: NextRequest) {
 
     if (updateError) {
       console.error('Password update error:', updateError)
-      return NextResponse.json(
-        { error: 'Failed to update password' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to update password', 500)
     }
 
     // Update the user profile's updated_at timestamp
@@ -110,16 +80,10 @@ export async function POST(request: NextRequest) {
       // Don't fail the request if this fails
     }
 
-    return NextResponse.json({
-      success: true,
-      message: 'Password updated successfully'
-    })
+    return createSuccessResponse({ message: 'Password updated successfully' })
 
   } catch (error) {
     console.error('Change password API error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error', 500)
   }
-}
+})

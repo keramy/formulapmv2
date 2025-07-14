@@ -10,6 +10,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useAuth } from './useAuth'
 import { usePermissions } from './usePermissions'
+import { useApiQuery } from './useApiQuery'
+import { useAdvancedApiQuery } from './useAdvancedApiQuery'
 import { 
   ProjectWithDetails, 
   ProjectFormData, 
@@ -23,7 +25,198 @@ import {
 } from '@/types/projects'
 
 // ============================================================================
-// MAIN PROJECT HOOK
+// OPTIMIZED PROJECT HOOKS (New Pattern)
+// ============================================================================
+
+/**
+ * Optimized project hook using useApiQuery pattern
+ * This is the new recommended way to fetch projects
+ */
+export const useProjectsOptimized = (params?: ProjectListParams) => {
+  const { profile } = useAuth()
+  const { canAccessProject } = usePermissions()
+
+  // Use the new useApiQuery hook for data fetching
+  const { data, loading, error, refetch } = useApiQuery({
+    endpoint: '/api/projects',
+    params: {
+      page: params?.page || 1,
+      limit: params?.limit || 20,
+      include_details: params?.include_details || false,
+      ...params?.filters
+    },
+    enabled: !!profile,
+    cacheKey: `projects-${JSON.stringify(params)}`,
+    dependencies: [profile?.id],
+    transform: (data) => {
+      // Filter projects based on user access (client-side filtering for security)
+      if (!profile || !data?.projects) return { projects: [], pagination: data?.pagination }
+
+      const accessibleProjects = data.projects.filter((project: any) =>
+        canAccessProject(project.id)
+      )
+
+      return {
+        projects: accessibleProjects,
+        pagination: data.pagination
+      }
+    }
+  })
+
+  return {
+    projects: data?.projects || [],
+    pagination: data?.pagination,
+    loading,
+    error,
+    refetch,
+    // Computed values
+    totalCount: data?.pagination?.total || 0,
+    hasMore: data?.pagination?.has_more || false,
+    currentPage: data?.pagination?.page || 1
+  }
+}
+
+/**
+ * Simple project fetcher for dropdowns and selects
+ */
+export const useProjectsList = () => {
+  return useApiQuery({
+    endpoint: '/api/projects',
+    params: { limit: 100, include_details: false },
+    cacheKey: 'projects-list',
+    transform: (data) => data?.projects || []
+  })
+}
+
+/**
+ * Single project hook with caching
+ */
+export const useProject = (projectId: string) => {
+  return useApiQuery({
+    endpoint: `/api/projects/${projectId}`,
+    enabled: !!projectId,
+    cacheKey: `project-${projectId}`,
+    dependencies: [projectId]
+  })
+}
+
+/**
+ * ADVANCED OPTIMIZED HOOKS - NEXT GENERATION PATTERNS
+ */
+
+/**
+ * Advanced projects hook with sophisticated caching and real-time updates
+ */
+export const useProjectsAdvanced = (params?: ProjectListParams) => {
+  const { profile } = useAuth()
+  const { canAccessProject } = usePermissions()
+
+  return useAdvancedApiQuery({
+    endpoint: '/api/projects',
+    params: {
+      page: params?.page || 1,
+      limit: params?.limit || 20,
+      include_details: params?.include_details || false,
+      ...params?.filters
+    },
+    enabled: !!profile,
+    cacheKey: `projects-advanced-${JSON.stringify(params)}`,
+    dependencies: [profile?.id],
+
+    // Advanced caching
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    cacheTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnWindowFocus: true,
+
+    // Performance optimization
+    debounceMs: 300,
+    retryCount: 3,
+    keepPreviousData: true,
+
+    // Real-time updates
+    realtime: true,
+    realtimeChannel: 'projects',
+
+    // Data transformation
+    transform: (data) => {
+      if (!profile || !data?.projects) return { projects: [], pagination: data?.pagination }
+
+      const accessibleProjects = data.projects.filter((project: any) =>
+        canAccessProject(project.id)
+      )
+
+      return {
+        projects: accessibleProjects,
+        pagination: data.pagination
+      }
+    },
+
+    // Validation
+    validate: (data) => data && typeof data === 'object' && Array.isArray(data.projects)
+  })
+}
+
+/**
+ * Advanced single project hook with real-time updates
+ */
+export const useProjectAdvanced = (projectId: string) => {
+  return useAdvancedApiQuery({
+    endpoint: `/api/projects/${projectId}`,
+    enabled: !!projectId,
+    cacheKey: `project-advanced-${projectId}`,
+    dependencies: [projectId],
+
+    // Advanced features
+    staleTime: 1 * 60 * 1000, // 1 minute
+    realtime: true,
+    realtimeChannel: `project-${projectId}`,
+    keepPreviousData: true,
+
+    // Performance
+    retryCount: 3,
+    debounceMs: 100,
+
+    // Validation
+    validate: (data) => data && typeof data === 'object' && data.id === projectId
+  })
+}
+
+/**
+ * Project metrics hook with advanced caching
+ */
+export const useProjectMetricsAdvanced = (projectId?: string) => {
+  return useAdvancedApiQuery({
+    endpoint: projectId ? `/api/projects/${projectId}/metrics` : '/api/projects/metrics',
+    enabled: !!projectId,
+    cacheKey: `project-metrics-${projectId || 'all'}`,
+    dependencies: [projectId],
+
+    // Longer cache for metrics
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    cacheTime: 15 * 60 * 1000, // 15 minutes
+
+    // Auto-refresh metrics
+    refetchInterval: 30 * 1000, // 30 seconds
+
+    // Transform metrics data
+    transform: (data) => {
+      if (!data) return null
+
+      // Add computed metrics
+      return {
+        ...data,
+        computed: {
+          completionPercentage: data.completed_tasks / data.total_tasks * 100,
+          budgetUtilization: data.spent_budget / data.total_budget * 100,
+          timeUtilization: data.time_spent / data.estimated_time * 100
+        }
+      }
+    }
+  })
+}
+
+// ============================================================================
+// MAIN PROJECT HOOK (Legacy - Keep for backward compatibility)
 // ============================================================================
 
 export const useProjects = () => {
@@ -250,7 +443,7 @@ export const useProjects = () => {
 // INDIVIDUAL PROJECT HOOK
 // ============================================================================
 
-export const useProject = (projectId: string) => {
+export const useProjectDetailed = (projectId: string) => {
   const { profile, getAccessToken } = useAuth()
   const { canViewPricing } = usePermissions()
   

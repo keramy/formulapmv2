@@ -1,0 +1,74 @@
+{
+  "timestamp": "2025-07-14T11:44:31.091Z",
+  "summary": {
+    "totalOptimizations": 34,
+    "totalLinesReduced": 344,
+    "performanceGain": 19.428571428571427,
+    "qualityImprovement": 19.428571428571427
+  },
+  "detailed": {
+    "codebase": {
+      "totalFiles": 219,
+      "totalLines": 59348,
+      "optimizedFiles": 0,
+      "optimizedLines": 0,
+      "complexityScore": 3079,
+      "maintainabilityIndex": 44.781735159817345
+    },
+    "patterns": {
+      "apiRoutes": {
+        "total": 56,
+        "optimized": 4,
+        "linesReduced": 32
+      },
+      "hooks": {
+        "total": 14,
+        "optimized": 14,
+        "linesReduced": 210
+      },
+      "components": {
+        "total": 76,
+        "optimized": 3,
+        "linesReduced": 30
+      },
+      "forms": {
+        "total": 29,
+        "optimized": 1,
+        "linesReduced": 12
+      },
+      "loadingStates": {
+        "total": 0,
+        "optimized": 12,
+        "linesReduced": 60
+      }
+    },
+    "performance": {
+      "bundleSize": 1961057,
+      "buildTime": 0,
+      "typeCheckTime": -1,
+      "testCoverage": 0,
+      "apiResponseTimes": [],
+      "cacheHitRates": []
+    },
+    "quality": {
+      "duplicateCodeReduction": 344,
+      "cyclomaticComplexityReduction": 103,
+      "maintainabilityImprovement": 19.428571428571427,
+      "errorReduction": 0
+    }
+  },
+  "recommendations": [
+    "Continue migrating remaining API routes to withAuth pattern",
+    "Implement advanced caching strategies for better performance",
+    "Add comprehensive test coverage for optimized patterns",
+    "Monitor real-time performance metrics in production",
+    "Consider implementing code splitting for bundle optimization"
+  ],
+  "nextSteps": [
+    "Deploy optimizations to staging environment",
+    "Run comprehensive test suite",
+    "Monitor performance metrics in production",
+    "Train team on new optimization patterns",
+    "Schedule regular optimization reviews"
+  ]
+}

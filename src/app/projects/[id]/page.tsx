@@ -2,7 +2,7 @@
 
 import { useParams } from 'next/navigation';
 import { ProjectHeader } from '@/components/projects/ProjectHeader';
-import { TabbedWorkspace } from '@/components/projects/TabbedWorkspace';
+import { TabbedWorkspaceOptimized } from '@/components/projects/TabbedWorkspaceOptimized';
 
 export default function ProjectWorkspacePage() {
   const params = useParams();
@@ -11,7 +11,7 @@ export default function ProjectWorkspacePage() {
   return (
     <div className="p-6 space-y-6">
       <ProjectHeader projectId={projectId} />
-      <TabbedWorkspace projectId={projectId} />
+      <TabbedWorkspaceOptimized projectId={projectId} />
     </div>
   );
 }

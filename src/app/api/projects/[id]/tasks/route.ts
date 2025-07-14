@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import { 
@@ -21,13 +21,8 @@ import { TaskStatistics } from '@/types/tasks'
 // GET /api/projects/[id]/tasks - List tasks for a specific project
 // ============================================================================
 
-export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const GET = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+,
       { status: 401 }
     )
   }
@@ -36,10 +31,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
   if (!hasPermission(profile.role, 'projects.read.all') && 
       !hasPermission(profile.role, 'projects.read.assigned') &&
       !hasPermission(profile.role, 'projects.read.own')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to view project tasks' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to view project tasks' , 403)
   }
 
   try {
@@ -49,10 +41,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
     // Validate UUID format
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     if (!uuidRegex.test(projectId)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid project ID format' },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid project ID format' , 400)
     }
 
     const supabase = createServerClient()
@@ -60,10 +49,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
     // Check if user has access to this project
     const hasProjectAccess = await verifyProjectAccess(supabase, user, projectId)
     if (!hasProjectAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied to this project' },
-        { status: 403 }
-      )
+      return createErrorResponse('Access denied to this project' , 403)
     }
 
     // Verify project exists
@@ -74,10 +60,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
       .single()
 
     if (projectError || !project) {
-      return NextResponse.json(
-        { success: false, error: 'Project not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('Project not found' , 404)
     }
 
     const url = new URL(request.url)
@@ -112,14 +95,9 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
     // Validate parameters
     const validationResult = validateTaskListParams(queryParams)
     if (!validationResult.success) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Invalid parameters',
+      return createErrorResponse('Invalid parameters',
           details: validationResult.error.issues 
-        },
-        { status: 400 }
-      )
+        , 400)
     }
 
     // Build query for project-specific tasks
@@ -211,10 +189,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
 
     if (fetchError) {
       console.error('Project tasks fetch error:', fetchError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to fetch project tasks' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to fetch project tasks' , 500)
     }
 
     // Calculate additional fields for tasks
@@ -264,10 +239,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
 
   } catch (error) {
     console.error('Project tasks API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 
@@ -275,23 +247,15 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
 // POST /api/projects/[id]/tasks - Create new task for a specific project
 // ============================================================================
 
-export async function POST(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const POST = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+,
       { status: 401 }
     )
   }
 
   // Permission check
   if (!validateTaskPermissions(profile.role, 'create')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to create tasks' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to create tasks' , 403)
   }
 
   try {
@@ -301,10 +265,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
     // Validate UUID format
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     if (!uuidRegex.test(projectId)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid project ID format' },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid project ID format' , 400)
     }
 
     const supabase = createServerClient()
@@ -312,10 +273,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
     // Check if user has access to this project
     const hasProjectAccess = await verifyProjectAccess(supabase, user, projectId)
     if (!hasProjectAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied to this project' },
-        { status: 403 }
-      )
+      return createErrorResponse('Access denied to this project' , 403)
     }
 
     // Verify project exists
@@ -326,10 +284,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
       .single()
 
     if (projectError || !project) {
-      return NextResponse.json(
-        { success: false, error: 'Project not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('Project not found' , 404)
     }
 
     const body = await request.json()
@@ -343,14 +298,9 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
     // Validate task data
     const validationResult = validateTaskFormData(taskData)
     if (!validationResult.success) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Invalid task data',
+      return createErrorResponse('Invalid task data',
           details: validationResult.error.issues 
-        },
-        { status: 400 }
-      )
+        , 400)
     }
 
     const validatedData = validationResult.data
@@ -365,10 +315,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
         .single()
 
       if (scopeError || !scopeItem) {
-        return NextResponse.json(
-          { success: false, error: 'Scope item not found in this project' },
-          { status: 404 }
-        )
+        return createErrorResponse('Scope item not found in this project' , 404)
       }
     }
 
@@ -381,19 +328,13 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
         .single()
 
       if (assigneeError || !assignee) {
-        return NextResponse.json(
-          { success: false, error: 'Assignee not found' },
-          { status: 404 }
-        )
+        return createErrorResponse('Assignee not found' , 404)
       }
 
       // Check if assignee has access to the project
       const hasAssigneeAccess = await verifyProjectAccess(supabase, { id: validatedData.assigned_to }, projectId)
       if (!hasAssigneeAccess) {
-        return NextResponse.json(
-          { success: false, error: 'Assignee does not have access to this project' },
-          { status: 400 }
-        )
+        return createErrorResponse('Assignee does not have access to this project' , 400)
       }
     }
 
@@ -429,10 +370,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
 
     if (insertError) {
       console.error('Project task creation error:', insertError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to create task' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to create task' , 500)
     }
 
     // Add computed fields
@@ -457,10 +395,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
 
   } catch (error) {
     console.error('Project task creation API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 

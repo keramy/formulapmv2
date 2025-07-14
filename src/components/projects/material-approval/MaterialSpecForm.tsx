@@ -26,6 +26,7 @@ import {
 import { Loader2, Plus, X, AlertTriangle } from 'lucide-react';
 import { MaterialSpec, MaterialSpecFormData, MaterialStatus, MaterialPriority } from '@/types/material-specs';
 import { useMaterialSpecs } from '@/hooks/useMaterialSpecs';
+import { projectSchemas, validateData, FormValidator } from '@/lib/form-validation';
 
 interface MaterialSpecFormProps {
   projectId: string;
@@ -165,39 +166,17 @@ export function MaterialSpecForm({
     ));
   };
 
+  // Use centralized validation
   const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {};
-    
-    if (!formData.name.trim()) {
-      newErrors.name = 'Material name is required';
+    const validationResult = validateData(projectSchemas.materialSpec, formData);
+
+    if (!validationResult.success) {
+      setErrors(validationResult.fieldErrors || {});
+      return false;
     }
-    
-    if (!formData.category.trim()) {
-      newErrors.category = 'Category is required';
-    }
-    
-    if (!formData.unit_of_measure.trim()) {
-      newErrors.unit_of_measure = 'Unit of measure is required';
-    }
-    
-    if (formData.quantity_required < 1) {
-      newErrors.quantity_required = 'Quantity required must be at least 1';
-    }
-    
-    if (formData.minimum_stock_level !== undefined && formData.minimum_stock_level < 0) {
-      newErrors.minimum_stock_level = 'Minimum stock level cannot be negative';
-    }
-    
-    if (formData.estimated_cost !== undefined && formData.estimated_cost < 0) {
-      newErrors.estimated_cost = 'Estimated cost cannot be negative';
-    }
-    
-    if (formData.lead_time_days !== undefined && formData.lead_time_days < 0) {
-      newErrors.lead_time_days = 'Lead time cannot be negative';
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+
+    setErrors({});
+    return true;
   };
 
   const handleSubmit = async () => {
@@ -521,6 +500,203 @@ export function MaterialSpecForm({
             ) : (
               isEditing ? 'Update Material Spec' : 'Create Material Spec'
             )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/**
+ * Optimized MaterialSpecForm using centralized validation - EXAMPLE FOR AI AGENT
+ * This shows how to use the centralized form validation patterns with FormValidator class
+ */
+export function MaterialSpecFormOptimized({
+  projectId,
+  materialSpec,
+  isOpen,
+  onClose,
+  onSuccess
+}: MaterialSpecFormProps) {
+  const { permissions, createMaterialSpec, updateMaterialSpec } = useMaterialSpecs(projectId);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Use FormValidator class for advanced validation
+  const validator = new FormValidator(projectSchemas.materialSpec);
+
+  const [formData, setFormData] = useState<MaterialSpecFormData>({
+    name: materialSpec?.name || '',
+    description: materialSpec?.description || '',
+    category: materialSpec?.category || '',
+    unit: materialSpec?.unit_of_measure || '',
+    unit_price: materialSpec?.estimated_cost || 0,
+    minimum_quantity: materialSpec?.minimum_stock_level || 1,
+    project_id: projectId,
+    delivery_date: materialSpec?.delivery_date || undefined
+  });
+
+  const handleInputChange = (field: keyof MaterialSpecFormData, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+
+    // Validate field on change using centralized validation
+    validator.validateField(field, value);
+  };
+
+  const handleSubmit = async () => {
+    // Use centralized validation
+    const validationResult = validator.validateAll(formData);
+
+    if (!validationResult.success) {
+      return; // Errors are already set in the validator
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const result = materialSpec
+        ? await updateMaterialSpec(materialSpec.id, validationResult.data!)
+        : await createMaterialSpec(validationResult.data!);
+
+      if (result) {
+        onSuccess?.(result);
+        onClose();
+      }
+    } catch (error) {
+      console.error('Error saving material specification:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>
+            {materialSpec ? 'Edit Material Specification' : 'Add Material Specification'}
+          </DialogTitle>
+          <DialogDescription>
+            {materialSpec
+              ? 'Update the material specification details below.'
+              : 'Enter the details for the new material specification.'
+            }
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-6">
+          {/* Basic Information */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Basic Information</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="name">Material Name *</Label>
+                  <Input
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) => handleInputChange('name', e.target.value)}
+                    placeholder="Enter material name"
+                    className={validator.getFieldError('name') ? 'border-red-500' : ''}
+                  />
+                  {validator.getFieldError('name') && (
+                    <p className="text-sm text-red-500 mt-1">{validator.getFieldError('name')}</p>
+                  )}
+                </div>
+
+                <div>
+                  <Label htmlFor="category">Category *</Label>
+                  <Input
+                    id="category"
+                    value={formData.category}
+                    onChange={(e) => handleInputChange('category', e.target.value)}
+                    placeholder="Enter category"
+                    className={validator.getFieldError('category') ? 'border-red-500' : ''}
+                  />
+                  {validator.getFieldError('category') && (
+                    <p className="text-sm text-red-500 mt-1">{validator.getFieldError('category')}</p>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  placeholder="Enter material description"
+                  rows={3}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Quantity and Pricing */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Quantity & Pricing</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="unit">Unit *</Label>
+                  <Input
+                    id="unit"
+                    value={formData.unit}
+                    onChange={(e) => handleInputChange('unit', e.target.value)}
+                    placeholder="e.g., pieces, kg, m"
+                    className={validator.getFieldError('unit') ? 'border-red-500' : ''}
+                  />
+                  {validator.getFieldError('unit') && (
+                    <p className="text-sm text-red-500 mt-1">{validator.getFieldError('unit')}</p>
+                  )}
+                </div>
+
+                <div>
+                  <Label htmlFor="unit_price">Unit Price *</Label>
+                  <Input
+                    id="unit_price"
+                    type="number"
+                    step="0.01"
+                    value={formData.unit_price}
+                    onChange={(e) => handleInputChange('unit_price', parseFloat(e.target.value))}
+                    min="0"
+                    placeholder="Enter unit price"
+                    className={validator.getFieldError('unit_price') ? 'border-red-500' : ''}
+                  />
+                  {validator.getFieldError('unit_price') && (
+                    <p className="text-sm text-red-500 mt-1">{validator.getFieldError('unit_price')}</p>
+                  )}
+                </div>
+
+                <div>
+                  <Label htmlFor="minimum_quantity">Minimum Quantity *</Label>
+                  <Input
+                    id="minimum_quantity"
+                    type="number"
+                    value={formData.minimum_quantity}
+                    onChange={(e) => handleInputChange('minimum_quantity', parseInt(e.target.value))}
+                    min="1"
+                    className={validator.getFieldError('minimum_quantity') ? 'border-red-500' : ''}
+                  />
+                  {validator.getFieldError('minimum_quantity') && (
+                    <p className="text-sm text-red-500 mt-1">{validator.getFieldError('minimum_quantity')}</p>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit} disabled={isSubmitting || validator.hasErrors()}>
+            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {materialSpec ? 'Update' : 'Create'} Material Specification
           </Button>
         </DialogFooter>
       </DialogContent>

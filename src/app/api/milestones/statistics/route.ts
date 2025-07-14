@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import { 
@@ -20,13 +20,8 @@ import { MilestoneStatistics } from '@/types/milestones'
 // GET /api/milestones/statistics - Get milestone statistics
 // ============================================================================
 
-export async function GET(request: NextRequest) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
+,
       { status: 401 }
     )
   }
@@ -35,10 +30,7 @@ export async function GET(request: NextRequest) {
   if (!hasPermission(profile.role, 'projects.read.all') && 
       !hasPermission(profile.role, 'projects.read.assigned') &&
       !hasPermission(profile.role, 'projects.read.own')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to view milestone statistics' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to view milestone statistics' , 403)
   }
 
   try {
@@ -57,14 +49,9 @@ export async function GET(request: NextRequest) {
     // Validate parameters
     const validationResult = validateMilestoneStatisticsParams(queryParams)
     if (!validationResult.success) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Invalid parameters',
+      return createErrorResponse('Invalid parameters',
           details: validationResult.error.issues 
-        },
-        { status: 400 }
-      )
+        , 400)
     }
 
     const supabase = createServerClient()
@@ -99,10 +86,7 @@ export async function GET(request: NextRequest) {
     if (queryParams.project_id) {
       // Verify user has access to this project
       if (!accessibleProjects.includes(queryParams.project_id)) {
-        return NextResponse.json(
-          { success: false, error: 'Access denied to this project' },
-          { status: 403 }
-        )
+        return createErrorResponse('Access denied to this project' , 403)
       }
       query = query.eq('project_id', queryParams.project_id)
     }
@@ -118,10 +102,7 @@ export async function GET(request: NextRequest) {
 
     if (fetchError) {
       console.error('Milestone statistics fetch error:', fetchError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to fetch milestone statistics' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to fetch milestone statistics' , 500)
     }
 
     if (!milestones || milestones.length === 0) {
@@ -167,10 +148,7 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('Milestone statistics API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 

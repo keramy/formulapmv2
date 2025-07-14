@@ -7,6 +7,7 @@ import { hasPermission, Permission } from '@/lib/permissions'
 import { UserRole } from '@/types/auth'
 import { Loader2, AlertCircle } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { DataStateWrapper } from '@/components/ui/loading-states'
 
 interface AuthGuardProps {
   children: ReactNode

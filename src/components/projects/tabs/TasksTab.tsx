@@ -26,8 +26,9 @@ import {
   TrendingUp
 } from 'lucide-react'
 import { Task, TaskFormData, TaskFilters, TaskPermissions } from '@/types/tasks'
-import { useTasks } from '@/hooks/useTasks'
+import { useTasks, useTasksOptimized } from '@/hooks/useTasks'
 import { useProjectMembers } from '@/hooks/useProjectMembers'
+import { DataStateWrapper } from '@/components/ui/loading-states'
 
 interface TasksTabProps {
   projectId: string
@@ -274,5 +275,119 @@ export function TasksTab({ projectId }: TasksTabProps) {
         </Dialog>
       )}
     </div>
+  )
+}
+
+/**
+ * Optimized TasksTab using new patterns - EXAMPLE FOR AI AGENT
+ * This shows how to use DataStateWrapper and optimized hooks
+ */
+export function TasksTabOptimized({ projectId }: TasksTabProps) {
+  const [filters, setFilters] = useState<TaskFilters>({})
+  const [createDialogOpen, setCreateDialogOpen] = useState(false)
+
+  // Use the new optimized hook
+  const {
+    tasks,
+    statistics,
+    loading,
+    error,
+    permissions,
+    refetch
+  } = useTasksOptimized(projectId, filters)
+
+  return (
+    <DataStateWrapper
+      loading={loading}
+      error={error}
+      data={tasks}
+      onRetry={refetch}
+      emptyComponent={
+        <div className="text-center py-12">
+          <Target className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-semibold mb-2">No tasks yet</h3>
+          <p className="text-muted-foreground mb-4">
+            Create your first task to get started.
+          </p>
+          {permissions.canCreate && (
+            <Button onClick={() => setCreateDialogOpen(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Create Task
+            </Button>
+          )}
+        </div>
+      }
+    >
+      <div className="space-y-6">
+        {/* Statistics Cards */}
+        {statistics && (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center space-x-2">
+                  <CheckSquare className="h-4 w-4 text-green-600" />
+                  <div>
+                    <p className="text-sm font-medium">Completed</p>
+                    <p className="text-2xl font-bold">{statistics.completed}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center space-x-2">
+                  <Clock className="h-4 w-4 text-blue-600" />
+                  <div>
+                    <p className="text-sm font-medium">In Progress</p>
+                    <p className="text-2xl font-bold">{statistics.in_progress}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center space-x-2">
+                  <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                  <div>
+                    <p className="text-sm font-medium">Pending</p>
+                    <p className="text-2xl font-bold">{statistics.pending}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center space-x-2">
+                  <TrendingUp className="h-4 w-4 text-purple-600" />
+                  <div>
+                    <p className="text-sm font-medium">Total</p>
+                    <p className="text-2xl font-bold">{statistics.total}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Task List with optimized loading */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Tasks ({tasks.length})</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <TaskList
+              tasks={tasks}
+              permissions={permissions}
+              onEdit={() => {/* Handle edit */}}
+              onDelete={() => {/* Handle delete */}}
+              onStatusChange={() => {/* Handle status change */}}
+            />
+          </CardContent>
+        </Card>
+      </div>
+    </DataStateWrapper>
   )
 }

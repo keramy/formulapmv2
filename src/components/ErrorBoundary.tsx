@@ -4,6 +4,7 @@ import React, { Component, ReactNode } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { DataStateWrapper } from '@/components/ui/loading-states';
 
 interface Props {
   children: ReactNode;
@@ -90,4 +91,70 @@ export function useErrorBoundary() {
   }
 
   return setError;
+}
+
+/**
+ * Enhanced ErrorBoundary with DataStateWrapper integration
+ * This provides consistent error handling that works with our optimization patterns
+ */
+export function EnhancedErrorBoundary({
+  children,
+  fallback,
+  onError,
+  showRetry = true,
+  showDetails = process.env.NODE_ENV === 'development'
+}: Props & {
+  showRetry?: boolean;
+  showDetails?: boolean;
+}) {
+  return (
+    <ErrorBoundary
+      onError={onError}
+      fallback={fallback || (
+        <DataStateWrapper
+          loading={false}
+          error="Component Error"
+          data={null}
+          emptyComponent={
+            <Card className="border-red-200 bg-red-50">
+              <CardHeader>
+                <CardTitle className="flex items-center text-red-700">
+                  <AlertTriangle className="mr-2 h-5 w-5" />
+                  Component Error
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-red-600 mb-4">
+                  This component encountered an error and couldn't load properly.
+                </p>
+                {showDetails && (
+                  <details className="mb-4">
+                    <summary className="cursor-pointer text-sm text-red-500 mb-2">
+                      Error details (development only)
+                    </summary>
+                    <pre className="text-xs bg-red-100 p-2 rounded overflow-auto">
+                      Component failed to render
+                    </pre>
+                  </details>
+                )}
+                {showRetry && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => window.location.reload()}
+                    className="border-red-300 text-red-700 hover:bg-red-100"
+                  >
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    Reload Page
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+          }
+        />
+      )}
+    >
+      {children}
+    </ErrorBoundary>
+  );
 }

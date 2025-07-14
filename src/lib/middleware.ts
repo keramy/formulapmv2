@@ -133,7 +133,7 @@ export async function verifyAuth(request: NextRequest): Promise<{
     // Clear cache to force fresh fetch for debugging
     authCache.delete(cacheKey)
     
-    if (false && cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
       console.log(`💨 [verifyAuth:${correlationId}] Cache hit`, {
         userId: cached.user.id,
         cacheAge: Date.now() - cached.timestamp,
@@ -202,7 +202,7 @@ export async function verifyAuth(request: NextRequest): Promise<{
         // Use the supabaseAdmin client to bypass RLS for profile fetching
         console.log(`🔐 [verifyAuth:${correlationId}] Using supabaseAdmin for profile fetch`)
         console.log(`🔐 [verifyAuth:${correlationId}] Admin client config`, {
-          url: supabaseAdmin.supabaseUrl,
+          url: process.env.NEXT_PUBLIC_SUPABASE_URL,
           hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
           serviceKeyStart: process.env.SUPABASE_SERVICE_ROLE_KEY?.substring(0, 20) + '...'
         })

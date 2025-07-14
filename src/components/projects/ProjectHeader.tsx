@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { DataStateWrapper } from '@/components/ui/loading-states';
 import { 
   ArrowLeft, 
   Edit, 
@@ -59,58 +60,26 @@ export function ProjectHeader({ projectId }: ProjectHeaderProps) {
     );
   }
 
-  if (loading) {
-    return (
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Skeleton className="h-10 w-32" />
-              <div>
-                <Skeleton className="h-8 w-64 mb-2" />
-                <Skeleton className="h-4 w-48" />
-              </div>
-            </div>
-            <Skeleton className="h-10 w-24" />
-          </div>
-        </CardHeader>
-      </Card>
-    );
-  }
 
-  if (error) {
-    return (
-      <Card>
-        <CardContent className="text-center py-8">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <AlertTriangle className="w-8 h-8 text-red-500" />
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Error Loading Project</h1>
-          <p className="text-gray-600 mb-4">{error}</p>
-          <Button asChild>
-            <Link href="/projects">Back to Projects</Link>
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (!project) {
-    return (
-      <Card>
-        <CardContent className="text-center py-8">
-          <h1 className="text-2xl font-bold text-gray-900">Project Not Found</h1>
-          <p className="text-gray-600">The requested project could not be found.</p>
-          <Button asChild className="mt-4">
-            <Link href="/projects">Back to Projects</Link>
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
 
   return (
-    <Card>
+    <DataStateWrapper
+      loading={loading}
+      error={error}
+      data={project}
+      emptyComponent={
+        <Card>
+          <CardContent className="text-center py-8">
+            <h1 className="text-2xl font-bold text-gray-900">Project Not Found</h1>
+            <p className="text-gray-600">The requested project could not be found.</p>
+            <Button asChild className="mt-4">
+              <Link href="/projects">Back to Projects</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      }
+    >
+      <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
@@ -187,6 +156,7 @@ export function ProjectHeader({ projectId }: ProjectHeaderProps) {
           </div>
         )}
       </CardContent>
-    </Card>
+      </Card>
+    </DataStateWrapper>
   );
 }

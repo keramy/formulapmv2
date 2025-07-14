@@ -10,6 +10,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useAuth } from './useAuth'
 import { usePermissions } from './usePermissions'
+import { useAdvancedApiQuery } from './useAdvancedApiQuery'
 import { 
   ScopeItem,
   ScopeItemFormData,
@@ -749,4 +750,151 @@ export const useScopeProgress = (projectId?: string) => {
   }, [scopeItems, statistics])
 
   return progressMetrics
+}
+
+// ============================================================================
+// ADVANCED OPTIMIZED SCOPE HOOKS - NEXT GENERATION PATTERNS
+// ============================================================================
+
+/**
+ * Advanced scope items hook with sophisticated caching and real-time updates
+ */
+export const useScopeAdvanced = (projectId?: string, params?: ScopeListParams) => {
+  const { canViewScope } = usePermissions()
+
+  return useAdvancedApiQuery({
+    endpoint: '/api/scope',
+    params: {
+      project_id: projectId,
+      page: params?.page || 1,
+      limit: params?.limit || 50,
+      include_dependencies: params?.include_dependencies || false,
+      include_materials: params?.include_materials || false,
+      include_assignments: params?.include_assignments || false,
+      ...params?.filters
+    },
+    enabled: !!projectId && canViewScope(),
+    cacheKey: `scope-advanced-${projectId}-${JSON.stringify(params)}`,
+    dependencies: [projectId],
+
+    // Advanced caching
+    staleTime: 1 * 60 * 1000, // 1 minute
+    cacheTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: true,
+
+    // Performance optimization
+    debounceMs: 300,
+    retryCount: 3,
+    keepPreviousData: true,
+
+    // Real-time updates for scope changes
+    realtime: true,
+    realtimeChannel: `scope-${projectId}`,
+
+    // Data transformation
+    transform: (data) => {
+      if (!data?.items) return { items: [], statistics: null, pagination: data?.pagination }
+
+      // Add computed fields to scope items
+      const enhancedItems = data.items.map((item: any) => ({
+        ...item,
+        computed: {
+          totalCost: (item.unit_price || 0) * (item.quantity || 0),
+          isOverBudget: item.actual_cost > item.estimated_cost,
+          progressPercentage: item.progress_percentage || 0,
+          daysRemaining: item.due_date ?
+            Math.ceil((new Date(item.due_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : null
+        }
+      }))
+
+      return {
+        items: enhancedItems,
+        statistics: data.statistics,
+        pagination: data.pagination
+      }
+    },
+
+    // Validation
+    validate: (data) => data && typeof data === 'object' && Array.isArray(data.items)
+  })
+}
+
+/**
+ * Advanced single scope item hook with real-time updates
+ */
+export const useScopeItemAdvanced = (itemId: string) => {
+  const { canViewScope } = usePermissions()
+
+  return useAdvancedApiQuery({
+    endpoint: `/api/scope/${itemId}`,
+    enabled: !!itemId && canViewScope(),
+    cacheKey: `scope-item-advanced-${itemId}`,
+    dependencies: [itemId],
+
+    // Advanced features
+    staleTime: 30 * 1000, // 30 seconds
+    realtime: true,
+    realtimeChannel: `scope-item-${itemId}`,
+    keepPreviousData: true,
+
+    // Performance
+    retryCount: 3,
+    debounceMs: 100,
+
+    // Transform single item
+    transform: (data) => {
+      if (!data) return null
+
+      return {
+        ...data,
+        computed: {
+          totalCost: (data.unit_price || 0) * (data.quantity || 0),
+          isOverBudget: data.actual_cost > data.estimated_cost,
+          progressPercentage: data.progress_percentage || 0,
+          daysRemaining: data.due_date ?
+            Math.ceil((new Date(data.due_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : null,
+          canEdit: data.status !== 'completed' && data.status !== 'cancelled'
+        }
+      }
+    },
+
+    // Validation
+    validate: (data) => data && typeof data === 'object' && data.id === itemId
+  })
+}
+
+/**
+ * Advanced scope statistics hook with auto-refresh
+ */
+export const useScopeStatisticsAdvanced = (projectId?: string) => {
+  return useAdvancedApiQuery({
+    endpoint: '/api/scope/overview',
+    params: { project_id: projectId },
+    enabled: !!projectId,
+    cacheKey: `scope-statistics-advanced-${projectId}`,
+    dependencies: [projectId],
+
+    // Longer cache for statistics
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    cacheTime: 10 * 60 * 1000, // 10 minutes
+
+    // Auto-refresh statistics
+    refetchInterval: 60 * 1000, // 1 minute
+
+    // Transform statistics
+    transform: (data) => {
+      if (!data) return null
+
+      return {
+        ...data,
+        computed: {
+          completionRate: data.total_items > 0 ? (data.completed_items / data.total_items) * 100 : 0,
+          budgetUtilization: data.total_budget > 0 ? (data.spent_budget / data.total_budget) * 100 : 0,
+          averageProgress: data.total_items > 0 ? data.total_progress / data.total_items : 0,
+          estimatedCompletion: data.remaining_items > 0 && data.average_completion_rate > 0 ?
+            new Date(Date.now() + (data.remaining_items / data.average_completion_rate * 24 * 60 * 60 * 1000)) : null
+        }
+      }
+    }
+  })
 }

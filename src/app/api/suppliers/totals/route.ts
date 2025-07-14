@@ -1,19 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
   try {
-    // Verify authentication
-    const { user, profile, error: authError } = await verifyAuth(request)
-    if (authError || !user || !profile) {
-      return NextResponse.json({ error: authError || 'Authentication required' }, { status: 401 })
-    }
-
     // Check permission
     if (!hasPermission(profile.role, 'projects.read.all')) {
-      return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
+      return createErrorResponse('Insufficient permissions', 403)
     }
 
     const url = new URL(request.url)
@@ -47,7 +41,7 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error('Error fetching scope items:', error)
-      return NextResponse.json({ error: 'Failed to fetch supplier totals' }, { status: 500 })
+      return createErrorResponse('Failed to fetch supplier totals', 500)
     }
 
     // Calculate totals per supplier
@@ -79,8 +73,7 @@ export async function GET(request: NextRequest) {
       b.total_estimated - a.total_estimated
     )
 
-    return NextResponse.json({
-      success: true,
+    return createSuccessResponse({
       data: totalsArray,
       summary: {
         total_suppliers: totalsArray.length,
@@ -92,6 +85,6 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('Unexpected error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return createErrorResponse('Internal server error', 500)
   }
-}
+})

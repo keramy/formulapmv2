@@ -2,6 +2,8 @@
 const nextConfig = {
   images: {
     domains: ['localhost'],
+    formats: ['image/webp', 'image/avif'],
+    minimumCacheTTL: 60,
   },
   env: {
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -18,6 +20,21 @@ const nextConfig = {
   },
   // Additional options to reduce hydration warnings
   poweredByHeader: false,
+  // Bundle analysis and performance optimizations
+  webpack: (config, { isServer }) => {
+    if (process.env.ANALYZE === 'true') {
+      const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
+      config.plugins.push(
+        new BundleAnalyzerPlugin({
+          analyzerMode: 'static',
+          openAnalyzer: false,
+          reportFilename: '../bundle-analysis.html',
+        })
+      )
+    }
+    return config
+  },
+  compress: true,
   // Security headers
   async headers() {
     return [

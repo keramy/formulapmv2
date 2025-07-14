@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import { 
@@ -19,23 +19,15 @@ import {
 // POST /api/milestones/bulk - Bulk update milestones
 // ============================================================================
 
-export async function POST(request: NextRequest) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const POST = withAuth(async (request: NextRequest, { user, profile }) => {
+,
       { status: 401 }
     )
   }
 
   // Permission check
   if (!validateMilestonePermissions(profile.role, 'update')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to update milestones' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to update milestones' , 403)
   }
 
   try {
@@ -44,14 +36,9 @@ export async function POST(request: NextRequest) {
     // Validate bulk update data
     const validationResult = validateMilestoneBulkUpdate(body)
     if (!validationResult.success) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Invalid bulk update data',
+      return createErrorResponse('Invalid bulk update data',
           details: validationResult.error.issues 
-        },
-        { status: 400 }
-      )
+        , 400)
     }
 
     const { milestone_ids, updates, notify_team } = validationResult.data
@@ -65,17 +52,11 @@ export async function POST(request: NextRequest) {
 
     if (fetchError) {
       console.error('Milestone bulk fetch error:', fetchError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to fetch milestones' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to fetch milestones' , 500)
     }
 
     if (!milestones || milestones.length !== milestone_ids.length) {
-      return NextResponse.json(
-        { success: false, error: 'One or more milestones not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('One or more milestones not found' , 404)
     }
 
     // Check access to all projects
@@ -97,10 +78,7 @@ export async function POST(request: NextRequest) {
 
     // Check for status change permissions
     if (updates.status && !validateMilestonePermissions(profile.role, 'change_status')) {
-      return NextResponse.json(
-        { success: false, error: 'Insufficient permissions to change milestone status' },
-        { status: 403 }
-      )
+      return createErrorResponse('Insufficient permissions to change milestone status' , 403)
     }
 
     // Prepare update data
@@ -140,10 +118,7 @@ export async function POST(request: NextRequest) {
 
     if (updateError) {
       console.error('Milestone bulk update error:', updateError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to update milestones' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to update milestones' , 500)
     }
 
     // Enhance milestones with computed fields
@@ -186,10 +161,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Milestone bulk update API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 
@@ -197,33 +169,22 @@ export async function POST(request: NextRequest) {
 // DELETE /api/milestones/bulk - Bulk delete milestones
 // ============================================================================
 
-export async function DELETE(request: NextRequest) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const DELETE = withAuth(async (request: NextRequest, { user, profile }) => {
+,
       { status: 401 }
     )
   }
 
   // Permission check
   if (!validateMilestonePermissions(profile.role, 'delete')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to delete milestones' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to delete milestones' , 403)
   }
 
   try {
     const body = await request.json()
     
     if (!body.milestone_ids || !Array.isArray(body.milestone_ids) || body.milestone_ids.length === 0) {
-      return NextResponse.json(
-        { success: false, error: 'milestone_ids array is required' },
-        { status: 400 }
-      )
+      return createErrorResponse('milestone_ids array is required' , 400)
     }
 
     const milestone_ids = body.milestone_ids
@@ -237,17 +198,11 @@ export async function DELETE(request: NextRequest) {
 
     if (fetchError) {
       console.error('Milestone bulk fetch error:', fetchError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to fetch milestones' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to fetch milestones' , 500)
     }
 
     if (!milestones || milestones.length !== milestone_ids.length) {
-      return NextResponse.json(
-        { success: false, error: 'One or more milestones not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('One or more milestones not found' , 404)
     }
 
     // Check access to all projects
@@ -288,10 +243,7 @@ export async function DELETE(request: NextRequest) {
 
     if (deleteError) {
       console.error('Milestone bulk delete error:', deleteError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to delete milestones' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to delete milestones' , 500)
     }
 
     // Log bulk operation for audit trail
@@ -313,10 +265,7 @@ export async function DELETE(request: NextRequest) {
 
   } catch (error) {
     console.error('Milestone bulk delete API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 

@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import { 
@@ -21,25 +21,16 @@ import {
 // GET /api/milestones/[id] - Get individual milestone
 // ============================================================================
 
-export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
-      { status: 401 }
-    )
+export const GET = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+  if (!user || !profile) {
+    return createErrorResponse('Authentication required', 401)
   }
 
   // Permission check
   if (!hasPermission(profile.role, 'projects.read.all') && 
       !hasPermission(profile.role, 'projects.read.assigned') &&
       !hasPermission(profile.role, 'projects.read.own')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to view milestones' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to view milestones' , 403)
   }
 
   try {
@@ -49,10 +40,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
     // Validate UUID format
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     if (!uuidRegex.test(milestoneId)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid milestone ID format' },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid milestone ID format' , 400)
     }
 
     const supabase = createServerClient()
@@ -69,19 +57,13 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
       .single()
 
     if (fetchError || !milestone) {
-      return NextResponse.json(
-        { success: false, error: 'Milestone not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('Milestone not found' , 404)
     }
 
     // Check if user has access to this milestone's project
     const hasProjectAccess = await verifyProjectAccess(supabase, user, milestone.project_id)
     if (!hasProjectAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied to this milestone' },
-        { status: 403 }
-      )
+      return createErrorResponse('Access denied to this milestone' , 403)
     }
 
     // Calculate additional fields
@@ -105,10 +87,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
 
   } catch (error) {
     console.error('Milestone detail API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 
@@ -116,23 +95,15 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
 // PUT /api/milestones/[id] - Update milestone
 // ============================================================================
 
-export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const PUT = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+,
       { status: 401 }
     )
   }
 
   // Permission check
   if (!validateMilestonePermissions(profile.role, 'update')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to update milestones' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to update milestones' , 403)
   }
 
   try {
@@ -142,10 +113,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
     // Validate UUID format
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     if (!uuidRegex.test(milestoneId)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid milestone ID format' },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid milestone ID format' , 400)
     }
 
     const supabase = createServerClient()
@@ -158,19 +126,13 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
       .single()
 
     if (fetchError || !existingMilestone) {
-      return NextResponse.json(
-        { success: false, error: 'Milestone not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('Milestone not found' , 404)
     }
 
     // Check if user has access to this milestone's project
     const hasProjectAccess = await verifyProjectAccess(supabase, user, existingMilestone.project_id)
     if (!hasProjectAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied to this milestone' },
-        { status: 403 }
-      )
+      return createErrorResponse('Access denied to this milestone' , 403)
     }
 
     const body = await request.json()
@@ -180,22 +142,14 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
       // Validate status update
       const statusValidation = validateMilestoneStatusUpdate(body)
       if (!statusValidation.success) {
-        return NextResponse.json(
-          { 
-            success: false, 
-            error: 'Invalid status update data',
+        return createErrorResponse('Invalid status update data',
             details: statusValidation.error.issues 
-          },
-          { status: 400 }
-        )
+          , 400)
       }
 
       // Check permissions for status changes
       if (!validateMilestonePermissions(profile.role, 'change_status')) {
-        return NextResponse.json(
-          { success: false, error: 'Insufficient permissions to change milestone status' },
-          { status: 403 }
-        )
+        return createErrorResponse('Insufficient permissions to change milestone status' , 403)
       }
 
       // Handle status-specific updates
@@ -224,10 +178,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
 
       if (updateError) {
         console.error('Milestone status update error:', updateError)
-        return NextResponse.json(
-          { success: false, error: 'Failed to update milestone status' },
-          { status: 500 }
-        )
+        return createErrorResponse('Failed to update milestone status' , 500)
       }
 
       // Calculate additional fields
@@ -251,14 +202,9 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
       // Regular update validation
       const validationResult = validateMilestoneUpdate(body)
       if (!validationResult.success) {
-        return NextResponse.json(
-          { 
-            success: false, 
-            error: 'Invalid update data',
+        return createErrorResponse('Invalid update data',
             details: validationResult.error.issues 
-          },
-          { status: 400 }
-        )
+          , 400)
       }
 
       const updateData = validationResult.data
@@ -285,10 +231,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
 
       if (updateError) {
         console.error('Milestone update error:', updateError)
-        return NextResponse.json(
-          { success: false, error: 'Failed to update milestone' },
-          { status: 500 }
-        )
+        return createErrorResponse('Failed to update milestone' , 500)
       }
 
       // Calculate additional fields
@@ -312,10 +255,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
 
   } catch (error) {
     console.error('Milestone update API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 
@@ -323,23 +263,15 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
 // DELETE /api/milestones/[id] - Delete milestone
 // ============================================================================
 
-export async function DELETE(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const DELETE = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+,
       { status: 401 }
     )
   }
 
   // Permission check
   if (!validateMilestonePermissions(profile.role, 'delete')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to delete milestones' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to delete milestones' , 403)
   }
 
   try {
@@ -349,10 +281,7 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
     // Validate UUID format
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     if (!uuidRegex.test(milestoneId)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid milestone ID format' },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid milestone ID format' , 400)
     }
 
     const supabase = createServerClient()
@@ -365,30 +294,19 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
       .single()
 
     if (fetchError || !milestone) {
-      return NextResponse.json(
-        { success: false, error: 'Milestone not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('Milestone not found' , 404)
     }
 
     // Check if user has access to this milestone's project
     const hasProjectAccess = await verifyProjectAccess(supabase, user, milestone.project_id)
     if (!hasProjectAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied to this milestone' },
-        { status: 403 }
-      )
+      return createErrorResponse('Access denied to this milestone' , 403)
     }
 
     // Prevent deletion of completed milestones (business rule)
     if (milestone.status === 'completed') {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Cannot delete completed milestones. Consider cancelling instead.' 
-        },
-        { status: 400 }
-      )
+      return createErrorResponse('Cannot delete completed milestones. Consider cancelling instead.' 
+        , 400)
     }
 
     // Delete milestone
@@ -399,23 +317,15 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
 
     if (deleteError) {
       console.error('Milestone deletion error:', deleteError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to delete milestone' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to delete milestone' , 500)
     }
 
-    return NextResponse.json({
-      success: true,
-      message: 'Milestone deleted successfully'
-    })
+    return createSuccessResponse({ message: 'Milestone deleted successfully'
+     })
 
   } catch (error) {
     console.error('Milestone deletion API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 

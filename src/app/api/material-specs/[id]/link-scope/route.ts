@@ -7,7 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { 
   validateScopeLink,
@@ -18,23 +18,14 @@ import {
 // POST /api/material-specs/[id]/link-scope - Link material specification to scope item
 // ============================================================================
 
-export async function POST(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
-      { status: 401 }
-    )
+export const POST = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+  if (!user || !profile) {
+    return createErrorResponse('Authentication required', 401)
   }
 
   // Permission check
   if (!validateMaterialSpecPermissions(profile.role, 'link')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to link material specifications to scope items' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to link material specifications to scope items', 403)
   }
 
   try {
@@ -44,10 +35,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
     // Validate UUID format
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     if (!uuidRegex.test(materialSpecId)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid material specification ID format' },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid material specification ID format', 400)
     }
 
     const supabase = createServerClient()
@@ -60,19 +48,13 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
       .single()
 
     if (fetchError || !existingMaterialSpec) {
-      return NextResponse.json(
-        { success: false, error: 'Material specification not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('Material specification not found', 404)
     }
 
     // Check if user has access to this material spec's project
     const hasProjectAccess = await verifyProjectAccess(supabase, user, existingMaterialSpec.project_id)
     if (!hasProjectAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied to this material specification' },
-        { status: 403 }
-      )
+      return createErrorResponse('Access denied to this material specification', 403)
     }
 
     const body = await request.json()
@@ -80,14 +62,9 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
     // Validate scope link data
     const validationResult = validateScopeLink(body)
     if (!validationResult.success) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Invalid scope link data',
-          details: validationResult.error.issues 
-        },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid scope link data', 400, {
+        details: validationResult.error.issues
+      })
     }
 
     const linkData = validationResult.data
@@ -100,18 +77,12 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
       .single()
 
     if (scopeError || !scopeItem) {
-      return NextResponse.json(
-        { success: false, error: 'Scope item not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('Scope item not found', 404)
     }
 
     // Verify scope item belongs to the same project as material spec
     if (scopeItem.project_id !== existingMaterialSpec.project_id) {
-      return NextResponse.json(
-        { success: false, error: 'Scope item must belong to the same project as the material specification' },
-        { status: 400 }
-      )
+      return createErrorResponse('Scope item must belong to the same project as the material specification', 400)
     }
 
     // Check if link already exists
@@ -123,10 +94,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
       .single()
 
     if (existingLink) {
-      return NextResponse.json(
-        { success: false, error: 'Material specification is already linked to this scope item' },
-        { status: 400 }
-      )
+      return createErrorResponse('Material specification is already linked to this scope item', 400)
     }
 
     // Create the scope material link
@@ -147,10 +115,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
 
     if (insertError) {
       console.error('Scope material link creation error:', insertError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to link material specification to scope item' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to link material specification to scope item', 500)
     }
 
     // Log link action for audit trail
@@ -180,34 +145,22 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
 
   } catch (error) {
     console.error('Material spec scope linking API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error', 500)
   }
-}
+})
 
 // ============================================================================
 // GET /api/material-specs/[id]/link-scope - Get all scope items linked to material specification
 // ============================================================================
 
-export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
-      { status: 401 }
-    )
+export const GET = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+  if (!user || !profile) {
+    return createErrorResponse('Authentication required', 401)
   }
 
   // Permission check
   if (!validateMaterialSpecPermissions(profile.role, 'read')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to view material specification scope links' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to view material specification scope links', 403)
   }
 
   try {
@@ -217,10 +170,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
     // Validate UUID format
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     if (!uuidRegex.test(materialSpecId)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid material specification ID format' },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid material specification ID format', 400)
     }
 
     const supabase = createServerClient()
@@ -233,19 +183,13 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
       .single()
 
     if (fetchError || !existingMaterialSpec) {
-      return NextResponse.json(
-        { success: false, error: 'Material specification not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('Material specification not found', 404)
     }
 
     // Check if user has access to this material spec's project
     const hasProjectAccess = await verifyProjectAccess(supabase, user, existingMaterialSpec.project_id)
     if (!hasProjectAccess) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied to this material specification' },
-        { status: 403 }
-      )
+      return createErrorResponse('Access denied to this material specification', 403)
     }
 
     // Get all scope items linked to this material specification
@@ -260,10 +204,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
 
     if (linksError) {
       console.error('Scope material links fetch error:', linksError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to fetch scope item links' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to fetch scope item links', 500)
     }
 
     return NextResponse.json({
@@ -279,12 +220,9 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
 
   } catch (error) {
     console.error('Material spec scope links fetch API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error', 500)
   }
-}
+})
 
 // ============================================================================
 // HELPER FUNCTIONS

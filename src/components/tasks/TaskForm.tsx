@@ -11,6 +11,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { projectSchemas, validateData, FormValidator } from '@/lib/form-validation'
 import { Task, TaskFormData } from '@/types/tasks'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -467,5 +468,183 @@ export const TaskForm: React.FC<TaskFormProps> = ({
         </Form>
       </DialogContent>
     </Dialog>
+  )
+}
+
+/**
+ * Optimized TaskForm using centralized validation - EXAMPLE FOR AI AGENT
+ * This shows how to use the centralized form validation patterns
+ */
+export function TaskFormOptimized({
+  task,
+  projectId,
+  mode = 'create',
+  onSave,
+  onCancel
+}: TaskFormProps) {
+  const [isLoading, setIsLoading] = useState(false)
+  const { toast } = useToast()
+
+  // Use centralized validation schema
+  const form = useForm<TaskFormData>({
+    resolver: zodResolver(projectSchemas.task),
+    defaultValues: {
+      title: task?.title || '',
+      description: task?.description || '',
+      status: task?.status || 'pending',
+      priority: task?.priority || 'medium',
+      assigned_to: task?.assigned_to || '',
+      due_date: task?.due_date || '',
+      project_id: projectId,
+      scope_item_id: task?.scope_item_id || ''
+    }
+  })
+
+  // Alternative: Use FormValidator class for more control
+  const validator = new FormValidator(projectSchemas.task)
+
+  const handleSubmit = async (data: TaskFormData) => {
+    setIsLoading(true)
+
+    try {
+      // Validate using centralized validation
+      const validationResult = validateData(projectSchemas.task, data)
+
+      if (!validationResult.success) {
+        // Handle validation errors
+        Object.entries(validationResult.fieldErrors || {}).forEach(([field, error]) => {
+          form.setError(field as keyof TaskFormData, { message: error })
+        })
+        return
+      }
+
+      await onSave(validationResult.data!)
+
+      toast({
+        title: mode === 'create' ? 'Task created' : 'Task updated',
+        description: `Task "${data.title}" has been ${mode === 'create' ? 'created' : 'updated'} successfully.`
+      })
+
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'An error occurred',
+        variant: 'destructive'
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem className="md:col-span-2">
+                <FormLabel>Task Title</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Enter task title..."
+                    {...field}
+                    disabled={mode === 'view'}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="priority"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Priority</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                  disabled={mode === 'view'}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select priority" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                    <SelectItem value="critical">Critical</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Status</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                  disabled={mode === 'view'}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="in_progress">In Progress</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem className="md:col-span-2">
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Enter task description..."
+                    className="min-h-[100px]"
+                    {...field}
+                    disabled={mode === 'view'}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {mode !== 'view' && (
+          <div className="flex justify-end space-x-2">
+            <Button type="button" variant="outline" onClick={onCancel}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? 'Saving...' : mode === 'create' ? 'Create Task' : 'Save Changes'}
+            </Button>
+          </div>
+        )}
+      </form>
+    </Form>
   )
 }

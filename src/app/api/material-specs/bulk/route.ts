@@ -7,7 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyAuth } from '@/lib/middleware'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { 
   validateMaterialSpecBulkUpdate,
@@ -24,23 +24,14 @@ import {
 // PUT /api/material-specs/bulk - Bulk update material specifications
 // ============================================================================
 
-export async function PUT(request: NextRequest) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
-      { status: 401 }
-    )
+export const PUT = withAuth(async (request: NextRequest, { user, profile }) => {
+  if (!user || !profile) {
+    return createErrorResponse('Authentication required', 401)
   }
 
   // Permission check
   if (!validateMaterialSpecPermissions(profile.role, 'update')) {
-    return NextResponse.json(
-      { success: false, error: 'Insufficient permissions to bulk update material specifications' },
-      { status: 403 }
-    )
+    return createErrorResponse('Insufficient permissions to bulk update material specifications' , 403)
   }
 
   try {
@@ -49,14 +40,9 @@ export async function PUT(request: NextRequest) {
     // Validate bulk update data
     const validationResult = validateMaterialSpecBulkUpdate(body)
     if (!validationResult.success) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Invalid bulk update data',
-          details: validationResult.error.issues 
-        },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid bulk update data', 400, {
+        details: validationResult.error.issues
+      })
     }
 
     const bulkUpdateData = validationResult.data
@@ -69,17 +55,11 @@ export async function PUT(request: NextRequest) {
       .in('id', bulkUpdateData.material_spec_ids)
 
     if (fetchError) {
-      return NextResponse.json(
-        { success: false, error: 'Failed to fetch material specifications' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to fetch material specifications' , 500)
     }
 
     if (!materialSpecs || materialSpecs.length !== bulkUpdateData.material_spec_ids.length) {
-      return NextResponse.json(
-        { success: false, error: 'One or more material specifications not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('One or more material specifications not found' , 404)
     }
 
     // Verify user has access to all projects
@@ -89,10 +69,7 @@ export async function PUT(request: NextRequest) {
     )
 
     if (accessResults.some(result => !result)) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied to one or more projects' },
-        { status: 403 }
-      )
+      return createErrorResponse('Access denied to one or more projects' , 403)
     }
 
     // Verify supplier exists if provided
@@ -104,10 +81,7 @@ export async function PUT(request: NextRequest) {
         .single()
 
       if (supplierError || !supplier) {
-        return NextResponse.json(
-          { success: false, error: 'Supplier not found' },
-          { status: 404 }
-        )
+        return createErrorResponse('Supplier not found' , 404)
       }
     }
 
@@ -132,10 +106,7 @@ export async function PUT(request: NextRequest) {
 
     if (updateError) {
       console.error('Bulk update error:', updateError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to update material specifications' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to update material specifications' , 500)
     }
 
     // Add computed fields to updated specs
@@ -194,10 +165,7 @@ export async function PUT(request: NextRequest) {
 
   } catch (error) {
     console.error('Bulk update API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 
@@ -205,13 +173,8 @@ export async function PUT(request: NextRequest) {
 // POST /api/material-specs/bulk - Bulk approve/reject material specifications
 // ============================================================================
 
-export async function POST(request: NextRequest) {
-  // Authentication check
-  const { user, profile, error } = await verifyAuth(request)
-  
-  if (error || !user || !profile) {
-    return NextResponse.json(
-      { success: false, error: error || 'Authentication required' },
+export const POST = withAuth(async (request: NextRequest, { user, profile }) => {
+,
       { status: 401 }
     )
   }
@@ -221,10 +184,7 @@ export async function POST(request: NextRequest) {
     const action = body.action // 'approve' or 'reject'
 
     if (!action || !['approve', 'reject'].includes(action)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid action. Must be "approve" or "reject"' },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid action. Must be "approve" or "reject"' , 400)
     }
 
     // Permission check
@@ -241,27 +201,17 @@ export async function POST(request: NextRequest) {
     if (action === 'approve') {
       validationResult = validateMaterialSpecBulkApproval(body)
       if (!validationResult.success) {
-        return NextResponse.json(
-          { 
-            success: false, 
-            error: 'Invalid bulk approval data',
+        return createErrorResponse('Invalid bulk approval data',
             details: validationResult.error.issues 
-          },
-          { status: 400 }
-        )
+          , 400)
       }
       bulkData = validationResult.data
     } else {
       validationResult = validateMaterialSpecBulkRejection(body)
       if (!validationResult.success) {
-        return NextResponse.json(
-          { 
-            success: false, 
-            error: 'Invalid bulk rejection data',
+        return createErrorResponse('Invalid bulk rejection data',
             details: validationResult.error.issues 
-          },
-          { status: 400 }
-        )
+          , 400)
       }
       bulkData = validationResult.data
     }
@@ -275,17 +225,11 @@ export async function POST(request: NextRequest) {
       .in('id', bulkData.material_spec_ids)
 
     if (fetchError) {
-      return NextResponse.json(
-        { success: false, error: 'Failed to fetch material specifications' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to fetch material specifications' , 500)
     }
 
     if (!materialSpecs || materialSpecs.length !== bulkData.material_spec_ids.length) {
-      return NextResponse.json(
-        { success: false, error: 'One or more material specifications not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('One or more material specifications not found' , 404)
     }
 
     // Verify user has access to all projects
@@ -295,10 +239,7 @@ export async function POST(request: NextRequest) {
     )
 
     if (accessResults.some(result => !result)) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied to one or more projects' },
-        { status: 403 }
-      )
+      return createErrorResponse('Access denied to one or more projects' , 403)
     }
 
     // Validate status transitions and prevent self-approval/rejection
@@ -336,10 +277,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (validSpecs.length === 0) {
-      return NextResponse.json(
-        { success: false, error: 'No valid material specifications to process' },
-        { status: 400 }
-      )
+      return createErrorResponse('No valid material specifications to process' , 400)
     }
 
     // Prepare update data based on action
@@ -441,10 +379,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Bulk approve/reject API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error' , 500)
   }
 }
 

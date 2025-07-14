@@ -11,6 +11,7 @@
 import { useState } from 'react'
 import { DataTable } from '@/components/ui/data-table'
 import { Construction } from 'lucide-react'
+import { DataStateWrapper } from '@/components/ui/loading-states'
 import { ScopeItem, ScopeStatus } from '@/types/scope'
 import { useScopeTableColumns } from './table/ScopeTableColumns'
 import { ScopeBulkActions } from './table/ScopeBulkActions'
@@ -88,21 +89,22 @@ export const ScopeItemsTable: React.FC<ScopeItemsTableProps> = ({
     itemsLength: items.length
   })
 
-  if (loading) {
-    return (
-      <div className="space-y-4">
-        <div className="h-8 bg-gray-200 rounded animate-pulse" />
-        <div className="space-y-2">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-12 bg-gray-100 rounded animate-pulse" />
-          ))}
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div className="space-y-4">
+    <DataStateWrapper
+      loading={loading}
+      error={null}
+      data={items}
+      emptyComponent={
+        <div className="text-center py-12">
+          <Construction className="mx-auto h-12 w-12 text-muted-foreground" />
+          <h3 className="mt-4 text-lg font-semibold">No scope items</h3>
+          <p className="mt-2 text-muted-foreground">
+            No scope items have been added to this project yet.
+          </p>
+        </div>
+      }
+    >
+      <div className="space-y-4">
       {/* Bulk Actions Bar */}
       <ScopeBulkActions
         selectedItems={selectedItems}
@@ -117,17 +119,7 @@ export const ScopeItemsTable: React.FC<ScopeItemsTableProps> = ({
         data={items}
         searchable={false} // Search is handled in parent component
       />
-
-      {/* Empty State */}
-      {items.length === 0 && !loading && (
-        <div className="text-center py-12">
-          <Construction className="mx-auto h-12 w-12 text-muted-foreground" />
-          <h3 className="mt-4 text-lg font-semibold">No scope items found</h3>
-          <p className="mt-2 text-muted-foreground">
-            Get started by creating your first scope item or importing from Excel.
-          </p>
-        </div>
-      )}
-    </div>
+      </div>
+    </DataStateWrapper>
   )
 }

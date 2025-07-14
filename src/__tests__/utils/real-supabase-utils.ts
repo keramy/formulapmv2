@@ -340,7 +340,7 @@ export async function setupBasicTestEnvironment(userRole: keyof typeof TEST_USER
   }
 }
 
-export function createMockContext(params: Record<string, string>) {
+export function createMockContext(params: { id: string } | Record<string, string>) {
   return {
     params: Promise.resolve(params)
   }
