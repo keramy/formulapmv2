@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { DataStateWrapper } from '@/components/ui/loading-states';
 import { OverviewTab } from './tabs/OverviewTab';
 import { MilestonesTab } from './tabs/MilestonesTab';
 import { TasksTab } from './tabs/TasksTab';
@@ -59,5 +60,66 @@ export function TabbedWorkspace({ projectId }: TabbedWorkspaceProps) {
         </TabsContent>
       </Tabs>
     </div>
+  );
+}
+
+/**
+ * Enhanced TabbedWorkspace with DataStateWrapper integration
+ * This provides consistent loading states for project workspace tabs
+ */
+export function TabbedWorkspaceEnhanced({ projectId }: TabbedWorkspaceProps) {
+  const [activeTab, setActiveTab] = useState('overview');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  return (
+    <DataStateWrapper
+      loading={loading}
+      error={error}
+      data={projectId}
+      onRetry={() => setError(null)}
+      emptyComponent={
+        <div className="text-center py-12">
+          <div className="text-muted-foreground">No project selected</div>
+        </div>
+      }
+    >
+      <div className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-6">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="scope">Scope</TabsTrigger>
+            <TabsTrigger value="milestones">Milestones</TabsTrigger>
+            <TabsTrigger value="tasks">Tasks</TabsTrigger>
+            <TabsTrigger value="materials">Materials</TabsTrigger>
+            <TabsTrigger value="reports">Reports</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-4">
+            <OverviewTab projectId={projectId} />
+          </TabsContent>
+
+          <TabsContent value="scope" className="space-y-4">
+            <ScopeListTab projectId={projectId} />
+          </TabsContent>
+
+          <TabsContent value="milestones" className="space-y-4">
+            <MilestonesTab projectId={projectId} />
+          </TabsContent>
+
+          <TabsContent value="tasks" className="space-y-4">
+            <TasksTab projectId={projectId} />
+          </TabsContent>
+
+          <TabsContent value="materials" className="space-y-4">
+            <MaterialSpecsTab projectId={projectId} />
+          </TabsContent>
+
+          <TabsContent value="reports" className="space-y-4">
+            <ReportsTab projectId={projectId} />
+          </TabsContent>
+        </Tabs>
+      </div>
+    </DataStateWrapper>
   );
 }

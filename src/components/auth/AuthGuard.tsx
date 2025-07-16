@@ -45,62 +45,36 @@ export const AuthGuard = ({
   // LayoutWrapper handles authentication redirects at the application level
   // AuthGuard focuses purely on permission checking and UI feedback
 
-  // Show loading spinner while auth is loading
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="flex flex-col items-center space-y-4">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground">Loading...</p>
+  return (
+    <DataStateWrapper
+      loading={loading}
+      error={!user ? "Authentication required" : !profile ? "Profile not found" : !profile.is_active ? "Account deactivated" : null}
+      data={user && profile && profile.is_active ? user : null}
+      onRetry={() => window.location.reload()}
+      loadingComponent={
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="flex flex-col items-center space-y-4">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-sm text-muted-foreground">Loading...</p>
+          </div>
         </div>
-      </div>
-    )
-  }
-
-  // Not authenticated - show user-friendly message
-  // LayoutWrapper handles redirects, so we just show feedback here
-  if (!user) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Alert className="max-w-md">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            You must be logged in to access this page.
-          </AlertDescription>
-        </Alert>
-      </div>
-    )
-  }
-
-  // No profile found
-  if (!profile) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Alert variant="destructive" className="max-w-md">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            User profile not found. Please contact administrator.
-          </AlertDescription>
-        </Alert>
-      </div>
-    )
-  }
-
-  // Account deactivated
-  if (!profile.is_active) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Alert variant="destructive" className="max-w-md">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            Your account has been deactivated. Please contact administrator.
-          </AlertDescription>
-        </Alert>
-      </div>
-    )
-  }
-
-  // Check admin requirement
+      }
+      errorComponent={
+        <div className="flex items-center justify-center min-h-screen">
+          <Alert variant={!user ? "default" : "destructive"} className="max-w-md">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              {!user ? "You must be logged in to access this page." :
+               !profile ? "User profile not found. Please contact administrator." :
+               !profile.is_active ? "Your account has been deactivated. Please contact administrator." :
+               "Access denied"}
+            </AlertDescription>
+          </Alert>
+        </div>
+      }
+    >
+      {(() => {
+        // Check admin requirement
   if (requireAdmin) {
     const adminRoles: UserRole[] = ['company_owner', 'admin']
     if (!adminRoles.includes(profile.role)) {
@@ -168,8 +142,11 @@ export const AuthGuard = ({
     )
   }
 
-  // All checks passed, render children
-  return <>{children}</>
+        // All checks passed, render children
+        return <>{children}</>
+      })()}
+    </DataStateWrapper>
+  )
 }
 
 // Convenience components for common use cases

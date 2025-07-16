@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { ResetPasswordData } from '@/types/auth'
 
@@ -9,19 +10,13 @@ export async function POST(request: NextRequest) {
 
     // Validate input
     if (!email) {
-      return NextResponse.json(
-        { error: 'Email is required' },
-        { status: 400 }
-      )
+      return createErrorResponse('Email is required', 400)
     }
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: 'Invalid email format' },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid email format', 400)
     }
 
     const supabase = createServerClient()
@@ -35,17 +30,14 @@ export async function POST(request: NextRequest) {
 
     if (!profile) {
       // Don't reveal if user exists or not for security
-      return NextResponse.json({
-        success: true,
-        message: 'If an account with that email exists, a password reset link has been sent.'
+      return createSuccessResponse({
+        message: 'If an account with that email exists, a password reset link has been sent.',
+        timestamp: new Date().toISOString()
       })
     }
 
     if (!profile.is_active) {
-      return NextResponse.json(
-        { error: 'Account is deactivated. Please contact administrator.' },
-        { status: 403 }
-      )
+      return createErrorResponse('Account is deactivated. Please contact administrator.', 403)
     }
 
     // Send password reset email
@@ -55,23 +47,17 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error('Password reset error:', error)
-      return NextResponse.json(
-        { error: 'Failed to send password reset email' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to send password reset email', 500)
     }
 
-    return NextResponse.json({
-      success: true,
-      message: 'Password reset link sent to your email address'
+    return createSuccessResponse({
+      message: 'Password reset link sent to your email address',
+      timestamp: new Date().toISOString()
     })
 
   } catch (error) {
     console.error('Reset password API error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error', 500)
   }
 }
 

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { useImpersonation } from '@/hooks/useImpersonation'
+import { DataStateWrapper } from '@/components/ui/loading-states'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -259,16 +260,29 @@ export const UserImpersonationModal = ({ open, onOpenChange }: UserImpersonation
 
         {/* Users List */}
         <ScrollArea className="flex-1 -mx-6 px-6 min-h-0">
-          {loading ? (
-            <div className="flex items-center justify-center py-8">
-              <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-              <span className="ml-2 text-gray-600">Loading users...</span>
-            </div>
-          ) : filteredUsers.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              {users.length === 0 ? 'No users available for impersonation' : 'No users match your search criteria'}
-            </div>
-          ) : (
+          <DataStateWrapper
+            loading={loading}
+            error={error}
+            data={filteredUsers}
+            onRetry={fetchUsers}
+            emptyComponent={
+              <div className="text-center py-8">
+                <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <div className="text-muted-foreground">
+                  {users.length === 0 ? 'No users available for impersonation' : 'No users match your search criteria'}
+                </div>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Try adjusting your search criteria.
+                </p>
+              </div>
+            }
+            loadingComponent={
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+                <span className="ml-2 text-gray-600">Loading users...</span>
+              </div>
+            }
+          >
             <div className="space-y-2">
               {filteredUsers.map((user) => (
                 <div
@@ -317,7 +331,7 @@ export const UserImpersonationModal = ({ open, onOpenChange }: UserImpersonation
                 </div>
               ))}
             </div>
-          )}
+          </DataStateWrapper>
         </ScrollArea>
 
         {/* Footer */}
@@ -325,6 +339,255 @@ export const UserImpersonationModal = ({ open, onOpenChange }: UserImpersonation
           <div className="text-sm text-gray-500">
             {filteredUsers.length} of {users.length} users shown
           </div>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+/**
+ * Enhanced UserImpersonationModal using DataStateWrapper pattern (claude.md aligned)
+ * Following the proven UI component optimization pattern from claude.md
+ */
+export function UserImpersonationModalEnhanced({
+  open,
+  onOpenChange
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void
+}) {
+  const { getAccessToken, profile: currentProfile } = useAuth()
+  const { impersonateUser } = useImpersonation()
+
+  const [users, setUsers] = useState<ImpersonationUser[]>([])
+  const [filteredUsers, setFilteredUsers] = useState<ImpersonationUser[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedRole, setSelectedRole] = useState<string>('all')
+  const [impersonating, setImpersonating] = useState(false)
+
+  const fetchUsers = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
+      const response = await fetch('/api/admin/users', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error || 'Failed to fetch users')
+      }
+
+      const data = await response.json()
+      if (data.success) {
+        setUsers(data.data.available_for_impersonation || [])
+      } else {
+        throw new Error(data.error || 'Failed to fetch users')
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load users'
+      setError(errorMessage)
+      console.error('Error fetching users for impersonation:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Fetch users when modal opens
+  useEffect(() => {
+    if (open) {
+      fetchUsers()
+    }
+  }, [open])
+
+  // Filter users based on search and role
+  useEffect(() => {
+    let filtered = users
+
+    if (searchTerm) {
+      filtered = filtered.filter(user =>
+        user.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.role?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    }
+
+    if (selectedRole !== 'all') {
+      filtered = filtered.filter(user => user.role === selectedRole)
+    }
+
+    setFilteredUsers(filtered)
+  }, [users, searchTerm, selectedRole])
+
+  const handleImpersonate = async (targetUser: ImpersonationUser) => {
+    if (!currentProfile) {
+      setError('Current profile not available')
+      return
+    }
+
+    try {
+      setImpersonating(true)
+      setError(null)
+
+      const success = impersonateUser(currentProfile, targetUser)
+
+      if (success) {
+        onOpenChange(false)
+        // Small delay to allow UI to update
+        setTimeout(() => {
+          window.location.reload()
+        }, 100)
+      } else {
+        setError('Failed to start impersonation')
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to start impersonation'
+      setError(errorMessage)
+      console.error('Error starting impersonation:', err)
+    } finally {
+      setImpersonating(false)
+    }
+  }
+
+  const availableRoles = Array.from(new Set(users.map(user => user.role).filter(Boolean)))
+
+  const getRoleIcon = (role: string) => {
+    switch (role) {
+      case 'company_owner': return <Shield className="h-4 w-4 text-purple-600" />
+      case 'general_manager': return <UserCheck className="h-4 w-4 text-blue-600" />
+      case 'project_manager': return <Building className="h-4 w-4 text-green-600" />
+      case 'architect': return <Wrench className="h-4 w-4 text-orange-600" />
+      case 'field_supervisor': return <HardHat className="h-4 w-4 text-yellow-600" />
+      case 'purchase_manager': return <ShoppingCart className="h-4 w-4 text-red-600" />
+      default: return <Users className="h-4 w-4 text-gray-600" />
+    }
+  }
+
+  const getInitials = (firstName?: string, lastName?: string) => {
+    if (!firstName || !lastName) return 'U'
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[600px] max-h-[80vh] flex flex-col">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Zap className="h-5 w-5 text-blue-600" />
+            User Impersonation
+          </DialogTitle>
+          <DialogDescription>
+            Switch to another user's account for testing and support purposes.
+          </DialogDescription>
+        </DialogHeader>
+
+        {/* Search and Filters */}
+        <div className="flex flex-col sm:flex-row gap-4 py-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              placeholder="Search by name, email, role, or department..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <select
+            value={selectedRole}
+            onChange={(e) => setSelectedRole(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="all">All Roles</option>
+            {availableRoles.map(role => (
+              <option key={role} value={role}>
+                {role.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Users List with DataStateWrapper */}
+        <DataStateWrapper
+          loading={loading}
+          error={error}
+          data={filteredUsers}
+          onRetry={fetchUsers}
+          emptyComponent={
+            <div className="text-center py-8">
+              <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <div className="text-muted-foreground">No users found</div>
+              <p className="text-sm text-muted-foreground mt-2">
+                Try adjusting your search criteria.
+              </p>
+            </div>
+          }
+        >
+          <ScrollArea className="flex-1 -mx-6 px-6 min-h-0">
+            <div className="space-y-2">
+              {filteredUsers.map((user) => (
+                <div
+                  key={user.id}
+                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <div className="flex items-center space-x-3">
+                    <Avatar className="h-10 w-10">
+                      <AvatarFallback className="bg-blue-100 text-blue-600">
+                        {getInitials(user.first_name, user.last_name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {user.first_name} {user.last_name}
+                        </p>
+                        {getRoleIcon(user.role)}
+                      </div>
+                      <p className="text-sm text-gray-500 truncate">{user.email}</p>
+                      <p className="text-xs text-gray-400 capitalize">
+                        {user.role?.replace(/_/g, ' ')} • {user.department || 'No department'}
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={() => handleImpersonate(user)}
+                    disabled={impersonating}
+                    className="ml-4"
+                  >
+                    {impersonating ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Switching...
+                      </>
+                    ) : (
+                      <>
+                        <UserCheck className="h-4 w-4 mr-2" />
+                        Impersonate
+                      </>
+                    )}
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
+        </DataStateWrapper>
+
+        <div className="flex justify-end pt-4 border-t">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>

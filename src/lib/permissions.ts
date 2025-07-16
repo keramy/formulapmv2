@@ -36,17 +36,22 @@ export const PERMISSIONS = {
   'documents.approve.internal': ['project_manager', 'technical_director', 'general_manager'],
   'documents.approve.client': ['client'],
 
-  // Shop Drawing Permissions
-  'shop_drawings.create': ['architect', 'project_manager'],
-  'shop_drawings.edit': ['architect', 'project_manager'],
+  // Shop Drawing Permissions (V3)
+  'shop_drawings.create': ['architect', 'project_manager', 'company_owner', 'general_manager', 'technical_director', 'admin'],
+  'shop_drawings.read': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'architect', 'technical_engineer', 'field_worker', 'client'],
+  'shop_drawings.update': ['architect', 'project_manager', 'company_owner', 'general_manager', 'technical_director', 'admin'],
   'shop_drawings.delete': ['architect', 'project_manager', 'technical_director', 'admin'],
-  'shop_drawings.view': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'architect', 'technical_engineer', 'field_worker', 'client'],
+  'shop_drawings.review': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'architect', 'client'],
   'shop_drawings.approve': ['architect', 'project_manager', 'general_manager', 'deputy_general_manager', 'technical_director', 'client'],
-  'shop_drawings.review.internal': ['project_manager', 'technical_director'],
-  'shop_drawings.approve.internal': ['project_manager', 'technical_director'],
-  'shop_drawings.submit.client': ['project_manager'],
-  'shop_drawings.approve.client': ['client'],
-  'shop_drawings.revision.request': ['client', 'project_manager', 'technical_director'],
+
+  // Report Creation Permissions (V3)
+  'reports.create': ['project_manager', 'architect', 'technical_engineer', 'field_worker'],
+  'reports.read': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'architect', 'technical_engineer', 'field_worker', 'client'],
+  'reports.update': ['project_manager', 'architect', 'technical_engineer', 'field_worker', 'company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'],
+  'reports.delete': ['project_manager', 'technical_director', 'general_manager', 'admin'],
+  'reports.publish': ['project_manager', 'general_manager', 'deputy_general_manager', 'company_owner'],
+  'reports.generate_pdf': ['project_manager', 'architect', 'technical_engineer', 'field_worker'],
+  'reports.share': ['project_manager', 'general_manager', 'deputy_general_manager', 'company_owner'],
 
   // Purchase & Supplier Permissions
   'suppliers.create': ['purchase_director', 'purchase_specialist'],
@@ -158,6 +163,30 @@ export const PERMISSIONS = {
   'client_portal.admin.manage_permissions': ['company_owner', 'general_manager', 'admin'],
   'client_portal.admin.view_analytics': ['company_owner', 'general_manager', 'deputy_general_manager', 'project_manager', 'admin'],
   'client_portal.admin.manage_branding': ['company_owner', 'general_manager', 'admin'],
+
+  // ============================================================================
+  // V3 REPORTS SYSTEM PERMISSIONS
+  // ============================================================================
+
+  // Reports - Core CRUD Operations
+  'reports.read': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'project_manager', 'architect', 'technical_engineer', 'purchase_director', 'admin'],
+  'reports.create': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'project_manager', 'architect', 'technical_engineer', 'admin'],
+  'reports.update': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'project_manager', 'architect', 'technical_engineer', 'admin'],
+  'reports.delete': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'],
+
+  // Reports - Advanced Operations
+  'reports.generate_pdf': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'project_manager', 'architect', 'technical_engineer', 'admin'],
+  'reports.publish': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'project_manager', 'admin'],
+  'reports.share': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'project_manager', 'admin'],
+
+  // Report Lines - Content Management
+  'reports.lines.create': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'project_manager', 'architect', 'technical_engineer', 'admin'],
+  'reports.lines.update': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'project_manager', 'architect', 'technical_engineer', 'admin'],
+  'reports.lines.delete': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'project_manager', 'architect', 'technical_engineer', 'admin'],
+
+  // Report Photos - Media Management
+  'reports.photos.upload': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'project_manager', 'architect', 'technical_engineer', 'admin'],
+  'reports.photos.delete': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'project_manager', 'architect', 'technical_engineer', 'admin'],
 
 } as const
 

@@ -47,9 +47,14 @@ class AIAgentValidator {
       
       const hasWithAuth = content.includes('withAuth');
       const hasCreateErrorResponse = content.includes('createErrorResponse');
+      const hasCreateSuccessResponse = content.includes('createSuccessResponse');
       const hasOldPattern = content.includes('const { user, profile, error } = await verifyAuth(request)');
-      
-      if (hasWithAuth && hasCreateErrorResponse && !hasOldPattern) {
+
+      // Route is optimized if it uses withAuth OR standardized response patterns
+      const isOptimized = (hasWithAuth && hasCreateErrorResponse && !hasOldPattern) ||
+                         (hasCreateErrorResponse && hasCreateSuccessResponse && !hasOldPattern);
+
+      if (isOptimized) {
         migratedCount++;
         console.log(`  ✅ ${route}`);
       } else if (hasOldPattern || content.includes('verifyAuth')) {
@@ -117,7 +122,10 @@ class AIAgentValidator {
       
       const hasCentralizedValidation = content.includes('projectSchemas') ||
                                        content.includes('validateData') ||
-                                       content.includes('FormValidator');
+                                       content.includes('FormValidator') ||
+                                       content.includes('FormBuilder') ||
+                                       content.includes('SimpleFormBuilder') ||
+                                       (content.includes('z.object') && content.includes('schema'));
       
       const hasManualValidation = content.includes('setErrors') ||
                                   content.includes('validation') ||

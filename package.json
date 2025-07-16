@@ -29,7 +29,13 @@
     "supabase:start": "npm run supabase:validate && supabase start",
     "supabase:reset": "npm run supabase:validate && supabase db reset",
     "pre-commit": "npm run validate-migrations:ci",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "analyze:full": "node scripts/analysis/analysis-orchestrator.js",
+    "analyze:typescript": "node scripts/analysis/typescript-analyzer.js",
+    "analyze:bundle": "node scripts/analysis/bundle-analyzer.js",
+    "analyze:database": "node scripts/analysis/database-analyzer.js",
+    "analyze:security": "node scripts/analysis/security-analyzer.js",
+    "analyze:quality": "node scripts/analysis/code-quality-analyzer.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
@@ -65,6 +71,7 @@
     "clsx": "^2.0.0",
     "date-fns": "^4.1.0",
     "exceljs": "^4.4.0",
+    "isomorphic-dompurify": "^2.26.0",
     "lucide-react": "^0.525.0",
     "next": "^15.3.5",
     "next-themes": "^0.4.6",

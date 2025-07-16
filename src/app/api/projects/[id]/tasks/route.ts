@@ -9,13 +9,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
-import { 
+import {
   validateTaskFormData,
   validateTaskListParams,
   validateTaskPermissions,
   calculateTaskStatus
 } from '@/lib/validation/tasks'
 import { TaskStatistics } from '@/types/tasks'
+import { getTaskFields, QueryOptions, queryMonitor } from '@/lib/query-optimization'
 
 // ============================================================================
 // GET /api/projects/[id]/tasks - List tasks for a specific project
@@ -100,17 +101,20 @@ export const GET = withAuth(async (request: NextRequest, context: { params: Prom
         , 400)
     }
 
-    // Build query for project-specific tasks
+    // Build optimized query for project-specific tasks
+    const startTime = Date.now()
+
+    const queryOptions: QueryOptions = {
+      userRole: profile.role,
+      requestType: queryParams.include_project ? 'detail' : 'list',
+      includeRelations: queryParams.include_assignee || queryParams.include_assigner || queryParams.include_scope_item
+    }
+
+    const selectedFields = getTaskFields(queryOptions)
+
     let query = supabase
       .from('tasks')
-      .select(`
-        *,
-        ${queryParams.include_assignee ? 'assignee:user_profiles!assigned_to(id, first_name, last_name, email, avatar_url),' : ''}
-        ${queryParams.include_assigner ? 'assigner:user_profiles!assigned_by(id, first_name, last_name, email, avatar_url),' : ''}
-        ${queryParams.include_scope_item ? 'scope_item:scope_items!scope_item_id(id, item_no, title, description),' : ''}
-        ${queryParams.include_project ? 'project:projects!project_id(id, name, status),' : ''}
-        project_id
-      `, { count: 'exact' })
+      .select(selectedFields, { count: 'exact' })
       .eq('project_id', projectId)
 
     // Apply filters
@@ -218,6 +222,11 @@ export const GET = withAuth(async (request: NextRequest, context: { params: Prom
       user.id
     )
 
+    // Track query performance
+    const endTime = Date.now()
+    const queryDuration = endTime - startTime
+    queryMonitor.trackQuery(`project-tasks-${projectId}`, queryDuration)
+
     return NextResponse.json({
       success: true,
       data: {
@@ -234,6 +243,10 @@ export const GET = withAuth(async (request: NextRequest, context: { params: Prom
         limit: queryParams.limit,
         total: count || 0,
         has_more: queryParams.page * queryParams.limit < (count || 0)
+      },
+      meta: {
+        query_duration_ms: queryDuration,
+        fields_selected: selectedFields.split(',').length
       }
     })
 

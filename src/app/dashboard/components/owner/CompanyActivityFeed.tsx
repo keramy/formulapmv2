@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
+import { DataStateWrapper } from '@/components/ui/loading-states';
 import {
   FileText,
   UserPlus,
@@ -32,6 +33,7 @@ interface ActivityItem {
 export function CompanyActivityFeed() {
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { getAccessToken, isAuthenticated } = useAuth();
 
   useEffect(() => {
@@ -163,25 +165,6 @@ export function CompanyActivityFeed() {
     });
   };
 
-  if (loading) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Company Activity</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="animate-pulse">
-                <div className="h-12 bg-gray-200 rounded"></div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <Card className="h-full">
       <CardHeader>
@@ -193,10 +176,32 @@ export function CompanyActivityFeed() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-3 max-h-[600px] overflow-y-auto">
-          {activities.length === 0 ? (
-            <p className="text-center text-gray-500 py-8">No recent activities</p>
-          ) : (
+        <DataStateWrapper
+          loading={loading}
+          error={error}
+          data={activities}
+          onRetry={fetchRecentActivities}
+          emptyComponent={
+            <div className="text-center py-8">
+              <Activity className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No Recent Activities</h3>
+              <p className="text-gray-500">
+                Company activities will appear here as team members work on projects.
+              </p>
+            </div>
+          }
+          loadingComponent={
+            <div className="space-y-3">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="h-12 bg-gray-200 rounded"></div>
+                </div>
+              ))}
+            </div>
+          }
+        >
+          <div className="space-y-3 max-h-[600px] overflow-y-auto">
+            {activities.map((activity) => (
             activities.map((activity) => (
               <div
                 key={activity.id}
@@ -223,9 +228,9 @@ export function CompanyActivityFeed() {
                   </div>
                 </div>
               </div>
-            ))
-          )}
-        </div>
+            ))}
+          </div>
+        </DataStateWrapper>
       </CardContent>
     </Card>
   );

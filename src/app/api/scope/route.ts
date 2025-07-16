@@ -9,8 +9,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
-import { 
-  ScopeItem, 
+import {
+  ScopeItem,
   ScopeListParams,
   ScopeFilters,
   ScopeApiResponse,
@@ -18,6 +18,7 @@ import {
   ScopeCreateResponse,
   ScopeStatistics
 } from '@/types/scope'
+import { getScopeFields, QueryOptions, queryMonitor } from '@/lib/query-optimization'
 
 // ============================================================================
 // GET /api/scope - List scope items with filtering and pagination
@@ -66,16 +67,22 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
     }
 
     const supabase = createServerClient()
+    const startTime = Date.now()
 
-    // Build base query
+    // Build optimized query with selective field loading
+    const queryOptions: QueryOptions = {
+      userRole: profile.role,
+      requestType: 'list',
+      includeRelations: true,
+      includeAssignments: queryParams.include_assignments,
+      includeCosts: hasPermission(profile.role, 'projects.read.costs')
+    }
+
+    const selectedFields = getScopeFields(queryOptions)
+
     let query = supabase
       .from('scope_items')
-      .select(`
-        *,
-        supplier:suppliers(*),
-        created_by_user:user_profiles!created_by(*),
-        last_updated_by_user:user_profiles!last_updated_by(*)
-      `, { count: 'exact' })
+      .select(selectedFields, { count: 'exact' })
 
     // Apply role-based filtering for project access
     if (!hasPermission(profile.role, 'projects.read.all')) {
@@ -273,6 +280,11 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
       hasPermission(profile.role, 'projects.read.all')
     )
 
+    // Track query performance
+    const endTime = Date.now()
+    const queryDuration = endTime - startTime
+    queryMonitor.trackQuery(`scope-items-list`, queryDuration)
+
     const response: ScopeApiResponse<ScopeListResponse> = {
       success: true,
       data: {
@@ -286,6 +298,11 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
         limit,
         total: count || 0,
         has_more: page * limit < (count || 0)
+      },
+      meta: {
+        query_duration_ms: queryDuration,
+        fields_selected: selectedFields.split(',').length,
+        optimized: true
       }
     }
 

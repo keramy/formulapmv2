@@ -87,6 +87,11 @@ export const MilestoneList: React.FC<MilestoneListProps> = ({
 
   // Filter and sort milestones
   const filteredAndSortedMilestones = useMemo(() => {
+    // Add safety check for milestones array
+    if (!milestones || !Array.isArray(milestones)) {
+      return []
+    }
+    
     let filtered = milestones.filter(milestone => {
       // Search filter
       if (filters.search) {
@@ -137,6 +142,11 @@ export const MilestoneList: React.FC<MilestoneListProps> = ({
 
   // Milestone statistics
   const statistics = useMemo(() => {
+    // Add safety check for milestones array
+    if (!milestones || !Array.isArray(milestones)) {
+      return { overdue: 0, dueToday: 0, dueThisWeek: 0, completed: 0, upcoming: 0, inProgress: 0 }
+    }
+    
     const overdue = milestones.filter(m => m.target_date && isPast(new Date(m.target_date)) && m.status !== 'completed' && m.status !== 'cancelled').length
     const dueToday = milestones.filter(m => m.target_date && isToday(new Date(m.target_date))).length
     const dueThisWeek = milestones.filter(m => m.target_date && isThisWeek(new Date(m.target_date))).length

@@ -12,6 +12,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Save, Calendar, MapPin, DollarSign } from 'lucide-react';
 import Link from 'next/link';
+import { projectSchemas, validateData } from '@/lib/form-validation';
+import { AuthGuard } from '@/components/auth/AuthGuard';
 
 export default function NewProjectPage() {
   const router = useRouter();
@@ -90,29 +92,8 @@ export default function NewProjectPage() {
     }
   };
 
-  if (!user) {
-    return (
-      <div className="p-6">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900">Access Denied</h1>
-          <p className="text-gray-600">Please log in to create projects.</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!hasPermission('projects.create')) {
-    return (
-      <div className="p-6">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900">Access Denied</h1>
-          <p className="text-gray-600">You don't have permission to create projects.</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
+    <AuthGuard requiredPermission="projects.create">
     <div className="p-6 max-w-4xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
@@ -281,5 +262,190 @@ export default function NewProjectPage() {
         </div>
       </form>
     </div>
+    </AuthGuard>
+  );
+}
+
+/**
+ * Enhanced Project Creation Form using centralized validation
+ * This demonstrates the optimized approach with centralized validation patterns
+ */
+export function NewProjectPageEnhanced() {
+  const router = useRouter();
+  const { profile } = useAuth();
+  const { hasPermission } = usePermissions();
+  const { createProject } = useProjects();
+
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    location: '',
+    start_date: '',
+    end_date: '',
+    budget: '',
+    priority: 'medium',
+    client_id: '',
+    status: 'planning'
+  });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+
+  // Check permissions
+  if (!hasPermission('projects.create')) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Card>
+          <CardContent className="p-6 text-center">
+            <div className="text-muted-foreground">
+              You don't have permission to create projects.
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+
+    // Clear validation error when user starts typing
+    if (validationErrors[field]) {
+      setValidationErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Use centralized validation
+    const validationResult = validateData(projectSchemas.project, {
+      ...formData,
+      budget: formData.budget ? parseFloat(formData.budget) : undefined,
+      priority: formData.priority === 'low' ? 1 : formData.priority === 'medium' ? 2 : formData.priority === 'high' ? 3 : 4,
+      team_assignments: []
+    });
+
+    if (!validationResult.success) {
+      // Handle validation errors using centralized validation
+      setValidationErrors(validationResult.fieldErrors || {});
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      setValidationErrors({});
+
+      const newProject = await createProject(validationResult.data!);
+      router.push(`/projects/${newProject.id}`);
+    } catch (error) {
+      console.error('Failed to create project:', error);
+      setValidationErrors({
+        submit: error instanceof Error ? error.message : 'Failed to create project'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <AuthGuard requiredPermission="projects.create">
+      <div className="container mx-auto px-4 py-8">
+      <div className="mb-6">
+        <Link href="/projects" className="inline-flex items-center text-blue-600 hover:text-blue-800">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Projects
+        </Link>
+      </div>
+
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Create New Project</h1>
+        <p className="text-gray-600 mt-2">Set up a new construction project with all the necessary details.</p>
+      </div>
+
+      {validationErrors.submit && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
+          <p className="text-red-600">{validationErrors.submit}</p>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Project Information</CardTitle>
+            <CardDescription>
+              Basic information about the construction project
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Project Name */}
+            <div className="space-y-2">
+              <Label htmlFor="name">Project Name *</Label>
+              <Input
+                id="name"
+                value={formData.name}
+                onChange={(e) => handleInputChange('name', e.target.value)}
+                placeholder="Enter project name"
+                className={validationErrors.name ? 'border-red-500' : ''}
+                disabled={isSubmitting}
+              />
+              {validationErrors.name && <p className="text-sm text-red-500">{validationErrors.name}</p>}
+            </div>
+
+            {/* Project Description */}
+            <div className="space-y-2">
+              <Label htmlFor="description">Description *</Label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => handleInputChange('description', e.target.value)}
+                placeholder="Describe the project scope and objectives"
+                rows={4}
+                className={validationErrors.description ? 'border-red-500' : ''}
+                disabled={isSubmitting}
+              />
+              {validationErrors.description && <p className="text-sm text-red-500">{validationErrors.description}</p>}
+            </div>
+
+            {/* Location */}
+            <div className="space-y-2">
+              <Label htmlFor="location">Location *</Label>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  id="location"
+                  value={formData.location}
+                  onChange={(e) => handleInputChange('location', e.target.value)}
+                  placeholder="Project address or location"
+                  className={`pl-10 ${validationErrors.location ? 'border-red-500' : ''}`}
+                  disabled={isSubmitting}
+                />
+              </div>
+              {validationErrors.location && <p className="text-sm text-red-500">{validationErrors.location}</p>}
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="flex justify-end space-x-4">
+          <Button type="button" variant="outline" asChild disabled={isSubmitting}>
+            <Link href="/projects">Cancel</Link>
+          </Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                Creating...
+              </>
+            ) : (
+              <>
+                <Save className="mr-2 h-4 w-4" />
+                Create Project
+              </>
+            )}
+          </Button>
+        </div>
+      </form>
+      </div>
+    </AuthGuard>
   );
 }

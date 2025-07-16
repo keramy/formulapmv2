@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@/lib/supabase'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 
-export async function POST(request: NextRequest) {
+export const POST = withAuth(async (request: NextRequest, { user, profile, supabase }) => {
   const correlationId = Math.random().toString(36).substr(2, 9)
   const startTime = Date.now()
 
@@ -9,33 +9,11 @@ export async function POST(request: NextRequest) {
     console.log(`🔄 [recover-profile:${correlationId}] Starting profile recovery`, {
       timestamp: new Date().toISOString(),
       url: request.url,
-      method: request.method
+      method: request.method,
+      userId: user.id
     })
 
-    const authHeader = request.headers.get('authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { success: false, error: 'Authentication token required' },
-        { status: 401 }
-      )
-    }
-
-    const token = authHeader.substring(7)
-    const supabase = createServerClient()
-    
-    // Verify token to get user
-    const { data: { user }, error: userError } = await supabase.auth.getUser(token)
-    
-    if (userError || !user) {
-      console.error(`❌ [recover-profile:${correlationId}] Token verification failed`, {
-        error: userError,
-        duration: Date.now() - startTime
-      })
-      return NextResponse.json(
-        { success: false, error: 'Invalid or expired token' },
-        { status: 401 }
-      )
-    }
+    // User is already authenticated via withAuth, continue with recovery logic
 
     // Check if profile exists
     const { data: existingProfile, error: profileError } = await supabase
@@ -99,11 +77,12 @@ export async function POST(request: NextRequest) {
         duration: Date.now() - startTime
       })
 
-      return NextResponse.json({
-        success: true,
+      return createSuccessResponse({
         message: 'Profile created successfully',
         profile: createdProfile,
-        recovered: true
+        recovered: true,
+        timestamp: new Date().toISOString(),
+        userId: user.id
       })
     }
 
@@ -215,9 +194,9 @@ export async function POST(request: NextRequest) {
       duration: Date.now() - startTime
     })
 
-    return NextResponse.json(
-      { success: false, error: 'Profile recovery failed' },
-      { status: 500 }
+    return createErrorResponse(
+      error instanceof Error ? error.message : 'Profile recovery failed',
+      500
     )
   }
-}
+}, { permission: 'auth.profile' })

@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@/lib/supabase'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { authMonitor } from '@/lib/auth-monitoring'
 
-export async function POST(request: NextRequest) {
+export const POST = withAuth(async (request: NextRequest, { user, profile, supabase }) => {
+  // Check if user has admin privileges
+  if (!['company_owner', 'admin', 'general_manager'].includes(profile.role)) {
+    return createErrorResponse('Admin privileges required', 403)
+  }
+
   const correlationId = Math.random().toString(36).substr(2, 9)
   const startTime = Date.now()
 
@@ -10,74 +15,23 @@ export async function POST(request: NextRequest) {
     console.log(`🔄 [reset-auth:${correlationId}] Admin auth reset request`, {
       timestamp: new Date().toISOString(),
       url: request.url,
-      ip: request.headers.get('x-forwarded-for') || 'unknown'
+      ip: request.headers.get('x-forwarded-for') || 'unknown',
+      adminUser: user.id
     })
 
-    // Verify admin access
-    const authHeader = request.headers.get('authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { success: false, error: 'Admin authentication required' },
-        { status: 401 }
-      )
-    }
-
-    const token = authHeader.substring(7)
-    const supabase = createServerClient()
-    
-    const { data: { user }, error: userError } = await supabase.auth.getUser(token)
-    
-    if (userError || !user) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid admin token' },
-        { status: 401 }
-      )
-    }
-
-    // Check if user has admin privileges
-    const { data: profile, error: profileError } = await supabase
-      .from('user_profiles')
-      .select('role, email')
-      .eq('id', user.id)
-      .single()
-
-    if (profileError || !profile) {
-      return NextResponse.json(
-        { success: false, error: 'Admin profile not found' },
-        { status: 403 }
-      )
-    }
-
-    const isAdmin = ['company_owner', 'admin', 'general_manager'].includes(profile.role)
-    if (!isAdmin) {
-      console.warn(`🚫 [reset-auth:${correlationId}] Non-admin reset attempt`, {
-        userId: user.id,
-        userEmail: profile.email,
-        userRole: profile.role
-      })
-      return NextResponse.json(
-        { success: false, error: 'Admin privileges required' },
-        { status: 403 }
-      )
-    }
+    // User is already authenticated via withAuth, continue with reset logic
 
     // Parse request body
     const body = await request.json()
     const { userId, resetType, reason } = body
 
     if (!userId || !resetType) {
-      return NextResponse.json(
-        { success: false, error: 'userId and resetType are required' },
-        { status: 400 }
-      )
+      return createErrorResponse('userId and resetType are required', 400)
     }
 
     const validResetTypes = ['circuit_breaker', 'auth_loops', 'monitoring_data', 'all']
     if (!validResetTypes.includes(resetType)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid reset type' },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid reset type', 400)
     }
 
     // Verify target user exists
@@ -88,10 +42,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (targetError || !targetUser) {
-      return NextResponse.json(
-        { success: false, error: 'Target user not found' },
-        { status: 404 }
-      )
+      return createErrorResponse('Target user not found', 404)
     }
 
     const resetResults = {
@@ -168,20 +119,18 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        targetUser: {
-          id: targetUser.id,
-          email: targetUser.email,
-          name: `${targetUser.first_name} ${targetUser.last_name}`.trim()
-        },
-        resetType,
-        reason: reason || 'No reason provided',
-        results: resetResults,
-        timestamp: new Date().toISOString(),
-        correlationId
-      }
+    return createSuccessResponse({
+      targetUser: {
+        id: targetUser.id,
+        email: targetUser.email,
+        name: `${targetUser.first_name} ${targetUser.last_name}`.trim()
+      },
+      resetType,
+      reason: reason || 'No reason provided',
+      results: resetResults,
+      timestamp: new Date().toISOString(),
+      correlationId,
+      requestedBy: user.id
     })
 
   } catch (error) {
@@ -191,13 +140,12 @@ export async function POST(request: NextRequest) {
       duration: Date.now() - startTime
     })
 
-    return NextResponse.json({
-      success: false,
-      error: 'Failed to reset auth state',
-      correlationId
-    }, { status: 500 })
+    return createErrorResponse(
+      error instanceof Error ? error.message : 'Failed to reset auth state',
+      500
+    )
   }
-}
+}, { permission: 'system.admin' })
 
 async function resetCircuitBreaker(userId: string) {
   if (typeof window === 'undefined') {

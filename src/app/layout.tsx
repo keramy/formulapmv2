@@ -2,6 +2,8 @@ import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { LayoutWrapper } from '@/components/layouts/LayoutWrapper'
+import { StartupService } from '@/lib/startup'
+import { PageErrorBoundary, ErrorBoundaryProvider } from '@/components/ErrorBoundary'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -18,12 +20,22 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  // Initialize startup services
+  if (typeof window === 'undefined') {
+    // Server-side initialization
+    StartupService.initialize()
+  }
+
   return (
     <html lang="en">
       <body className={inter.className} suppressHydrationWarning={true}>
-        <LayoutWrapper>
-          {children}
-        </LayoutWrapper>
+        <ErrorBoundaryProvider>
+          <PageErrorBoundary pageName="Application Root">
+            <LayoutWrapper>
+              {children}
+            </LayoutWrapper>
+          </PageErrorBoundary>
+        </ErrorBoundaryProvider>
       </body>
     </html>
   )

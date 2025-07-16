@@ -9,12 +9,13 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { 
-  Plus, 
-  Search, 
-  Filter, 
-  Users, 
-  Phone, 
+import { DataStateWrapper } from '@/components/ui/loading-states';
+import {
+  Plus,
+  Search,
+  Filter,
+  Users,
+  Phone,
   Mail,
   Building,
   MapPin,
@@ -99,7 +100,7 @@ export default function ClientsPage() {
     }, 1000);
   }, []);
 
-  const filteredClients = clients.filter(client => {
+  const filteredClients = (clients || []).filter(client => {
     const matchesSearch = client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          client.company?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -200,67 +201,64 @@ export default function ClientsPage() {
       </div>
 
       {/* Client Cards */}
-      {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(6)].map((_, i) => (
-            <Card key={i}>
-              <CardHeader>
-                <div className="flex items-center space-x-4">
-                  <Skeleton className="h-12 w-12 rounded-full" />
-                  <div className="space-y-2">
-                    <Skeleton className="h-4 w-32" />
-                    <Skeleton className="h-3 w-24" />
+      <DataStateWrapper
+        loading={loading}
+        error={error}
+        data={filteredClients}
+        onRetry={() => window.location.reload()}
+        loadingComponent={
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, i) => (
+              <Card key={i}>
+                <CardHeader>
+                  <div className="flex items-center space-x-4">
+                    <Skeleton className="h-12 w-12 rounded-full" />
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-3 w-24" />
+                    </div>
                   </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-2/3" />
-                  <Skeleton className="h-8 w-full" />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      ) : error ? (
-        <Card>
-          <CardContent className="text-center py-8">
-            <div className="text-red-500 mb-4">
-              <h3 className="text-lg font-semibold">Error Loading Clients</h3>
-              <p className="text-sm">{error}</p>
-            </div>
-            <Button onClick={() => window.location.reload()} variant="outline">
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      ) : filteredClients.length === 0 ? (
-        <Card>
-          <CardContent className="text-center py-12">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Users className="w-8 h-8 text-gray-400" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              {searchTerm || filterStatus !== 'all' || filterType !== 'all' ? 'No clients found' : 'No clients yet'}
-            </h3>
-            <p className="text-gray-600 mb-4">
-              {searchTerm || filterStatus !== 'all' || filterType !== 'all'
-                ? 'Try adjusting your search or filter criteria.' 
-                : 'Get started by adding your first client.'
-              }
-            </p>
-            {hasPermission('users.create') && !searchTerm && filterStatus === 'all' && filterType === 'all' && (
-              <Button asChild>
-                <Link href="/clients/new">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Client
-                </Link>
-              </Button>
-            )}
-          </CardContent>
-        </Card>
-      ) : (
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-2/3" />
+                    <Skeleton className="h-8 w-full" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        }
+        emptyComponent={
+          <Card>
+            <CardContent className="text-center py-12">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Users className="w-8 h-8 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                {searchTerm || filterStatus !== 'all' || filterType !== 'all' ? 'No clients found' : 'No clients yet'}
+              </h3>
+              <p className="text-gray-600 mb-4">
+                {searchTerm || filterStatus !== 'all' || filterType !== 'all'
+                  ? 'Try adjusting your search or filter criteria.'
+                  : 'Get started by adding your first client.'
+                }
+              </p>
+              {hasPermission('users.create') && !searchTerm && filterStatus === 'all' && filterType === 'all' && (
+                <Button asChild>
+                  <Link href="/clients/new">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Client
+                  </Link>
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+        }
+        emptyWhen={(data) => !data || data.length === 0}
+      >
+        {(
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredClients.map((client) => {
             const TypeIcon = getTypeIcon(client.type);
@@ -352,7 +350,8 @@ export default function ClientsPage() {
             );
           })}
         </div>
-      )}
+        )}
+      </DataStateWrapper>
     </div>
   );
 }

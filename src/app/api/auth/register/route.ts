@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { RegisterData } from '@/types/auth'
 
@@ -9,27 +10,18 @@ export async function POST(request: NextRequest) {
 
     // Validate required fields
     if (!email || !password || !first_name || !last_name || !role) {
-      return NextResponse.json(
-        { success: false, error: 'Email, password, first name, last name, and role are required' },
-        { status: 400 }
-      )
+      return createErrorResponse('Email, password, first name, last name, and role are required', 400)
     }
 
     // Validate password strength
     if (password.length < 8) {
-      return NextResponse.json(
-        { success: false, error: 'Password must be at least 8 characters long' },
-        { status: 400 }
-      )
+      return createErrorResponse('Password must be at least 8 characters long', 400)
     }
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid email format' },
-        { status: 400 }
-      )
+      return createErrorResponse('Invalid email format', 400)
     }
 
     // Create server client with service role for user creation
@@ -44,10 +36,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (existingUser) {
-      return NextResponse.json(
-        { success: false, error: 'User with this email already exists' },
-        { status: 409 }
-      )
+      return createErrorResponse('User with this email already exists', 409)
     }
 
     // Create auth user using admin client
@@ -64,17 +53,11 @@ export async function POST(request: NextRequest) {
 
     if (authError) {
       console.error('Auth signup error:', authError)
-      return NextResponse.json(
-        { success: false, error: authError.message },
-        { status: 400 }
-      )
+      return createErrorResponse(authError.message, 400)
     }
 
     if (!authData.user) {
-      return NextResponse.json(
-        { success: false, error: 'Failed to create user account' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to create user account', 500)
     }
 
     // Create user profile
@@ -108,14 +91,10 @@ export async function POST(request: NextRequest) {
         console.error('Failed to cleanup auth user:', cleanupError)
       }
       
-      return NextResponse.json(
-        { success: false, error: 'Failed to create user profile' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to create user profile', 500)
     }
 
-    return NextResponse.json({
-      success: true,
+    return createSuccessResponse({
       message: 'User registered successfully',
       user: {
         id: authData.user.id,
@@ -123,14 +102,12 @@ export async function POST(request: NextRequest) {
         first_name,
         last_name,
         role
-      }
+      },
+      timestamp: new Date().toISOString()
     })
 
   } catch (error) {
     console.error('Register API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error', 500)
   }
 }

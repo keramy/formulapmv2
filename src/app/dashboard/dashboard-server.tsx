@@ -10,7 +10,7 @@
 
 import { Suspense } from 'react';
 import { cookies } from 'next/headers';
-import { createServerClient } from '@/lib/supabase';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DashboardSkeleton } from './components/DashboardSkeleton';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -24,6 +24,12 @@ import { ServerActivityFeed } from './components/server/ServerActivityFeed';
 import { ClientDashboardActions } from './components/client/ClientDashboardActions';
 import { RealtimeDashboard } from '@/components/dashboard/RealtimeDashboard';
 
+// PM-specific dashboard components
+import { MyProjectsOverview } from './components/pm/MyProjectsOverview';
+import { MyTasksAndActions } from './components/pm/MyTasksAndActions';
+import { RecentProjectActivity } from './components/pm/RecentProjectActivity';
+import { CriticalAlerts } from './components/pm/CriticalAlerts';
+
 interface DashboardUser {
   id: string;
   email: string;
@@ -36,8 +42,7 @@ interface DashboardUser {
 
 async function getAuthenticatedUser(): Promise<DashboardUser | null> {
   try {
-    const cookieStore = cookies();
-    const supabase = createServerClient();
+    const supabase = await createServerSupabaseClient();
 
     // Get the session from cookies
     const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -226,6 +231,137 @@ async function ServerDashboard() {
             <Suspense fallback={<DashboardSkeleton />}>
               <RealtimeDashboard />
             </Suspense>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Project Manager Dashboard
+  if (user.role === 'project_manager') {
+    return (
+      <div className="space-y-6">
+        {/* Dashboard Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">
+              Welcome back, {user.first_name}
+            </h1>
+            <p className="text-gray-600">
+              Project Manager Dashboard
+            </p>
+          </div>
+          <Suspense fallback={<div className="h-10 w-32 bg-gray-200 rounded animate-pulse" />}>
+            <ClientDashboardActions userId={user.id} role={user.role} />
+          </Suspense>
+        </div>
+
+        {/* PM Dashboard Content - Specialized for project management */}
+        <div className="space-y-6">
+          {/* Critical Alerts - Top priority */}
+          <Suspense fallback={
+            <Card className="h-32 animate-pulse">
+              <CardContent className="p-4">
+                <div className="h-4 bg-gray-200 rounded w-1/3 mb-3"></div>
+                <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+              </CardContent>
+            </Card>
+          }>
+            <ErrorBoundary>
+              <CriticalAlerts userId={user.id} />
+            </ErrorBoundary>
+          </Suspense>
+
+          {/* Tasks and Projects Overview - Main content */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Suspense fallback={
+              <Card className="h-96 animate-pulse">
+                <CardHeader>
+                  <div className="h-6 bg-gray-200 rounded w-1/3"></div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {[...Array(3)].map((_, i) => (
+                      <div key={i} className="h-4 bg-gray-200 rounded"></div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            }>
+              <ErrorBoundary>
+                <MyTasksAndActions userId={user.id} />
+              </ErrorBoundary>
+            </Suspense>
+
+            <Suspense fallback={
+              <Card className="h-96 animate-pulse">
+                <CardHeader>
+                  <div className="h-6 bg-gray-200 rounded w-1/3"></div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {[...Array(3)].map((_, i) => (
+                      <div key={i} className="h-4 bg-gray-200 rounded"></div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            }>
+              <ErrorBoundary>
+                <MyProjectsOverview userId={user.id} />
+              </ErrorBoundary>
+            </Suspense>
+          </div>
+
+          {/* Projects and Activity Feed - Secondary content */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <Suspense fallback={
+                <Card className="h-96 animate-pulse">
+                  <CardHeader>
+                    <div className="h-6 bg-gray-200 rounded w-1/3"></div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {[...Array(5)].map((_, i) => (
+                        <div key={i} className="h-4 bg-gray-200 rounded"></div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              }>
+                <ErrorBoundary>
+                  <ServerProjectsOverview userId={user.id} role={user.role} />
+                </ErrorBoundary>
+              </Suspense>
+            </div>
+            
+            <div>
+              <Suspense fallback={
+                <Card className="h-96 animate-pulse">
+                  <CardHeader>
+                    <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {[...Array(6)].map((_, i) => (
+                        <div key={i} className="flex items-center space-x-3">
+                          <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+                          <div className="flex-1">
+                            <div className="h-3 bg-gray-200 rounded w-3/4 mb-2"></div>
+                            <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              }>
+                <ErrorBoundary>
+                  <RecentProjectActivity userId={user.id} />
+                </ErrorBoundary>
+              </Suspense>
+            </div>
           </div>
         </div>
       </div>

@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Calendar, DollarSign, Users, AlertTriangle, MapPin, Clock } from 'lucide-react'
 import { usePermissions } from '@/hooks/usePermissions'
 import { cn, formatCurrency, formatDate, formatRelativeTime, getUserInitials } from '@/lib/utils'
+import { DataStateWrapper } from '@/components/ui/loading-states'
+import { Skeleton } from '@/components/ui/skeleton'
 
 interface ProjectCardProps {
   project: {
@@ -205,5 +207,87 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
         </div>
       </CardContent>
     </Card>
+  )
+}
+
+/**
+ * Enhanced ProjectCard with DataStateWrapper integration
+ * Following the proven component optimization pattern from claude.md
+ */
+export interface EnhancedProjectCardProps extends Omit<ProjectCardProps, 'project'> {
+  projectId: string
+  project?: ProjectCardProps['project']
+  loading?: boolean
+  error?: string | null
+  onRetry?: () => void
+}
+
+export const EnhancedProjectCard: React.FC<EnhancedProjectCardProps> = ({
+  projectId,
+  project,
+  loading = false,
+  error = null,
+  onRetry,
+  onClick,
+  className,
+  showActions = true
+}) => {
+  const { canViewPricing } = usePermissions()
+
+  return (
+    <DataStateWrapper
+      loading={loading}
+      error={error}
+      data={project}
+      onRetry={onRetry}
+      loadingComponent={
+        <Card className={cn("overflow-hidden transition-all", className)}>
+          <CardHeader className="pb-3">
+            <div className="flex items-start justify-between">
+              <div className="space-y-1 flex-1 min-w-0">
+                <Skeleton className="h-6 w-3/4" />
+                <Skeleton className="h-4 w-full" />
+              </div>
+              <Skeleton className="h-6 w-16 rounded-full" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <Skeleton className="h-4 w-1/2" />
+              <Skeleton className="h-4 w-2/3" />
+              <Skeleton className="h-8 w-full" />
+              <div className="flex justify-between">
+                <Skeleton className="h-8 w-20" />
+                <Skeleton className="h-8 w-20" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      }
+      emptyComponent={
+        <Card className={cn("overflow-hidden transition-all", className)}>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">Project Not Found</CardTitle>
+            <CardDescription>
+              The project with ID {projectId} could not be found or you don't have access to it.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex justify-center">
+              <Button variant="outline" onClick={onRetry}>
+                Retry
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      }
+    >
+      {project && <ProjectCard
+        project={project}
+        onClick={onClick}
+        className={className}
+        showActions={showActions}
+      />}
+    </DataStateWrapper>
   )
 }

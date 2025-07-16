@@ -3,11 +3,10 @@
  * Database helper functions, validation, and Supabase client configuration
  */
 
-import { createClient } from '@supabase/supabase-js';
-import { 
-  UserProfile, 
-  Project, 
-  ScopeItem, 
+import {
+  UserProfile,
+  Project,
+  ScopeItem,
   Document,
   UserRole,
   MANAGEMENT_ROLES,
@@ -16,14 +15,8 @@ import {
   hasCostTrackingAccess
 } from '@/types/database';
 
-// ============================================================================
-// SUPABASE CLIENT CONFIGURATION
-// ============================================================================
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Import optimized clients from centralized configuration
+import { supabase, supabaseAdmin, createServerClient } from '@/lib/supabase';
 
 // ============================================================================
 // DATABASE VALIDATION FUNCTIONS

@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@/lib/supabase'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 
-export async function POST(request: NextRequest) {
+export const POST = withAuth(async (request: NextRequest, { user, profile, supabase }) => {
+  // Only allow in development environment
+  if (process.env.NODE_ENV !== 'development') {
+    return createErrorResponse('Debug endpoints only available in development', 403)
+  }
+
   try {
-    const supabase = createServerClient()
-    
     console.log('🔧 [create-test-profiles] Starting profile creation for test users')
     
     // Test user profiles to create
@@ -78,21 +81,18 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({
-      success: true,
+    return createSuccessResponse({
       message: 'Test profile creation completed',
-      results
+      results,
+      requestedBy: user.id,
+      timestamp: new Date().toISOString()
     })
 
   } catch (error) {
     console.error('❌ [create-test-profiles] Exception:', error)
-    return NextResponse.json(
-      { 
-        success: false, 
-        error: 'Failed to create test profiles', 
-        details: error instanceof Error ? error.message : 'Unknown error' 
-      },
-      { status: 500 }
+    return createErrorResponse(
+      error instanceof Error ? error.message : 'Failed to create test profiles',
+      500
     )
   }
-}
+}, { permission: 'system.debug' })

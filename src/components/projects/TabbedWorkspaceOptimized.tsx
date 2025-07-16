@@ -52,6 +52,11 @@ const ReportsTab = dynamic(() => import('./tabs/ReportsTab').then(mod => ({ defa
   ssr: false
 });
 
+const TeamTab = dynamic(() => import('./tabs/TeamTab').then(mod => ({ default: mod.TeamTab })), {
+  loading: () => <TabLoadingSkeleton />,
+  ssr: false
+});
+
 interface TabbedWorkspaceProps {
   projectId: string;
 }
@@ -96,7 +101,7 @@ export function TabbedWorkspaceOptimized({ projectId }: TabbedWorkspaceProps) {
   return (
     <div className="w-full">
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-8">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="milestones">Milestones</TabsTrigger>
           <TabsTrigger value="tasks">Tasks</TabsTrigger>
@@ -104,6 +109,7 @@ export function TabbedWorkspaceOptimized({ projectId }: TabbedWorkspaceProps) {
           <TabsTrigger value="drawings">Shop Drawings</TabsTrigger>
           <TabsTrigger value="materials">Material Specs</TabsTrigger>
           <TabsTrigger value="reports">Reports</TabsTrigger>
+          <TabsTrigger value="team">Team</TabsTrigger>
         </TabsList>
         
         {/* Overview Tab - Load immediately as it's the default */}
@@ -154,6 +160,13 @@ export function TabbedWorkspaceOptimized({ projectId }: TabbedWorkspaceProps) {
             <ReportsTab projectId={projectId} />
           </Suspense>
         </TabsContent>
+        
+        {/* Team Tab - Dynamic import */}
+        <TabsContent value="team" className="mt-6">
+          <Suspense fallback={<TabLoadingSkeleton />}>
+            <TeamTab projectId={projectId} />
+          </Suspense>
+        </TabsContent>
       </Tabs>
     </div>
   );
@@ -162,9 +175,9 @@ export function TabbedWorkspaceOptimized({ projectId }: TabbedWorkspaceProps) {
 // Export performance analytics
 export function getTabbedWorkspaceMetrics() {
   return {
-    totalTabs: 7,
+    totalTabs: 8,
     loadedTabs: loadedTabs.size,
-    bundleSavings: ((7 - loadedTabs.size) / 7) * 100,
+    bundleSavings: ((8 - loadedTabs.size) / 8) * 100,
     loadedTabsList: Array.from(loadedTabs)
   };
 }

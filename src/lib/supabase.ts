@@ -1,16 +1,39 @@
 import { createClient } from '@supabase/supabase-js'
 import { Database } from '@/types/database'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+// Environment variable validation with detailed error messages
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables')
+// Comprehensive environment validation
+function validateEnvironment() {
+  const missing = []
+
+  if (!supabaseUrl) missing.push('NEXT_PUBLIC_SUPABASE_URL')
+  if (!supabaseAnonKey) missing.push('NEXT_PUBLIC_SUPABASE_ANON_KEY')
+  if (!supabaseServiceKey) missing.push('SUPABASE_SERVICE_ROLE_KEY')
+
+  if (missing.length > 0) {
+    throw new Error(
+      `Missing required Supabase environment variables: ${missing.join(', ')}\n` +
+      'Please check your .env.local file and ensure all required variables are set.'
+    )
+  }
+
+  // Validate URL format
+  try {
+    new URL(supabaseUrl!)
+  } catch {
+    throw new Error('NEXT_PUBLIC_SUPABASE_URL must be a valid URL')
+  }
 }
 
+// Validate environment on module load
+validateEnvironment()
+
 // Client for browser/client-side operations with optimized configuration
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+export const supabase = createClient<Database>(supabaseUrl!, supabaseAnonKey!, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
@@ -29,7 +52,7 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
 })
 
 // Admin client for server-side operations with elevated permissions
-export const supabaseAdmin = createClient<Database>(supabaseUrl, supabaseServiceKey, {
+export const supabaseAdmin = createClient<Database>(supabaseUrl!, supabaseServiceKey!, {
   auth: {
     autoRefreshToken: false,
     persistSession: false
@@ -39,8 +62,13 @@ export const supabaseAdmin = createClient<Database>(supabaseUrl, supabaseService
   }
 })
 
-// Server-side client for API routes
+// Server-side client for API routes with validation
 export const createServerClient = () => {
+  // Ensure environment is still valid at runtime
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error('Supabase environment variables not properly initialized')
+  }
+
   return createClient<Database>(supabaseUrl, supabaseAnonKey, {
     auth: {
       autoRefreshToken: false,

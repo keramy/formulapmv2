@@ -91,7 +91,7 @@ const CATEGORY_CONFIG = {
 }
 
 export default function GlobalScopePage() {
-  const { profile } = useAuth()
+  const { profile, getAccessToken } = useAuth()
   const { 
     canViewScope, 
     canCreateScope, 
@@ -114,9 +114,12 @@ export default function GlobalScopePage() {
 
     try {
       setLoading(true)
+      // Use the proper JWT access token instead of profile.id
+      const token = await getAccessToken()
+      
       const response = await fetch('/api/scope/overview', {
         headers: {
-          'Authorization': `Bearer ${profile.id}`,
+          'Authorization': `Bearer ${token}`,
         }
       })
 

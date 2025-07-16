@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
+import { DataStateWrapper } from '@/components/ui/loading-states';
 import { 
   Building2, 
   DollarSign, 
@@ -98,28 +99,42 @@ export function GlobalStatsCards() {
     return Math.round((stats.actualSpent / stats.totalBudget) * 100);
   };
 
-  if (loading) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[...Array(4)].map((_, i) => (
-          <Card key={i} className="animate-pulse">
-            <CardHeader className="pb-2">
-              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-            </CardHeader>
-            <CardContent>
-              <div className="h-8 bg-gray-200 rounded w-1/2"></div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    );
-  }
-
-  const budgetPercentage = calculateBudgetPercentage();
-  const budgetStatus = budgetPercentage > 80 ? 'text-red-600' : budgetPercentage > 60 ? 'text-yellow-600' : 'text-green-600';
-
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <DataStateWrapper
+      loading={loading}
+      error={null}
+      data={stats}
+      onRetry={() => window.location.reload()}
+      loadingComponent={
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <Card key={i} className="animate-pulse">
+              <CardHeader className="pb-2">
+                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+              </CardHeader>
+              <CardContent>
+                <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      }
+      emptyComponent={
+        <Card>
+          <CardContent className="text-center py-12">
+            <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No company statistics available</h3>
+            <p className="text-gray-600">Statistics will appear once you have active projects</p>
+          </CardContent>
+        </Card>
+      }
+    >
+      {(() => {
+        const budgetPercentage = calculateBudgetPercentage();
+        const budgetStatus = budgetPercentage > 80 ? 'text-red-600' : budgetPercentage > 60 ? 'text-yellow-600' : 'text-green-600';
+
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       {/* Active Projects Card */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -186,6 +201,132 @@ export function GlobalStatsCards() {
           <p className="text-xs text-muted-foreground">Need attention</p>
         </CardContent>
       </Card>
-    </div>
+          </div>
+        );
+      })()}
+    </DataStateWrapper>
+  );
+}
+
+/**
+ * Enhanced GlobalStatsCards with DataStateWrapper integration
+ * This provides consistent loading states and error handling for global statistics
+ */
+export function GlobalStatsCardsEnhanced() {
+  const { user } = useAuth();
+  const [stats, setStats] = useState<StatsData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchStats = async () => {
+    if (!user) {
+      setError('User authentication required');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await fetch('/api/dashboard/comprehensive-stats');
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Failed to fetch stats: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      setStats(data);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch global statistics';
+      setError(errorMessage);
+      console.error('Error fetching global stats:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchStats();
+  }, [user]);
+
+  const calculateBudgetPercentage = () => {
+    if (!stats || stats.totalBudget === 0) return 0;
+    return Math.round((stats.actualSpent / stats.totalBudget) * 100);
+  };
+
+  return (
+    <DataStateWrapper
+      loading={loading}
+      error={error}
+      data={stats}
+      onRetry={fetchStats}
+      emptyComponent={
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="p-6 text-center">
+              <div className="text-muted-foreground">No global statistics available</div>
+            </CardContent>
+          </Card>
+        </div>
+      }
+    >
+      {stats && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
+              <Building2 className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.activeProjects}</div>
+              <p className="text-xs text-muted-foreground">Currently running</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Budget Status</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                ${stats.actualSpent.toLocaleString()}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {calculateBudgetPercentage()}% of ${stats.totalBudget.toLocaleString()}
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Pending Approvals</CardTitle>
+              <ClipboardCheck className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className={`text-2xl font-bold ${stats.pendingApprovals > 0 ? 'text-yellow-600' : ''}`}>
+                {stats.pendingApprovals}
+              </div>
+              <p className="text-xs text-muted-foreground">Awaiting review</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">At-Risk Projects</CardTitle>
+              <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className={`text-2xl font-bold ${stats.atRiskProjects > 0 ? 'text-red-600' : ''}`}>
+                {stats.atRiskProjects}
+              </div>
+              <p className="text-xs text-muted-foreground">Need attention</p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+    </DataStateWrapper>
   );
 }

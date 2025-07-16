@@ -9,18 +9,20 @@ import { NextRequest, NextResponse } from 'next/server'
 import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
-import { 
-  validateProjectFormData, 
+import {
+  validateProjectFormData,
   validateProjectListParams,
-  validateProjectPermissions 
+  validateProjectPermissions
 } from '@/lib/validation/projects'
 import { ProjectWithDetails, ProjectListResponse } from '@/types/projects'
+import { getProjectFields, QueryOptions, queryMonitor } from '@/lib/query-optimization'
 
 // ============================================================================
 // GET /api/projects - List projects with filtering and pagination
 // ============================================================================
 
-export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
+export const GET = withAuth(async (request: NextRequest, context) => {
+  const { user, profile } = context
 
   // Permission check
   if (!hasPermission(profile.role, 'projects.read.all') && 
@@ -66,10 +68,21 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
       supabase = createServerClient()
     }
 
-    // Build simplified query to avoid complex joins that might fail
+    // Build optimized query with selective field loading
+    const startTime = Date.now()
+
+    const queryOptions: QueryOptions = {
+      userRole: profile.role,
+      requestType: 'list',
+      includeRelations: queryParams.include_client || queryParams.include_manager,
+      includeCosts: hasPermission(profile.role, 'projects.read.costs')
+    }
+
+    const selectedFields = getProjectFields(queryOptions)
+
     let query = supabase
       .from('projects')
-      .select('*', { count: 'exact' })
+      .select(selectedFields, { count: 'exact' })
 
     // Simplified role-based filtering - admin/management can see all projects
     if (['company_owner', 'admin', 'general_manager', 'deputy_general_manager', 'technical_director'].includes(profile.role)) {
@@ -117,6 +130,11 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
       )
     }
 
+    // Track query performance
+    const endTime = Date.now()
+    const queryDuration = endTime - startTime
+    queryMonitor.trackQuery(`projects-list`, queryDuration)
+
     // For now, return projects as-is without complex enhancements
     let enhancedProjects = projects || []
 
@@ -135,7 +153,10 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
         total_count: count || 0,
         page: queryParams.page,
         limit: queryParams.limit,
-        has_more: queryParams.page < totalPages
+        has_more: queryParams.page < totalPages,
+        query_duration_ms: queryDuration,
+        fields_selected: selectedFields.split(',').length,
+        optimized: true
       }
     }
 
@@ -151,7 +172,8 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
 // POST /api/projects - Create new project
 // ============================================================================
 
-export const POST = withAuth(async (request: NextRequest, { user, profile }) => {
+export const POST = withAuth(async (request: NextRequest, context) => {
+  const { user, profile } = context
 
   // Permission check
   if (!hasPermission(profile.role, 'projects.create')) {

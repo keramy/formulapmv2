@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formula PM 2.0 Analysis Report</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { border-bottom: 2px solid #e1e5e9; padding-bottom: 20px; margin-bottom: 30px; }
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .metric-card { background: #f8f9fa; padding: 20px; border-radius: 6px; text-align: center; }
+        .metric-value { font-size: 2em; font-weight: bold; color: #2563eb; }
+        .metric-label { color: #6b7280; margin-top: 5px; }
+        .critical { color: #dc2626; }
+        .high { color: #ea580c; }
+        .medium { color: #ca8a04; }
+        .low { color: #16a34a; }
+        .section { margin-bottom: 40px; }
+        .section h2 { color: #1f2937; border-bottom: 1px solid #e5e7eb; padding-bottom: 10px; }
+        .issue-list { list-style: none; padding: 0; }
+        .issue-item { background: #f9fafb; margin: 10px 0; padding: 15px; border-left: 4px solid #e5e7eb; border-radius: 4px; }
+        .issue-item.critical { border-left-color: #dc2626; }
+        .issue-item.high { border-left-color: #ea580c; }
+        .issue-item.medium { border-left-color: #ca8a04; }
+        .issue-item.low { border-left-color: #16a34a; }
+        .issue-title { font-weight: 600; margin-bottom: 5px; }
+        .issue-description { color: #6b7280; margin-bottom: 10px; }
+        .issue-meta { font-size: 0.9em; color: #9ca3af; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Formula PM 2.0 Analysis Report</h1>
+            <p><strong>Generated:</strong> 2025-07-16T14:27:33.053Z</p>
+            <p><strong>Version:</strong> 1.0.0</p>
+        </div>
+        
+        <div class="summary-grid">
+            <div class="metric-card">
+                <div class="metric-value">1878</div>
+                <div class="metric-label">Total Issues</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value critical">43</div>
+                <div class="metric-label">Critical</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value high">7</div>
+                <div class="metric-label">High Priority</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value medium">67</div>
+                <div class="metric-label">Medium Priority</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value low">1761</div>
+                <div class="metric-label">Low Priority</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">2332h</div>
+                <div class="metric-label">Estimated Effort</div>
+            </div>
+        </div>
+
+        
+        <div class="section">
+            <h2>🚨 Production Blockers</h2>
+            <ul class="issue-list">
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\admin\auth-state\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\admin\auth-state\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\admin\create-test-users\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\admin\create-test-users\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\admin\reset-auth\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\admin\reset-auth\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\admin\users\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\admin\users\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\auth\diagnostics\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\auth\diagnostics\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\auth\recover-profile\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\auth\recover-profile\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\auth\reset-password\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\auth\reset-password\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\dashboard\recent-activity\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\dashboard\recent-activity\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\debug\create-test-profiles\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\debug\create-test-profiles\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\material-specs\bulk\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\material-specs\bulk\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\material-specs\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\material-specs\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\material-specs\statistics\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\material-specs\statistics\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\material-specs\[id]\approve\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\material-specs\[id]\approve\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\material-specs\[id]\link-scope\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\material-specs\[id]\link-scope\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\material-specs\[id]\reject\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\material-specs\[id]\reject\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\material-specs\[id]\request-revision\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\material-specs\[id]\request-revision\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\material-specs\[id]\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\material-specs\[id]\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\material-specs\[id]\unlink-scope\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\material-specs\[id]\unlink-scope\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\milestones\bulk\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\milestones\bulk\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\milestones\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\milestones\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\milestones\statistics\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\milestones\statistics\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\milestones\[id]\status\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\milestones\[id]\status\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\projects\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\projects\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\projects\[id]\assignments\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\projects\[id]\assignments\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\projects\[id]\material-specs\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\projects\[id]\material-specs\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\projects\[id]\milestones\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\projects\[id]\milestones\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\projects\[id]\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\projects\[id]\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\projects\[id]\tasks\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\projects\[id]\tasks\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\reports\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\reports\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\reports\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\reports\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\reports\[id]\generate-pdf\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\reports\[id]\generate-pdf\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\reports\[id]\publish\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\reports\[id]\publish\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\scope\bulk\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\scope\bulk\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\scope\excel\export\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\scope\excel\export\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\scope\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\scope\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\scope\[id]\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\scope\[id]\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\shop-drawings\[id]\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\shop-drawings\[id]\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\shop-drawings\[id]\submissions\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\shop-drawings\[id]\submissions\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\shop-drawings\[id]\submit\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\shop-drawings\[id]\submit\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\suppliers\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\suppliers\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\tasks\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\tasks\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\tasks\statistics\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\tasks\statistics\route.ts | Effort: 3h</div>
+                </li>
+                
+                <li class="issue-item critical">
+                    <div class="issue-title">SQL Injection Risk in src\app\api\test-auth\route.ts</div>
+                    <div class="issue-description">Potential SQL injection vulnerability detected</div>
+                    <div class="issue-meta">Location: src\app\api\test-auth\route.ts | Effort: 3h</div>
+                </li>
+                
+            </ul>
+        </div>
+        
+
+        <div class="section">
+            <h2>📊 Analysis Details</h2>
+            <p>Detailed analysis results have been saved to <code>analysis-report.json</code> for programmatic access.</p>
+        </div>
+    </div>
+</body>
+</html>

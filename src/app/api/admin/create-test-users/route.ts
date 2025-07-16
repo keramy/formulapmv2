@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createClient } from '@supabase/supabase-js'
 
 // Use service role for admin operations
-const supabase = createClient(
+const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
   {
@@ -71,17 +72,27 @@ const testUsers: TestUser[] = [
   }
 ]
 
-export async function POST(request: NextRequest) {
+export const POST = withAuth(async (request: NextRequest, { user, profile, supabase }) => {
+  // Only allow in development environment and for admin users
+  if (process.env.NODE_ENV !== 'development') {
+    return createErrorResponse('Test user creation only available in development', 403)
+  }
+
+  // Check if user has admin privileges
+  if (!['company_owner', 'admin', 'general_manager'].includes(profile.role)) {
+    return createErrorResponse('Admin privileges required', 403)
+  }
+
   try {
     console.log('🔧 Starting test user creation process...')
-    
+
     const results = []
-    
+
     for (const userData of testUsers) {
       console.log(`👤 Processing user: ${userData.email}`)
-      
+
       // First, try to create auth user
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+      const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
         email: userData.email,
         password: userData.password,
         email_confirm: true,
@@ -157,21 +168,18 @@ export async function POST(request: NextRequest) {
     const successCount = results.filter(r => r.success).length
     console.log(`🎉 Test user creation complete: ${successCount}/${testUsers.length} successful`)
     
-    return NextResponse.json({
-      success: true,
+    return createSuccessResponse({
       message: `Created ${successCount}/${testUsers.length} test users successfully`,
-      results
+      results,
+      requestedBy: user.id,
+      timestamp: new Date().toISOString()
     })
-    
+
   } catch (error) {
     console.error('🚨 Test user creation failed:', error)
-    return NextResponse.json(
-      { 
-        success: false, 
-        error: 'Failed to create test users',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
-      { status: 500 }
+    return createErrorResponse(
+      error instanceof Error ? error.message : 'Failed to create test users',
+      500
     )
   }
-}
+}, { permission: 'system.admin' })

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient, supabaseAdmin } from '@/lib/supabase'
 import { LoginCredentials } from '@/types/auth'
 
@@ -9,10 +10,7 @@ export async function POST(request: NextRequest) {
 
     // Validate input
     if (!email || !password) {
-      return NextResponse.json(
-        { success: false, error: 'Email and password are required' },
-        { status: 400 }
-      )
+      return createErrorResponse('Email and password are required', 400)
     }
 
     // Create server client
@@ -26,10 +24,7 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error('Login error:', error)
-      return NextResponse.json(
-        { success: false, error: error.message },
-        { status: 401 }
-      )
+      return createErrorResponse(error.message, 401)
     }
 
     // Get user profile using admin client to bypass RLS
@@ -41,18 +36,12 @@ export async function POST(request: NextRequest) {
 
     if (profileError) {
       console.error('Profile fetch error:', profileError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to fetch user profile' },
-        { status: 500 }
-      )
+      return createErrorResponse('Failed to fetch user profile', 500)
     }
 
     // Check if user is active
     if (!profile.is_active) {
-      return NextResponse.json(
-        { success: false, error: 'Account is deactivated. Please contact administrator.' },
-        { status: 403 }
-      )
+      return createErrorResponse('Account is deactivated. Please contact administrator.', 403)
     }
 
     // Update JWT claims with user role information
@@ -78,18 +67,15 @@ export async function POST(request: NextRequest) {
       // Don't fail the login, just log the error
     }
 
-    return NextResponse.json({
-      success: true,
+    return createSuccessResponse({
       user: data.user,
       profile,
-      session: data.session
+      session: data.session,
+      timestamp: new Date().toISOString()
     })
 
   } catch (error) {
     console.error('Login API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return createErrorResponse('Internal server error', 500)
   }
 }

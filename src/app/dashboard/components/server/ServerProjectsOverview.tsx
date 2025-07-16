@@ -6,7 +6,7 @@
  */
 
 import Link from 'next/link';
-import { createServerClient } from '@/lib/supabase';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -26,7 +26,7 @@ interface Project {
 }
 
 async function getRecentProjects(userId: string, role: string): Promise<Project[]> {
-  const supabase = createServerClient();
+  const supabase = await createServerSupabaseClient();
   
   try {
     let query = supabase

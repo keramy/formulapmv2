@@ -111,23 +111,77 @@ export function withValidation<T>(schema: z.ZodSchema<T>) {
   }
 }
 
-// Database operation wrapper
+// Enhanced database operation wrapper with detailed error handling
 export async function withDatabase<T>(
   operation: (supabase: any) => Promise<{ data: T | null, error: any }>
 ): Promise<{ data: T | null, error: string | null }> {
   try {
     const supabase = createServerClient()
     const { data, error } = await operation(supabase)
-    
+
     if (error) {
-      console.error('Database operation error:', error)
-      return { data: null, error: 'Database operation failed' }
+      // Log detailed error information for debugging
+      console.error('Database operation error:', {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint
+      })
+
+      // Return user-friendly error messages based on error type
+      if (error.code === 'PGRST116') {
+        return { data: null, error: 'Record not found' }
+      } else if (error.code === 'PGRST302') {
+        return { data: null, error: 'Access denied' }
+      } else if (error.code?.startsWith('23')) {
+        return { data: null, error: 'Data validation error' }
+      } else {
+        return { data: null, error: 'Database operation failed' }
+      }
     }
-    
+
     return { data, error: null }
   } catch (error) {
     console.error('Database wrapper error:', error)
     return { data: null, error: 'Database connection failed' }
+  }
+}
+
+// Database health check function
+export async function checkDatabaseHealth(): Promise<{
+  healthy: boolean
+  latency: number
+  error?: string
+}> {
+  const startTime = Date.now()
+
+  try {
+    const supabase = createServerClient()
+    const { error } = await supabase
+      .from('user_profiles')
+      .select('count')
+      .limit(1)
+
+    const latency = Date.now() - startTime
+
+    if (error) {
+      return {
+        healthy: false,
+        latency,
+        error: error.message
+      }
+    }
+
+    return {
+      healthy: true,
+      latency
+    }
+  } catch (error) {
+    return {
+      healthy: false,
+      latency: Date.now() - startTime,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    }
   }
 }
 

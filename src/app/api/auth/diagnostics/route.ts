@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { createServerClient } from '@/lib/supabase'
 
 export async function GET(request: NextRequest) {
@@ -192,10 +193,11 @@ export async function GET(request: NextRequest) {
       hasProfile: !!profile
     })
 
-    return NextResponse.json({
-      success: true,
+    return createSuccessResponse({
       diagnostics,
-      overall
+      overall,
+      timestamp: new Date().toISOString(),
+      correlationId
     })
 
   } catch (error) {
@@ -205,15 +207,9 @@ export async function GET(request: NextRequest) {
       duration: Date.now() - startTime
     })
 
-    return NextResponse.json({
-      success: false,
-      diagnostics: {
-        timestamp: new Date().toISOString(),
-        correlationId,
-        error: error instanceof Error ? error.message : 'Unknown error',
-        duration: Date.now() - startTime
-      },
-      overall: 'FAILED - System error'
-    }, { status: 500 })
+    return createErrorResponse(
+      error instanceof Error ? error.message : 'Diagnostics failed',
+      500
+    )
   }
 }

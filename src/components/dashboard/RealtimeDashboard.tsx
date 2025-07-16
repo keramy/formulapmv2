@@ -18,6 +18,8 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DataStateWrapper } from '@/components/ui/loading-states';
 import { useRealtime } from '@/contexts/RealtimeContext';
+import { useDashboardOptimized } from '@/hooks/useDashboardOptimized';
+import { useProjectRealtimeUpdates } from '@/hooks/useRealtimeUpdates';
 import { useAuth } from '@/hooks/useAuth';
 import { 
   Activity, 
@@ -205,20 +207,35 @@ export function RealtimeDashboard() {
     ));
   }, [profile, broadcastProjectUpdate]);
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(6)].map((_, i) => (
-            <Card key={i} className="h-32 animate-pulse bg-gray-100" />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-6">
+    <DataStateWrapper
+      loading={loading}
+      error={error}
+      data={projects}
+      onRetry={() => window.location.reload()}
+      loadingComponent={
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, i) => (
+              <Card key={i} className="h-32 animate-pulse bg-gray-100" />
+            ))}
+          </div>
+        </div>
+      }
+      emptyComponent={
+        <Card>
+          <CardContent className="text-center py-12">
+            <Activity className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No projects yet</h3>
+            <p className="text-gray-600 mb-4">Get started by creating your first project</p>
+            <Button>
+              Create Project
+            </Button>
+          </CardContent>
+        </Card>
+      }
+    >
+      <div className="space-y-6">
       {/* Connection Status Header */}
       <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
         <div className="flex items-center gap-3">
@@ -356,5 +373,6 @@ export function RealtimeDashboard() {
         </CardContent>
       </Card>
     </div>
+    </DataStateWrapper>
   );
 }

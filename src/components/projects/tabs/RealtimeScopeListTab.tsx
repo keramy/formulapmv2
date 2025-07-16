@@ -350,39 +350,55 @@ export function RealtimeScopeListTab({ projectId }: RealtimeScopeListTabProps) {
   const totalActual = scopeItems.reduce((sum, item) => sum + (item.actualCost || 0), 0);
   const currentSupplierTotals = getSupplierTotals();
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[...Array(3)].map((_, i) => (
-            <Card key={i}>
-              <CardHeader>
-                <Skeleton className="h-6 w-32" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-8 w-24" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-        <div className="space-y-4">
-          {[...Array(5)].map((_, i) => (
-            <Card key={i}>
-              <CardContent className="p-4">
-                <div className="space-y-2">
-                  <Skeleton className="h-6 w-3/4" />
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-1/2" />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
   return (
+    <DataStateWrapper
+      loading={loading}
+      error={null}
+      data={scopeItems}
+      emptyComponent={
+        <Card>
+          <CardContent className="text-center py-12">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Building className="w-8 h-8 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">No Scope Items</h3>
+            <p className="text-gray-600 mb-4">
+              This project doesn't have any scope items yet. Add scope items to start tracking project progress.
+            </p>
+          </CardContent>
+        </Card>
+      }
+      loadingComponent={
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[...Array(3)].map((_, i) => (
+              <Card key={i}>
+                <CardHeader>
+                  <Skeleton className="h-6 w-32" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-8 w-24" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          <div className="space-y-4">
+            {[...Array(5)].map((_, i) => (
+              <Card key={i}>
+                <CardContent className="p-4">
+                  <div className="space-y-2">
+                    <Skeleton className="h-6 w-3/4" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-1/2" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      }
+    >
+    <div className="space-y-6">
     <div className="space-y-6">
       {/* Real-time Status Header */}
       <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
@@ -685,5 +701,6 @@ export function RealtimeScopeListTab({ projectId }: RealtimeScopeListTabProps) {
         </CardContent>
       </Card>
     </div>
+    </DataStateWrapper>
   );
 }

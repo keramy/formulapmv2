@@ -5,7 +5,7 @@
  * This replaces the client-side data fetching for better performance
  */
 
-import { createServerClient } from '@/lib/supabase';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Activity, DollarSign, FolderOpen, Users, AlertTriangle } from 'lucide-react';
 
@@ -21,7 +21,7 @@ interface DashboardStats {
 }
 
 async function getDashboardStats(userId: string, role: string): Promise<DashboardStats> {
-  const supabase = createServerClient();
+  const supabase = await createServerSupabaseClient();
   
   try {
     // Parallel queries for better performance

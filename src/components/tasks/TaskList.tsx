@@ -82,6 +82,11 @@ export const TaskList: React.FC<TaskListProps> = ({
 
   // Filter and sort tasks
   const filteredAndSortedTasks = useMemo(() => {
+    // Add safety check for tasks array
+    if (!tasks || !Array.isArray(tasks)) {
+      return []
+    }
+    
     let filtered = tasks.filter(task => {
       // Search filter
       if (filters.search) {

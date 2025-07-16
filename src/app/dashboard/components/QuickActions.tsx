@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { usePermissions } from '@/hooks/usePermissions';
+import { DataStateWrapper } from '@/components/ui/loading-states';
 import { 
   Plus, 
   FolderOpen, 
@@ -171,5 +172,174 @@ export function QuickActions() {
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+/**
+ * Enhanced QuickActions with DataStateWrapper integration
+ * Following the proven dashboard component optimization pattern from claude.md
+ */
+export function QuickActionsEnhanced() {
+  const { user, profile, loading: authLoading } = useAuth();
+  const {
+    hasPermission,
+    canCreateProject,
+    canCreateUsers,
+    canViewFinancials,
+    canAccessSystemSettings,
+    isManagement,
+    isProject,
+    isField,
+    isExternal
+  } = usePermissions();
+
+  const quickActions: QuickAction[] = [
+    // Universal actions
+    {
+      title: 'New Project',
+      description: 'Create a new project',
+      href: '/projects/new',
+      icon: Plus,
+      requiresPermission: () => canCreateProject()
+    },
+    {
+      title: 'View Projects',
+      description: 'Browse all projects',
+      href: '/projects',
+      icon: FolderOpen,
+      variant: 'outline'
+    },
+    {
+      title: 'My Tasks',
+      description: 'View assigned tasks',
+      href: '/tasks',
+      icon: CheckSquare,
+      variant: 'outline'
+    },
+
+    // Management actions
+    {
+      title: 'Team Management',
+      description: 'Manage team members',
+      href: '/admin/users',
+      icon: Users,
+      requiresPermission: () => canCreateUsers()
+    },
+    {
+      title: 'Reports',
+      description: 'Generate reports',
+      href: '/reports',
+      icon: FileText,
+      variant: 'outline',
+      requiresPermission: () => hasPermission('reports.view')
+    },
+    {
+      title: 'Material Specs',
+      description: 'Manage specifications',
+      href: '/material-specs',
+      icon: ShoppingCart,
+      variant: 'outline',
+      requiresPermission: () => hasPermission('material_specs.read')
+    },
+
+    // Field/Project specific actions
+    {
+      title: 'Shop Drawings',
+      description: 'Review drawings',
+      href: '/shop-drawings',
+      icon: PenTool,
+      variant: 'outline',
+      requiresPermission: () => hasPermission('shop_drawings.read')
+    },
+    {
+      title: 'Scope Items',
+      description: 'Manage scope',
+      href: '/scope',
+      icon: CheckSquare,
+      variant: 'outline',
+      requiresPermission: () => hasPermission('scope.read')
+    },
+
+    // Admin actions
+    {
+      title: 'System Settings',
+      description: 'Configure system',
+      href: '/admin/settings',
+      icon: Settings,
+      requiresPermission: () => canAccessSystemSettings()
+    },
+    {
+      title: 'Import Data',
+      description: 'Import Excel data',
+      href: '/scope/import',
+      icon: Upload,
+      variant: 'outline',
+      requiresPermission: () => hasPermission('scope.import')
+    }
+  ];
+
+  // Filter actions based on permissions and role
+  const availableActions = quickActions.filter(action => {
+    if (action.requiresPermission && !action.requiresPermission()) {
+      return false;
+    }
+    return true;
+  });
+
+  return (
+    <DataStateWrapper
+      loading={authLoading}
+      error={null}
+      data={profile}
+      emptyComponent={
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold">Quick Actions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center py-6">
+              <div className="text-muted-foreground">Please log in to see available actions</div>
+            </div>
+          </CardContent>
+        </Card>
+      }
+    >
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold">Quick Actions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 gap-3">
+            {availableActions.map((action, index) => (
+              <Button
+                key={index}
+                variant={action.variant || 'default'}
+                size="sm"
+                asChild
+                className="justify-start h-auto p-3"
+              >
+                <Link href={action.href}>
+                  <action.icon className="h-4 w-4 mr-3 flex-shrink-0" />
+                  <div className="text-left">
+                    <div className="font-medium">{action.title}</div>
+                    <div className="text-xs opacity-70">{action.description}</div>
+                  </div>
+                </Link>
+              </Button>
+            ))}
+          </div>
+
+          {/* Role-based welcome message */}
+          <div className="mt-6 pt-4 border-t">
+            <p className="text-xs text-gray-500 text-center">
+              {isManagement() && "Management Dashboard"}
+              {isProject() && "Project Manager Dashboard"}
+              {isField() && "Field User Dashboard"}
+              {isExternal() && "External User Dashboard"}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    </DataStateWrapper>
   );
 }

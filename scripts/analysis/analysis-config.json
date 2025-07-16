@@ -1,0 +1,60 @@
+{
+  "analysis": {
+    "typescript": {
+      "enabled": true,
+      "strictMode": true,
+      "checkUnusedImports": true,
+      "checkAnyUsage": true
+    },
+    "bundle": {
+      "enabled": true,
+      "maxBundleSize": 2000000,
+      "maxChunkSize": 500000,
+      "checkDuplicateDependencies": true
+    },
+    "database": {
+      "enabled": true,
+      "checkRLSPolicies": true,
+      "checkMissingIndexes": true,
+      "checkN1Problems": true,
+      "maxQueryLimit": 1000
+    },
+    "security": {
+      "enabled": true,
+      "checkHardcodedSecrets": true,
+      "checkSQLInjection": true,
+      "checkXSS": true,
+      "checkMissingAuth": true,
+      "checkRLSCoverage": true
+    },
+    "codeQuality": {
+      "enabled": true,
+      "maxComplexity": 20,
+      "maxFunctionLength": 50,
+      "maxNesting": 4,
+      "maxFileLength": 300,
+      "minTestCoverage": 70
+    }
+  },
+  "reporting": {
+    "outputDir": "analysis-reports",
+    "generateHTML": true,
+    "generateJSON": true,
+    "generateMarkdown": true,
+    "includeRecommendations": true
+  },
+  "thresholds": {
+    "critical": {
+      "maxIssues": 0,
+      "blockProduction": true
+    },
+    "high": {
+      "maxIssues": 10,
+      "blockProduction": false
+    },
+    "medium": {
+      "maxIssues": 50,
+      "blockProduction": false
+    }
+  }
+}

@@ -3,6 +3,8 @@
 import { useAuth } from './useAuth'
 import { hasPermission as checkUserPermission, getUserPermissions, Permission, isManagementRole, isProjectRole, isPurchaseRole, isFieldRole, isExternalRole, hasHigherRole, canManageUser } from '@/lib/permissions'
 import { UserRole } from '@/types/auth'
+import { useAdvancedApiQuery } from './useAdvancedApiQuery'
+import { useMemo, useCallback } from 'react'
 
 export const usePermissions = () => {
   const { profile } = useAuth()
@@ -553,5 +555,170 @@ export const usePermissions = () => {
     
     // Navigation
     getVisibleNavItems
+  }
+}
+
+/**
+ * Enhanced Permissions hook using advanced patterns
+ * This demonstrates optimized permission checking with intelligent caching and memoization
+ */
+export function usePermissionsAdvanced() {
+  const { profile } = useAuth()
+
+  // Use advanced API query for dynamic permissions (if needed for role-based permissions from server)
+  const {
+    data: dynamicPermissions,
+    loading: permissionsLoading,
+    error: permissionsError
+  } = useAdvancedApiQuery<Permission[]>({
+    queryKey: ['user-permissions', profile?.id],
+    queryFn: async () => {
+      if (!profile) return []
+
+      const response = await fetch('/api/auth/permissions')
+      if (!response.ok) throw new Error('Failed to fetch permissions')
+
+      const result = await response.json()
+      return result.permissions || []
+    },
+    enabled: !!profile,
+    staleTime: 10 * 60 * 1000, // 10 minutes - permissions don't change often
+    cacheTime: 30 * 60 * 1000, // 30 minutes
+    refetchOnWindowFocus: false,
+    refetchInterval: false // Permissions are relatively static
+  })
+
+  // Memoized permission checker for performance
+  const checkPermission = useCallback((permission: Permission): boolean => {
+    if (!profile) return false
+    return checkUserPermission(profile.role, permission)
+  }, [profile])
+
+  // Memoized role helpers for performance
+  const roleHelpers = useMemo(() => ({
+    isManagement: profile ? isManagementRole(profile.role) : false,
+    isProject: profile ? isProjectRole(profile.role) : false,
+    isPurchase: profile ? isPurchaseRole(profile.role) : false,
+    isField: profile ? isFieldRole(profile.role) : false,
+    isExternal: profile ? isExternalRole(profile.role) : false,
+  }), [profile])
+
+  // Memoized project permissions for performance
+  const projectPermissions = useMemo(() => ({
+    canCreateProject: checkPermission('projects.create'),
+    canReadAllProjects: checkPermission('projects.read.all'),
+    canReadAssignedProjects: checkPermission('projects.read.assigned'),
+    canReadOwnProjects: checkPermission('projects.read.own'),
+    canUpdateProjects: checkPermission('projects.update'),
+    canDeleteProjects: checkPermission('projects.delete'),
+    canArchiveProjects: checkPermission('projects.archive'),
+  }), [checkPermission])
+
+  // Memoized task permissions for performance
+  const taskPermissions = useMemo(() => ({
+    canViewTasks: checkPermission('tasks.view'),
+    canCreateTasks: checkPermission('tasks.create'),
+    canManageAllTasks: checkPermission('tasks.manage_all'),
+    canComment: checkPermission('tasks.view'),
+  }), [checkPermission])
+
+  // Memoized scope permissions for performance
+  const scopePermissions = useMemo(() => ({
+    canViewScope: checkPermission('scope.view'),
+    canEditScope: checkPermission('scope.update'),
+    canCreateScope: checkPermission('scope.create'),
+    canViewPricing: checkPermission('scope.prices.view'),
+  }), [checkPermission])
+
+  // Memoized user management permissions for performance
+  const userManagementPermissions = useMemo(() => ({
+    canManageUsers: checkPermission('users.create'),
+    canCreateUsers: checkPermission('users.create'),
+    canViewAllUsers: checkPermission('users.read.all'),
+    canUpdateUsers: checkPermission('users.update'),
+    canDeactivateUsers: checkPermission('users.deactivate'),
+    canAssignRoles: checkPermission('users.roles.assign'),
+  }), [checkPermission])
+
+  // Memoized navigation items for performance
+  const visibleNavItems = useMemo(() => {
+    const navItems = []
+
+    if (checkPermission('dashboard.view')) navItems.push('dashboard')
+    if (checkPermission('tasks.view')) navItems.push('tasks')
+    if (checkPermission('scope.view')) navItems.push('scope')
+    if (checkPermission('shop_drawings.view_all')) navItems.push('shop-drawings')
+    if (checkPermission('clients.view')) navItems.push('clients')
+    if (checkPermission('purchase.requests.read')) navItems.push('purchase')
+    if (checkPermission('reports.read.all') || checkPermission('reports.read.project') || checkPermission('reports.read.own')) navItems.push('reports')
+    if (checkPermission('documents.read.all') || checkPermission('documents.read.project') || checkPermission('documents.read.client_visible')) navItems.push('documents')
+    if (checkPermission('system.settings')) navItems.push('settings')
+
+    return navItems
+  }, [checkPermission])
+
+  // Enhanced permission checker with caching
+  const hasPermissionCached = useCallback((permission: Permission): boolean => {
+    return checkPermission(permission)
+  }, [checkPermission])
+
+  // Enhanced project access checker
+  const canAccessProject = useCallback((projectId?: string): boolean => {
+    if (!profile) return false
+
+    // Management can access all projects
+    if (roleHelpers.isManagement) {
+      return true
+    }
+
+    // Other roles need to be assigned to the project
+    if (!projectId) {
+      return roleHelpers.isProject || roleHelpers.isPurchase || roleHelpers.isField
+    }
+
+    return roleHelpers.isProject || roleHelpers.isPurchase || roleHelpers.isField
+  }, [profile, roleHelpers])
+
+  // Enhanced user management checker
+  const canManageSpecificUser = useCallback((targetRole: UserRole): boolean => {
+    if (!profile) return false
+    return canManageUser(profile.role, targetRole)
+  }, [profile])
+
+  return {
+    // Enhanced permission checking
+    hasPermission: hasPermissionCached,
+    checkPermission,
+
+    // Loading states
+    loading: permissionsLoading,
+    error: permissionsError,
+
+    // Memoized permission groups
+    projectPermissions,
+    taskPermissions,
+    scopePermissions,
+    userManagementPermissions,
+
+    // Enhanced utilities
+    canAccessProject,
+    canManageSpecificUser,
+
+    // Memoized role helpers
+    ...roleHelpers,
+
+    // Enhanced navigation
+    visibleNavItems,
+
+    // Data
+    allPermissions: profile ? getUserPermissions(profile.role) : [],
+    dynamicPermissions: dynamicPermissions || [],
+    userRole: profile?.role || null,
+
+    // Performance utilities
+    hasHigherRoleThan: useCallback((comparedRole: UserRole): boolean => {
+      if (!profile) return false
+      return hasHigherRole(profile.role, comparedRole)
+    }, [profile])
   }
 }

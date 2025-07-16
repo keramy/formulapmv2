@@ -584,3 +584,6 @@ if (!validationResult.success) {
 3. **Low Priority**: UI component standardization (developer experience)
 
 **These patterns have been proven to work in production and should be used for all future development to maintain consistency and reduce technical debt.**
+
+## New Memory Entry
+- Before you start your session always read augment.md to be aligned with other ai agent

@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { DataStateWrapper } from '@/components/ui/loading-states';
 import { 
   Bell, 
   CheckCircle, 
@@ -123,6 +124,8 @@ const mockNotifications: Notification[] = [
 export default function NotificationsPage() {
   const { user } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState('all');
   const [showUnreadOnly, setShowUnreadOnly] = useState(false);
 
@@ -147,6 +150,25 @@ export default function NotificationsPage() {
   const deleteNotification = (id: string) => {
     setNotifications(prev => prev.filter(n => n.id !== id));
   };
+
+  const fetchNotifications = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      // In a real app, this would fetch from an API
+      // For now, simulate loading with mock data
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setNotifications(mockNotifications);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch notifications');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
 
   const getIcon = (type: string) => {
     switch (type) {
@@ -273,8 +295,12 @@ export default function NotificationsPage() {
       </div>
 
       {/* Notifications List */}
-      <div className="space-y-4">
-        {filteredNotifications.length === 0 ? (
+      <DataStateWrapper
+        loading={loading}
+        error={error}
+        data={filteredNotifications}
+        onRetry={fetchNotifications}
+        emptyComponent={
           <Card>
             <CardContent className="text-center py-12">
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -282,14 +308,35 @@ export default function NotificationsPage() {
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">No notifications</h3>
               <p className="text-gray-600">
-                {showUnreadOnly 
-                  ? "You're all caught up! No unread notifications." 
+                {showUnreadOnly
+                  ? "You're all caught up! No unread notifications."
                   : "No notifications found for the selected filter."
                 }
               </p>
             </CardContent>
           </Card>
-        ) : (
+        }
+        loadingComponent={
+          <div className="space-y-4">
+            {[...Array(5)].map((_, i) => (
+              <Card key={i}>
+                <CardContent className="p-6">
+                  <div className="flex items-start space-x-4 animate-pulse">
+                    <div className="w-10 h-10 bg-gray-200 rounded-full" />
+                    <div className="flex-1 space-y-2">
+                      <div className="h-4 bg-gray-200 rounded w-3/4" />
+                      <div className="h-3 bg-gray-200 rounded w-full" />
+                      <div className="h-3 bg-gray-200 rounded w-1/2" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          {filteredNotifications.map((notification) => {
           filteredNotifications.map((notification) => {
             const Icon = getIcon(notification.type);
             const CategoryIcon = getCategoryIcon(notification.category);
@@ -378,9 +425,9 @@ export default function NotificationsPage() {
                 </CardContent>
               </Card>
             );
-          })
-        )}
-      </div>
+          })}
+        </div>
+      </DataStateWrapper>
     </div>
   );
 }

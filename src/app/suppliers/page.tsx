@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { DataStateWrapper } from '@/components/ui/loading-states';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -42,6 +44,7 @@ interface Supplier {
 export default function SuppliersPage() {
   const { user, getAccessToken, isAuthenticated } = useAuth();
   const { hasPermission } = usePermissions();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
@@ -108,7 +111,7 @@ export default function SuppliersPage() {
     }
   };
 
-  const filteredSuppliers = suppliers.filter(supplier =>
+  const filteredSuppliers = (suppliers || []).filter(supplier =>
     supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     supplier.contact_person.toLowerCase().includes(searchTerm.toLowerCase()) ||
     supplier.specialties.some(spec => spec.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -193,9 +196,18 @@ export default function SuppliersPage() {
         description: ''
       });
       setIsAddDialogOpen(false);
+      toast({
+        title: "Success",
+        description: "Supplier has been created successfully",
+        variant: "default"
+      });
     } catch (err) {
       console.error('Error saving supplier:', err);
-      alert(err instanceof Error ? err.message : 'Failed to save supplier');
+      toast({
+        title: "Error",
+        description: err instanceof Error ? err.message : 'Failed to save supplier',
+        variant: "destructive"
+      });
     }
   };
 
@@ -391,30 +403,40 @@ export default function SuppliersPage() {
             />
           </div>
 
-          {/* Loading State */}
-          {loading && (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading suppliers...</p>
-            </div>
-          )}
-
-          {/* Error State */}
-          {error && (
-            <div className="text-center py-8">
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Building className="w-8 h-8 text-red-400" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Error Loading Suppliers</h3>
-              <p className="text-red-600 mb-4">{error}</p>
-              <Button onClick={fetchSuppliers} variant="outline">
-                Try Again
-              </Button>
-            </div>
-          )}
-
           {/* Suppliers Grid */}
-          {!loading && !error && (
+          <DataStateWrapper
+            loading={loading}
+            error={error}
+            data={filteredSuppliers}
+            onRetry={fetchSuppliers}
+            emptyComponent={
+              <div className="text-center py-12">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Building className="w-8 h-8 text-gray-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">No Suppliers Found</h3>
+                <p className="text-gray-600 mb-4">
+                  {searchTerm ? 'No suppliers match your search criteria.' : 'Start by adding your first supplier.'}
+                </p>
+                {hasPermission('suppliers.create') && !searchTerm && (
+                  <Button asChild>
+                    <Link href="/suppliers/new">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Supplier
+                    </Link>
+                  </Button>
+                )}
+              </div>
+            }
+            loadingComponent={
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p className="text-gray-600">Loading suppliers...</p>
+              </div>
+            }
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {filteredSuppliers.map((supplier) => (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {filteredSuppliers.map((supplier) => (
               <Card key={supplier.id} className="hover:shadow-md transition-shadow">
@@ -491,19 +513,7 @@ export default function SuppliersPage() {
               </Card>
             ))}
             </div>
-          )}
-
-          {!loading && !error && filteredSuppliers.length === 0 && (
-            <div className="text-center py-8">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Building className="w-8 h-8 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No suppliers found</h3>
-              <p className="text-gray-600">
-                {searchTerm ? 'Try adjusting your search criteria.' : 'No suppliers have been added yet.'}
-              </p>
-            </div>
-          )}
+          </DataStateWrapper>
         </CardContent>
       </Card>
     </div>

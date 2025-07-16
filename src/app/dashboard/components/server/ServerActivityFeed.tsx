@@ -6,7 +6,7 @@
  */
 
 import Link from 'next/link';
-import { createServerClient } from '@/lib/supabase';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -34,7 +34,7 @@ interface ActivityItem {
 }
 
 async function getRecentActivity(userId: string, role: string): Promise<ActivityItem[]> {
-  const supabase = createServerClient();
+  const supabase = await createServerSupabaseClient();
   
   try {
     // Get recent audit logs with user information

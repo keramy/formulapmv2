@@ -12,6 +12,7 @@ import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { projectSchemas, validateData } from '@/lib/form-validation'
 import { ScopeItem, ScopeItemFormData } from '@/types/scope'
 import { usePermissions } from '@/hooks/usePermissions'
 import { Button } from '@/components/ui/button'
@@ -263,6 +264,161 @@ export const ScopeItemEditor: React.FC<ScopeItemEditorProps> = ({
             </div>
           </form>
         </Form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+/**
+ * Enhanced ScopeItemEditor using centralized validation patterns (claude.md aligned)
+ * Following the proven form validation pattern from claude.md guidelines
+ */
+export function ScopeItemEditorEnhanced({
+  item,
+  onSave,
+  onCancel,
+  open,
+  onOpenChange
+}: ScopeItemEditorProps & { open: boolean; onOpenChange: (open: boolean) => void }) {
+  const { toast } = useToast()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
+
+  // Simple form state (claude.md: basic React state management)
+  const [formData, setFormData] = useState({
+    name: item?.name || '',
+    description: item?.description || '',
+    category: item?.category || '',
+    quantity: item?.quantity || 1,
+    unit: item?.unit || 'each',
+    unit_price: item?.unit_price || 0
+  })
+
+  const handleInputChange = (field: string, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+
+    // Clear validation error when user starts typing
+    if (validationErrors[field]) {
+      setValidationErrors(prev => ({ ...prev, [field]: '' }))
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    try {
+      setIsSubmitting(true)
+      setValidationErrors({})
+
+      // Use centralized validation (claude.md pattern)
+      const validationResult = validateData(
+        projectSchemas.scopeItem || z.object({
+          name: z.string().min(1, 'Name is required'),
+          description: z.string().min(1, 'Description is required'),
+          category: z.string().min(1, 'Category is required'),
+          quantity: z.number().min(0, 'Quantity must be positive'),
+          unit: z.string().min(1, 'Unit is required'),
+          unit_price: z.number().min(0, 'Unit price must be positive')
+        }),
+        formData
+      )
+
+      if (!validationResult.success) {
+        // Handle validation errors (claude.md pattern)
+        setValidationErrors(validationResult.fieldErrors || {})
+        return
+      }
+
+      await onSave(validationResult.data!)
+
+      toast({
+        title: "Success",
+        description: item ? "Scope item updated successfully" : "Scope item created successfully"
+      })
+
+      onOpenChange(false)
+
+    } catch (error) {
+      // Simple error handling (claude.md: simple solutions first)
+      const errorMessage = error instanceof Error ? error.message : "Failed to save scope item"
+      toast({
+        title: "Save Failed",
+        description: errorMessage,
+        variant: "destructive"
+      })
+      setValidationErrors({ submit: errorMessage })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[600px]">
+        <DialogHeader>
+          <DialogTitle>{item ? 'Edit Scope Item' : 'Create Scope Item'}</DialogTitle>
+          <DialogDescription>
+            {item ? 'Update the scope item details' : 'Add a new item to the project scope'}
+          </DialogDescription>
+        </DialogHeader>
+
+        {validationErrors.submit && (
+          <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+            <p className="text-red-600 text-sm">{validationErrors.submit}</p>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Name *</Label>
+            <Input
+              id="name"
+              value={formData.name}
+              onChange={(e) => handleInputChange('name', e.target.value)}
+              placeholder="Enter scope item name"
+              disabled={isSubmitting}
+              className={validationErrors.name ? 'border-red-500' : ''}
+            />
+            {validationErrors.name && <p className="text-sm text-red-500">{validationErrors.name}</p>}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="description">Description *</Label>
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => handleInputChange('description', e.target.value)}
+              placeholder="Describe the scope item"
+              disabled={isSubmitting}
+              className={validationErrors.description ? 'border-red-500' : ''}
+            />
+            {validationErrors.description && <p className="text-sm text-red-500">{validationErrors.description}</p>}
+          </div>
+
+          <div className="flex justify-end space-x-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  {item ? 'Update' : 'Create'}
+                </>
+              )}
+            </Button>
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   )

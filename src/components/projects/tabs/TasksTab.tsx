@@ -96,17 +96,29 @@ export function TasksTab({ projectId }: TasksTabProps) {
     await bulkUpdateTasks(taskIds, updates)
   }
 
-  if (error) {
-    return (
-      <Alert variant="destructive">
-        <AlertTriangle className="h-4 w-4" />
-        <AlertDescription>{error}</AlertDescription>
-      </Alert>
-    )
-  }
-
   return (
-    <div className="space-y-6">
+    <DataStateWrapper
+      loading={loading}
+      error={error}
+      data={tasks}
+      onRetry={() => window.location.reload()}
+      emptyComponent={
+        <Card>
+          <CardContent className="text-center py-12">
+            <CheckSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No tasks yet</h3>
+            <p className="text-gray-600 mb-4">Get started by creating your first task</p>
+            {permissions.canCreate && (
+              <Button onClick={() => setCreateDialogOpen(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Create Task
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+      }
+    >
+      <div className="space-y-6">
       {/* Header with Key Metrics */}
       <div className="flex items-center justify-between">
         <div>
