@@ -356,20 +356,14 @@ export async function requireRole(
   return null // Allow request to continue
 }
 
-// Middleware to require management level access
+// Middleware to require management level access - UPDATED FOR 5-ROLE STRUCTURE
 export async function requireManagement(request: NextRequest): Promise<NextResponse | null> {
-  return requireRole(request, [
-    'company_owner',
-    'general_manager', 
-    'deputy_general_manager',
-    'technical_director',
-    'admin'
-  ])
+  return requireRole(request, ['management', 'admin'])
 }
 
-// Middleware to require admin level access
+// Middleware to require admin level access - UPDATED FOR 5-ROLE STRUCTURE
 export async function requireAdmin(request: NextRequest): Promise<NextResponse | null> {
-  return requireRole(request, ['company_owner', 'admin'])
+  return requireRole(request, ['admin'])
 }
 
 // Helper function to create protected API handler
@@ -410,15 +404,9 @@ export function withAuth<T extends any[]>(
         )
       }
 
-      // Check management requirement
+      // Check management requirement - UPDATED FOR 5-ROLE STRUCTURE
       if (options?.requireManagement) {
-        const managementRoles: UserRole[] = [
-          'company_owner',
-          'general_manager',
-          'deputy_general_manager',
-          'technical_director',
-          'admin'
-        ]
+        const managementRoles: UserRole[] = ['management', 'admin']
         if (!managementRoles.includes(profile.role)) {
           return NextResponse.json(
             { error: 'Management access required' },
@@ -427,9 +415,9 @@ export function withAuth<T extends any[]>(
         }
       }
 
-      // Check admin requirement
+      // Check admin requirement - UPDATED FOR 5-ROLE STRUCTURE
       if (options?.requireAdmin) {
-        const adminRoles: UserRole[] = ['company_owner', 'admin']
+        const adminRoles: UserRole[] = ['admin']
         if (!adminRoles.includes(profile.role)) {
           return NextResponse.json(
             { error: 'Admin access required' },

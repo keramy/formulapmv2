@@ -18,7 +18,7 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
   }
 
   // Authorization check - only company owners and admins can list users
-  const adminRoles: UserRole[] = ['company_owner', 'admin']
+  const adminRoles: UserRole[] = ['management', 'admin']
   if (!adminRoles.includes(profile.role)) {
     return createErrorResponse('Admin access required', 403)
   }
@@ -59,17 +59,17 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
     // Group users by role for better organization
     const usersByRole: Record<string, any[]> = {}
     const roleOrder: UserRole[] = [
-      'company_owner',
-      'general_manager', 
-      'deputy_general_manager',
-      'technical_director',
+      'management',
+      'management', 
+      'management',
+      'technical_lead',
       'admin',
       'project_manager',
-      'purchase_director',
-      'architect',
-      'technical_engineer',
-      'purchase_specialist',
-      'field_worker',
+      'purchase_manager',
+      'project_manager',
+      'project_manager',
+      'purchase_manager',
+      'project_manager',
       'client'
     ]
 
@@ -129,12 +129,12 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
     // For admin: can impersonate non-owner/admin roles
     let secureList = []
     
-    if (profile.role === 'company_owner') {
+    if (profile.role === 'management') {
       // Company owners can impersonate anyone except themselves
       secureList = availableForImpersonation
     } else if (profile.role === 'admin') {
       // Admins can impersonate non-admin/owner roles
-      secureList = availableForImpersonation.filter(u => !['company_owner', 'admin'].includes(u.role))
+      secureList = availableForImpersonation.filter(u => !['management', 'admin'].includes(u.role))
     } else {
       // Non-admin users cannot impersonate anyone
       secureList = []

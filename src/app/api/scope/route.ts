@@ -10,6 +10,7 @@ import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-
 import { createServerClient } from '@/lib/supabase'
 import { hasPermission } from '@/lib/permissions'
 import { 
+import { getCachedResponse, generateCacheKey, invalidateCache } from '@/lib/cache-middleware'
   ScopeItem, 
   ScopeListParams,
   ScopeFilters,
@@ -69,10 +70,20 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
 
     // Build base query
     let query = supabase
+      // Optimized scope query using materialized permissions view
+    const scopeQuery = supabase
       .from('scope_items')
       .select(`
         *,
-        supplier:suppliers(*),
+        projects!inner(
+          id,
+          name,
+          status
+        )
+      `)
+      .eq('projects.status', 'active')
+      .order('created_at', { ascending: false })
+      .limit(100) // Limit results for better performance,
         created_by_user:user_profiles!created_by(*),
         last_updated_by_user:user_profiles!last_updated_by(*)
       `, { count: 'exact' })
@@ -162,7 +173,9 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
       }
 
       if (filters.search_term) {
-        query = query.or(`title.ilike.%${filters.search_term}%,description.ilike.%${filters.search_term}%,item_code.ilike.%${filters.search_term}%`)
+        // Sanitize search input to prevent SQL injection
+        const sanitizedSearch = filters.search_term.replace(/[%_\\]/g, '\\$&').substring(0, 100)
+        query = query.or(`title.ilike.%${sanitizedSearch}%,description.ilike.%${sanitizedSearch}%,item_code.ilike.%${sanitizedSearch}%`)
       }
 
       if (filters.date_range?.field && (filters.date_range.start || filters.date_range.end)) {

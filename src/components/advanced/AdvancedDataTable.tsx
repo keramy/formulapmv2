@@ -249,7 +249,8 @@ export function AdvancedDataTable<T = any>({
     updateHeight()
     window.addEventListener('resize', updateHeight)
     return () => window.removeEventListener('resize', updateHeight)
-  }, [])
+  }, []
+  // TODO: Review dependencies - potential deps: updateHeight, containerRef, current)
 
   // Row selection
   const handleRowSelect = useCallback((record: T, selected: boolean) => {

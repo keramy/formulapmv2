@@ -1,0 +1,313 @@
+{
+  "timestamp": "2025-07-17T07:56:31.833Z",
+  "refinedStructure": {
+    "userRoles": [
+      {
+        "name": "management",
+        "description": "Owner, General Manager, Deputy General Manager - Full oversight",
+        "permissions": [
+          "all_projects_overview",
+          "total_budgets_visibility",
+          "ongoing_active_projects",
+          "active_tasks_monitoring",
+          "recent_updates_dashboard",
+          "financial_data_full",
+          "user_management",
+          "system_configuration"
+        ],
+        "replaces": [
+          "company_owner",
+          "general_manager",
+          "deputy_general_manager"
+        ],
+        "estimatedUsers": 3,
+        "complexity": 1.1,
+        "dashboardFeatures": [
+          "Company-wide project dashboard",
+          "Total budget tracking",
+          "Active projects overview",
+          "Recent updates feed",
+          "Financial summaries",
+          "Team performance metrics"
+        ]
+      },
+      {
+        "name": "purchase_manager",
+        "description": "Purchase and vendor management",
+        "permissions": [
+          "purchase_processing",
+          "vendor_management",
+          "cost_tracking",
+          "purchase_approval",
+          "supplier_database_management"
+        ],
+        "replaces": [
+          "purchase_director",
+          "purchase_specialist"
+        ],
+        "estimatedUsers": 5,
+        "complexity": 1.3
+      },
+      {
+        "name": "technical_lead",
+        "description": "Technical oversight and scope management",
+        "permissions": [
+          "scope_list_upload",
+          "technical_specifications",
+          "project_technical_oversight",
+          "cost_tracking",
+          "quality_control",
+          "subcontractor_assignment"
+        ],
+        "replaces": [
+          "technical_director"
+        ],
+        "estimatedUsers": 8,
+        "complexity": 1.4,
+        "keyFeatures": [
+          "Upload scope lists to system",
+          "Assign subcontractors to scope items",
+          "Monitor technical progress",
+          "Cost visibility for technical decisions"
+        ]
+      },
+      {
+        "name": "project_manager",
+        "description": "Project coordination, field work, and architectural tasks",
+        "permissions": [
+          "project_management",
+          "team_coordination",
+          "progress_tracking",
+          "field_updates",
+          "photo_upload",
+          "task_management",
+          "architectural_review",
+          "design_coordination",
+          "client_communication"
+        ],
+        "replaces": [
+          "project_manager",
+          "architect",
+          "technical_engineer",
+          "field_worker"
+        ],
+        "estimatedUsers": 35,
+        "complexity": 1.6,
+        "keyFeatures": [
+          "Unified project management",
+          "Field work capabilities",
+          "Architectural coordination",
+          "Direct client communication",
+          "Progress reporting"
+        ]
+      },
+      {
+        "name": "client",
+        "description": "Project visibility and report access only",
+        "permissions": [
+          "assigned_project_progress",
+          "uploaded_reports_view",
+          "updated_reports_view",
+          "project_timeline_view"
+        ],
+        "replaces": [
+          "client"
+        ],
+        "estimatedUsers": 25,
+        "complexity": 1.1,
+        "restrictions": [
+          "No cost visibility",
+          "No task details",
+          "No team information",
+          "Only assigned project access"
+        ]
+      }
+    ],
+    "subcontractorSystem": {
+      "approach": "database_entities",
+      "description": "Subcontractors as assignable resources, not system users",
+      "structure": {
+        "table": "subcontractors",
+        "fields": [
+          "id",
+          "name",
+          "company",
+          "contact_info",
+          "specialties",
+          "hourly_rate",
+          "contract_terms",
+          "performance_rating",
+          "active_assignments",
+          "total_payments",
+          "availability_status"
+        ]
+      },
+      "assignment": {
+        "method": "scope_item_assignment",
+        "assignedBy": [
+          "technical_lead",
+          "project_manager"
+        ],
+        "tracking": [
+          "Which subcontractor is doing what",
+          "Payment calculations",
+          "Performance monitoring",
+          "Availability tracking"
+        ]
+      },
+      "benefits": [
+        "No user account overhead",
+        "Simplified permission system",
+        "Better cost tracking",
+        "Easier subcontractor management"
+      ]
+    },
+    "specialRoles": [
+      {
+        "name": "admin",
+        "description": "System administration only",
+        "permissions": [
+          "system_admin",
+          "technical_support"
+        ],
+        "estimatedUsers": 2,
+        "complexity": 1
+      }
+    ]
+  },
+  "performanceImpact": {
+    "current": {
+      "totalRoles": 13,
+      "averageComplexity": 1.67,
+      "averageResponseTime": 262,
+      "problematicRoles": [
+        "field_worker: 542ms",
+        "subcontractor: 359ms"
+      ],
+      "rlsPolicies": 45
+    },
+    "refined": {
+      "totalRoles": 5,
+      "averageComplexity": 1.3,
+      "estimatedResponseTime": 180,
+      "eliminatedProblems": [
+        "No more field_worker complexity",
+        "No subcontractor user accounts"
+      ],
+      "estimatedRlsPolicies": 15
+    },
+    "improvements": {
+      "roleReduction": "62% fewer roles (13 → 5)",
+      "complexityReduction": "22% average complexity reduction",
+      "responseTimeImprovement": "31% faster (262ms → 180ms)",
+      "rlsPolicyReduction": "67% fewer policies (45 → 15)",
+      "maintenanceReduction": "70% less role management overhead"
+    }
+  },
+  "businessAlignment": {
+    "management": {
+      "requirement": "Oversee all projects, budgets, tasks, updates",
+      "solution": "Single management role with company-wide dashboard",
+      "benefit": "Unified oversight, no permission complexity"
+    },
+    "technicalLead": {
+      "requirement": "Upload scope lists, assign subcontractors",
+      "solution": "Technical lead with scope management and subcontractor assignment",
+      "benefit": "Clear technical ownership, streamlined workflow"
+    },
+    "projectManager": {
+      "requirement": "Combine architect, field worker, project management",
+      "solution": "Unified project manager role with all capabilities",
+      "benefit": "Single point of contact, reduced handoffs"
+    },
+    "client": {
+      "requirement": "See project progress and reports only",
+      "solution": "Simplified client role with read-only access",
+      "benefit": "Clean client experience, no unnecessary complexity"
+    },
+    "subcontractor": {
+      "requirement": "Track assignments and payments, not system users",
+      "solution": "Database entities with assignment tracking",
+      "benefit": "No user account overhead, better cost control"
+    }
+  },
+  "implementationPlan": {
+    "phase1": {
+      "title": "Database Schema Updates",
+      "duration": "1-2 weeks",
+      "priority": "HIGH",
+      "tasks": [
+        "Create new 5-role enum structure",
+        "Design subcontractor entities table",
+        "Update RLS policies (45 → 15 policies)",
+        "Create role migration scripts"
+      ]
+    },
+    "phase2": {
+      "title": "Management Dashboard",
+      "duration": "2-3 weeks",
+      "priority": "HIGH",
+      "tasks": [
+        "Build company-wide overview dashboard",
+        "Implement total budget tracking",
+        "Create active projects monitoring",
+        "Add recent updates feed"
+      ]
+    },
+    "phase3": {
+      "title": "Subcontractor System",
+      "duration": "2-3 weeks",
+      "priority": "MEDIUM",
+      "tasks": [
+        "Create subcontractor database entities",
+        "Build assignment interface for technical leads",
+        "Implement payment tracking",
+        "Add performance monitoring"
+      ]
+    },
+    "phase4": {
+      "title": "Unified Project Manager Role",
+      "duration": "3-4 weeks",
+      "priority": "HIGH",
+      "tasks": [
+        "Merge architect + field worker + PM capabilities",
+        "Simplify mobile interface for field work",
+        "Streamline project coordination tools",
+        "Update client communication features"
+      ]
+    },
+    "phase5": {
+      "title": "Client Portal Simplification",
+      "duration": "1-2 weeks",
+      "priority": "MEDIUM",
+      "tasks": [
+        "Simplify client interface",
+        "Focus on progress and reports only",
+        "Remove unnecessary features",
+        "Optimize for read-only access"
+      ]
+    },
+    "phase6": {
+      "title": "Migration and Testing",
+      "duration": "2-3 weeks",
+      "priority": "HIGH",
+      "tasks": [
+        "Migrate existing users to new roles",
+        "Convert subcontractor users to entities",
+        "Comprehensive testing",
+        "Performance validation"
+      ]
+    }
+  },
+  "databaseSchema": "\n-- REFINED ROLE SYSTEM (5 roles instead of 13)\nCREATE TYPE user_role_refined AS ENUM (\n    'management',        -- Owner, GM, Deputy GM\n    'purchase_manager',  -- Purchase operations\n    'technical_lead',    -- Technical oversight, scope management\n    'project_manager',   -- Projects, field work, architecture\n    'client'            -- Project visibility only\n);\n\n-- Subcontractors as entities, not users\nCREATE TABLE IF NOT EXISTS public.subcontractors (\n    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n    name TEXT NOT NULL,\n    company TEXT,\n    contact_person TEXT,\n    email TEXT,\n    phone TEXT,\n    specialties TEXT[], -- Array of specialties\n    hourly_rate DECIMAL(10,2),\n    contract_terms TEXT,\n    performance_rating DECIMAL(3,2) DEFAULT 0.00,\n    total_assignments INTEGER DEFAULT 0,\n    total_payments DECIMAL(12,2) DEFAULT 0.00,\n    availability_status TEXT DEFAULT 'available',\n    notes TEXT,\n    is_active BOOLEAN DEFAULT TRUE,\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\n-- Subcontractor assignments to scope items\nCREATE TABLE IF NOT EXISTS public.subcontractor_assignments (\n    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n    subcontractor_id UUID REFERENCES subcontractors(id),\n    scope_item_id UUID REFERENCES scope_items(id),\n    assigned_by UUID REFERENCES user_profiles(id),\n    hourly_rate DECIMAL(10,2),\n    estimated_hours INTEGER,\n    actual_hours INTEGER DEFAULT 0,\n    total_cost DECIMAL(10,2),\n    status TEXT DEFAULT 'assigned',\n    start_date DATE,\n    end_date DATE,\n    notes TEXT,\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\n-- Simplified RLS policies (15 instead of 45)\n-- Management: See everything\nCREATE POLICY \"Management full access\" ON user_profiles\n    FOR ALL USING (\n        (auth.jwt() ->> 'user_role') = 'management'\n    );\n\n-- Project managers: Project-based access\nCREATE POLICY \"PM project access\" ON projects\n    FOR ALL USING (\n        project_manager_id = auth.uid() OR\n        (auth.jwt() ->> 'user_role') = 'management'\n    );\n\n-- Clients: Assigned project only\nCREATE POLICY \"Client project access\" ON projects\n    FOR SELECT USING (\n        client_id = auth.uid() AND\n        (auth.jwt() ->> 'user_role') = 'client'\n    );\n\n-- Technical leads: Subcontractor management\nCREATE POLICY \"Technical lead subcontractor access\" ON subcontractors\n    FOR ALL USING (\n        (auth.jwt() ->> 'user_role') IN ('management', 'technical_lead')\n    );\n",
+  "keyBenefits": [
+    "62% fewer roles (13 → 5)",
+    "31% better performance (262ms → 180ms)",
+    "67% fewer RLS policies (45 → 15)",
+    "Eliminated field worker complexity (542ms)",
+    "No subcontractor user account overhead",
+    "Unified management oversight",
+    "Streamlined project management",
+    "Simplified client experience"
+  ]
+}

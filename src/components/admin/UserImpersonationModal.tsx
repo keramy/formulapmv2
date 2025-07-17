@@ -127,7 +127,6 @@ export const UserImpersonationModal = ({ open, onOpenChange }: UserImpersonation
       const success = impersonateUser(currentProfile, targetUser)
       
       if (success) {
-        console.log('🎭 [UserImpersonationModal] Impersonation started successfully')
         onOpenChange(false) // Close modal
         
         // Reset form state
@@ -151,21 +150,21 @@ export const UserImpersonationModal = ({ open, onOpenChange }: UserImpersonation
 
   const getRoleIcon = (role: string) => {
     switch (role) {
-      case 'company_owner':
+      case 'management':
       case 'admin':
         return <Shield className="h-4 w-4" />
-      case 'general_manager':
-      case 'deputy_general_manager':
-      case 'technical_director':
+      case 'management':
+      case 'management':
+      case 'technical_lead':
         return <Building className="h-4 w-4" />
       case 'project_manager':
-      case 'architect':
-      case 'technical_engineer':
+      case 'project_manager':
+      case 'project_manager':
         return <Wrench className="h-4 w-4" />
-      case 'purchase_director':
-      case 'purchase_specialist':
+      case 'purchase_manager':
+      case 'purchase_manager':
         return <ShoppingCart className="h-4 w-4" />
-      case 'field_worker':
+      case 'project_manager':
         return <HardHat className="h-4 w-4" />
       case 'client':
         return <UserCheck className="h-4 w-4" />
@@ -176,21 +175,21 @@ export const UserImpersonationModal = ({ open, onOpenChange }: UserImpersonation
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
-      case 'company_owner':
+      case 'management':
       case 'admin':
         return 'bg-purple-100 text-purple-800'
-      case 'general_manager':
-      case 'deputy_general_manager':
-      case 'technical_director':
+      case 'management':
+      case 'management':
+      case 'technical_lead':
         return 'bg-blue-100 text-blue-800'
       case 'project_manager':
-      case 'architect':
-      case 'technical_engineer':
+      case 'project_manager':
+      case 'project_manager':
         return 'bg-green-100 text-green-800'
-      case 'purchase_director':
-      case 'purchase_specialist':
+      case 'purchase_manager':
+      case 'purchase_manager':
         return 'bg-orange-100 text-orange-800'
-      case 'field_worker':
+      case 'project_manager':
         return 'bg-yellow-100 text-yellow-800'
       case 'client':
         return 'bg-gray-100 text-gray-800'
@@ -207,7 +206,7 @@ export const UserImpersonationModal = ({ open, onOpenChange }: UserImpersonation
   // Get unique roles for filter dropdown
   const availableRoles = Array.from(new Set(users.map(user => user.role)))
     .sort((a, b) => {
-      const roleOrder = ['company_owner', 'admin', 'general_manager', 'deputy_general_manager', 'technical_director', 'project_manager', 'purchase_director', 'architect', 'technical_engineer', 'purchase_specialist', 'field_worker', 'client']
+      const roleOrder = ['management', 'admin', 'management', 'management', 'technical_lead', 'project_manager', 'purchase_manager', 'project_manager', 'project_manager', 'purchase_manager', 'project_manager', 'client']
       return roleOrder.indexOf(a) - roleOrder.indexOf(b)
     })
 

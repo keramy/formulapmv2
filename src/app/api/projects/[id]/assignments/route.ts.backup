@@ -1,0 +1,398 @@
+/**
+ * Formula PM 2.0 Project Assignments API
+ * Wave 2 Business Logic Implementation
+ * 
+ * Handles project team assignments and access control
+ */
+
+import { NextRequest, NextResponse } from 'next/server'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
+import { createServerClient } from '@/lib/supabase'
+import { hasPermission } from '@/lib/permissions'
+import { validateProjectAssignments } from '@/lib/validation/projects'
+
+// ============================================================================
+// GET /api/projects/[id]/assignments - Get project team assignments
+// ============================================================================
+
+export const GET = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+
+  try {
+    const params = await context.params
+    const projectId = params.id
+
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+    if (!uuidRegex.test(projectId)) {
+      return createErrorResponse('Invalid project ID format' , 400)
+    }
+
+    const supabase = createServerClient()
+
+    // Check if user has access to this project
+    const hasAccess = await checkProjectAccess(supabase, user, projectId)
+    if (!hasAccess) {
+      return createErrorResponse('Project not found or access denied' , 404)
+    }
+
+    // Get project assignments with user details
+    const { data: assignments, error } = await supabase
+      .from('project_assignments')
+      .select(`
+        *,
+        user:user_profiles(
+          id,
+          first_name,
+          last_name,
+          email,
+          role,
+          department,
+          phone,
+          avatar_url
+        ),
+        assigned_by_user:user_profiles!assigned_by(
+          first_name,
+          last_name
+        )
+      `)
+      .eq('project_id', projectId)
+      .eq('is_active', true)
+      .order('assigned_at', { ascending: false })
+
+    if (error) {
+      console.error('Assignments fetch error:', error)
+      return createErrorResponse('Failed to fetch project assignments' , 500)
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        assignments: assignments || []
+      }
+    })
+
+  } catch (error) {
+    console.error('Project assignments API error:', error)
+    return createErrorResponse('Internal server error' , 500)
+  }
+}
+
+// ============================================================================
+// POST /api/projects/[id]/assignments - Add/update project team assignments
+// ============================================================================
+
+export const POST = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+
+  try {
+    const params = await context.params
+    const projectId = params.id
+
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+    if (!uuidRegex.test(projectId)) {
+      return createErrorResponse('Invalid project ID format' , 400)
+    }
+
+    // Check permissions - project managers and management can assign team members
+    const canManageTeam = hasPermission(profile.role, 'projects.update') || 
+                         ['company_owner', 'general_manager', 'deputy_general_manager', 'project_manager'].includes(profile.role)
+    
+    if (!canManageTeam) {
+      return createErrorResponse('Insufficient permissions to manage project team' , 403)
+    }
+
+    const supabase = createServerClient()
+
+    // Check if user has access to this project
+    const hasAccess = await checkProjectAccess(supabase, user, projectId)
+    if (!hasAccess) {
+      return createErrorResponse('Project not found or access denied' , 404)
+    }
+
+    const body = await request.json()
+    
+    // Validate assignment data
+    const validationResult = validateProjectAssignments(body)
+    if (!validationResult.success) {
+      return createErrorResponse('Invalid assignment data',
+          details: validationResult.error.issues 
+        , 400)
+    }
+
+    const { assignments, replace_existing, notify_assigned_users } = validationResult.data
+
+    // Validate that all users exist and have appropriate roles
+    const userIds = assignments.map(a => a.user_id)
+    const { data: users, error: usersError } = await supabase
+      .from('user_profiles')
+      .select('id, role, first_name, last_name, email, is_active')
+      .in('id', userIds)
+
+    if (usersError) {
+      console.error('Users validation error:', usersError)
+      return createErrorResponse('Failed to validate users' , 500)
+    }
+
+    // Check if all users exist and are active
+    const foundUserIds = users.map(u => u.id)
+    const missingUsers = userIds.filter(id => !foundUserIds.includes(id))
+    if (missingUsers.length > 0) {
+      return NextResponse.json(
+        { success: false, error: `Users not found: ${missingUsers.join(', ')}` },
+        { status: 400 }
+      )
+    }
+
+    const inactiveUsers = users.filter(u => !u.is_active)
+    if (inactiveUsers.length > 0) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: `Cannot assign inactive users: ${inactiveUsers.map(u => `${u.first_name} ${u.last_name}`).join(', ')}` 
+        },
+        { status: 400 }
+      )
+    }
+
+    // If replacing existing assignments, deactivate current ones
+    if (replace_existing) {
+      await supabase
+        .from('project_assignments')
+        .update({ is_active: false })
+        .eq('project_id', projectId)
+        .eq('is_active', true)
+    }
+
+    // Prepare assignment records
+    const assignmentRecords = assignments.map(assignment => ({
+      project_id: projectId,
+      user_id: assignment.user_id,
+      role: assignment.role,
+      responsibilities: assignment.responsibilities,
+      assigned_by: user.id,
+      is_active: true
+    }))
+
+    // Handle duplicate assignments (upsert logic)
+    const { data: newAssignments, error: insertError } = await supabase
+      .from('project_assignments')
+      .upsert(assignmentRecords, {
+        onConflict: 'project_id,user_id,role',
+        ignoreDuplicates: false
+      })
+      .select(`
+        *,
+        user:user_profiles(
+          id,
+          first_name,
+          last_name,
+          email,
+          role,
+          department
+        )
+      `)
+
+    if (insertError) {
+      console.error('Assignment creation error:', insertError)
+      return createErrorResponse('Failed to create assignments' , 500)
+    }
+
+    // Send notifications to assigned users if requested
+    if (notify_assigned_users && newAssignments) {
+      await sendAssignmentNotifications(supabase, projectId, newAssignments, user.id)
+    }
+
+    // Log the assignment activity
+    await logProjectActivity(
+      supabase, 
+      projectId, 
+      'team_assignments_updated', 
+      `Team assignments updated: ${assignments.length} members assigned`, 
+      user.id, 
+      { assignments: assignments.length, replace_existing }
+    )
+
+    return NextResponse.json({
+      success: true,
+      message: 'Project assignments updated successfully',
+      data: {
+        assignments: newAssignments
+      }
+    })
+
+  } catch (error) {
+    console.error('Project assignments API error:', error)
+    return createErrorResponse('Internal server error' , 500)
+  }
+}
+
+// ============================================================================
+// DELETE /api/projects/[id]/assignments - Remove team member from project
+// ============================================================================
+
+export const DELETE = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
+
+  try {
+    const params = await context.params
+    const projectId = params.id
+
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+    if (!uuidRegex.test(projectId)) {
+      return createErrorResponse('Invalid project ID format' , 400)
+    }
+
+    // Check permissions
+    const canManageTeam = hasPermission(profile.role, 'projects.update') || 
+                         ['company_owner', 'general_manager', 'deputy_general_manager', 'project_manager'].includes(profile.role)
+    
+    if (!canManageTeam) {
+      return createErrorResponse('Insufficient permissions to manage project team' , 403)
+    }
+
+    const url = new URL(request.url)
+    const userId = url.searchParams.get('user_id')
+    const role = url.searchParams.get('role')
+
+    if (!userId) {
+      return createErrorResponse('user_id parameter is required' , 400)
+    }
+
+    const supabase = createServerClient()
+
+    // Check if user has access to this project
+    const hasAccess = await checkProjectAccess(supabase, user, projectId)
+    if (!hasAccess) {
+      return createErrorResponse('Project not found or access denied' , 404)
+    }
+
+    // Deactivate the assignment
+    let query = supabase
+      .from('project_assignments')
+      .update({ is_active: false })
+      .eq('project_id', projectId)
+      .eq('user_id', userId)
+
+    // If role is specified, only remove that specific role assignment
+    if (role) {
+      query = query.eq('role', role)
+    }
+
+    const { error: removeError } = await query
+
+    if (removeError) {
+      console.error('Assignment removal error:', removeError)
+      return createErrorResponse('Failed to remove assignment' , 500)
+    }
+
+    // Log the removal activity
+    await logProjectActivity(
+      supabase, 
+      projectId, 
+      'team_member_removed', 
+      `Team member removed from project${role ? ` (role: ${role})` : ''}`, 
+      user.id, 
+      { removed_user_id: userId, role }
+    )
+
+    return createSuccessResponse({ message: 'Team member removed successfully'
+     })
+
+  } catch (error) {
+    console.error('Assignment removal API error:', error)
+    return createErrorResponse('Internal server error' , 500)
+  }
+}
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+async function checkProjectAccess(supabase: any, user: any, projectId: string): Promise<boolean> {
+  try {
+    // Management roles can access all projects
+    if (['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'].includes(user.role)) {
+      return true
+    }
+
+    // Check if user is assigned to this project or is the project manager
+    const { data: assignment } = await supabase
+      .from('project_assignments')
+      .select('id')
+      .eq('project_id', projectId)
+      .eq('user_id', user.id)
+      .eq('is_active', true)
+      .single()
+
+    if (assignment) {
+      return true
+    }
+
+    // Check if user is the project manager
+    const { data: project } = await supabase
+      .from('projects')
+      .select('project_manager_id')
+      .eq('id', projectId)
+      .single()
+
+    return project?.project_manager_id === user.id
+  } catch (error) {
+    console.error('Access check error:', error)
+    return false
+  }
+}
+
+async function sendAssignmentNotifications(supabase: any, projectId: string, assignments: any[], assignedBy: string) {
+  try {
+    // Get project details for notification
+    const { data: project } = await supabase
+      .from('projects')
+      .select('name')
+      .eq('id', projectId)
+      .single()
+
+    if (!project) return
+
+    // Create notification records
+    const notifications = assignments.map(assignment => ({
+      user_id: assignment.user_id,
+      title: 'New Project Assignment',
+      message: `You have been assigned to project "${project.name}" as ${assignment.role.replace('_', ' ')}`,
+      type: 'project_assignment',
+      action_url: `/projects/${projectId}`,
+      project_id: projectId,
+      created_by: assignedBy
+    }))
+
+    await supabase
+      .from('notifications')
+      .insert(notifications)
+  } catch (error) {
+    console.error('Notification sending error:', error)
+    // Don't fail the main operation for notification issues
+  }
+}
+
+async function logProjectActivity(
+  supabase: any, 
+  projectId: string, 
+  type: string, 
+  description: string, 
+  userId: string, 
+  metadata?: any
+) {
+  try {
+    await supabase
+      .from('project_activities')
+      .insert({
+        project_id: projectId,
+        type,
+        description,
+        performed_by: userId,
+        metadata: metadata || {}
+      })
+  } catch (error) {
+    console.error('Activity logging error:', error)
+    // Don't fail the main operation for logging issues
+  }
+}

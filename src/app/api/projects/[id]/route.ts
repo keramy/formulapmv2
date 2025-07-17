@@ -254,7 +254,7 @@ export const PUT = withAuth(async (request: NextRequest, context: { params: Prom
 
     if (hasSensitiveUpdates) {
       // Require management permissions for sensitive updates
-      const isManagement = ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'].includes(profile.role)
+      const isManagement = ['management', 'management', 'management', 'technical_lead', 'admin'].includes(profile.role)
       const isProjectManager = profile.role === 'project_manager'
       
       if (!isManagement && !isProjectManager) {
@@ -407,7 +407,7 @@ export const DELETE = withAuth(async (request: NextRequest, context: { params: P
 async function checkProjectAccess(supabase: any, user: any, projectId: string): Promise<boolean> {
   try {
     // Management roles can access all projects
-    if (['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'].includes(user.profile?.role || user.role)) {
+    if (['management', 'management', 'management', 'technical_lead', 'admin'].includes(user.profile?.role || user.role)) {
       return true
     }
 

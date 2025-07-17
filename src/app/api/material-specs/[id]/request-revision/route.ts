@@ -70,7 +70,7 @@ export const POST = withAuth(async (request: NextRequest, context: { params: Pro
     }
 
     // Prevent self-revision request if created by same user (but allow supervisors to request revision)
-    if (existingMaterialSpec.created_by === user.id && !['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'].includes(profile.role)) {
+    if (existingMaterialSpec.created_by === user.id && !['management', 'management', 'management', 'technical_lead', 'admin'].includes(profile.role)) {
       return createErrorResponse('Cannot request revision for your own material specification' , 400)
     }
 
@@ -172,7 +172,7 @@ export const POST = withAuth(async (request: NextRequest, context: { params: Pro
 async function verifyProjectAccess(supabase: any, user: any, projectId: string): Promise<boolean> {
   try {
     // Management roles can access all projects
-    if (['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'].includes(user.role)) {
+    if (['management', 'management', 'management', 'technical_lead', 'admin'].includes(user.role)) {
       return true
     }
 

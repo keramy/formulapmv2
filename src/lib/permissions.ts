@@ -1,212 +1,266 @@
-import { UserRole } from '@/types/database'
+import { useMemo } from 'react'
+import { UserRole, SeniorityLevel, ApprovalLimits } from '@/types/auth'
 
+// OPTIMIZED PERMISSIONS FOR 5-ROLE STRUCTURE (down from 13 roles)
 export const PERMISSIONS = {
-  // Project Management
-  'projects.create': ['company_owner', 'general_manager', 'deputy_general_manager', 'project_manager', 'admin'],
-  'projects.read.all': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'],
-  'projects.read.assigned': ['project_manager', 'architect', 'technical_engineer', 'purchase_director', 'purchase_specialist'],
-  'projects.read.own': ['client', 'field_worker'],
-  'projects.update': ['company_owner', 'general_manager', 'deputy_general_manager', 'project_manager', 'admin'],
-  'projects.delete': ['company_owner', 'general_manager', 'admin'],
-  'projects.archive': ['company_owner', 'general_manager', 'deputy_general_manager', 'project_manager', 'admin'],
+  // Project Management - Simplified for 5 roles
+  'projects.create': ['management', 'project_manager', 'admin'],
+  'projects.read.all': ['management', 'admin'],
+  'projects.read.assigned': ['project_manager', 'technical_lead', 'purchase_manager'],
+  'projects.read.own': ['client'],
+  'projects.update': ['management', 'project_manager', 'admin'],
+  'projects.delete': ['management', 'admin'],
+  'projects.archive': ['management', 'project_manager', 'admin'],
 
-  // Scope Management
-  'scope.create': ['project_manager', 'technical_engineer', 'deputy_general_manager'],
-  'scope.read.full': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'technical_engineer'],
-  'scope.read.limited': ['architect', 'field_worker'],
-  'scope.update': ['project_manager', 'technical_engineer'],
-  'scope.pricing.set': ['technical_engineer', 'project_manager'],
-  'scope.supplier.assign': ['purchase_director', 'purchase_specialist'],
-  'scope.prices.view': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'purchase_director', 'purchase_specialist', 'technical_engineer'],
+  // Scope Management - Unified under project_manager and technical_lead
+  'scope.create': ['management', 'project_manager', 'technical_lead', 'admin'],
+  'scope.read.full': ['management', 'technical_lead', 'purchase_manager', 'admin'],
+  'scope.read.assigned': ['project_manager'],
+  'scope.read.limited': ['client'],
+  'scope.update': ['management', 'project_manager', 'technical_lead', 'admin'],
+  'scope.pricing.set': ['management', 'technical_lead', 'purchase_manager', 'admin'],
+  'scope.upload': ['technical_lead'], // Key feature for technical leads
+  'scope.prices.view': ['management', 'technical_lead', 'purchase_manager', 'admin'],
 
-  // Document Management
-  'documents.create': ['project_manager', 'architect', 'technical_engineer', 'field_worker'],
-  'documents.read': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'architect', 'technical_engineer', 'field_worker', 'purchase_director', 'purchase_specialist'],
-  'documents.read.all': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'],
-  'documents.read.project': ['project_manager', 'architect', 'technical_engineer', 'field_worker', 'purchase_director', 'purchase_specialist'],
+  // Subcontractor Management - New entity-based system
+  'subcontractors.create': ['management', 'technical_lead', 'admin'],
+  'subcontractors.read': ['management', 'technical_lead', 'project_manager', 'purchase_manager', 'admin'],
+  'subcontractors.update': ['management', 'technical_lead', 'admin'],
+  'subcontractors.assign': ['technical_lead', 'project_manager'], // Key workflow
+  'subcontractors.rate': ['management', 'technical_lead', 'project_manager', 'admin'],
+  'subcontractors.payments.view': ['management', 'technical_lead', 'purchase_manager', 'admin'],
+
+  // Document Management - Simplified
+  'documents.create': ['management', 'project_manager', 'technical_lead', 'admin'],
+  'documents.read.all': ['management', 'admin'],
+  'documents.read.project': ['project_manager', 'technical_lead', 'purchase_manager'],
   'documents.read.client_visible': ['client'],
-  'documents.update': ['project_manager', 'architect', 'technical_engineer'],
-  'documents.delete': ['project_manager', 'technical_director', 'general_manager', 'admin'],
-  'documents.version.manage': ['project_manager', 'architect'],
-  
-  // Document Approval Workflow
-  'documents.view': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'architect', 'technical_engineer', 'field_worker', 'purchase_director', 'purchase_specialist', 'client'],
-  'documents.manage': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager'],
-  'documents.approve': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'architect', 'technical_engineer', 'client'],
-  'documents.approve.internal': ['project_manager', 'technical_director', 'general_manager'],
+  'documents.update': ['management', 'project_manager', 'technical_lead', 'admin'],
+  'documents.delete': ['management', 'admin'],
+  'documents.approve': ['management', 'project_manager', 'technical_lead', 'client', 'admin'],
   'documents.approve.client': ['client'],
 
-  // Shop Drawing Permissions
-  'shop_drawings.create': ['architect', 'project_manager'],
-  'shop_drawings.edit': ['architect', 'project_manager'],
-  'shop_drawings.delete': ['architect', 'project_manager', 'technical_director', 'admin'],
-  'shop_drawings.view': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'architect', 'technical_engineer', 'field_worker', 'client'],
-  'shop_drawings.approve': ['architect', 'project_manager', 'general_manager', 'deputy_general_manager', 'technical_director', 'client'],
-  'shop_drawings.review.internal': ['project_manager', 'technical_director'],
-  'shop_drawings.approve.internal': ['project_manager', 'technical_director'],
-  'shop_drawings.submit.client': ['project_manager'],
+  // Shop Drawing Permissions - Under project_manager (was architect)
+  'shop_drawings.create': ['project_manager', 'technical_lead'],
+  'shop_drawings.edit': ['project_manager', 'technical_lead'],
+  'shop_drawings.delete': ['management', 'project_manager', 'technical_lead', 'admin'],
+  'shop_drawings.view': ['management', 'project_manager', 'technical_lead', 'client', 'admin'],
+  'shop_drawings.approve': ['management', 'project_manager', 'technical_lead', 'client', 'admin'],
   'shop_drawings.approve.client': ['client'],
-  'shop_drawings.revision.request': ['client', 'project_manager', 'technical_director'],
 
-  // Purchase & Supplier Permissions
-  'suppliers.create': ['purchase_director', 'purchase_specialist'],
-  'suppliers.read': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'purchase_director', 'purchase_specialist'],
-  'suppliers.approve': ['general_manager', 'deputy_general_manager'],
-  'suppliers.evaluate': ['purchase_director', 'purchase_specialist', 'project_manager'],
-  'suppliers.select.scope': ['purchase_director', 'purchase_specialist'],
-  'payments.view': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'purchase_director'],
-  'payments.track': ['purchase_director', 'purchase_specialist'],
+  // Purchase & Supplier Permissions - Unified under purchase_manager
+  'suppliers.create': ['management', 'purchase_manager', 'admin'],
+  'suppliers.read': ['management', 'technical_lead', 'project_manager', 'purchase_manager', 'admin'],
+  'suppliers.approve': ['management', 'purchase_manager', 'admin'],
+  'suppliers.evaluate': ['purchase_manager', 'project_manager', 'technical_lead'],
+  'suppliers.select.scope': ['purchase_manager', 'technical_lead'],
+  'payments.view': ['management', 'purchase_manager', 'admin'],
+  'payments.track': ['purchase_manager'],
 
-  // Purchase Department Workflow Permissions
-  'purchase.requests.create': ['project_manager', 'technical_engineer', 'field_worker', 'purchase_director', 'purchase_specialist'],
-  'purchase.requests.read': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'technical_engineer', 'field_worker', 'purchase_director', 'purchase_specialist'],
-  'purchase.requests.update': ['project_manager', 'technical_engineer', 'purchase_director', 'purchase_specialist'],
-  'purchase.requests.delete': ['project_manager', 'purchase_director', 'purchase_specialist'],
-  'purchase.requests.approve': ['project_manager', 'general_manager', 'deputy_general_manager', 'purchase_director'],
-  'purchase.requests.emergency': ['project_manager', 'general_manager', 'deputy_general_manager', 'purchase_director'],
+  // Purchase Department Workflow - Simplified
+  'purchase.requests.create': ['project_manager', 'technical_lead', 'purchase_manager'],
+  'purchase.requests.read': ['management', 'project_manager', 'technical_lead', 'purchase_manager', 'admin'],
+  'purchase.requests.update': ['project_manager', 'technical_lead', 'purchase_manager'],
+  'purchase.requests.delete': ['management', 'purchase_manager', 'admin'],
+  'purchase.requests.approve': ['management', 'purchase_manager', 'admin'], // With hierarchy
   
-  'purchase.orders.create': ['purchase_director', 'purchase_specialist'],
-  'purchase.orders.read': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'purchase_director', 'purchase_specialist'],
-  'purchase.orders.update': ['purchase_director', 'purchase_specialist'],
-  'purchase.orders.delete': ['purchase_director', 'general_manager', 'deputy_general_manager'],
-  'purchase.orders.send': ['purchase_director', 'purchase_specialist'],
-  'purchase.orders.confirm': ['purchase_director', 'purchase_specialist'],
+  'purchase.orders.create': ['purchase_manager'],
+  'purchase.orders.read': ['management', 'project_manager', 'technical_lead', 'purchase_manager', 'admin'],
+  'purchase.orders.update': ['purchase_manager'],
+  'purchase.orders.delete': ['management', 'purchase_manager', 'admin'],
+  'purchase.orders.send': ['purchase_manager'],
+  'purchase.orders.confirm': ['purchase_manager'],
   
-  'purchase.vendors.create': ['purchase_director', 'purchase_specialist'],
-  'purchase.vendors.read': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'purchase_director', 'purchase_specialist'],
-  'purchase.vendors.update': ['purchase_director', 'purchase_specialist'],
-  'purchase.vendors.rate': ['project_manager', 'purchase_director', 'purchase_specialist'],
-  'purchase.vendors.approve': ['general_manager', 'deputy_general_manager', 'purchase_director'],
+  'purchase.vendors.create': ['purchase_manager'],
+  'purchase.vendors.read': ['management', 'project_manager', 'technical_lead', 'purchase_manager', 'admin'],
+  'purchase.vendors.update': ['purchase_manager'],
+  'purchase.vendors.rate': ['project_manager', 'technical_lead', 'purchase_manager'],
+  'purchase.vendors.approve': ['management', 'purchase_manager', 'admin'],
   
-  'purchase.approvals.view': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'purchase_director', 'purchase_specialist'],
-  'purchase.approvals.process': ['project_manager', 'general_manager', 'deputy_general_manager', 'purchase_director'],
-  'purchase.approvals.delegate': ['project_manager', 'general_manager', 'deputy_general_manager', 'purchase_director'],
+  'purchase.approvals.view': ['management', 'project_manager', 'technical_lead', 'purchase_manager', 'admin'],
+  'purchase.approvals.process': ['management', 'purchase_manager', 'admin'], // With PM hierarchy
+  'purchase.approvals.delegate': ['management', 'purchase_manager', 'admin'],
   
-  'purchase.deliveries.confirm': ['field_worker', 'project_manager', 'technical_engineer', 'purchase_director', 'purchase_specialist'],
-  'purchase.deliveries.reject': ['field_worker', 'project_manager', 'technical_engineer', 'purchase_director', 'purchase_specialist'],
-  'purchase.deliveries.view': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'technical_engineer', 'field_worker', 'purchase_director', 'purchase_specialist'],
+  'purchase.deliveries.confirm': ['project_manager', 'technical_lead', 'purchase_manager'],
+  'purchase.deliveries.reject': ['project_manager', 'technical_lead', 'purchase_manager'],
+  'purchase.deliveries.view': ['management', 'project_manager', 'technical_lead', 'purchase_manager', 'admin'],
   
-  'purchase.financials.view': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'purchase_director'],
-  'purchase.reports.view': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'purchase_director', 'purchase_specialist'],
+  'purchase.financials.view': ['management', 'purchase_manager', 'admin'],
+  'purchase.reports.view': ['management', 'project_manager', 'technical_lead', 'purchase_manager', 'admin'],
 
-  // Reporting Permissions
-  'reports.create.internal': ['project_manager', 'architect', 'technical_engineer'],
+  // Reporting Permissions - Unified under project_manager
+  'reports.create': ['management', 'project_manager', 'technical_lead', 'admin'],
   'reports.create.client': ['project_manager'],
-  'reports.create.field': ['field_worker'],
-  'reports.read.all': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'],
-  'reports.read.project': ['project_manager', 'architect', 'technical_engineer'],
-  'reports.read.own': ['field_worker', 'client'],
-  'reports.approve': ['project_manager', 'general_manager'],
+  'reports.read.all': ['management', 'admin'],
+  'reports.read.project': ['project_manager', 'technical_lead', 'purchase_manager'],
+  'reports.read.own': ['client'],
+  'reports.approve': ['management', 'project_manager', 'admin'],
+  'reports.generate': ['management', 'project_manager', 'technical_lead', 'admin'], // PDF generation
 
-  // Task Management Permissions
-  'tasks.create': ['deputy_general_manager', 'project_manager', 'technical_director'],
-  'tasks.assign': ['deputy_general_manager', 'project_manager'],
-  'tasks.read.all': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'],
-  'tasks.read.assigned': ['project_manager', 'architect', 'technical_engineer', 'field_worker'],
-  'tasks.update.status': ['project_manager', 'architect', 'technical_engineer', 'field_worker'],
-  'tasks.approve': ['project_manager', 'deputy_general_manager'],
+  // Task Management - Simplified
+  'tasks.create': ['management', 'project_manager', 'technical_lead', 'admin'],
+  'tasks.assign': ['management', 'project_manager', 'admin'],
+  'tasks.read.all': ['management', 'admin'],
+  'tasks.read.assigned': ['project_manager', 'technical_lead'],
+  'tasks.update.status': ['project_manager', 'technical_lead'],
+  'tasks.approve': ['management', 'project_manager', 'admin'], // With hierarchy
 
-  // User Management Permissions
-  'users.create': ['company_owner', 'general_manager', 'admin'],
-  'users.read.all': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'],
-  'users.read.team': ['project_manager'],
-  'users.update': ['company_owner', 'general_manager', 'admin'],
-  'users.deactivate': ['company_owner', 'general_manager', 'admin'],
-  'users.roles.assign': ['company_owner', 'admin'],
+  // User Management
+  'users.create': ['management', 'admin'],
+  'users.read.all': ['management', 'admin'],
+  'users.read.team': ['project_manager', 'technical_lead'],
+  'users.update': ['management', 'admin'],
+  'users.deactivate': ['management', 'admin'],
+  'users.roles.assign': ['management', 'admin'],
 
-  // Global Navigation Permissions
-  'dashboard.view': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'architect', 'technical_engineer', 'purchase_director', 'purchase_specialist', 'field_worker', 'client'],
-  'tasks.view': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'architect', 'technical_engineer', 'field_worker'],
-  'tasks.manage_all': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'],
-  'scope.view': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'architect', 'technical_engineer', 'purchase_director', 'purchase_specialist'],
-  'shop_drawings.view_all': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'architect', 'technical_engineer'],
-  'clients.view': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager'],
-  'clients.manage': ['company_owner', 'general_manager', 'deputy_general_manager', 'admin'],
-  'procurement.view': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'purchase_director', 'purchase_specialist'],
-  'procurement.manage': ['purchase_director', 'purchase_specialist'],
-  'procurement.approve': ['company_owner', 'general_manager', 'deputy_general_manager'],
+  // PM Hierarchy & Management Oversight - NEW FEATURES
+  'management.dashboard.view': ['management', 'admin'],
+  'management.pm_workload.view': ['management', 'admin'],
+  'management.pm_workload.manage': ['management', 'admin'],
+  'management.approvals.override': ['management', 'admin'],
+  'management.projects.reassign': ['management', 'admin'],
+  'management.resources.allocate': ['management', 'admin'],
+  
+  'approvals.create': ['project_manager', 'technical_lead', 'purchase_manager'],
+  'approvals.process.senior': ['project_manager'], // Senior PMs only
+  'approvals.process.management': ['management', 'admin'],
+  'approvals.view.own': ['project_manager', 'technical_lead', 'purchase_manager'],
+  'approvals.view.all': ['management', 'admin'],
 
-  // Financial Data
-  'financials.view': ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'purchase_director'],
-  'budgets.approve': ['company_owner', 'general_manager', 'deputy_general_manager'],
+  // Global Navigation - Simplified
+  'dashboard.view': ['management', 'project_manager', 'technical_lead', 'purchase_manager', 'client', 'admin'],
+  'tasks.view': ['management', 'project_manager', 'technical_lead', 'admin'],
+  'scope.view': ['management', 'project_manager', 'technical_lead', 'purchase_manager', 'admin'],
+  'shop_drawings.view_all': ['management', 'project_manager', 'technical_lead', 'admin'],
+  'clients.view': ['management', 'project_manager', 'admin'],
+  'clients.manage': ['management', 'admin'],
+  'procurement.view': ['management', 'project_manager', 'technical_lead', 'purchase_manager', 'admin'],
+  'procurement.manage': ['purchase_manager'],
+  'procurement.approve': ['management', 'admin'],
+
+  // Financial Data - Cost visibility control
+  'financials.view': ['management', 'technical_lead', 'purchase_manager', 'admin'],
+  'budgets.approve': ['management', 'admin'],
+  'costs.view.full': ['management', 'technical_lead', 'purchase_manager', 'admin'],
+  'costs.view.limited': ['project_manager'], // Based on seniority level
 
   // System Administration
-  'system.admin': ['company_owner', 'admin'],
-  'system.settings': ['company_owner', 'general_manager', 'admin'],
+  'system.admin': ['admin'],
+  'system.settings': ['management', 'admin'],
 
-  // Client Portal Permissions - External Client Access
+  // Client Portal - Simplified
   'client_portal.access': ['client'],
   'client_portal.dashboard.view': ['client'],
   'client_portal.projects.view': ['client'],
   'client_portal.documents.view': ['client'],
   'client_portal.documents.download': ['client'],
-  'client_portal.documents.comment': ['client'],
   'client_portal.documents.approve': ['client'],
-  'client_portal.communications.view': ['client'],
-  'client_portal.communications.create': ['client'],
-  'client_portal.communications.reply': ['client'],
-  'client_portal.notifications.view': ['client'],
-  'client_portal.notifications.manage': ['client'],
+  'client_portal.reports.view': ['client'], // Key feature
+  'client_portal.progress.view': ['client'], // Key feature
   'client_portal.profile.view': ['client'],
   'client_portal.profile.update': ['client'],
 
-  // Client Portal Administration - Internal Management
-  'client_portal.admin.view': ['company_owner', 'general_manager', 'deputy_general_manager', 'admin'],
-  'client_portal.admin.manage_users': ['company_owner', 'general_manager', 'admin'],
-  'client_portal.admin.manage_companies': ['company_owner', 'general_manager', 'admin'],
-  'client_portal.admin.manage_access': ['company_owner', 'general_manager', 'deputy_general_manager', 'project_manager', 'admin'],
-  'client_portal.admin.manage_permissions': ['company_owner', 'general_manager', 'admin'],
-  'client_portal.admin.view_analytics': ['company_owner', 'general_manager', 'deputy_general_manager', 'project_manager', 'admin'],
-  'client_portal.admin.manage_branding': ['company_owner', 'general_manager', 'admin'],
+  // Client Portal Administration
+  'client_portal.admin.view': ['management', 'admin'],
+  'client_portal.admin.manage': ['management', 'admin'],
 
 } as const
 
 export type Permission = keyof typeof PERMISSIONS
 
-export const hasPermission = (userRole: UserRole, permission: Permission): boolean => {
-  return (PERMISSIONS[permission] as readonly UserRole[])?.includes(userRole) ?? false
+// SIMPLIFIED PERMISSION CHECKING
+export const hasPermission = (userRole: UserRole, permission: Permission, seniorityLevel?: SeniorityLevel): boolean => {
+  const allowedRoles = PERMISSIONS[permission] as readonly UserRole[]
+  
+  if (!allowedRoles?.includes(userRole)) {
+    return false
+  }
+  
+  // Special cases for PM hierarchy
+  if (permission === 'approvals.process.senior' && userRole === 'project_manager') {
+    return seniorityLevel === 'senior'
+  }
+  
+  if (permission === 'costs.view.full' && userRole === 'project_manager') {
+    return seniorityLevel === 'senior'
+  }
+  
+  return true
 }
 
-export const getUserPermissions = (userRole: UserRole): Permission[] => {
+// Enhanced permission checking with approval limits
+export const hasPermissionWithLimits = (
+  userRole: UserRole, 
+  permission: Permission, 
+  seniorityLevel?: SeniorityLevel,
+  approvalLimits?: ApprovalLimits,
+  requestAmount?: number
+): boolean => {
+  if (!hasPermission(userRole, permission, seniorityLevel)) {
+    return false
+  }
+  
+  // Check approval limits for budget-related permissions
+  if (permission.includes('approve') && requestAmount && approvalLimits?.budget) {
+    if (approvalLimits.budget === 'unlimited') {
+      return true
+    }
+    if (typeof approvalLimits.budget === 'number') {
+      return requestAmount <= approvalLimits.budget
+    }
+  }
+  
+  return true
+}
+
+export const getUserPermissions = (userRole: UserRole, seniorityLevel?: SeniorityLevel): Permission[] => {
   return Object.keys(PERMISSIONS).filter(permission => 
-    hasPermission(userRole, permission as Permission)
+    hasPermission(userRole, permission as Permission, seniorityLevel)
   ) as Permission[]
 }
 
+// SIMPLIFIED ROLE CHECKING FUNCTIONS
 export const isManagementRole = (userRole: UserRole): boolean => {
-  return ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'].includes(userRole)
+  return userRole === 'management' || userRole === 'admin'
 }
 
 export const isProjectRole = (userRole: UserRole): boolean => {
-  return ['project_manager', 'architect', 'technical_engineer'].includes(userRole)
+  return userRole === 'project_manager'
+}
+
+export const isTechnicalRole = (userRole: UserRole): boolean => {
+  return userRole === 'technical_lead'
 }
 
 export const isPurchaseRole = (userRole: UserRole): boolean => {
-  return ['purchase_director', 'purchase_specialist'].includes(userRole)
-}
-
-export const isFieldRole = (userRole: UserRole): boolean => {
-  return ['field_worker'].includes(userRole)
+  return userRole === 'purchase_manager'
 }
 
 export const isExternalRole = (userRole: UserRole): boolean => {
-  return ['client'].includes(userRole)
+  return userRole === 'client'
 }
 
-// Role hierarchy for permission inheritance
+export const hasCostAccess = (userRole: UserRole, seniorityLevel?: SeniorityLevel): boolean => {
+  if (['management', 'technical_lead', 'purchase_manager', 'admin'].includes(userRole)) {
+    return true
+  }
+  
+  // Senior project managers have cost access
+  if (userRole === 'project_manager' && seniorityLevel === 'senior') {
+    return true
+  }
+  
+  return false
+}
+
+// SIMPLIFIED ROLE HIERARCHY (5 roles instead of 13)
 export const ROLE_HIERARCHY: Record<UserRole, number> = {
-  'company_owner': 100,
-  'general_manager': 90,
-  'deputy_general_manager': 80,
-  'technical_director': 70,
-  'admin': 65,
-  'project_manager': 60,
-  'purchase_director': 55,
-  'architect': 50,
-  'technical_engineer': 45,
-  'purchase_specialist': 40,
-  'field_worker': 30,
-  'client': 10
+  'management': 100,    // Highest level - company oversight
+  'admin': 95,          // System administration
+  'technical_lead': 80, // Technical oversight and scope management
+  'purchase_manager': 70, // Purchase operations
+  'project_manager': 60, // Project coordination (with seniority levels)
+  'client': 10          // External read-only access
 }
 
 export const hasHigherRole = (userRole: UserRole, comparedRole: UserRole): boolean => {
@@ -214,11 +268,118 @@ export const hasHigherRole = (userRole: UserRole, comparedRole: UserRole): boole
 }
 
 export const canManageUser = (managerRole: UserRole, targetRole: UserRole): boolean => {
-  // Only owners and admins can manage other owners and admins
-  if (['company_owner', 'admin'].includes(targetRole)) {
-    return ['company_owner', 'admin'].includes(managerRole)
+  // Only management and admin can manage other management and admin
+  if (['management', 'admin'].includes(targetRole)) {
+    return ['management', 'admin'].includes(managerRole)
   }
   
   // Management roles can manage lower roles
   return hasHigherRole(managerRole, targetRole)
+}
+
+// PM HIERARCHY FUNCTIONS
+export const canApproveRequest = (
+  approverRole: UserRole,
+  approverSeniority: SeniorityLevel | undefined,
+  requestAmount: number,
+  approvalLimits?: ApprovalLimits
+): boolean => {
+  // Management can approve anything
+  if (approverRole === 'management' || approverRole === 'admin') {
+    return true
+  }
+  
+  // Check approval limits
+  if (approvalLimits?.budget) {
+    if (approvalLimits.budget === 'unlimited') {
+      return true
+    }
+    if (typeof approvalLimits.budget === 'number') {
+      return requestAmount <= approvalLimits.budget
+    }
+  }
+  
+  // Default limits based on role and seniority
+  const defaultLimits = getDefaultApprovalLimits(approverRole, approverSeniority)
+  if (typeof defaultLimits.budget === 'number') {
+    return requestAmount <= defaultLimits.budget
+  }
+  
+  return false
+}
+
+export const getDefaultApprovalLimits = (role: UserRole, seniorityLevel?: SeniorityLevel): ApprovalLimits => {
+  switch (role) {
+    case 'management':
+      return {
+        budget: 'unlimited',
+        scope_changes: 'all',
+        timeline_extensions: 'unlimited',
+        resource_allocation: 'unlimited'
+      }
+    
+    case 'technical_lead':
+      return {
+        budget: 75000,
+        scope_changes: 'all',
+        timeline_extensions: 'unlimited',
+        subcontractor_assignment: 'all'
+      }
+    
+    case 'purchase_manager':
+      return {
+        budget: seniorityLevel === 'senior' ? 100000 : 25000,
+        vendor_management: 'all',
+        purchase_orders: 'unlimited'
+      }
+    
+    case 'project_manager':
+      return {
+        budget: seniorityLevel === 'senior' ? 50000 : 15000,
+        scope_changes: seniorityLevel === 'senior' ? 'major' : 'minor',
+        timeline_extensions: seniorityLevel === 'senior' ? 30 : 7
+      }
+    
+    case 'client':
+      return {
+        document_approval: 'assigned_projects',
+        report_access: 'assigned_projects'
+      }
+    
+    default:
+      return {}
+  }
+}
+
+// APPROVAL CHAIN FUNCTIONS
+export const getApprovalChain = (
+  requestType: 'budget' | 'scope_change' | 'timeline_extension' | 'resource_request',
+  requestAmount?: number,
+  requesterRole?: UserRole,
+  requesterSeniority?: SeniorityLevel
+): UserRole[] => {
+  switch (requestType) {
+    case 'budget':
+      if (!requestAmount) return ['management']
+      
+      if (requestAmount <= 15000) {
+        return requesterSeniority === 'senior' ? [] : ['project_manager'] // Senior PM can approve
+      } else if (requestAmount <= 50000) {
+        return ['project_manager'] // Senior PM approval needed
+      } else {
+        return ['project_manager', 'management'] // Senior PM → Management
+      }
+    
+    case 'scope_change':
+      return ['project_manager', 'management']
+    
+    case 'timeline_extension':
+      return ['project_manager', 'management']
+    
+    case 'resource_request':
+      return ['project_manager', 'management']
+    
+    default:
+      return ['management']
+  }
 }

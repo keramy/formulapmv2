@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, ReactNode } from 'react'
+import {useEffect, ReactNode, useMemo} from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { hasPermission, Permission } from '@/lib/permissions'
@@ -102,7 +102,7 @@ export const AuthGuard = ({
 
   // Check admin requirement
   if (requireAdmin) {
-    const adminRoles: UserRole[] = ['company_owner', 'admin']
+    const adminRoles: UserRole[] = ['management', 'admin']
     if (!adminRoles.includes(profile.role)) {
       return fallback || (
         <div className="flex items-center justify-center min-h-screen">
@@ -120,10 +120,10 @@ export const AuthGuard = ({
   // Check management requirement
   if (requireManagement) {
     const managementRoles: UserRole[] = [
-      'company_owner',
-      'general_manager',
-      'deputy_general_manager',
-      'technical_director',
+      'management',
+      'management',
+      'management',
+      'technical_lead',
       'admin'
     ]
     if (!managementRoles.includes(profile.role)) {
@@ -173,7 +173,8 @@ export const AuthGuard = ({
 }
 
 // Convenience components for common use cases
-export const ManagementGuard = ({ children, fallback }: { children: ReactNode; fallback?: ReactNode }) => (
+export const ManagementGuard = ({ children, fallback }: { children: ReactNode;
+  // TODO: Consider memoizing permission calculations with useMemo fallback?: ReactNode }) => (
   <AuthGuard requireManagement fallback={fallback}>
     {children}
   </AuthGuard>

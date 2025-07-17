@@ -305,17 +305,17 @@ export const validateMilestoneStatisticsParams = (data: unknown) => {
 
 export const validateMilestonePermissions = (userRole: string, action: string): boolean => {
   const rolePermissions: Record<string, string[]> = {
-    'company_owner': ['create', 'read', 'update', 'delete', 'change_status', 'view_all'],
-    'general_manager': ['create', 'read', 'update', 'delete', 'change_status', 'view_all'],
-    'deputy_general_manager': ['create', 'read', 'update', 'change_status', 'view_all'],
-    'technical_director': ['read', 'update', 'change_status', 'view_all'],
+    'management': ['create', 'read', 'update', 'delete', 'change_status', 'view_all'],
+    'management': ['create', 'read', 'update', 'delete', 'change_status', 'view_all'],
+    'management': ['create', 'read', 'update', 'change_status', 'view_all'],
+    'technical_lead': ['read', 'update', 'change_status', 'view_all'],
     'admin': ['create', 'read', 'update', 'delete', 'change_status', 'view_all'],
     'project_manager': ['create', 'read', 'update', 'change_status'],
-    'architect': ['read', 'update'],
-    'technical_engineer': ['read', 'update'],
-    'purchase_director': ['read'],
-    'purchase_specialist': ['read'],
-    'field_worker': ['read'],
+    'project_manager': ['read', 'update'],
+    'project_manager': ['read', 'update'],
+    'purchase_manager': ['read'],
+    'purchase_manager': ['read'],
+    'project_manager': ['read'],
     'client': ['read'],
   }
   
@@ -324,7 +324,7 @@ export const validateMilestonePermissions = (userRole: string, action: string): 
 
 export const validateMilestoneAccess = (userRole: string, projectId: string, assignedProjects: string[]): boolean => {
   // Management roles can access all project milestones
-  if (['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'].includes(userRole)) {
+  if (['management', 'management', 'management', 'technical_lead', 'admin'].includes(userRole)) {
     return true
   }
   

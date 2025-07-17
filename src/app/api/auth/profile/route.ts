@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
 import { UserProfile } from '@/types/auth'
+import { getCachedResponse, generateCacheKey, invalidateCache } from '@/lib/cache-middleware'
 
 export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
   if (!user || !profile) {

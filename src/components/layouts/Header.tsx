@@ -89,11 +89,9 @@ export const Header = ({ onMenuClick }: HeaderProps = {}) => {
 
   const handleStopImpersonation = async () => {
     try {
-      console.log('🎭 [Header] Attempting to stop impersonation...')
       const success = stopImpersonation()
       
       if (success) {
-        console.log('🎭 [Header] Stopped impersonation successfully - refreshing page')
         // Refresh the page to ensure all components reset to admin state
         setTimeout(() => {
           window.location.reload()

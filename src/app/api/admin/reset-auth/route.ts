@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const isAdmin = ['company_owner', 'admin', 'general_manager'].includes(profile.role)
+    const isAdmin = ['management', 'admin', 'management'].includes(profile.role)
     if (!isAdmin) {
       console.warn(`🚫 [reset-auth:${correlationId}] Non-admin reset attempt`, {
         userId: user.id,

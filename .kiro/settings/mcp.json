@@ -1,0 +1,30 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--readonly=false",
+        "--project-ref=xrrrtwrfadcilwkgwacs"
+      ],
+      "env": {
+        "SUPABASE_ACCESS_TOKEN": "sbp_f9eeca405156f6f4170f22e9312c8ce8a67a0d44"
+      },
+      "disabled": false,
+      "autoApprove": ["supabase_query", "supabase_execute"]
+    },
+    "filesystem": {
+      "command": "uvx",
+      "args": ["mcp-server-filesystem", "--base-path", "."],
+      "disabled": false,
+      "autoApprove": ["read_file", "write_file", "list_directory"]
+    },
+    "docker": {
+      "command": "uvx", 
+      "args": ["mcp-server-docker"],
+      "disabled": false,
+      "autoApprove": ["docker_ps", "docker_run", "docker_exec"]
+    }
+  }
+}

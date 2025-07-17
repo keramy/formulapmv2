@@ -74,10 +74,10 @@ export const projectSchemas = {
     email: commonSchemas.email,
     phone: commonSchemas.phone.optional(),
     role: z.enum([
-      'company_owner', 'general_manager', 'deputy_general_manager',
-      'technical_director', 'admin', 'project_manager', 'architect',
-      'technical_engineer', 'purchase_director', 'purchase_specialist',
-      'field_worker', 'client', 'subcontractor'
+      'management', 'management', 'management',
+      'technical_lead', 'admin', 'project_manager', 'project_manager',
+      'project_manager', 'purchase_manager', 'purchase_manager',
+      'project_manager', 'client', 'subcontractor'
     ]),
     company: commonSchemas.optionalString,
     department: commonSchemas.optionalString

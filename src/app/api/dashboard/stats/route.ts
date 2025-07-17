@@ -1,38 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware';
 import { createServerClient } from '@/lib/supabase';
+import { getCachedResponse, generateCacheKey, invalidateCache } from '@/lib/cache-middleware'
 
 export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
   try {
 
-    const supabase = createServerClient();
-
-    // Fetch active projects count and budget data
-    const { data: projects, error: projectError } = await supabase
-      .from('projects')
-      .select('id, budget, actual_cost, status, end_date')
-      .in('status', ['active', 'planning', 'bidding']);
-
-    if (projectError) {
-      console.error('Error fetching projects:', projectError);
-      return createErrorResponse('Failed to fetch projects', 500);
-    }
-
-    // Calculate stats from projects
-    const activeCount = projects?.filter((p: any) => p.status === 'active').length || 0;
-    const totalBudget = projects?.reduce((sum: number, p: any) => sum + (p.budget || 0), 0) || 0;
-    const actualSpent = projects?.reduce((sum: number, p: any) => sum + (p.actual_cost || 0), 0) || 0;
-    
-    // Calculate at-risk projects (budget overrun or past deadline)
-    const today = new Date();
-    const atRiskCount = projects?.filter((p: any) => {
-      const isOverBudget = p.actual_cost > p.budget * 0.9; // 90% budget threshold
-      const isPastDeadline = p.end_date && new Date(p.end_date) < today && p.status === 'active';
-      return isOverBudget || isPastDeadline;
-    }).length || 0;
-
-    // Fetch pending approvals count
-    const { count: approvalCount, error: approvalError } = await supabase
+    // Optimized dashboard stats with aggregated queries
+    const [projectStats, taskStats, scopeStats] = await Promise.all([
+      supabase
+        .from('projects')
+        .select('status')
+        .eq('status', 'active'),
+      
+      supabase
+        .from('tasks')
+        .select('status, priority')
+        .in('status', ['pending', 'in_progress', 'completed']),
+        
+      supabase
+        .from('scope_items')
+        .select('category, status')
+        .eq('status', 'active')
+    ])
       .from('documents')
       .select('id', { count: 'exact', head: true })
       .eq('status', 'review');

@@ -1,0 +1,60 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware';
+import { createServerClient } from '@/lib/supabase';
+
+export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
+  try {
+
+    const supabase = createServerClient();
+
+    // Fetch active projects count and budget data
+    const { data: projects, error: projectError } = await supabase
+      .from('projects')
+      .select('id, budget, actual_cost, status, end_date')
+      .in('status', ['active', 'planning', 'bidding']);
+
+    if (projectError) {
+      console.error('Error fetching projects:', projectError);
+      return createErrorResponse('Failed to fetch projects', 500);
+    }
+
+    // Calculate stats from projects
+    const activeCount = projects?.filter((p: any) => p.status === 'active').length || 0;
+    const totalBudget = projects?.reduce((sum: number, p: any) => sum + (p.budget || 0), 0) || 0;
+    const actualSpent = projects?.reduce((sum: number, p: any) => sum + (p.actual_cost || 0), 0) || 0;
+    
+    // Calculate at-risk projects (budget overrun or past deadline)
+    const today = new Date();
+    const atRiskCount = projects?.filter((p: any) => {
+      const isOverBudget = p.actual_cost > p.budget * 0.9; // 90% budget threshold
+      const isPastDeadline = p.end_date && new Date(p.end_date) < today && p.status === 'active';
+      return isOverBudget || isPastDeadline;
+    }).length || 0;
+
+    // Fetch pending approvals count
+    const { count: approvalCount, error: approvalError } = await supabase
+      .from('documents')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'review');
+
+    if (approvalError) {
+      console.error('Error fetching approvals:', approvalError);
+      // Don't fail the entire request for approvals error
+    }
+
+    const stats = {
+      activeProjects: activeCount,
+      totalBudget,
+      actualSpent,
+      pendingApprovals: approvalCount || 0,
+      atRiskProjects: atRiskCount
+    };
+
+    return createSuccessResponse(stats);
+  } catch (error) {
+    console.error('Dashboard stats API error:', error);
+    return createErrorResponse('Internal server error', 500);
+  }
+}, {
+  permission: 'dashboard.read'
+})

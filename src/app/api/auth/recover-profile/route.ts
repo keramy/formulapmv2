@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
         repairs.push('email')
       }
 
-      if (!existingProfile.role || !['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin', 'project_manager', 'architect', 'technical_engineer', 'purchase_director', 'purchase_specialist', 'field_worker', 'client'].includes(existingProfile.role)) {
+      if (!existingProfile.role || !['management', 'management', 'management', 'technical_lead', 'admin', 'project_manager', 'project_manager', 'project_manager', 'purchase_manager', 'purchase_manager', 'project_manager', 'client'].includes(existingProfile.role)) {
         updates.role = 'client'
         repairs.push('role')
       }

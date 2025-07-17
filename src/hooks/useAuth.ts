@@ -42,7 +42,7 @@ export const useAuth = () => {
               .from('user_profiles')
               .insert({
                 id: userId,
-                role: 'company_owner',
+                role: 'management',
                 first_name: 'Admin',
                 last_name: 'User',
                 email: user.email,
@@ -331,10 +331,10 @@ export const useAuth = () => {
                   (user && profile) ? 'authenticated' : 'idle',
     
     // Role checks (based on current effective profile - original or impersonated)
-    isManagement: profile ? ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'].includes(profile.role) : false,
-    isProjectRole: profile ? ['project_manager', 'architect', 'technical_engineer'].includes(profile.role) : false,
-    isPurchaseRole: profile ? ['purchase_director', 'purchase_specialist'].includes(profile.role) : false,
-    isFieldRole: profile ? ['field_worker'].includes(profile.role) : false,
+    isManagement: profile ? ['management', 'management', 'management', 'technical_lead', 'admin'].includes(profile.role) : false,
+    isProjectRole: profile ? ['project_manager', 'project_manager', 'project_manager'].includes(profile.role) : false,
+    isPurchaseRole: profile ? ['purchase_manager', 'purchase_manager'].includes(profile.role) : false,
+    isFieldRole: profile ? ['project_manager'].includes(profile.role) : false,
     isExternalRole: profile ? ['client'].includes(profile.role) : false,
     
     // Simplified debug info

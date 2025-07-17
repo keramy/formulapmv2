@@ -17,6 +17,7 @@ import {
   calculateTaskStatus
 } from '@/lib/validation/tasks'
 import { Task, TaskFilters, TaskStatistics } from '@/types/tasks'
+import { getCachedResponse, generateCacheKey, invalidateCache } from '@/lib/cache-middleware'
 
 // ============================================================================
 // GET /api/tasks - List tasks with filtering and pagination
@@ -78,10 +79,33 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
 
     // Build base query
     let query = supabase
+      // Optimized tasks query with user permissions
+    const tasksQuery = supabase
       .from('tasks')
       .select(`
-        *,
-        ${queryParams.include_assignee ? 'assignee:user_profiles!assigned_to(id, first_name, last_name, email, avatar_url),' : ''}
+        id,
+        title,
+        description,
+        status,
+        priority,
+        due_date,
+        assigned_to,
+        project_id,
+        created_at,
+        projects!inner(
+          id,
+          name,
+          status
+        ),
+        user_profiles!tasks_assigned_to_fkey(
+          id,
+          first_name,
+          last_name
+        )
+      `)
+      .eq('projects.status', 'active')
+      .order('due_date', { ascending: true, nullsLast: true })
+      .limit(100),' : ''}
         ${queryParams.include_assigner ? 'assigner:user_profiles!assigned_by(id, first_name, last_name, email, avatar_url),' : ''}
         ${queryParams.include_scope_item ? 'scope_item:scope_items!scope_item_id(id, item_no, title, description),' : ''}
         ${queryParams.include_project ? 'project:projects!project_id(id, name, status),' : ''}
@@ -136,7 +160,9 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
       }
 
       if (filters.search) {
-        query = query.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%`)
+        // Sanitize search input to prevent SQL injection
+        const sanitizedSearch = filters.search.replace(/[%_\\]/g, '\\$&').substring(0, 100)
+        query = query.or(`title.ilike.%${sanitizedSearch}%,description.ilike.%${sanitizedSearch}%`)
       }
 
       if (filters.due_date_start) {

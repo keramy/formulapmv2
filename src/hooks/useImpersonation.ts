@@ -51,7 +51,7 @@ export const useImpersonation = () => {
   const impersonateUser = useCallback((originalAdmin: UserProfile, targetUser: UserProfile): boolean => {
     try {
       // Security check: Only allow admins to impersonate
-      const adminRoles = ['company_owner', 'admin']
+      const adminRoles = ['management', 'admin']
       if (!adminRoles.includes(originalAdmin.role)) {
         console.error('🎭 [useImpersonation] Unauthorized impersonation attempt:', {
           adminRole: originalAdmin.role,
@@ -61,7 +61,7 @@ export const useImpersonation = () => {
       }
 
       // Security check: Don't allow impersonating other admins (unless you're company_owner)
-      if (adminRoles.includes(targetUser.role) && originalAdmin.role !== 'company_owner') {
+      if (adminRoles.includes(targetUser.role) && originalAdmin.role !== 'management') {
         console.error('🎭 [useImpersonation] Cannot impersonate admin user:', {
           adminRole: originalAdmin.role,
           targetRole: targetUser.role
@@ -130,7 +130,7 @@ export const useImpersonation = () => {
 
   // Check if user can impersonate others
   const canImpersonate = useCallback((userRole: string): boolean => {
-    return ['company_owner', 'admin'].includes(userRole)
+    return ['management', 'admin'].includes(userRole)
   }, [])
 
   // Get impersonation info for display

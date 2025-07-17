@@ -317,7 +317,7 @@ export const DELETE = withAuth(async (request: NextRequest, context: { params: P
 async function verifyProjectAccess(supabase: any, user: { id: string; role: string }, projectId: string): Promise<boolean> {
   try {
     // Management roles can access all projects
-    if (['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'].includes(user.role)) {
+    if (['management', 'management', 'management', 'technical_lead', 'admin'].includes(user.role)) {
       return true
     }
 

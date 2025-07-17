@@ -1,0 +1,469 @@
+{
+  "bundleAnalysis": {
+    "totalDependencies": 46,
+    "totalDevDependencies": 22,
+    "heavyDependenciesPresent": [
+      "@supabase/supabase-js",
+      "next",
+      "react",
+      "react-dom",
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-dropdown-menu",
+      "lucide-react",
+      "recharts",
+      "date-fns"
+    ],
+    "potentialBundleImpact": "HIGH"
+  },
+  "componentAnalysis": {
+    "totalComponents": 81,
+    "largeComponents": [
+      {
+        "file": "admin\\UserImpersonationModal.tsx",
+        "lines": 335,
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "advanced\\AdvancedDataTable.tsx",
+        "lines": 517,
+        "severity": "HIGH"
+      },
+      {
+        "file": "auth\\LoginForm.tsx",
+        "lines": 448,
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "dashboard\\RealtimeDashboard.tsx",
+        "lines": 360,
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "forms\\FormBuilder.tsx",
+        "lines": 378,
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "milestones\\MilestoneCalendar.tsx",
+        "lines": 356,
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "milestones\\MilestoneCard.tsx",
+        "lines": 396,
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "milestones\\MilestoneForm.tsx",
+        "lines": 359,
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "milestones\\MilestoneList.tsx",
+        "lines": 528,
+        "severity": "HIGH"
+      },
+      {
+        "file": "projects\\material-approval\\MaterialApprovalActions.tsx",
+        "lines": 374,
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "projects\\material-approval\\MaterialSpecForm.tsx",
+        "lines": 705,
+        "severity": "HIGH"
+      },
+      {
+        "file": "projects\\tabs\\MaterialSpecsTab.tsx",
+        "lines": 419,
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "projects\\tabs\\MilestonesTab.tsx",
+        "lines": 375,
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "projects\\tabs\\OverviewTab.tsx",
+        "lines": 333,
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "projects\\tabs\\RealtimeScopeListTab.tsx",
+        "lines": 689,
+        "severity": "HIGH"
+      },
+      {
+        "file": "projects\\tabs\\ReportsTab.tsx",
+        "lines": 442,
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "projects\\tabs\\ScopeListTab.tsx",
+        "lines": 511,
+        "severity": "HIGH"
+      },
+      {
+        "file": "projects\\tabs\\ShopDrawingsTab.tsx",
+        "lines": 383,
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "projects\\tabs\\TasksTab.tsx",
+        "lines": 393,
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "scope\\ExcelImportDialog.tsx",
+        "lines": 315,
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "scope\\form\\ScopeFormSections.tsx",
+        "lines": 485,
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "scope\\ScopeCoordinator.tsx",
+        "lines": 417,
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "scope\\table\\ScopeTableColumns.tsx",
+        "lines": 469,
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "tasks\\TaskCard.tsx",
+        "lines": 304,
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "tasks\\TaskForm.tsx",
+        "lines": 650,
+        "severity": "HIGH"
+      },
+      {
+        "file": "tasks\\TaskList.tsx",
+        "lines": 537,
+        "severity": "HIGH"
+      }
+    ],
+    "complexComponents": [
+      {
+        "file": "admin\\UserImpersonationModal.tsx",
+        "hooks": 17,
+        "props": 1,
+        "complexity": 18
+      },
+      {
+        "file": "advanced\\AdvancedDataTable.tsx",
+        "hooks": 30,
+        "props": 1,
+        "complexity": 31
+      },
+      {
+        "file": "auth\\LoginForm.tsx",
+        "hooks": 17,
+        "props": 1,
+        "complexity": 18
+      },
+      {
+        "file": "dashboard\\RealtimeDashboard.tsx",
+        "hooks": 16,
+        "props": 1,
+        "complexity": 17
+      },
+      {
+        "file": "layouts\\Header.tsx",
+        "hooks": 10,
+        "props": 1,
+        "complexity": 11
+      },
+      {
+        "file": "layouts\\LayoutWrapper.tsx",
+        "hooks": 12,
+        "props": 1,
+        "complexity": 13
+      },
+      {
+        "file": "milestones\\MilestoneList.tsx",
+        "hooks": 10,
+        "props": 3,
+        "complexity": 13
+      },
+      {
+        "file": "projects\\material-approval\\MaterialApprovalActions.tsx",
+        "hooks": 12,
+        "props": 2,
+        "complexity": 14
+      },
+      {
+        "file": "projects\\material-approval\\MaterialSpecForm.tsx",
+        "hooks": 13,
+        "props": 1,
+        "complexity": 14
+      },
+      {
+        "file": "projects\\material-approval\\ScopeLinkingActions.tsx",
+        "hooks": 13,
+        "props": 2,
+        "complexity": 15
+      },
+      {
+        "file": "projects\\tabs\\MaterialSpecsTab.tsx",
+        "hooks": 12,
+        "props": 1,
+        "complexity": 13
+      },
+      {
+        "file": "projects\\tabs\\MilestonesTab.tsx",
+        "hooks": 9,
+        "props": 1,
+        "complexity": 10
+      },
+      {
+        "file": "projects\\tabs\\OverviewTab.tsx",
+        "hooks": 12,
+        "props": 1,
+        "complexity": 13
+      },
+      {
+        "file": "projects\\tabs\\RealtimeScopeListTab.tsx",
+        "hooks": 19,
+        "props": 1,
+        "complexity": 20
+      },
+      {
+        "file": "projects\\tabs\\ScopeListTab.tsx",
+        "hooks": 10,
+        "props": 1,
+        "complexity": 11
+      },
+      {
+        "file": "projects\\tabs\\TasksTab.tsx",
+        "hooks": 15,
+        "props": 1,
+        "complexity": 16
+      },
+      {
+        "file": "scope\\ScopeCoordinator.tsx",
+        "hooks": 21,
+        "props": 1,
+        "complexity": 22
+      },
+      {
+        "file": "scope\\ScopeItemEditor.tsx",
+        "hooks": 13,
+        "props": 1,
+        "complexity": 14
+      },
+      {
+        "file": "tasks\\TaskForm.tsx",
+        "hooks": 10,
+        "props": 1,
+        "complexity": 11
+      },
+      {
+        "file": "tasks\\TaskList.tsx",
+        "hooks": 10,
+        "props": 3,
+        "complexity": 13
+      },
+      {
+        "file": "ui\\form.tsx",
+        "hooks": 12,
+        "props": 1,
+        "complexity": 13
+      }
+    ],
+    "performanceIssues": [
+      {
+        "file": "admin\\UserImpersonationModal.tsx",
+        "issue": "Console logs in production code",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "advanced\\AdvancedDataTable.tsx",
+        "issue": "Empty dependency array useEffect",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "auth\\LoginForm.tsx",
+        "issue": "Empty dependency array useEffect",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "auth\\LoginForm.tsx",
+        "issue": "Console logs in production code",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "dashboard\\RealtimeDashboard.tsx",
+        "issue": "Empty dependency array useEffect",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "dashboard\\RealtimeDashboard.tsx",
+        "issue": "Console logs in production code",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "layouts\\Header.tsx",
+        "issue": "Console logs in production code",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "layouts\\LayoutWrapper.tsx",
+        "issue": "Console logs in production code",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "projects\\TabbedWorkspaceOptimized.tsx",
+        "issue": "Console logs in production code",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "projects\\tabs\\RealtimeScopeListTab.tsx",
+        "issue": "Console logs in production code",
+        "severity": "MEDIUM"
+      }
+    ]
+  },
+  "optimizationOpportunities": [
+    {
+      "category": "Bundle Size",
+      "priority": "HIGH",
+      "opportunity": "Implement code splitting and lazy loading",
+      "impact": "Reduce initial bundle size by 30-50%",
+      "effort": "MEDIUM"
+    },
+    {
+      "category": "Component Size",
+      "priority": "MEDIUM",
+      "opportunity": "Break down large components into smaller, reusable pieces",
+      "impact": "Improve maintainability and performance",
+      "effort": "MEDIUM"
+    },
+    {
+      "category": "Component Performance",
+      "priority": "HIGH",
+      "opportunity": "Fix identified performance anti-patterns",
+      "impact": "Reduce re-renders and improve responsiveness",
+      "effort": "LOW"
+    },
+    {
+      "category": "Role-Based Rendering",
+      "priority": "MEDIUM",
+      "opportunity": "Optimize permission checks and role-based rendering",
+      "impact": "Improve rendering performance for complex permission states",
+      "effort": "MEDIUM"
+    },
+    {
+      "category": "Image Optimization",
+      "priority": "MEDIUM",
+      "opportunity": "Implement Next.js Image optimization",
+      "impact": "Faster page loads and better Core Web Vitals",
+      "effort": "LOW"
+    },
+    {
+      "category": "Caching",
+      "priority": "HIGH",
+      "opportunity": "Implement API response caching and SWR",
+      "impact": "Reduce API calls and improve perceived performance",
+      "effort": "MEDIUM"
+    },
+    {
+      "category": "Prefetching",
+      "priority": "MEDIUM",
+      "opportunity": "Implement route prefetching for common navigation paths",
+      "impact": "Faster navigation between pages",
+      "effort": "LOW"
+    }
+  ],
+  "performanceMetrics": {
+    "roleBasedRendering": {
+      "filesAnalyzed": 5,
+      "issuesFound": 5,
+      "issues": [
+        {
+          "file": "src/components/auth/AuthGuard.tsx",
+          "issues": [
+            "Complex permission calculations in render - consider useMemo",
+            "Conditional component rendering based on role - consider lazy loading"
+          ]
+        },
+        {
+          "file": "src/components/layouts/Sidebar.tsx",
+          "issues": [
+            "Conditional component rendering based on role - consider lazy loading"
+          ]
+        },
+        {
+          "file": "src/components/layouts/Header.tsx",
+          "issues": [
+            "Conditional component rendering based on role - consider lazy loading"
+          ]
+        },
+        {
+          "file": "src/hooks/usePermissions.ts",
+          "issues": [
+            "Complex permission calculations in render - consider useMemo",
+            "Conditional component rendering based on role - consider lazy loading"
+          ]
+        },
+        {
+          "file": "src/lib/permissions.ts",
+          "issues": [
+            "Complex permission calculations in render - consider useMemo",
+            "Conditional component rendering based on role - consider lazy loading"
+          ]
+        }
+      ]
+    }
+  },
+  "recommendations": [
+    {
+      "priority": "HIGH",
+      "category": "Bundle Optimization",
+      "recommendation": "Implement dynamic imports for heavy components",
+      "implementation": "Use React.lazy() and Suspense for route-level code splitting",
+      "expectedImpact": "30-50% reduction in initial bundle size"
+    },
+    {
+      "priority": "HIGH",
+      "category": "API Performance",
+      "recommendation": "Implement SWR or React Query for data fetching",
+      "implementation": "Replace useEffect + fetch with SWR hooks",
+      "expectedImpact": "Reduced API calls, better caching, improved UX"
+    },
+    {
+      "priority": "MEDIUM",
+      "category": "Component Optimization",
+      "recommendation": "Memoize expensive calculations and components",
+      "implementation": "Use React.memo, useMemo, and useCallback strategically",
+      "expectedImpact": "Reduced re-renders, smoother interactions"
+    },
+    {
+      "priority": "MEDIUM",
+      "category": "Role-Based Performance",
+      "recommendation": "Optimize permission checking logic",
+      "implementation": "Cache permission results, use context efficiently",
+      "expectedImpact": "Faster role-based UI updates"
+    },
+    {
+      "priority": "LOW",
+      "category": "Asset Optimization",
+      "recommendation": "Optimize images and static assets",
+      "implementation": "Use Next.js Image component, compress assets",
+      "expectedImpact": "Better Core Web Vitals scores"
+    },
+    {
+      "priority": "LOW",
+      "category": "Development Experience",
+      "recommendation": "Set up performance monitoring",
+      "implementation": "Add React DevTools Profiler, bundle analyzer",
+      "expectedImpact": "Better visibility into performance issues"
+    }
+  ]
+}

@@ -16,7 +16,9 @@ export async function GET(request: NextRequest) {
       .order('name');
     
     if (search) {
-      query = query.or(`name.ilike.%${search}%,contact_person.ilike.%${search}%`);
+      // Sanitize search input to prevent SQL injection
+      const sanitizedSearch = search.replace(/[%_\\]/g, '\\$&').substring(0, 100)
+      query = query.or(`name.ilike.%${sanitizedSearch}%,contact_person.ilike.%${sanitizedSearch}%`);
     }
     
     const { data: suppliers, error } = await query;

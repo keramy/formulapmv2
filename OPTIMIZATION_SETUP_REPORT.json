@@ -1,0 +1,26 @@
+{
+  "setupResults": {
+    "redis": {
+      "installed": false,
+      "running": false,
+      "tested": true
+    },
+    "database": {
+      "migrationsApplied": false,
+      "indexesCreated": false,
+      "rlsOptimized": false
+    },
+    "performance": {
+      "apiTested": false,
+      "cacheWorking": true,
+      "improvementValidated": false
+    },
+    "errors": [
+      "Redis setup: Container management failed: Command failed: docker run -d --name redis-formulapm -p 6379:6379 --restart unless-stopped redis:alpine\nUnable to find image 'redis:alpine' locally\ndocker: Error response from daemon: error from registry: failed to resolve reference \"docker.io/library/redis:alpine\": failed to authorize: failed to fetch oauth token: unexpected status from GET request to https://auth.docker.io/token?scope=repository%3Alibrary%2Fredis%3Apull&service=registry.docker.io: 401 Unauthorized\n\nRun 'docker run --help' for more information\n",
+      "Performance test: Some endpoints may not be accessible"
+    ]
+  },
+  "completionPercentage": 25,
+  "completedAt": "2025-07-17T15:08:39.824Z",
+  "nextSteps": "Address setup issues"
+}

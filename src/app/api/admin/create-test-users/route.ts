@@ -27,7 +27,7 @@ const testUsers: TestUser[] = [
   {
     email: 'owner.test@formulapm.com',
     password: 'testpass123',
-    role: 'company_owner',
+    role: 'management',
     first_name: 'David',
     last_name: 'Owner',
     company: 'Formula PM',
@@ -45,7 +45,7 @@ const testUsers: TestUser[] = [
   {
     email: 'gm.test@formulapm.com',
     password: 'testpass123',
-    role: 'general_manager',
+    role: 'management',
     first_name: 'Michael',
     last_name: 'General',
     company: 'Formula PM',
@@ -54,7 +54,7 @@ const testUsers: TestUser[] = [
   {
     email: 'architect.test@formulapm.com',
     password: 'testpass123',
-    role: 'architect',
+    role: 'project_manager',
     first_name: 'Emma',
     last_name: 'Architect',
     company: 'Formula PM',

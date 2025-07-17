@@ -81,18 +81,15 @@ export function RealtimeDashboard() {
   // Load initial data
   useEffect(() => {
     loadInitialData();
-  }, []);
+  }, []
+  // TODO: Review dependencies - potential deps: loadInitialData);
 
   // Set up real-time subscriptions
   useEffect(() => {
     if (!profile) return;
 
-    console.log('🔴 [RealtimeDashboard] Setting up subscriptions');
-    
     // Subscribe to activity feed
     const unsubscribeActivity = subscribeToActivity((payload) => {
-      console.log('🔴 [RealtimeDashboard] Activity update received:', payload);
-      
       if (payload.eventType === 'INSERT') {
         setActivities(prev => [payload.new, ...prev.slice(0, 9)]);
       } else if (payload.eventType === 'UPDATE') {

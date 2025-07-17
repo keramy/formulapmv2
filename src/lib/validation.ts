@@ -3,17 +3,17 @@ import { UserRole } from '@/types/auth'
 
 // User Role enum for validation
 const UserRoleEnum = z.enum([
-  'company_owner',
-  'general_manager',
-  'deputy_general_manager',
-  'technical_director',
+  'management',
+  'management',
+  'management',
+  'technical_lead',
   'admin',
   'project_manager',
-  'architect',
-  'technical_engineer',
-  'purchase_director',
-  'purchase_specialist',
-  'field_worker',
+  'project_manager',
+  'project_manager',
+  'purchase_manager',
+  'purchase_manager',
+  'project_manager',
   'client',
 ])
 
@@ -267,23 +267,23 @@ export const validateEmailDomain = (email: string, allowedDomains?: string[]): b
 // Role validation helpers
 export const canAssignRole = (assignerRole: UserRole, targetRole: UserRole): boolean => {
   const roleHierarchy: Record<UserRole, number> = {
-    'company_owner': 100,
+    'management': 100,
     'admin': 90,
-    'general_manager': 80,
-    'deputy_general_manager': 70,
-    'technical_director': 60,
+    'management': 80,
+    'management': 70,
+    'technical_lead': 60,
     'project_manager': 50,
-    'purchase_director': 45,
-    'architect': 40,
-    'technical_engineer': 35,
-    'purchase_specialist': 30,
-    'field_worker': 20,
+    'purchase_manager': 45,
+    'project_manager': 40,
+    'project_manager': 35,
+    'purchase_manager': 30,
+    'project_manager': 20,
     'client': 10
   }
 
   // Only company owners and admins can assign admin roles
-  if (['company_owner', 'admin'].includes(targetRole)) {
-    return ['company_owner', 'admin'].includes(assignerRole)
+  if (['management', 'admin'].includes(targetRole)) {
+    return ['management', 'admin'].includes(assignerRole)
   }
 
   // Higher hierarchy can assign lower roles

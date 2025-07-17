@@ -105,12 +105,8 @@ export function RealtimeScopeListTab({ projectId }: RealtimeScopeListTabProps) {
   useEffect(() => {
     if (!profile) return;
 
-    console.log('🔴 [RealtimeScopeListTab] Setting up real-time subscriptions');
-    
     // Subscribe to scope item changes
     const unsubscribeScope = subscribeToProjectScope(projectId, (payload) => {
-      console.log('🔴 [RealtimeScopeListTab] Scope update received:', payload);
-      
       if (payload.eventType === 'INSERT') {
         const newItem = transformScopeItem(payload.new);
         setScopeItems(prev => [...prev, newItem]);

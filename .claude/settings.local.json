@@ -95,7 +95,8 @@
       "mcp__supabase__list_projects",
       "mcp__supabase__execute_sql",
       "Bash(docker logs:*)",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash(mcp list:*)"
     ],
     "deny": []
   }

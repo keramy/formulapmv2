@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
       {
         id: '4b7af6d4-97d3-4f3a-8f64-9d3bc26d8b39', // The user ID from the debug logs
         email: 'owner.test@formulapm.com',
-        role: 'company_owner',
+        role: 'management',
         first_name: 'Owner',
         last_name: 'Test',
         company: 'Formula PM Test',

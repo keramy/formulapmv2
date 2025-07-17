@@ -440,17 +440,17 @@ export const validateProjectAssignments = (data: unknown) => {
 
 export const validateProjectPermissions = (userRole: string, action: string): boolean => {
   const rolePermissions: Record<string, string[]> = {
-    'company_owner': ['create', 'read', 'update', 'delete', 'manage_team', 'view_budget', 'edit_budget'],
-    'general_manager': ['create', 'read', 'update', 'delete', 'manage_team', 'view_budget', 'edit_budget'],
-    'deputy_general_manager': ['create', 'read', 'update', 'manage_team', 'view_budget', 'edit_budget'],
-    'technical_director': ['read', 'update', 'view_budget'],
+    'management': ['create', 'read', 'update', 'delete', 'manage_team', 'view_budget', 'edit_budget'],
+    'management': ['create', 'read', 'update', 'delete', 'manage_team', 'view_budget', 'edit_budget'],
+    'management': ['create', 'read', 'update', 'manage_team', 'view_budget', 'edit_budget'],
+    'technical_lead': ['read', 'update', 'view_budget'],
     'admin': ['create', 'read', 'update', 'delete', 'manage_team'],
     'project_manager': ['create', 'read', 'update', 'manage_team'],
-    'architect': ['read', 'update'],
-    'technical_engineer': ['read', 'update'],
-    'purchase_director': ['read', 'view_budget'],
-    'purchase_specialist': ['read'],
-    'field_worker': ['read'],
+    'project_manager': ['read', 'update'],
+    'project_manager': ['read', 'update'],
+    'purchase_manager': ['read', 'view_budget'],
+    'purchase_manager': ['read'],
+    'project_manager': ['read'],
     'client': ['read'],
   }
   
@@ -459,7 +459,7 @@ export const validateProjectPermissions = (userRole: string, action: string): bo
 
 export const validateProjectAccess = (userRole: string, projectId: string, assignedProjects: string[]): boolean => {
   // Management roles can access all projects
-  if (['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'].includes(userRole)) {
+  if (['management', 'management', 'management', 'technical_lead', 'admin'].includes(userRole)) {
     return true
   }
   

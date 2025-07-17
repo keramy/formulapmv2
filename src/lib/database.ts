@@ -168,7 +168,7 @@ export function generateUserPermissions(role: UserRole): string[] {
 
   // Role-specific permissions
   switch (role) {
-    case 'company_owner':
+    case 'management':
       permissions.push(
         'users.create',
         'users.update',
@@ -199,7 +199,7 @@ export function generateUserPermissions(role: UserRole): string[] {
       );
       break;
 
-    case 'architect':
+    case 'project_manager':
       permissions.push(
         'projects.read.assigned',
         'scope.read.assigned',
@@ -208,7 +208,7 @@ export function generateUserPermissions(role: UserRole): string[] {
       );
       break;
 
-    case 'technical_engineer':
+    case 'project_manager':
       permissions.push(
         'projects.read.assigned',
         'scope.read.full',
@@ -218,8 +218,8 @@ export function generateUserPermissions(role: UserRole): string[] {
       );
       break;
 
-    case 'purchase_director':
-    case 'purchase_specialist':
+    case 'purchase_manager':
+    case 'purchase_manager':
       permissions.push(
         'suppliers.create',
         'suppliers.update',
@@ -229,7 +229,7 @@ export function generateUserPermissions(role: UserRole): string[] {
       );
       break;
 
-    case 'field_worker':
+    case 'project_manager':
       permissions.push(
         'projects.read.assigned',
         'scope.read.assigned',
@@ -275,7 +275,7 @@ export function filterScopeItemByRole(scopeItem: ScopeItem, userRole: UserRole):
   }
 
   // Field workers and external users get even more limited data
-  if (userRole === 'field_worker' || userRole === 'client') {
+  if (userRole === 'project_manager' || userRole === 'client') {
     // Keep only essential fields
     return {
       id: filtered.id,

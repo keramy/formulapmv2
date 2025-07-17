@@ -95,7 +95,7 @@ export const POST = withAuth(async (request: NextRequest, context: { params: Pro
 
     // Check permissions - project managers and management can assign team members
     const canManageTeam = hasPermission(profile.role, 'projects.update') || 
-                         ['company_owner', 'general_manager', 'deputy_general_manager', 'project_manager'].includes(profile.role)
+                         ['management', 'management', 'management', 'project_manager'].includes(profile.role)
     
     if (!canManageTeam) {
       return createErrorResponse('Insufficient permissions to manage project team' , 403)
@@ -244,7 +244,7 @@ export const DELETE = withAuth(async (request: NextRequest, context: { params: P
 
     // Check permissions
     const canManageTeam = hasPermission(profile.role, 'projects.update') || 
-                         ['company_owner', 'general_manager', 'deputy_general_manager', 'project_manager'].includes(profile.role)
+                         ['management', 'management', 'management', 'project_manager'].includes(profile.role)
     
     if (!canManageTeam) {
       return createErrorResponse('Insufficient permissions to manage project team' , 403)
@@ -311,7 +311,7 @@ export const DELETE = withAuth(async (request: NextRequest, context: { params: P
 async function checkProjectAccess(supabase: any, user: any, projectId: string): Promise<boolean> {
   try {
     // Management roles can access all projects
-    if (['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'].includes(user.role)) {
+    if (['management', 'management', 'management', 'technical_lead', 'admin'].includes(user.role)) {
       return true
     }
 

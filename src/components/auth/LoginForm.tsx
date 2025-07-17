@@ -52,23 +52,17 @@ const LoginForm = ({
   
   // Simplified component initialization
   useEffect(() => {
-    console.log('🔐 [LoginForm] Component mounted with auth state:', {
-      authState,
-      isAuthenticated,
-      userEmail: user?.email
-    })
-    
     // Clear any existing errors on mount
     if (authError) {
       clearAuthError()
     }
-  }, [])
+  }, []
+  // TODO: Review dependencies - potential deps: Clear, any, existing)
 
   // Simplified authentication success handling
   useEffect(() => {
     // Redirect on successful authentication if user interacted with form
     if (isAuthenticated && authState === 'authenticated' && hasUserInteracted && !authError) {
-      console.log('✅ Authentication successful, redirecting to:', redirectTo)
       router.push(redirectTo)
     }
   }, [isAuthenticated, authState, redirectTo, router, authError, hasUserInteracted])
@@ -107,7 +101,6 @@ const LoginForm = ({
     }
 
     try {
-      console.log('🔐 [LoginForm] Starting login process...')
       await signIn(email.trim().toLowerCase(), password)
       // Success handling is done in useEffect
     } catch (error: any) {
@@ -152,7 +145,6 @@ const LoginForm = ({
   }
 
   const handleClearSession = async () => {
-    console.log('🔐 [LoginForm] Clearing stale session')
     try {
       await clearStaleSession()
       setLocalError(null)
@@ -164,13 +156,11 @@ const LoginForm = ({
   }
 
   const handleContinueWithExistingSession = () => {
-    console.log('🔐 [LoginForm] User chose to continue with existing session')
     setHasUserInteracted(true)
     // This will trigger the redirect in the useEffect
   }
 
   const handleLogoutAndLoginFresh = async () => {
-    console.log('🔐 [LoginForm] User chose to logout and login fresh')
     try {
       await clearStaleSession()
       setHasUserInteracted(false)

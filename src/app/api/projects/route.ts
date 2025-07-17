@@ -15,6 +15,7 @@ import {
   validateProjectPermissions 
 } from '@/lib/validation/projects'
 import { ProjectWithDetails, ProjectListResponse } from '@/types/projects'
+import { getCachedResponse, generateCacheKey, invalidateCache } from '@/lib/cache-middleware'
 
 // ============================================================================
 // GET /api/projects - List projects with filtering and pagination
@@ -59,7 +60,7 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
 
     // Use admin client for management roles to bypass RLS issues
     let supabase
-    if (['company_owner', 'admin'].includes(profile.role)) {
+    if (['management', 'admin'].includes(profile.role)) {
       const { supabaseAdmin } = await import('@/lib/supabase')
       supabase = supabaseAdmin
     } else {
@@ -68,11 +69,29 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
 
     // Build simplified query to avoid complex joins that might fail
     let query = supabase
+      // Optimized projects query with selective fields
+    const projectsQuery = supabase
       .from('projects')
-      .select('*', { count: 'exact' })
+      .select(`
+        id,
+        name,
+        description,
+        status,
+        created_at,
+        updated_at,
+        project_manager_id,
+        user_profiles!projects_project_manager_id_fkey(
+          id,
+          first_name,
+          last_name
+        )
+      `)
+      .eq('status', 'active')
+      .order('updated_at', { ascending: false })
+      .limit(50)
 
     // Simplified role-based filtering - admin/management can see all projects
-    if (['company_owner', 'admin', 'general_manager', 'deputy_general_manager', 'technical_director'].includes(profile.role)) {
+    if (['management', 'admin', 'management', 'management', 'technical_lead'].includes(profile.role)) {
       // Management can see all projects - no additional filtering
     } else {
       // For now, other roles can also see projects (will implement proper filtering later)
@@ -96,7 +115,9 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
     }
 
     if (queryParams.search) {
-      query = query.or(`name.ilike.%${queryParams.search}%,description.ilike.%${queryParams.search}%,location.ilike.%${queryParams.search}%`)
+      // Sanitize search input to prevent SQL injection
+      const sanitizedSearch = queryParams.search.replace(/[%_\\]/g, '\\$&').substring(0, 100)
+      query = query.or(`name.ilike.%${sanitizedSearch}%,description.ilike.%${sanitizedSearch}%,location.ilike.%${sanitizedSearch}%`)
     }
 
     // Apply sorting

@@ -69,4 +69,37 @@ const nextConfig = {
   },
 }
 
+
+// Performance optimizations
+const nextConfig = {
+  ...nextConfig,
+  experimental: {
+    optimizeCss: true,
+    optimizePackageImports: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', 'lucide-react']
+  },
+  webpack: (config, { dev, isServer }) => {
+    // Bundle analyzer in development
+    if (dev && !isServer) {
+      config.optimization.splitChunks = {
+        chunks: 'all',
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all',
+          },
+          common: {
+            name: 'common',
+            minChunks: 2,
+            chunks: 'all',
+            enforce: true,
+          },
+        },
+      }
+    }
+    return config
+  }
+}
+
+
 module.exports = nextConfig

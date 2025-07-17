@@ -1,0 +1,17 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "created": "2025-01-17T14:00:00.000Z",
+    "lastSync": "2025-01-17T14:00:00.000Z",
+    "description": "Luxury Brands Contact Database"
+  },
+  "contacts": {},
+  "activity": [
+    {
+      "user": "System",
+      "action": "initialize",
+      "timestamp": "2025-01-17T14:00:00.000Z",
+      "details": "Database initialized"
+    }
+  ]
+}

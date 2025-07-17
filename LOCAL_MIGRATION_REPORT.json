@@ -1,0 +1,29 @@
+{
+  "timestamp": "2025-07-17T15:37:13.616Z",
+  "target": "Local Supabase (127.0.0.1:54321)",
+  "migrations": [
+    {
+      "file": "1752763631808_optimized_rls_policies.sql",
+      "description": "Optimized RLS Policies (73% performance improvement)",
+      "success": false,
+      "error": "Command failed: npx supabase db execute -f \"C:\\Users\\Kerem\\Desktop\\formulapmv2\\scripts\\temp-migration.sql\"\nUsage:\n  supabase db [command]\n\nAvailable Commands:\n  diff        Diffs the local database for schema changes\n  dump        Dumps data or schemas from the remote database\n  lint        Checks local database for typing error\n  pull        Pull schema from the remote database\n  push        Push new migrations to the remote database\n  reset       Resets the local database to current migrations\n  start       Starts local Postgres database\n\nFlags:\n  -h, --help   help for db\n\nGlobal Flags:\n      --create-ticket                                  create a support ticket for any CLI error\n      --debug                                          output debug logs to stderr\n      --dns-resolver [ native | https ]                lookup domain names using the specified resolver (default native)\n      --experimental                                   enable experimental features\n      --network-id string                              use the specified docker network instead of a generated one\n  -o, --output [ env | pretty | json | toml | yaml ]   output format of status variables (default pretty)\n      --workdir string                                 path to a Supabase project directory\n      --yes                                            answer yes to all prompts\n\nUse \"supabase db [command] --help\" for more information about a command.\n\nunknown shorthand flag: 'f' in -f\nTry rerunning the command with --debug to troubleshoot the error.\n"
+    },
+    {
+      "file": "1752763631810_performance_indexes.sql",
+      "description": "Performance Indexes (30-50% improvement)",
+      "success": false,
+      "error": "Command failed: npx supabase db execute -f \"C:\\Users\\Kerem\\Desktop\\formulapmv2\\scripts\\temp-migration.sql\"\nUsage:\n  supabase db [command]\n\nAvailable Commands:\n  diff        Diffs the local database for schema changes\n  dump        Dumps data or schemas from the remote database\n  lint        Checks local database for typing error\n  pull        Pull schema from the remote database\n  push        Push new migrations to the remote database\n  reset       Resets the local database to current migrations\n  start       Starts local Postgres database\n\nFlags:\n  -h, --help   help for db\n\nGlobal Flags:\n      --create-ticket                                  create a support ticket for any CLI error\n      --debug                                          output debug logs to stderr\n      --dns-resolver [ native | https ]                lookup domain names using the specified resolver (default native)\n      --experimental                                   enable experimental features\n      --network-id string                              use the specified docker network instead of a generated one\n  -o, --output [ env | pretty | json | toml | yaml ]   output format of status variables (default pretty)\n      --workdir string                                 path to a Supabase project directory\n      --yes                                            answer yes to all prompts\n\nUse \"supabase db [command] --help\" for more information about a command.\n\nunknown shorthand flag: 'f' in -f\nTry rerunning the command with --debug to troubleshoot the error.\n"
+    },
+    {
+      "file": "1752763631814_connection_pooling.sql",
+      "description": "Connection Pooling Configuration",
+      "success": false,
+      "error": "Command failed: npx supabase db execute -f \"C:\\Users\\Kerem\\Desktop\\formulapmv2\\scripts\\temp-migration.sql\"\nUsage:\n  supabase db [command]\n\nAvailable Commands:\n  diff        Diffs the local database for schema changes\n  dump        Dumps data or schemas from the remote database\n  lint        Checks local database for typing error\n  pull        Pull schema from the remote database\n  push        Push new migrations to the remote database\n  reset       Resets the local database to current migrations\n  start       Starts local Postgres database\n\nFlags:\n  -h, --help   help for db\n\nGlobal Flags:\n      --create-ticket                                  create a support ticket for any CLI error\n      --debug                                          output debug logs to stderr\n      --dns-resolver [ native | https ]                lookup domain names using the specified resolver (default native)\n      --experimental                                   enable experimental features\n      --network-id string                              use the specified docker network instead of a generated one\n  -o, --output [ env | pretty | json | toml | yaml ]   output format of status variables (default pretty)\n      --workdir string                                 path to a Supabase project directory\n      --yes                                            answer yes to all prompts\n\nUse \"supabase db [command] --help\" for more information about a command.\n\nunknown shorthand flag: 'f' in -f\nTry rerunning the command with --debug to troubleshoot the error.\n"
+    }
+  ],
+  "summary": {
+    "total": 3,
+    "successful": 0,
+    "failed": 3
+  }
+}

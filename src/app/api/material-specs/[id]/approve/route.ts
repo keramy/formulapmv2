@@ -172,7 +172,7 @@ export const POST = withAuth(async (request: NextRequest, context: { params: Pro
 async function verifyProjectAccess(supabase: any, user: any, projectId: string): Promise<boolean> {
   try {
     // Management roles can access all projects
-    if (['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'].includes(user.profile?.role || user.role)) {
+    if (['management', 'management', 'management', 'technical_lead', 'admin'].includes(user.profile?.role || user.role)) {
       return true
     }
 

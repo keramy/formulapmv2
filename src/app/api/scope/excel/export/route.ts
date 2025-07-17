@@ -83,7 +83,9 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
     }
 
     if (filters.search_term) {
-      query = query.or(`title.ilike.%${filters.search_term}%,description.ilike.%${filters.search_term}%,item_code.ilike.%${filters.search_term}%`)
+      // Sanitize search input to prevent SQL injection
+      const sanitizedSearch = filters.search_term.replace(/[%_\\]/g, '\\$&').substring(0, 100)
+        query = query.or(`title.ilike.%${sanitizedSearch}%,description.ilike.%${sanitizedSearch}%,item_code.ilike.%${sanitizedSearch}%`)
     }
 
     const { data: scopeItems, error } = await query

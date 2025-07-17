@@ -152,7 +152,9 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
       }
 
       if (filters.search) {
-        query = query.or(`name.ilike.%${filters.search}%,description.ilike.%${filters.search}%,category.ilike.%${filters.search}%,brand.ilike.%${filters.search}%`)
+        // Sanitize search input to prevent SQL injection
+        const sanitizedSearch = filters.search.replace(/[%_\\]/g, '\\$&').substring(0, 100)
+        query = query.or(`name.ilike.%${sanitizedSearch}%,description.ilike.%${sanitizedSearch}%,category.ilike.%${sanitizedSearch}%,brand.ilike.%${sanitizedSearch}%`)
       }
 
       if (filters.created_by) {

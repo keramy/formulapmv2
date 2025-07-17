@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const isAdmin = ['company_owner', 'admin', 'general_manager'].includes(profile.role)
+    const isAdmin = ['management', 'admin', 'management'].includes(profile.role)
     if (!isAdmin) {
       console.warn(`🚫 [auth-state:${correlationId}] Non-admin access attempt`, {
         userId: user.id,

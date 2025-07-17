@@ -1,0 +1,461 @@
+{
+  "timestamp": "2025-07-17T07:30:34.408Z",
+  "currentRoleAnalysis": {
+    "totalRoles": 13,
+    "performanceIssues": [
+      {
+        "role": "field_worker",
+        "responseTime": 542,
+        "complexity": 2.5,
+        "severity": "high"
+      }
+    ],
+    "redundancies": [
+      {
+        "category": "management_hierarchy",
+        "roles": [
+          "company_owner",
+          "general_manager",
+          "deputy_general_manager"
+        ],
+        "issue": "Three similar management roles with overlapping permissions",
+        "impact": "Complex RLS policies, similar access patterns"
+      },
+      {
+        "category": "purchase_department",
+        "roles": [
+          "purchase_director",
+          "purchase_specialist"
+        ],
+        "issue": "Two purchase roles with similar core functions",
+        "impact": "Duplicate permission logic, workflow complexity"
+      },
+      {
+        "category": "technical_overlap",
+        "roles": [
+          "technical_director",
+          "architect",
+          "technical_engineer"
+        ],
+        "issue": "Overlapping technical responsibilities and permissions",
+        "impact": "Complex cost visibility rules, similar data access patterns"
+      }
+    ],
+    "complexityAnalysis": {
+      "low": [
+        "company_owner",
+        "general_manager",
+        "deputy_general_manager",
+        "technical_director",
+        "admin"
+      ],
+      "medium": [
+        "architect",
+        "technical_engineer",
+        "purchase_director",
+        "purchase_specialist",
+        "client"
+      ],
+      "high": [
+        "project_manager",
+        "field_worker",
+        "subcontractor"
+      ]
+    },
+    "usagePatterns": {
+      "high": [
+        "project_manager",
+        "technical_engineer",
+        "field_worker"
+      ],
+      "medium": [
+        "general_manager",
+        "technical_director",
+        "architect",
+        "purchase_specialist",
+        "subcontractor",
+        "client"
+      ],
+      "low": [
+        "company_owner",
+        "deputy_general_manager",
+        "purchase_director",
+        "admin"
+      ]
+    }
+  },
+  "optimizationRecommendations": [
+    {
+      "type": "role_consolidation",
+      "priority": "high",
+      "title": "Consolidate Management Hierarchy",
+      "description": "Merge company_owner, general_manager, and deputy_general_manager into a single \"management\" role",
+      "currentRoles": [
+        "company_owner",
+        "general_manager",
+        "deputy_general_manager"
+      ],
+      "proposedRole": "management",
+      "benefits": [
+        "Reduce RLS policy complexity by 60%",
+        "Eliminate redundant permission checks",
+        "Simplify user management",
+        "Improve query performance by ~40ms average"
+      ],
+      "risks": [
+        "Loss of granular permission control",
+        "May need role-based feature flags for specific management functions"
+      ],
+      "implementationEffort": "medium"
+    },
+    {
+      "type": "role_consolidation",
+      "priority": "medium",
+      "title": "Consolidate Purchase Department",
+      "description": "Merge purchase_director and purchase_specialist into \"purchase_manager\"",
+      "currentRoles": [
+        "purchase_director",
+        "purchase_specialist"
+      ],
+      "proposedRole": "purchase_manager",
+      "benefits": [
+        "Reduce purchase workflow complexity",
+        "Eliminate duplicate approval logic",
+        "Improve purchase query performance by ~25ms"
+      ],
+      "risks": [
+        "May need approval amount limits instead of role-based approvals"
+      ],
+      "implementationEffort": "low"
+    },
+    {
+      "type": "role_optimization",
+      "priority": "high",
+      "title": "Optimize Field Worker Role",
+      "description": "Simplify field_worker permissions and reduce assignment-based complexity",
+      "currentRoles": [
+        "field_worker"
+      ],
+      "proposedChanges": [
+        "Pre-compute accessible projects instead of real-time RLS checks",
+        "Cache assignment data to reduce JOIN complexity",
+        "Implement project-based data partitioning"
+      ],
+      "benefits": [
+        "Reduce field_worker response time from 542ms to ~200ms",
+        "Improve mobile app performance significantly",
+        "Reduce database load during peak field hours"
+      ],
+      "implementationEffort": "high"
+    },
+    {
+      "type": "role_restructuring",
+      "priority": "medium",
+      "title": "Restructure Technical Roles",
+      "description": "Reorganize technical roles based on actual responsibilities rather than hierarchy",
+      "currentRoles": [
+        "technical_director",
+        "architect",
+        "technical_engineer"
+      ],
+      "proposedRoles": [
+        {
+          "name": "technical_lead",
+          "description": "Senior technical oversight and approvals"
+        },
+        {
+          "name": "technical_specialist",
+          "description": "Hands-on technical work and specifications"
+        }
+      ],
+      "benefits": [
+        "Clearer permission boundaries",
+        "Reduced cost visibility complexity",
+        "Better alignment with actual workflows"
+      ],
+      "implementationEffort": "high"
+    },
+    {
+      "type": "permission_system",
+      "priority": "high",
+      "title": "Implement Permission Levels Instead of Complex Roles",
+      "description": "Replace some role-based permissions with level-based permissions",
+      "concept": {
+        "levels": [
+          {
+            "name": "basic",
+            "description": "Read-only access to assigned projects"
+          },
+          {
+            "name": "standard",
+            "description": "Read-write access with limited approvals"
+          },
+          {
+            "name": "advanced",
+            "description": "Full project access with cost visibility"
+          },
+          {
+            "name": "admin",
+            "description": "System-wide access and management"
+          }
+        ],
+        "roleMapping": {
+          "field_worker": "basic",
+          "subcontractor": "basic",
+          "client": "basic",
+          "project_manager": "standard",
+          "technical_specialist": "standard",
+          "technical_lead": "advanced",
+          "purchase_manager": "advanced",
+          "management": "admin",
+          "admin": "admin"
+        }
+      },
+      "benefits": [
+        "Dramatically simplify RLS policies",
+        "Easier to understand and maintain",
+        "Better performance through simpler queries",
+        "More flexible permission assignment"
+      ],
+      "implementationEffort": "high"
+    }
+  ],
+  "proposedRoleStructure": {
+    "totalRoles": 7,
+    "roles": [
+      {
+        "name": "management",
+        "description": "Executive and senior management",
+        "permissions": [
+          "all_access",
+          "financial_data",
+          "user_management",
+          "system_config"
+        ],
+        "replaces": [
+          "company_owner",
+          "general_manager",
+          "deputy_general_manager"
+        ],
+        "estimatedUsers": 3,
+        "complexity": 1.2
+      },
+      {
+        "name": "technical_lead",
+        "description": "Senior technical oversight and approvals",
+        "permissions": [
+          "technical_oversight",
+          "cost_tracking",
+          "project_approval",
+          "design_review"
+        ],
+        "replaces": [
+          "technical_director"
+        ],
+        "estimatedUsers": 5,
+        "complexity": 1.4
+      },
+      {
+        "name": "project_manager",
+        "description": "Project coordination and management",
+        "permissions": [
+          "project_management",
+          "team_coordination",
+          "progress_tracking",
+          "limited_approvals"
+        ],
+        "replaces": [
+          "project_manager"
+        ],
+        "estimatedUsers": 15,
+        "complexity": 1.6
+      },
+      {
+        "name": "technical_specialist",
+        "description": "Technical implementation and specifications",
+        "permissions": [
+          "technical_specs",
+          "quality_control",
+          "drawing_approval",
+          "limited_cost_access"
+        ],
+        "replaces": [
+          "architect",
+          "technical_engineer"
+        ],
+        "estimatedUsers": 20,
+        "complexity": 1.5
+      },
+      {
+        "name": "purchase_manager",
+        "description": "Purchase and vendor management",
+        "permissions": [
+          "purchase_processing",
+          "vendor_management",
+          "cost_tracking",
+          "purchase_approval"
+        ],
+        "replaces": [
+          "purchase_director",
+          "purchase_specialist"
+        ],
+        "estimatedUsers": 8,
+        "complexity": 1.4
+      },
+      {
+        "name": "field_operator",
+        "description": "Field work and progress updates",
+        "permissions": [
+          "task_updates",
+          "photo_upload",
+          "progress_reporting",
+          "assigned_project_access"
+        ],
+        "replaces": [
+          "field_worker"
+        ],
+        "estimatedUsers": 50,
+        "complexity": 1.3
+      },
+      {
+        "name": "external_user",
+        "description": "Clients and subcontractors",
+        "permissions": [
+          "limited_project_visibility",
+          "document_review",
+          "progress_updates"
+        ],
+        "replaces": [
+          "client",
+          "subcontractor"
+        ],
+        "estimatedUsers": 30,
+        "complexity": 1.2
+      }
+    ],
+    "specialRoles": [
+      {
+        "name": "admin",
+        "description": "System administration",
+        "permissions": [
+          "system_admin",
+          "user_management",
+          "technical_support"
+        ],
+        "complexity": 1.1,
+        "estimatedUsers": 2
+      }
+    ]
+  },
+  "performanceImpact": {
+    "currentMetrics": {
+      "totalRoles": 13,
+      "averageComplexity": 1.67,
+      "averageResponseTime": 262,
+      "slowRoles": 1,
+      "rlsPolicies": 45
+    },
+    "projectedMetrics": {
+      "totalRoles": 7,
+      "averageComplexity": 1.37,
+      "estimatedResponseTime": 215,
+      "estimatedSlowRoles": 0,
+      "estimatedRlsPolicies": 20
+    },
+    "improvements": {
+      "roleReduction": "46% fewer roles",
+      "complexityReduction": "18%",
+      "responseTimeImprovement": "18%",
+      "rlsPolicyReduction": "56% fewer policies",
+      "maintenanceReduction": "60% less role management overhead"
+    },
+    "riskMitigation": [
+      "Implement gradual migration strategy",
+      "Maintain backward compatibility during transition",
+      "Add feature flags for granular control where needed",
+      "Comprehensive testing of permission changes"
+    ]
+  },
+  "implementationPlan": [
+    {
+      "phase": 1,
+      "title": "Analysis and Preparation",
+      "duration": "2-3 weeks",
+      "tasks": [
+        "Audit current user assignments and usage patterns",
+        "Map existing permissions to new role structure",
+        "Create migration scripts for role consolidation",
+        "Design backward compatibility layer"
+      ],
+      "deliverables": [
+        "User audit report",
+        "Permission mapping document",
+        "Migration plan"
+      ]
+    },
+    {
+      "phase": 2,
+      "title": "Database Schema Updates",
+      "duration": "1-2 weeks",
+      "tasks": [
+        "Create new role enum with optimized roles",
+        "Update RLS policies for simplified structure",
+        "Implement permission level system",
+        "Create role migration utilities"
+      ],
+      "deliverables": [
+        "Updated database schema",
+        "New RLS policies",
+        "Migration scripts"
+      ]
+    },
+    {
+      "phase": 3,
+      "title": "Application Layer Updates",
+      "duration": "3-4 weeks",
+      "tasks": [
+        "Update authentication and authorization logic",
+        "Modify UI components for new role structure",
+        "Update API endpoints and middleware",
+        "Implement feature flags for granular control"
+      ],
+      "deliverables": [
+        "Updated application code",
+        "New permission system",
+        "Feature flag system"
+      ]
+    },
+    {
+      "phase": 4,
+      "title": "Testing and Validation",
+      "duration": "2-3 weeks",
+      "tasks": [
+        "Comprehensive permission testing",
+        "Performance testing with new structure",
+        "User acceptance testing",
+        "Security audit of new permissions"
+      ],
+      "deliverables": [
+        "Test results",
+        "Performance benchmarks",
+        "Security audit report"
+      ]
+    },
+    {
+      "phase": 5,
+      "title": "Gradual Migration",
+      "duration": "2-4 weeks",
+      "tasks": [
+        "Migrate users in batches",
+        "Monitor performance improvements",
+        "Address any issues or edge cases",
+        "Complete rollout and cleanup"
+      ],
+      "deliverables": [
+        "Migrated user base",
+        "Performance metrics",
+        "Final cleanup"
+      ]
+    }
+  ]
+}

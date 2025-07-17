@@ -538,17 +538,17 @@ export const validateMaterialSpecStatisticsParams = (data: unknown) => {
 
 export const validateMaterialSpecPermissions = (userRole: string, action: string): boolean => {
   const rolePermissions: Record<string, string[]> = {
-    'company_owner': ['create', 'read', 'update', 'delete', 'approve', 'reject', 'link', 'unlink', 'view_all'],
-    'general_manager': ['create', 'read', 'update', 'delete', 'approve', 'reject', 'link', 'unlink', 'view_all'],
-    'deputy_general_manager': ['create', 'read', 'update', 'approve', 'reject', 'link', 'unlink', 'view_all'],
-    'technical_director': ['read', 'update', 'approve', 'reject', 'link', 'unlink', 'view_all'],
+    'management': ['create', 'read', 'update', 'delete', 'approve', 'reject', 'link', 'unlink', 'view_all'],
+    'management': ['create', 'read', 'update', 'delete', 'approve', 'reject', 'link', 'unlink', 'view_all'],
+    'management': ['create', 'read', 'update', 'approve', 'reject', 'link', 'unlink', 'view_all'],
+    'technical_lead': ['read', 'update', 'approve', 'reject', 'link', 'unlink', 'view_all'],
     'admin': ['create', 'read', 'update', 'delete', 'approve', 'reject', 'link', 'unlink', 'view_all'],
     'project_manager': ['create', 'read', 'update', 'approve', 'link', 'unlink'],
-    'architect': ['create', 'read', 'update', 'link', 'unlink'],
-    'technical_engineer': ['create', 'read', 'update', 'link', 'unlink'],
-    'purchase_director': ['read', 'approve', 'reject'],
-    'purchase_specialist': ['read', 'update'],
-    'field_worker': ['read'],
+    'project_manager': ['create', 'read', 'update', 'link', 'unlink'],
+    'project_manager': ['create', 'read', 'update', 'link', 'unlink'],
+    'purchase_manager': ['read', 'approve', 'reject'],
+    'purchase_manager': ['read', 'update'],
+    'project_manager': ['read'],
     'client': ['read'],
   }
   
@@ -557,7 +557,7 @@ export const validateMaterialSpecPermissions = (userRole: string, action: string
 
 export const validateMaterialSpecAccess = (userRole: string, projectId: string, assignedProjects: string[]): boolean => {
   // Management roles can access all project materials
-  if (['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'].includes(userRole)) {
+  if (['management', 'management', 'management', 'technical_lead', 'admin'].includes(userRole)) {
     return true
   }
   

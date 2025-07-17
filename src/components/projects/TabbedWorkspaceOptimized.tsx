@@ -88,8 +88,7 @@ export function TabbedWorkspaceOptimized({ projectId }: TabbedWorkspaceProps) {
     // Track tab loading for analytics
     if (!loadedTabs.has(value)) {
       loadedTabs.add(value);
-      console.log(`📊 [TabbedWorkspace] Dynamically loading tab: ${value}`);
-    }
+      }
     setActiveTab(value);
   };
 

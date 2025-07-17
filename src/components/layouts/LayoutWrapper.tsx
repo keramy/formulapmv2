@@ -40,12 +40,6 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
     const shouldRedirect = !isNoLayoutPath && !isAuthenticated && authState === 'idle' && !user
     
     if (shouldRedirect) {
-      console.log('🔐 [LayoutWrapper] Redirecting to login from protected route:', {
-        pathname,
-        authState,
-        isAuthenticated,
-        hasUser: !!user
-      })
       router.push('/auth/login')
     }
   }, [isNoLayoutPath, isAuthenticated, authState, pathname, router, user])

@@ -1,0 +1,525 @@
+'use client'
+
+import { useEffect, useState, useCallback } from 'react'
+import { User } from '@supabase/supabase-js'
+import { supabase } from '@/lib/supabase'
+import { UserProfile, UserRole } from '@/types/auth'
+import { useImpersonation } from './useImpersonation'
+import { useAdvancedApiQuery } from './useAdvancedApiQuery'
+
+export const useAuth = () => {
+  // Simplified state management - only essential states
+  const [user, setUser] = useState<User | null>(null)
+  const [profile, setProfile] = useState<UserProfile | null>(null)
+  const [originalProfile, setOriginalProfile] = useState<UserProfile | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [authError, setAuthError] = useState<string | null>(null)
+  const [isSigningIn, setIsSigningIn] = useState(false)
+
+  // Integrate impersonation system
+  const { isImpersonating, impersonatedUser, originalAdmin, stopImpersonation, canImpersonate } = useImpersonation()
+
+  // Optimized profile fetching - async, non-blocking
+  const fetchUserProfile = useCallback(async (userId: string): Promise<void> => {
+    try {
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', userId)
+        .single()
+
+      if (error) {
+        console.error('🔐 [useAuth] Profile fetch error:', error)
+        
+        // Handle admin profile creation if needed
+        if (error.code === 'PGRST116') {
+          const { data: { user } } = await supabase.auth.getUser()
+          if (user?.email === 'admin@formulapm.com') {
+            console.log('🔐 [useAuth] Creating missing admin profile')
+            
+            const { supabaseAdmin } = await import('@/lib/supabase')
+            const { data: newProfile, error: createError } = await supabaseAdmin
+              .from('user_profiles')
+              .insert({
+                id: userId,
+                role: 'company_owner',
+                first_name: 'Admin',
+                last_name: 'User',
+                email: user.email,
+                phone: null,
+                company: 'Formula PM',
+                department: 'Administration',
+                permissions: {},
+                is_active: true,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+              })
+              .select('*')
+              .single()
+            
+            if (!createError && newProfile) {
+              const profile: UserProfile = {
+                id: newProfile.id,
+                role: newProfile.role as UserRole,
+                first_name: newProfile.first_name,
+                last_name: newProfile.last_name,
+                email: newProfile.email,
+                phone: newProfile.phone,
+                company: newProfile.company,
+                department: newProfile.department,
+                permissions: newProfile.permissions || {},
+                is_active: newProfile.is_active,
+                created_at: newProfile.created_at,
+                updated_at: newProfile.updated_at
+              }
+              setProfile(profile)
+              return
+            }
+          }
+        }
+        
+        setAuthError('Failed to load user profile')
+        return
+      }
+
+      if (data) {
+        const profile: UserProfile = {
+          id: data.id,
+          role: data.role as UserRole,
+          first_name: data.first_name,
+          last_name: data.last_name,
+          email: data.email,
+          phone: data.phone,
+          company: data.company,
+          department: data.department,
+          permissions: data.permissions || {},
+          is_active: data.is_active,
+          created_at: data.created_at,
+          updated_at: data.updated_at
+        }
+        
+        setProfile(profile)
+      }
+      
+    } catch (error) {
+      console.error('🔐 [useAuth] Profile fetch exception:', error)
+      setAuthError('Profile loading failed')
+    }
+  }, [])
+
+  // Effect to handle impersonation changes
+  useEffect(() => {
+    if (isImpersonating && impersonatedUser && originalAdmin) {
+      console.log('🎭 [useAuth] Applying impersonation:', {
+        originalAdmin: originalAdmin.email,
+        impersonatedUser: impersonatedUser.email
+      })
+      
+      // Store original profile if not already stored
+      if (!originalProfile && profile) {
+        setOriginalProfile(profile)
+      }
+      
+      // Use impersonated user's profile
+      setProfile(impersonatedUser)
+    } else if (!isImpersonating && originalProfile) {
+      console.log('🎭 [useAuth] Restoring original profile')
+      
+      // Restore original profile when impersonation stops
+      setProfile(originalProfile)
+      setOriginalProfile(null)
+    }
+  }, [isImpersonating, impersonatedUser, originalAdmin, originalProfile])
+
+  useEffect(() => {
+    console.log('🔐 [useAuth] Initializing auth hook')
+    
+    const initializeAuth = async () => {
+      try {
+        // Session-first pattern: Get session immediately, defer profile loading
+        const { data: { session }, error } = await supabase.auth.getSession()
+        
+        if (error) {
+          console.error('🔐 [useAuth] Session error:', error)
+          setAuthError(error.message)
+          setLoading(false)
+          return
+        }
+
+        if (session?.user) {
+          console.log('🔐 [useAuth] Session found, setting user immediately')
+          setUser(session.user)
+          setLoading(false) // ✅ Critical: Set loading false immediately for responsive UI
+          
+          // Load profile asynchronously in background
+          fetchUserProfile(session.user.id)
+        } else {
+          console.log('🔐 [useAuth] No session found')
+          setLoading(false)
+        }
+      } catch (error) {
+        console.error('🔐 [useAuth] Auth initialization failed:', error)
+        setAuthError(error instanceof Error ? error.message : 'Authentication failed')
+        setLoading(false)
+      }
+    }
+
+    initializeAuth()
+
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('🔐 [useAuth] Auth state change:', event, session?.user?.id)
+        
+        try {
+          switch (event) {
+            case 'SIGNED_IN':
+              if (session?.user) {
+                setUser(session.user)
+                setAuthError(null)
+                setIsSigningIn(false)
+                // Load profile asynchronously
+                fetchUserProfile(session.user.id)
+              }
+              break
+              
+            case 'SIGNED_OUT':
+              setUser(null)
+              setProfile(null)
+              setOriginalProfile(null)
+              setAuthError(null)
+              setIsSigningIn(false)
+              break
+              
+            case 'TOKEN_REFRESHED':
+              if (session?.user) {
+                setUser(session.user)
+              }
+              break
+              
+            case 'USER_UPDATED':
+              if (session?.user) {
+                setUser(session.user)
+                fetchUserProfile(session.user.id)
+              }
+              break
+          }
+        } catch (error) {
+          console.error('🔐 [useAuth] Error handling auth state change:', error)
+          setAuthError(error instanceof Error ? error.message : 'Authentication error')
+        }
+      }
+    )
+
+    return () => subscription.unsubscribe()
+  }, []) // ✅ Removed fetchUserProfile dependency to prevent circular re-renders
+
+  const signIn = useCallback(async (email: string, password: string) => {
+    console.log('🔐 [useAuth] Starting sign in')
+    setIsSigningIn(true)
+    setAuthError(null)
+    
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password
+      })
+      
+      if (error) {
+        console.error('🔐 [useAuth] Sign in failed:', error)
+        setAuthError(error.message)
+        setIsSigningIn(false)
+        throw error
+      }
+      
+      console.log('🔐 [useAuth] Sign in successful')
+      // User and profile will be set by the auth state change listener
+      return data
+      
+    } catch (error) {
+      console.error('🔐 [useAuth] Sign in exception:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Sign in failed'
+      setAuthError(errorMessage)
+      setIsSigningIn(false)
+      throw error
+    }
+  }, [])
+
+  const signOut = useCallback(async () => {
+    console.log('🔐 [useAuth] Signing out')
+    try {
+      const { error } = await supabase.auth.signOut()
+      if (error) {
+        console.error('🔐 [useAuth] Sign out error:', error)
+      }
+    } catch (error) {
+      console.error('🔐 [useAuth] Sign out exception:', error)
+    }
+  }, [])
+
+  const getAccessToken = useCallback(async () => {
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession()
+      
+      if (error) {
+        console.error('🔐 [useAuth] Token fetch error:', error)
+        return null
+      }
+      
+      if (!session?.access_token) {
+        console.warn('🔐 [useAuth] No access token available')
+        return null
+      }
+      
+      return session.access_token
+    } catch (error) {
+      console.error('🔐 [useAuth] Get access token error:', error)
+      return null
+    }
+  }, [])
+
+  const clearAuthError = useCallback(() => {
+    setAuthError(null)
+  }, [])
+
+  const clearStaleSession = useCallback(async () => {
+    console.log('🔐 [useAuth] Clearing stale session')
+    try {
+      await supabase.auth.signOut()
+      setUser(null)
+      setProfile(null)
+      setOriginalProfile(null)
+      setAuthError(null)
+    } catch (error) {
+      console.error('🔐 [useAuth] Error clearing session:', error)
+      setAuthError('Failed to clear session')
+    }
+  }, [])
+
+  return {
+    // Core auth state
+    user,
+    profile,
+    loading,
+    authError,
+    
+    // Auth actions
+    signIn,
+    signOut,
+    getAccessToken,
+    clearAuthError,
+    clearStaleSession,
+    
+    // Impersonation system
+    isImpersonating,
+    impersonatedUser,
+    originalAdmin,
+    originalProfile,
+    stopImpersonation,
+    canImpersonate,
+    
+    // Simplified auth state - compatible with existing components
+    isAuthenticated: !!user && !!profile && profile.is_active,
+    authState: isSigningIn ? 'loading' : 
+               loading ? 'recovering' :
+               (user && profile) ? 'authenticated' : 'idle',
+    isError: !!authError,
+    isRecoveringSession: loading && !isSigningIn,
+    isUserInitiated: isSigningIn,
+    sessionState: isSigningIn ? 'signing_in' : 
+                  loading ? 'checking' :
+                  (user && profile) ? 'authenticated' : 'idle',
+    
+    // Role checks (based on current effective profile - original or impersonated)
+    isManagement: profile ? ['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'].includes(profile.role) : false,
+    isProjectRole: profile ? ['project_manager', 'architect', 'technical_engineer'].includes(profile.role) : false,
+    isPurchaseRole: profile ? ['purchase_director', 'purchase_specialist'].includes(profile.role) : false,
+    isFieldRole: profile ? ['field_worker'].includes(profile.role) : false,
+    isExternalRole: profile ? ['client'].includes(profile.role) : false,
+    
+    // Simplified debug info
+    debugInfo: {
+      authState: isSigningIn ? 'signing_in' : loading ? 'checking' : (user && profile) ? 'authenticated' : 'idle',
+      recoveryAttempts: 0,
+      hasError: !!authError,
+      errorCode: authError ? 'AUTH_ERROR' : undefined,
+      isRecovering: loading && !isSigningIn,
+      isUserInitiated: isSigningIn,
+      sessionState: isSigningIn ? 'signing_in' : loading ? 'checking' : (user && profile) ? 'authenticated' : 'idle',
+      isImpersonating,
+      impersonatedUserEmail: impersonatedUser?.email,
+      originalAdminEmail: originalAdmin?.email
+    }
+  }
+}
+
+/**
+ * Enhanced Auth hook using advanced API query patterns
+ * This demonstrates the optimized approach with intelligent caching and real-time updates
+ */
+export function useAuthAdvanced() {
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [authError, setAuthError] = useState<string | null>(null)
+
+  // Use advanced API query for user profile
+  const {
+    data: profile,
+    loading: profileLoading,
+    error: profileError,
+    refetch: refetchProfile,
+    mutate: mutateProfile
+  } = useAdvancedApiQuery<UserProfile | null>({
+    queryKey: ['user-profile', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null
+
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single()
+
+      if (error) {
+        console.error('Error fetching profile:', error)
+        return null
+      }
+
+      return data as UserProfile
+    },
+    enabled: !!user?.id,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    cacheTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnWindowFocus: false,
+    refetchInterval: false // Profile doesn't change often
+  })
+
+  // Enhanced authentication state management
+  useEffect(() => {
+    let mounted = true
+
+    const initializeAuth = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession()
+
+        if (error) {
+          console.error('Error getting session:', error)
+          setAuthError(error.message)
+        } else {
+          setUser(session?.user ?? null)
+        }
+      } catch (error) {
+        console.error('Auth initialization error:', error)
+        setAuthError('Failed to initialize authentication')
+      } finally {
+        if (mounted) {
+          setLoading(false)
+        }
+      }
+    }
+
+    initializeAuth()
+
+    // Enhanced auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (!mounted) return
+
+        console.log('Auth state changed:', event)
+
+        setUser(session?.user ?? null)
+        setAuthError(null)
+
+        // Invalidate profile cache on auth changes
+        if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+          mutateProfile()
+        }
+      }
+    )
+
+    return () => {
+      mounted = false
+      subscription.unsubscribe()
+    }
+  }, [mutateProfile])
+
+  // Enhanced sign in with caching
+  const signIn = useCallback(async (email: string, password: string) => {
+    try {
+      setAuthError(null)
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      })
+
+      if (error) {
+        setAuthError(error.message)
+        return { success: false, error: error.message }
+      }
+
+      // Preload profile data
+      if (data.user) {
+        refetchProfile()
+      }
+
+      return { success: true, user: data.user }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Sign in failed'
+      setAuthError(message)
+      return { success: false, error: message }
+    }
+  }, [refetchProfile])
+
+  // Enhanced sign out with cache cleanup
+  const signOut = useCallback(async () => {
+    try {
+      setAuthError(null)
+      const { error } = await supabase.auth.signOut()
+
+      if (error) {
+        setAuthError(error.message)
+        return { success: false, error: error.message }
+      }
+
+      // Clear profile cache
+      mutateProfile()
+
+      return { success: true }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Sign out failed'
+      setAuthError(message)
+      return { success: false, error: message }
+    }
+  }, [mutateProfile])
+
+  return {
+    // Core auth state
+    user,
+    profile,
+    loading: loading || profileLoading,
+    authError: authError || profileError,
+
+    // Loading states
+    authLoading: loading,
+    profileLoading,
+
+    // Actions
+    signIn,
+    signOut,
+    refetchProfile,
+    mutateProfile,
+
+    // Computed values
+    isAuthenticated: !!user,
+    hasProfile: !!profile,
+    userRole: profile?.role as UserRole,
+
+    // Enhanced debugging
+    debugInfo: {
+      userId: user?.id,
+      profileId: profile?.id,
+      hasSession: !!user,
+      hasProfile: !!profile
+    }
+  }
+}

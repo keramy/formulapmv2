@@ -149,7 +149,9 @@ export const GET = withAuth(async (request: NextRequest, context: { params: Prom
       }
 
       if (filters.search) {
-        query = query.or(`name.ilike.%${filters.search}%,description.ilike.%${filters.search}%,category.ilike.%${filters.search}%,brand.ilike.%${filters.search}%`)
+        // Sanitize search input to prevent SQL injection
+        const sanitizedSearch = filters.search.replace(/[%_\\]/g, '\\$&').substring(0, 100)
+        query = query.or(`name.ilike.%${sanitizedSearch}%,description.ilike.%${sanitizedSearch}%,category.ilike.%${sanitizedSearch}%,brand.ilike.%${sanitizedSearch}%`)
       }
 
       if (filters.created_by) {
@@ -496,7 +498,7 @@ export const POST = withAuth(async (request: NextRequest, context: { params: Pro
 async function verifyProjectAccess(supabase: any, user: any, projectId: string): Promise<boolean> {
   try {
     // Management roles can access all projects
-    if (['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'].includes(user.role)) {
+    if (['management', 'management', 'management', 'technical_lead', 'admin'].includes(user.role)) {
       return true
     }
 
