@@ -14,14 +14,17 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  // Suppress hydration warnings caused by browser extensions
+  // Suppress hydration warnings caused by browser extensions and performance optimizations
   experimental: {
-    optimizePackageImports: ['@radix-ui/react-icons'],
+    optimizePackageImports: ['@radix-ui/react-icons', '@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', 'lucide-react'],
+    optimizeCss: true,
   },
   // Additional options to reduce hydration warnings
   poweredByHeader: false,
+  compress: true,
   // Bundle analysis and performance optimizations
-  webpack: (config, { isServer }) => {
+  webpack: (config, { dev, isServer }) => {
+    // Bundle analyzer for production analysis
     if (process.env.ANALYZE === 'true') {
       const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
       config.plugins.push(
@@ -32,9 +35,29 @@ const nextConfig = {
         })
       )
     }
+    
+    // Performance optimizations for development
+    if (dev && !isServer) {
+      config.optimization.splitChunks = {
+        chunks: 'all',
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all',
+          },
+          common: {
+            name: 'common',
+            minChunks: 2,
+            chunks: 'all',
+            enforce: true,
+          },
+        },
+      }
+    }
+    
     return config
   },
-  compress: true,
   // Security headers
   async headers() {
     return [
@@ -67,38 +90,6 @@ const nextConfig = {
       },
     ]
   },
-}
-
-
-// Performance optimizations
-const nextConfig = {
-  ...nextConfig,
-  experimental: {
-    optimizeCss: true,
-    optimizePackageImports: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', 'lucide-react']
-  },
-  webpack: (config, { dev, isServer }) => {
-    // Bundle analyzer in development
-    if (dev && !isServer) {
-      config.optimization.splitChunks = {
-        chunks: 'all',
-        cacheGroups: {
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
-          },
-          common: {
-            name: 'common',
-            minChunks: 2,
-            chunks: 'all',
-            enforce: true,
-          },
-        },
-      }
-    }
-    return config
-  }
 }
 
 

@@ -56,8 +56,7 @@ const LoginForm = ({
     if (authError) {
       clearAuthError()
     }
-  }, []
-  // TODO: Review dependencies - potential deps: Clear, any, existing)
+  }, []) // TODO: Review dependencies - potential deps: clearAuthError, authError
 
   // Simplified authentication success handling
   useEffect(() => {

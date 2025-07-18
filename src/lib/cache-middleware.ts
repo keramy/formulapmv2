@@ -148,8 +148,84 @@ export async function invalidateCache(patterns: string[]) {
   }
 }
 
-// Cache key generator
+// Enhanced cache key generators
 export function generateCacheKey(endpoint: string, userId: string, params?: Record<string, any>): string {
   const paramString = params ? JSON.stringify(params) : ''
   return `${endpoint}:${userId}:${Buffer.from(paramString).toString('base64')}`
+}
+
+export const cacheKeys = {
+  userProfile: (userId: string) => `user:profile:${userId}`,
+  userPermissions: (role: string) => `permissions:${role}`,
+  userToken: (token: string) => `token:${token}`,
+  apiResponse: (endpoint: string, params: string) => `api:${endpoint}:${params}`,
+  queryResult: (table: string, query: string) => `query:${table}:${query}`
+}
+
+// Authentication caching functions
+export async function getCachedUserProfile(userId: string): Promise<any | null> {
+  try {
+    const cached = await redis.get(cacheKeys.userProfile(userId))
+    return cached ? JSON.parse(cached) : null
+  } catch (error) {
+    console.error('Error getting cached user profile:', error)
+    return null
+  }
+}
+
+export async function setCachedUserProfile(userId: string, profile: any, ttl: number = 3600): Promise<void> {
+  try {
+    await redis.setex(cacheKeys.userProfile(userId), ttl, JSON.stringify(profile))
+  } catch (error) {
+    console.error('Error setting cached user profile:', error)
+  }
+}
+
+export async function getCachedUserPermissions(role: string): Promise<string[] | null> {
+  try {
+    const cached = await redis.get(cacheKeys.userPermissions(role))
+    return cached ? JSON.parse(cached) : null
+  } catch (error) {
+    console.error('Error getting cached user permissions:', error)
+    return null
+  }
+}
+
+export async function setCachedUserPermissions(role: string, permissions: string[], ttl: number = 86400): Promise<void> {
+  try {
+    await redis.setex(cacheKeys.userPermissions(role), ttl, JSON.stringify(permissions))
+  } catch (error) {
+    console.error('Error setting cached user permissions:', error)
+  }
+}
+
+export async function getCachedToken(token: string): Promise<any | null> {
+  try {
+    const cached = await redis.get(cacheKeys.userToken(token))
+    return cached ? JSON.parse(cached) : null
+  } catch (error) {
+    console.error('Error getting cached token:', error)
+    return null
+  }
+}
+
+export async function setCachedToken(token: string, user: any, ttl: number = 600): Promise<void> {
+  try {
+    await redis.setex(cacheKeys.userToken(token), ttl, JSON.stringify(user))
+  } catch (error) {
+    console.error('Error setting cached token:', error)
+  }
+}
+
+export async function invalidateUserCache(userId: string): Promise<void> {
+  try {
+    await redis.del(cacheKeys.userProfile(userId))
+    // Also invalidate any API responses for this user
+    const keys = await redis.keys(`*:${userId}:*`)
+    if (keys.length > 0) {
+      await redis.del(...keys)
+    }
+  } catch (error) {
+    console.error('Error invalidating user cache:', error)
+  }
 }

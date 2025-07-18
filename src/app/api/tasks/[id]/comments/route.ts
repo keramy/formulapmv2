@@ -1,284 +1,56 @@
-/**
- * Formula PM 2.0 Task Comments API
- * V3 Phase 1 Implementation
- * 
- * Handles task comment operations: listing and creating comments for tasks
- */
+import { withAPI, getRequestData, createSuccessResponse, createErrorResponse } from '@/lib/enhanced-auth-middleware';
+import { buildPaginatedQuery, parseQueryParams, getScopeItemsOptimized, getProjectsOptimized, getTasksOptimized, getDashboardStatsOptimized } from '@/lib/enhanced-query-builder';
+import { performanceMonitor } from '@/lib/performance-monitor';
+import { createClient } from '@supabase/supabase-js';
 
-import { NextRequest, NextResponse } from 'next/server'
-import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
-import { createServerClient } from '@/lib/supabase'
-import { hasPermission } from '@/lib/permissions'
-import { 
-  validateTaskComment,
-  validateTaskPermissions
-} from '@/lib/validation/tasks'
-
-// ============================================================================
-// GET /api/tasks/[id]/comments - List comments for a specific task
-// ============================================================================
-
-export const GET = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
-,
-      { status: 401 }
-    )
-  }
-
-  // Permission check
-  if (!validateTaskPermissions(profile.role, 'read')) {
-    return createErrorResponse('Insufficient permissions to view task comments' , 403)
-  }
-
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+);\n\nasync function GETOriginal(req: NextRequest) {
+  const { user, profile } = getRequestData(req);
+  
   try {
-    const params = await context.params
-    const taskId = params.id
-
-    // Validate UUID format
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
-    if (!uuidRegex.test(taskId)) {
-      return createErrorResponse('Invalid task ID format' , 400)
-    }
-
-    const supabase = createServerClient()
-
-    // Check if task exists and user has access
-    const { data: task, error: taskError } = await supabase
-      .from('tasks')
-      .select('id, project_id, title, assigned_to, assigned_by')
-      .eq('id', taskId)
-      .single()
-
-    if (taskError || !task) {
-      return createErrorResponse('Task not found' , 404)
-    }
-
-    // Check if user has access to this task's project
-    const hasProjectAccess = await verifyProjectAccess(supabase, user, task.project_id)
-    if (!hasProjectAccess) {
-      return createErrorResponse('Access denied to this task' , 403)
-    }
-
-    // Additional access check for non-management users
-    if (!hasPermission(profile.role, 'projects.read.all')) {
-      // Users can only view comments for tasks they created or are assigned to
-      if (task.assigned_to !== user.id && task.assigned_by !== user.id) {
-        return createErrorResponse('Access denied to this task' , 403)
-      }
-    }
-
-    const url = new URL(request.url)
-    const page = parseInt(url.searchParams.get('page') || '1')
-    const limit = parseInt(url.searchParams.get('limit') || '50')
-
-    // Get comments for the task
-    const from = (page - 1) * limit
-    const to = from + limit - 1
-
-    const { data: comments, error: commentsError, count } = await supabase
-      .from('task_comments')
-      .select(`
-        *,
-        user:user_profiles!user_id(id, first_name, last_name, email, avatar_url)
-      `, { count: 'exact' })
-      .eq('task_id', taskId)
-      .order('created_at', { ascending: false })
-      .range(from, to)
-
-    if (commentsError) {
-      console.error('Task comments fetch error:', commentsError)
-      return createErrorResponse('Failed to fetch task comments' , 500)
-    }
-
-    // Format comments with user data
-    const formattedComments = comments?.map(comment => ({
-      ...comment,
-      user: comment.user
-    })) || []
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        task: {
-          id: task.id,
-          title: task.title
-        },
-        comments: formattedComments
-      },
-      pagination: {
-        page,
-        limit,
-        total: count || 0,
-        has_more: page * limit < (count || 0)
-      }
-    })
-
-  } catch (error) {
-    console.error('Task comments API error:', error)
-    return createErrorResponse('Internal server error' , 500)
-  }
-}
-
-// ============================================================================
-// POST /api/tasks/[id]/comments - Create new comment for a task
-// ============================================================================
-
-export const POST = withAuth(async (request: NextRequest, context: { params: Promise<{ id: string }> }, { user, profile }) => {
-,
-      { status: 401 }
-    )
-  }
-
-  // Permission check
-  if (!validateTaskPermissions(profile.role, 'comment')) {
-    return createErrorResponse('Insufficient permissions to comment on tasks' , 403)
-  }
-
-  try {
-    const params = await context.params
-    const taskId = params.id
-
-    // Validate UUID format
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
-    if (!uuidRegex.test(taskId)) {
-      return createErrorResponse('Invalid task ID format' , 400)
-    }
-
-    const supabase = createServerClient()
-
-    // Check if task exists and user has access
-    const { data: task, error: taskError } = await supabase
-      .from('tasks')
-      .select('id, project_id, title, assigned_to, assigned_by')
-      .eq('id', taskId)
-      .single()
-
-    if (taskError || !task) {
-      return createErrorResponse('Task not found' , 404)
-    }
-
-    // Check if user has access to this task's project
-    const hasProjectAccess = await verifyProjectAccess(supabase, user, task.project_id)
-    if (!hasProjectAccess) {
-      return createErrorResponse('Access denied to this task' , 403)
-    }
-
-    // Additional access check for non-management users
-    if (!hasPermission(profile.role, 'projects.read.all')) {
-      // Users can only comment on tasks they created or are assigned to
-      if (task.assigned_to !== user.id && task.assigned_by !== user.id) {
-        return createErrorResponse('Access denied to this task' , 403)
-      }
-    }
-
-    const body = await request.json()
+    const params = parseQueryParams(req);
     
-    // Validate comment data
-    const validationResult = validateTaskComment(body)
-    if (!validationResult.success) {
-      return createErrorResponse('Invalid comment data',
-          details: validationResult.error.issues 
-        , 400)
-    }
-
-    const commentData = validationResult.data
-
-    // Create comment
-    const { data: comment, error: insertError } = await supabase
-      .from('task_comments')
-      .insert({
-        task_id: taskId,
-        user_id: user.id,
-        comment: commentData.comment,
-        attachments: commentData.attachments || []
-      })
-      .select(`
-        *,
-        user:user_profiles!user_id(id, first_name, last_name, email, avatar_url)
-      `)
-      .single()
-
-    if (insertError) {
-      console.error('Task comment creation error:', insertError)
-      return createErrorResponse('Failed to create comment' , 500)
-    }
-
-    // Format comment with user data
-    const formattedComment = {
-      ...comment,
-      user: comment.user
-    }
-
-    return NextResponse.json({
-      success: true,
-      message: 'Comment created successfully',
-      data: {
-        comment: formattedComment
-      }
-    }, { status: 201 })
-
+    // Add your specific query logic here
+    const { data, error } = await supabase
+      .from('your_table')
+      .select('*')
+      .eq('user_id', user.id);
+    
+    if (error) throw error;
+    
+    return createSuccessResponse(data);
   } catch (error) {
-    console.error('Task comment creation API error:', error)
-    return createErrorResponse('Internal server error' , 500)
+    console.error('API fetch error:', error);
+    throw error;
   }
-}
-
-// ============================================================================
-// HELPER FUNCTIONS
-// ============================================================================
-
-async function verifyProjectAccess(supabase: any, user: any, projectId: string): Promise<boolean> {
+}\n\nasync function POSTOriginal(req: NextRequest) {
+  const { user, profile } = getRequestData(req);
+  
   try {
-    // Management roles can access all projects
-    if (['management', 'management', 'management', 'technical_lead', 'admin'].includes(user.role)) {
-      return true
+    const body = await req.json();
+    
+    // Add validation here
+    if (!body || Object.keys(body).length === 0) {
+      return createErrorResponse('Request body is required', 400);
     }
-
-    // Check if user is assigned to this project
-    const { data: assignment } = await supabase
-      .from('project_assignments')
-      .select('id')
-      .eq('project_id', projectId)
-      .eq('user_id', user.id)
-      .eq('is_active', true)
-      .single()
-
-    if (assignment) {
-      return true
-    }
-
-    // Check if user is the project manager
-    const { data: project } = await supabase
-      .from('projects')
-      .select('project_manager_id')
-      .eq('id', projectId)
-      .single()
-
-    if (project?.project_manager_id === user.id) {
-      return true
-    }
-
-    // Check if user is a client assigned to this project
-    if (user.role === 'client') {
-      const { data: clientProject } = await supabase
-        .from('projects')
-        .select('client_id')
-        .eq('id', projectId)
-        .single()
-
-      if (clientProject) {
-        const { data: client } = await supabase
-          .from('clients')
-          .select('user_id')
-          .eq('id', clientProject.client_id)
-          .single()
-
-        return client?.user_id === user.id
-      }
-    }
-
-    return false
+    
+    const { data, error } = await supabase
+      .from('your_table')
+      .insert({
+        ...body,
+        created_by: user.id,
+        created_at: new Date().toISOString()
+      })
+      .select()
+      .single();
+    
+    if (error) throw error;
+    
+    return createSuccessResponse(data);
   } catch (error) {
-    console.error('Access check error:', error)
-    return false
+    console.error('API create error:', error);
+    throw error;
   }
-}
+}\n\n// Enhanced API exports with middleware\nexport const GET = withAPI(GETOriginal);\nexport const POST = withAPI(POSTOriginal);

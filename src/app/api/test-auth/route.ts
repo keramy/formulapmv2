@@ -1,23 +1,28 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
+import { withAPI, getRequestData, createSuccessResponse, createErrorResponse } from '@/lib/enhanced-auth-middleware';
+import { buildPaginatedQuery, parseQueryParams, getScopeItemsOptimized, getProjectsOptimized, getTasksOptimized, getDashboardStatsOptimized } from '@/lib/enhanced-query-builder';
+import { performanceMonitor } from '@/lib/performance-monitor';
+import { createClient } from '@supabase/supabase-js';
 
-export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
-  console.log('🔍 Test Auth Endpoint Called')
-  console.log('Headers:', Object.fromEntries(request.headers.entries()))
-return NextResponse.json({
-    timestamp: new Date().toISOString(),
-    authResult: {
-      hasUser: !!user,
-      userId: user?.id,
-      userEmail: user?.email,
-      hasProfile: !!profile,
-      profileId: profile?.id,
-      profileRole: profile?.role,
-      error: error
-    },
-    headers: {
-      authorization: request.headers.get('authorization')?.substring(0, 50) + '...',
-      userAgent: request.headers.get('user-agent')
-    }
-  })
-})
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+);\n\nasync function GETOriginal(req: NextRequest) {
+  const { user, profile } = getRequestData(req);
+  
+  try {
+    const params = parseQueryParams(req);
+    
+    // Add your specific query logic here
+    const { data, error } = await supabase
+      .from('your_table')
+      .select('*')
+      .eq('user_id', user.id);
+    
+    if (error) throw error;
+    
+    return createSuccessResponse(data);
+  } catch (error) {
+    console.error('API fetch error:', error);
+    throw error;
+  }
+}\n\n// Enhanced API exports with middleware\nexport const GET = withAPI(GETOriginal);

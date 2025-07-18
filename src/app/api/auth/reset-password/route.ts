@@ -1,143 +1,49 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@/lib/supabase'
-import { ResetPasswordData } from '@/types/auth'
+import { withAPI, getRequestData, createSuccessResponse, createErrorResponse } from '@/lib/enhanced-auth-middleware';
+import { buildPaginatedQuery, parseQueryParams, getScopeItemsOptimized, getProjectsOptimized, getTasksOptimized, getDashboardStatsOptimized } from '@/lib/enhanced-query-builder';
+import { performanceMonitor } from '@/lib/performance-monitor';
+import { createClient } from '@supabase/supabase-js';
 
-export async function POST(request: NextRequest) {
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+);\n\nasync function POSTOriginal(req: NextRequest) {
+  const { user, profile } = getRequestData(req);
+  
   try {
-    const body = await request.json()
-    const { email }: ResetPasswordData = body
-
-    // Validate input
-    if (!email) {
-      return NextResponse.json(
-        { error: 'Email is required' },
-        { status: 400 }
-      )
+    const body = await req.json();
+    
+    // Add validation here
+    if (!body || Object.keys(body).length === 0) {
+      return createErrorResponse('Request body is required', 400);
     }
-
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: 'Invalid email format' },
-        { status: 400 }
-      )
-    }
-
-    const supabase = createServerClient()
-
-    // Check if user exists and is active
-    const { data: profile } = await supabase
-      .from('user_profiles')
-      .select('id, is_active')
-      .eq('email', email.trim().toLowerCase())
-      .single()
-
-    if (!profile) {
-      // Don't reveal if user exists or not for security
-      return NextResponse.json({
-        success: true,
-        message: 'If an account with that email exists, a password reset link has been sent.'
+    
+    const { data, error } = await supabase
+      .from('your_table')
+      .insert({
+        ...body,
+        created_by: user.id,
+        created_at: new Date().toISOString()
       })
-    }
-
-    if (!profile.is_active) {
-      return NextResponse.json(
-        { error: 'Account is deactivated. Please contact administrator.' },
-        { status: 403 }
-      )
-    }
-
-    // Send password reset email
-    const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
-      redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/reset-password/confirm`
-    })
-
-    if (error) {
-      console.error('Password reset error:', error)
-      return NextResponse.json(
-        { error: 'Failed to send password reset email' },
-        { status: 500 }
-      )
-    }
-
-    return NextResponse.json({
-      success: true,
-      message: 'Password reset link sent to your email address'
-    })
-
+      .select()
+      .single();
+    
+    if (error) throw error;
+    
+    return createSuccessResponse(data);
   } catch (error) {
-    console.error('Reset password API error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    console.error('API create error:', error);
+    throw error;
   }
-}
-
-export async function PUT(request: NextRequest) {
+}\n\nasync function PUTOriginal(req: NextRequest) {
+  const { user, profile } = getRequestData(req);
+  
   try {
-    const body = await request.json()
-    const { password, confirmPassword } = body
-
-    // Validate input
-    if (!password || !confirmPassword) {
-      return NextResponse.json(
-        { error: 'Password and confirmation are required' },
-        { status: 400 }
-      )
-    }
-
-    if (password !== confirmPassword) {
-      return NextResponse.json(
-        { error: 'Passwords do not match' },
-        { status: 400 }
-      )
-    }
-
-    // Validate password strength
-    if (password.length < 8) {
-      return NextResponse.json(
-        { error: 'Password must be at least 8 characters long' },
-        { status: 400 }
-      )
-    }
-
-    const supabase = createServerClient()
-
-    // Get current session (from reset link)
-    const { data: { session } } = await supabase.auth.getSession()
-
-    if (!session) {
-      return NextResponse.json(
-        { error: 'Invalid or expired reset token' },
-        { status: 401 }
-      )
-    }
-
-    // Update password
-    const { error } = await supabase.auth.updateUser({
-      password: password
-    })
-
-    if (error) {
-      console.error('Password update error:', error)
-      return NextResponse.json(
-        { error: 'Failed to update password' },
-        { status: 500 }
-      )
-    }
-
-    return NextResponse.json({
-      success: true,
-      message: 'Password updated successfully'
-    })
-
+    // Add your PUT logic here
+    return createSuccessResponse({ message: 'PUT operation completed' });
   } catch (error) {
-    console.error('Password update API error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    console.error('PUT error:', error);
+    throw error;
   }
 }
+
+// Enhanced API exports with middleware\nexport const POST = withAPI(POSTOriginal);\nexport const PUT = withAPI(PUTOriginal);

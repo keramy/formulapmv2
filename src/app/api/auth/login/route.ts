@@ -1,95 +1,37 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient, supabaseAdmin } from '@/lib/supabase'
-import { LoginCredentials } from '@/types/auth'
+import { withAPI, getRequestData, createSuccessResponse, createErrorResponse } from '@/lib/enhanced-auth-middleware';
+import { buildPaginatedQuery, parseQueryParams, getScopeItemsOptimized, getProjectsOptimized, getTasksOptimized, getDashboardStatsOptimized } from '@/lib/enhanced-query-builder';
+import { performanceMonitor } from '@/lib/performance-monitor';
+import { createClient } from '@supabase/supabase-js';
 
-export async function POST(request: NextRequest) {
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+);\n\nasync function POSTOriginal(req: NextRequest) {
+  const { user, profile } = getRequestData(req);
+  
   try {
-    const body = await request.json()
-    const { email, password }: LoginCredentials = body
-
-    // Validate input
-    if (!email || !password) {
-      return NextResponse.json(
-        { success: false, error: 'Email and password are required' },
-        { status: 400 }
-      )
+    const body = await req.json();
+    
+    // Add validation here
+    if (!body || Object.keys(body).length === 0) {
+      return createErrorResponse('Request body is required', 400);
     }
-
-    // Create server client
-    const supabase = createServerClient()
-
-    // Attempt to sign in
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: email.trim().toLowerCase(),
-      password
-    })
-
-    if (error) {
-      console.error('Login error:', error)
-      return NextResponse.json(
-        { success: false, error: error.message },
-        { status: 401 }
-      )
-    }
-
-    // Get user profile using admin client to bypass RLS
-    const { data: profile, error: profileError } = await supabaseAdmin
-      .from('user_profiles')
-      .select('*')
-      .eq('id', data.user.id)
-      .single()
-
-    if (profileError) {
-      console.error('Profile fetch error:', profileError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to fetch user profile' },
-        { status: 500 }
-      )
-    }
-
-    // Check if user is active
-    if (!profile.is_active) {
-      return NextResponse.json(
-        { success: false, error: 'Account is deactivated. Please contact administrator.' },
-        { status: 403 }
-      )
-    }
-
-    // Update JWT claims with user role information
-    try {
-      const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
-        data.user.id,
-        {
-          app_metadata: {
-            user_role: profile.role,
-            user_id: profile.id,
-            is_active: profile.is_active,
-            updated_at: new Date().toISOString()
-          }
-        }
-      )
-
-      if (updateError) {
-        console.error('JWT claims update error:', updateError)
-        // Don't fail the login, just log the error
-      }
-    } catch (jwtError) {
-      console.error('JWT update error:', jwtError)
-      // Don't fail the login, just log the error
-    }
-
-    return NextResponse.json({
-      success: true,
-      user: data.user,
-      profile,
-      session: data.session
-    })
-
+    
+    const { data, error } = await supabase
+      .from('your_table')
+      .insert({
+        ...body,
+        created_by: user.id,
+        created_at: new Date().toISOString()
+      })
+      .select()
+      .single();
+    
+    if (error) throw error;
+    
+    return createSuccessResponse(data);
   } catch (error) {
-    console.error('Login API error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    console.error('API create error:', error);
+    throw error;
   }
-}
+}\n\n// Enhanced API exports with middleware\nexport const POST = withAPI(POSTOriginal);

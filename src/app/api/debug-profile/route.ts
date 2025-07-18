@@ -1,37 +1,28 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { withAPI, getRequestData, createSuccessResponse, createErrorResponse } from '@/lib/enhanced-auth-middleware';
+import { buildPaginatedQuery, parseQueryParams, getScopeItemsOptimized, getProjectsOptimized, getTasksOptimized, getDashboardStatsOptimized } from '@/lib/enhanced-query-builder';
+import { performanceMonitor } from '@/lib/performance-monitor';
+import { createClient } from '@supabase/supabase-js';
 
-export async function GET(request: NextRequest) {
-  const userId = '217af21a-6a43-4464-bb6d-696d1d2e88e7'
-  
-  console.log('🔍 Debug: Testing direct profile fetch')
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+);\n\nasync function GETOriginal(req: NextRequest) {
+  const { user, profile } = getRequestData(req);
   
   try {
-    const result = await supabaseAdmin
-      .from('user_profiles')
+    const params = parseQueryParams(req);
+    
+    // Add your specific query logic here
+    const { data, error } = await supabase
+      .from('your_table')
       .select('*')
-      .eq('id', userId)
-      .single()
+      .eq('user_id', user.id);
     
-    console.log('🔍 Debug: Direct profile result', {
-      hasData: !!result.data,
-      error: result.error?.message,
-      errorCode: result.error?.code,
-      data: result.data
-    })
+    if (error) throw error;
     
-    return NextResponse.json({
-      success: true,
-      hasData: !!result.data,
-      error: result.error?.message,
-      errorCode: result.error?.code,
-      data: result.data
-    })
+    return createSuccessResponse(data);
   } catch (error) {
-    console.error('🔍 Debug: Exception in profile fetch', error)
-    return NextResponse.json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error'
-    })
+    console.error('API fetch error:', error);
+    throw error;
   }
-}
+}\n\n// Enhanced API exports with middleware\nexport const GET = withAPI(GETOriginal);

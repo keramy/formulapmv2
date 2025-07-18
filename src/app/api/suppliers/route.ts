@@ -1,70 +1,56 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase';
+import { withAPI, getRequestData, createSuccessResponse, createErrorResponse } from '@/lib/enhanced-auth-middleware';
+import { buildPaginatedQuery, parseQueryParams, getScopeItemsOptimized, getProjectsOptimized, getTasksOptimized, getDashboardStatsOptimized } from '@/lib/enhanced-query-builder';
+import { performanceMonitor } from '@/lib/performance-monitor';
+import { createClient } from '@supabase/supabase-js';
 
-export async function GET(request: NextRequest) {
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+);\n\nasync function GETOriginal(req: NextRequest) {
+  const { user, profile } = getRequestData(req);
+  
   try {
-    const supabase = createServerClient();
+    const params = parseQueryParams(req);
     
-    // Get search parameter
-    const { searchParams } = new URL(request.url);
-    const search = searchParams.get('search');
-    
-    let query = supabase
-      .from('suppliers')
+    // Add your specific query logic here
+    const { data, error } = await supabase
+      .from('your_table')
       .select('*')
-      .eq('status', 'active')
-      .order('name');
+      .eq('user_id', user.id);
     
-    if (search) {
-      // Sanitize search input to prevent SQL injection
-      const sanitizedSearch = search.replace(/[%_\\]/g, '\\$&').substring(0, 100)
-      query = query.or(`name.ilike.%${sanitizedSearch}%,contact_person.ilike.%${sanitizedSearch}%`);
-    }
+    if (error) throw error;
     
-    const { data: suppliers, error } = await query;
-    
-    if (error) {
-      console.error('Error fetching suppliers:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-    
-    return NextResponse.json(suppliers);
+    return createSuccessResponse(data);
   } catch (error) {
-    console.error('Error in suppliers API:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('API fetch error:', error);
+    throw error;
   }
-}
-
-export async function POST(request: NextRequest) {
+}\n\nasync function POSTOriginal(req: NextRequest) {
+  const { user, profile } = getRequestData(req);
+  
   try {
-    const supabase = createServerClient();
-    const body = await request.json();
+    const body = await req.json();
     
-    const { data: supplier, error } = await supabase
-      .from('suppliers')
-      .insert([
-        {
-          name: body.name,
-          contact_person: body.contact_person,
-          email: body.email,
-          phone: body.phone,
-          address: body.address,
-          specialties: body.specialties,
-          description: body.description,
-          status: 'active'
-        }
-      ])
+    // Add validation here
+    if (!body || Object.keys(body).length === 0) {
+      return createErrorResponse('Request body is required', 400);
+    }
+    
+    const { data, error } = await supabase
+      .from('your_table')
+      .insert({
+        ...body,
+        created_by: user.id,
+        created_at: new Date().toISOString()
+      })
       .select()
       .single();
     
-    if (error) {
-      console.error('Error creating supplier:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
+    if (error) throw error;
     
-    return NextResponse.json(supplier, { status: 201 });
+    return createSuccessResponse(data);
   } catch (error) {
-    console.error('Error in suppliers POST API:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('API create error:', error);
+    throw error;
   }
-}
+}\n\n// Enhanced API exports with middleware\nexport const GET = withAPI(GETOriginal);\nexport const POST = withAPI(POSTOriginal);

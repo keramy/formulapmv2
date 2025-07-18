@@ -1,0 +1,5663 @@
+{
+  "summary": {
+    "totalRoutes": 57,
+    "routesAnalyzed": 57,
+    "bottlenecksFound": 0,
+    "highSeverityIssues": 56,
+    "analysisTime": "2025-07-17T19:48:38.577Z"
+  },
+  "routes": {
+    "src\\app\\api\\admin\\auth-state\\route.ts": {
+      "path": "src\\app\\api\\admin\\auth-state\\route.ts",
+      "size": 6012,
+      "lines": 196,
+      "methods": [
+        "GET"
+      ],
+      "issues": [
+        {
+          "type": "heavyComputations",
+          "count": 3,
+          "severity": "medium",
+          "description": "Heavy computational operations in request handler",
+          "examples": [
+            "    const userIds = [...new Set(metrics.recentFailures.map(f => f.userId).filter(",
+            "JSON.parse",
+            "JSON.parse"
+          ],
+          "recommendation": "Move heavy computations to background jobs"
+        },
+        {
+          "type": "fileOperations",
+          "count": 26,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "stat",
+            "access"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 8,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await supabase.auth.getUser(token)",
+            "await supabase",
+            "await supabase"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 4,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "export async function GET(",
+            "sync function getRecentFailedUsers(",
+            "sync function getCircuitBreakerStats("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 167,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\admin\\create-test-users\\route.ts": {
+      "path": "src\\app\\api\\admin\\create-test-users\\route.ts",
+      "size": 5178,
+      "lines": 177,
+      "methods": [
+        "POST"
+      ],
+      "issues": [
+        {
+          "type": "missingPagination",
+          "count": 1,
+          "severity": "high",
+          "description": "Missing pagination on potentially large datasets",
+          "examples": [
+            ".select()"
+          ],
+          "recommendation": "Implement pagination with LIMIT and OFFSET"
+        },
+        {
+          "type": "heavyComputations",
+          "count": 1,
+          "severity": "medium",
+          "description": "Heavy computational operations in request handler",
+          "examples": [
+            "    const successCount = results.filter("
+          ],
+          "recommendation": "Move heavy computations to background jobs"
+        },
+        {
+          "type": "fileOperations",
+          "count": 1,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 3,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await supabase.auth.admin.createUser({",
+            "await supabase.auth.admin.listUsers()",
+            "await supabase"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 1,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "export async function POST("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 161,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\admin\\reset-auth\\route.ts": {
+      "path": "src\\app\\api\\admin\\reset-auth\\route.ts",
+      "size": 8793,
+      "lines": 267,
+      "methods": [
+        "POST"
+      ],
+      "issues": [
+        {
+          "type": "heavyComputations",
+          "count": 6,
+          "severity": "medium",
+          "description": "Heavy computational operations in request handler",
+          "examples": [
+            "JSON.stringify",
+            "JSON.parse",
+            "        const filteredEvents = events.filter("
+          ],
+          "recommendation": "Move heavy computations to background jobs"
+        },
+        {
+          "type": "fileOperations",
+          "count": 17,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "access",
+            "stat",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 8,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await supabase.auth.getUser(token)",
+            "await supabase",
+            "await request.json()"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 4,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "export async function POST(",
+            "sync function resetCircuitBreaker(",
+            "sync function clearAuthLoops("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 237,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\admin\\users\\route.ts": {
+      "path": "src\\app\\api\\admin\\users\\route.ts",
+      "size": 5779,
+      "lines": 172,
+      "methods": [
+        "GET"
+      ],
+      "issues": [
+        {
+          "type": "heavyComputations",
+          "count": 5,
+          "severity": "medium",
+          "description": "Heavy computational operations in request handler",
+          "examples": [
+            "      Object.entries(usersByRole).filter(",
+            "    const availableForImpersonation = flatUserList.filter(",
+            "      secureList = availableForImpersonation.filter("
+          ],
+          "recommendation": "Move heavy computations to background jobs"
+        },
+        {
+          "type": "fileOperations",
+          "count": 1,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "access"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 2,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await import('@/lib/supabase')",
+            "await supabaseAdmin"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "large_function",
+          "count": 154,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\auth\\change-password\\route.ts": {
+      "path": "src\\app\\api\\auth\\change-password\\route.ts",
+      "size": 3113,
+      "lines": 89,
+      "methods": [
+        "POST"
+      ],
+      "issues": [
+        {
+          "type": "syncDatabase",
+          "count": 1,
+          "severity": "medium",
+          "description": "Synchronous database operations may block execution",
+          "examples": [
+            "await supabase.auth.updateUser({"
+          ],
+          "recommendation": "Use async/await pattern for all database operations"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 5,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await request.json()",
+            "await supabase.auth.getSession()",
+            "await supabase.auth.signInWithPassword({"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\auth\\diagnostics\\route.ts": {
+      "path": "src\\app\\api\\auth\\diagnostics\\route.ts",
+      "size": 7604,
+      "lines": 219,
+      "methods": [
+        "GET"
+      ],
+      "issues": [
+        {
+          "type": "fileOperations",
+          "count": 4,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "access",
+            "access",
+            "access"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 2,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await supabase.auth.getUser(token)",
+            "await supabase"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 1,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "export async function GET("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 193,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\auth\\login\\route.ts": {
+      "path": "src\\app\\api\\auth\\login\\route.ts",
+      "size": 2680,
+      "lines": 95,
+      "methods": [
+        "POST"
+      ],
+      "issues": [
+        {
+          "type": "syncDatabase",
+          "count": 1,
+          "severity": "medium",
+          "description": "Synchronous database operations may block execution",
+          "examples": [
+            "await supabaseAdmin.auth.admin.updateUserById("
+          ],
+          "recommendation": "Use async/await pattern for all database operations"
+        },
+        {
+          "type": "fileOperations",
+          "count": 5,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "stat",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 4,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await request.json()",
+            "await supabase.auth.signInWithPassword({",
+            "await supabaseAdmin"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 1,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "export async function POST("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\auth\\logout\\route.ts": {
+      "path": "src\\app\\api\\auth\\logout\\route.ts",
+      "size": 915,
+      "lines": 36,
+      "methods": [
+        "POST"
+      ],
+      "issues": [
+        {
+          "type": "fileOperations",
+          "count": 2,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 2,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await supabase.auth.getSession()",
+            "await supabase.auth.signOut()"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 1,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "export async function POST("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\auth\\profile\\route.ts": {
+      "path": "src\\app\\api\\auth\\profile\\route.ts",
+      "size": 4182,
+      "lines": 133,
+      "methods": [
+        "GET",
+        "PUT"
+      ],
+      "issues": [
+        {
+          "type": "missingPagination",
+          "count": 1,
+          "severity": "high",
+          "description": "Missing pagination on potentially large datasets",
+          "examples": [
+            ".select()"
+          ],
+          "recommendation": "Implement pagination with LIMIT and OFFSET"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 5,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await import('@/lib/supabase')",
+            "await supabaseAdmin",
+            "await request.json()"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "large_function",
+          "count": 113,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\auth\\recover-profile\\route.ts": {
+      "path": "src\\app\\api\\auth\\recover-profile\\route.ts",
+      "size": 7279,
+      "lines": 223,
+      "methods": [
+        "POST"
+      ],
+      "issues": [
+        {
+          "type": "missingPagination",
+          "count": 2,
+          "severity": "high",
+          "description": "Missing pagination on potentially large datasets",
+          "examples": [
+            ".select()",
+            ".select()"
+          ],
+          "recommendation": "Implement pagination with LIMIT and OFFSET"
+        },
+        {
+          "type": "fileOperations",
+          "count": 8,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "stat",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 5,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await supabase.auth.getUser(token)",
+            "await supabase",
+            "await import('@/lib/supabase')"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 1,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "export async function POST("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 190,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        },
+        {
+          "type": "missing_transactions",
+          "count": 2,
+          "severity": "high",
+          "description": "Multiple write operations without transactions",
+          "recommendation": "Wrap related database operations in transactions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\auth\\register\\route.ts": {
+      "path": "src\\app\\api\\auth\\register\\route.ts",
+      "size": 4049,
+      "lines": 136,
+      "methods": [
+        "POST"
+      ],
+      "issues": [
+        {
+          "type": "syncDatabase",
+          "count": 1,
+          "severity": "medium",
+          "description": "Synchronous database operations may block execution",
+          "examples": [
+            "await supabase.auth.admin.deleteUser(authData.user.id)"
+          ],
+          "recommendation": "Use async/await pattern for all database operations"
+        },
+        {
+          "type": "fileOperations",
+          "count": 8,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "stat",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 6,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await request.json()",
+            "await import('@/lib/supabase')",
+            "await supabase"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 1,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "export async function POST("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 120,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\auth\\reset-password\\route.ts": {
+      "path": "src\\app\\api\\auth\\reset-password\\route.ts",
+      "size": 3831,
+      "lines": 143,
+      "methods": [
+        "POST",
+        "PUT"
+      ],
+      "issues": [
+        {
+          "type": "syncDatabase",
+          "count": 1,
+          "severity": "medium",
+          "description": "Synchronous database operations may block execution",
+          "examples": [
+            "await supabase.auth.updateUser({"
+          ],
+          "recommendation": "Use async/await pattern for all database operations"
+        },
+        {
+          "type": "fileOperations",
+          "count": 11,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "stat",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 6,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await request.json()",
+            "await supabase",
+            "await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 2,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "export async function POST(",
+            "export async function PUT("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 121,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\dashboard\\activity\\route.ts": {
+      "path": "src\\app\\api\\dashboard\\activity\\route.ts",
+      "size": 1339,
+      "lines": 45,
+      "methods": [
+        "GET"
+      ],
+      "issues": [
+        {
+          "type": "missingErrorHandling",
+          "count": 1,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await supabase"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\dashboard\\comprehensive-stats\\route.ts": {
+      "path": "src\\app\\api\\dashboard\\comprehensive-stats\\route.ts",
+      "size": 3395,
+      "lines": 86,
+      "methods": [
+        "GET"
+      ],
+      "issues": [
+        {
+          "type": "heavyComputations",
+          "count": 2,
+          "severity": "medium",
+          "description": "Heavy computational operations in request handler",
+          "examples": [
+            "    const completedScopeItems = scopeItems?.filter(",
+            "    const overdueScopeItems = scopeItems?.filter("
+          ],
+          "recommendation": "Move heavy computations to background jobs"
+        },
+        {
+          "type": "fileOperations",
+          "count": 8,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "stat",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 2,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await supabase",
+            "await Promise.all(["
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\dashboard\\recent-activity\\route.ts": {
+      "path": "src\\app\\api\\dashboard\\recent-activity\\route.ts",
+      "size": 3926,
+      "lines": 124,
+      "methods": [
+        "GET"
+      ],
+      "issues": [
+        {
+          "type": "heavyComputations",
+          "count": 1,
+          "severity": "medium",
+          "description": "Heavy computational operations in request handler",
+          "examples": [
+            "      .sort("
+          ],
+          "recommendation": "Move heavy computations to background jobs"
+        },
+        {
+          "type": "fileOperations",
+          "count": 13,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "access",
+            "access"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 4,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await supabase",
+            "await projectQuery;",
+            "await scopeQuery;"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "large_function",
+          "count": 106,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\dashboard\\stats\\route.ts": {
+      "path": "src\\app\\api\\dashboard\\stats\\route.ts",
+      "size": 1585,
+      "lines": 50,
+      "methods": [
+        "GET"
+      ],
+      "issues": [
+        {
+          "type": "fileOperations",
+          "count": 11,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "stat",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 1,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await Promise.all(["
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\dashboard\\tasks\\route.ts": {
+      "path": "src\\app\\api\\dashboard\\tasks\\route.ts",
+      "size": 1610,
+      "lines": 48,
+      "methods": [
+        "GET"
+      ],
+      "issues": [
+        {
+          "type": "missingErrorHandling",
+          "count": 1,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await query;"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\debug-profile\\route.ts": {
+      "path": "src\\app\\api\\debug-profile\\route.ts",
+      "size": 1046,
+      "lines": 37,
+      "methods": [
+        "GET"
+      ],
+      "issues": [
+        {
+          "type": "missingErrorHandling",
+          "count": 1,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await supabaseAdmin"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 1,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "export async function GET("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\debug\\create-test-profiles\\route.ts": {
+      "path": "src\\app\\api\\debug\\create-test-profiles\\route.ts",
+      "size": 3048,
+      "lines": 98,
+      "methods": [
+        "POST"
+      ],
+      "issues": [
+        {
+          "type": "missingPagination",
+          "count": 1,
+          "severity": "high",
+          "description": "Missing pagination on potentially large datasets",
+          "examples": [
+            ".select()"
+          ],
+          "recommendation": "Implement pagination with LIMIT and OFFSET"
+        },
+        {
+          "type": "fileOperations",
+          "count": 4,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "stat",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 2,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await supabase",
+            "await supabase"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 1,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "export async function POST("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\material-specs\\[id]\\approve\\route.ts": {
+      "path": "src\\app\\api\\material-specs\\[id]\\approve\\route.ts",
+      "size": 8032,
+      "lines": 227,
+      "methods": [
+        "POST"
+      ],
+      "issues": [
+        {
+          "type": "fileOperations",
+          "count": 16,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "access",
+            "stat",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 10,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await context.params",
+            "await supabase",
+            "await verifyProjectAccess(supabase, user, existingMaterialSpec.project_id)"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 1,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "sync function verifyProjectAccess("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 195,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        },
+        {
+          "type": "missing_transactions",
+          "count": 2,
+          "severity": "high",
+          "description": "Multiple write operations without transactions",
+          "recommendation": "Wrap related database operations in transactions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\material-specs\\[id]\\link-scope\\route.ts": {
+      "path": "src\\app\\api\\material-specs\\[id]\\link-scope\\route.ts",
+      "size": 10062,
+      "lines": 286,
+      "methods": [
+        "POST",
+        "GET"
+      ],
+      "issues": [
+        {
+          "type": "fileOperations",
+          "count": 5,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "access",
+            "stat",
+            "access"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 16,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await context.params",
+            "await supabase",
+            "await verifyProjectAccess(supabase, user, existingMaterialSpec.project_id)"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 1,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "sync function verifyProjectAccess("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 240,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        },
+        {
+          "type": "missing_transactions",
+          "count": 2,
+          "severity": "high",
+          "description": "Multiple write operations without transactions",
+          "recommendation": "Wrap related database operations in transactions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\material-specs\\[id]\\reject\\route.ts": {
+      "path": "src\\app\\api\\material-specs\\[id]\\reject\\route.ts",
+      "size": 8077,
+      "lines": 227,
+      "methods": [
+        "POST"
+      ],
+      "issues": [
+        {
+          "type": "fileOperations",
+          "count": 17,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "access",
+            "stat",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 10,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await context.params",
+            "await supabase",
+            "await verifyProjectAccess(supabase, user, existingMaterialSpec.project_id)"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 1,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "sync function verifyProjectAccess("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 195,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        },
+        {
+          "type": "missing_transactions",
+          "count": 2,
+          "severity": "high",
+          "description": "Multiple write operations without transactions",
+          "recommendation": "Wrap related database operations in transactions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\material-specs\\[id]\\request-revision\\route.ts": {
+      "path": "src\\app\\api\\material-specs\\[id]\\request-revision\\route.ts",
+      "size": 8388,
+      "lines": 227,
+      "methods": [
+        "POST"
+      ],
+      "issues": [
+        {
+          "type": "fileOperations",
+          "count": 16,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "access",
+            "stat",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 10,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await context.params",
+            "await supabase",
+            "await verifyProjectAccess(supabase, user, existingMaterialSpec.project_id)"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 1,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "sync function verifyProjectAccess("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 195,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        },
+        {
+          "type": "missing_transactions",
+          "count": 2,
+          "severity": "high",
+          "description": "Multiple write operations without transactions",
+          "recommendation": "Wrap related database operations in transactions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\material-specs\\[id]\\route.ts": {
+      "path": "src\\app\\api\\material-specs\\[id]\\route.ts",
+      "size": 14025,
+      "lines": 372,
+      "methods": [
+        "GET",
+        "PUT",
+        "DELETE"
+      ],
+      "issues": [
+        {
+          "type": "fileOperations",
+          "count": 14,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "access",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 17,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await context.params",
+            "await supabase",
+            "await verifyProjectAccess(supabase, user, materialSpec.project_id)"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 1,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "sync function verifyProjectAccess("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 314,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        },
+        {
+          "type": "missing_transactions",
+          "count": 2,
+          "severity": "high",
+          "description": "Multiple write operations without transactions",
+          "recommendation": "Wrap related database operations in transactions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\material-specs\\[id]\\unlink-scope\\route.ts": {
+      "path": "src\\app\\api\\material-specs\\[id]\\unlink-scope\\route.ts",
+      "size": 13949,
+      "lines": 392,
+      "methods": [
+        "DELETE",
+        "POST"
+      ],
+      "issues": [
+        {
+          "type": "fileOperations",
+          "count": 4,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "access",
+            "stat",
+            "access"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 21,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await context.params",
+            "await supabase",
+            "await verifyProjectAccess(supabase, user, existingMaterialSpec.project_id)"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 1,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "sync function verifyProjectAccess("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 331,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        },
+        {
+          "type": "missing_transactions",
+          "count": 6,
+          "severity": "high",
+          "description": "Multiple write operations without transactions",
+          "recommendation": "Wrap related database operations in transactions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\material-specs\\bulk\\route.ts": {
+      "path": "src\\app\\api\\material-specs\\bulk\\route.ts",
+      "size": 15196,
+      "lines": 445,
+      "methods": [
+        "PUT",
+        "POST"
+      ],
+      "issues": [
+        {
+          "type": "fileOperations",
+          "count": 32,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "access",
+            "stat",
+            "access"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 15,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await request.json()",
+            "await supabase",
+            "await Promise.all("
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 1,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "sync function verifyProjectAccess("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 384,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        },
+        {
+          "type": "missing_transactions",
+          "count": 4,
+          "severity": "high",
+          "description": "Multiple write operations without transactions",
+          "recommendation": "Wrap related database operations in transactions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\material-specs\\route.ts": {
+      "path": "src\\app\\api\\material-specs\\route.ts",
+      "size": 24536,
+      "lines": 687,
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "issues": [
+        {
+          "type": "fileOperations",
+          "count": 71,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "access",
+            "stat",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 16,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await getAccessibleProjects(supabase, user)",
+            "await verifyProjectAccess(supabase, user, queryParams.project_id)",
+            "await query"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 4,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "sync function getAccessibleProjects(",
+            "sync function verifyProjectAccess(",
+            "sync function calculateMaterialSpecStatistics("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 598,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        },
+        {
+          "type": "missing_transactions",
+          "count": 2,
+          "severity": "high",
+          "description": "Multiple write operations without transactions",
+          "recommendation": "Wrap related database operations in transactions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\material-specs\\statistics\\route.ts": {
+      "path": "src\\app\\api\\material-specs\\statistics\\route.ts",
+      "size": 18535,
+      "lines": 601,
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "issues": [
+        {
+          "type": "heavyComputations",
+          "count": 3,
+          "severity": "medium",
+          "description": "Heavy computational operations in request handler",
+          "examples": [
+            "    const approved = specs.filter(",
+            "    const weekSpecs = specs.filter(",
+            "  const onTime = specs.filter("
+          ],
+          "recommendation": "Move heavy computations to background jobs"
+        },
+        {
+          "type": "fileOperations",
+          "count": 93,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "stat",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 23,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await verifyProjectAccess(supabase, user, queryParams.project_id)",
+            "await getAccessibleProjects(supabase, user)",
+            "await calculateComprehensiveMaterialSpecStatistics("
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 9,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "sync function getAccessibleProjects(",
+            "sync function verifyProjectAccess(",
+            "sync function calculateComprehensiveMaterialSpecStatistics("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 507,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\milestones\\[id]\\route.ts": {
+      "path": "src\\app\\api\\milestones\\[id]\\route.ts",
+      "size": 13601,
+      "lines": 402,
+      "methods": [
+        "GET",
+        "PUT",
+        "DELETE"
+      ],
+      "issues": [
+        {
+          "type": "fileOperations",
+          "count": 43,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "access",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 17,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await context.params",
+            "await supabase",
+            "await verifyProjectAccess(supabase, user, milestone.project_id)"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 2,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "sync function verifyProjectAccess(",
+            "function calculateDaysUntilDue("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 334,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        },
+        {
+          "type": "missing_transactions",
+          "count": 3,
+          "severity": "high",
+          "description": "Multiple write operations without transactions",
+          "recommendation": "Wrap related database operations in transactions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\milestones\\[id]\\status\\route.ts": {
+      "path": "src\\app\\api\\milestones\\[id]\\status\\route.ts",
+      "size": 6370,
+      "lines": 196,
+      "methods": [
+        "PUT"
+      ],
+      "issues": [
+        {
+          "type": "fileOperations",
+          "count": 28,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "stat",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 9,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await context.params",
+            "await supabase",
+            "await verifyProjectAccess(supabase, user, existingMilestone.project_id)"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 2,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "sync function verifyProjectAccess(",
+            "function calculateDaysUntilDue("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 162,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\milestones\\bulk\\route.ts": {
+      "path": "src\\app\\api\\milestones\\bulk\\route.ts",
+      "size": 12197,
+      "lines": 384,
+      "methods": [
+        "POST",
+        "DELETE"
+      ],
+      "issues": [
+        {
+          "type": "heavyComputations",
+          "count": 4,
+          "severity": "medium",
+          "description": "Heavy computational operations in request handler",
+          "examples": [
+            "    const unauthorizedMilestones = milestones.filter(",
+            "    const unauthorizedMilestones = milestones.filter(",
+            "    const completedMilestones = milestones.filter("
+          ],
+          "recommendation": "Move heavy computations to background jobs"
+        },
+        {
+          "type": "fileOperations",
+          "count": 30,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "stat",
+            "access"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 17,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await request.json()",
+            "await supabase",
+            "await getAccessibleProjects(supabase, user, profile.role as any)"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 4,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "sync function getAccessibleProjects(",
+            "function calculateDaysUntilDue(",
+            "sync function logBulkOperation("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 329,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        },
+        {
+          "type": "missing_transactions",
+          "count": 4,
+          "severity": "high",
+          "description": "Multiple write operations without transactions",
+          "recommendation": "Wrap related database operations in transactions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\milestones\\route.ts": {
+      "path": "src\\app\\api\\milestones\\route.ts",
+      "size": 14790,
+      "lines": 449,
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "issues": [
+        {
+          "type": "fileOperations",
+          "count": 53,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "access",
+            "stat",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 13,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await getAccessibleProjects(supabase, user)",
+            "await verifyProjectAccess(supabase, user, queryParams.project_id)",
+            "await query"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 5,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "sync function getAccessibleProjects(",
+            "sync function verifyProjectAccess(",
+            "function calculateDaysUntilDue("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 386,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\milestones\\statistics\\route.ts": {
+      "path": "src\\app\\api\\milestones\\statistics\\route.ts",
+      "size": 18980,
+      "lines": 590,
+      "methods": [
+        "GET"
+      ],
+      "issues": [
+        {
+          "type": "heavyComputations",
+          "count": 6,
+          "severity": "medium",
+          "description": "Heavy computational operations in request handler",
+          "examples": [
+            "    .filter(",
+            "    .sort(",
+            "  const overdueMilestones = milestones.filter("
+          ],
+          "recommendation": "Move heavy computations to background jobs"
+        },
+        {
+          "type": "fileOperations",
+          "count": 67,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "stat",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 5,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await getAccessibleProjects(supabase, user, profile.role as any)",
+            "await query",
+            "await supabase"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 8,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "sync function getAccessibleProjects(",
+            "function calculateComprehensiveStatistics(",
+            "function calculateBreakdown("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 508,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\projects\\[id]\\assignments\\route.ts": {
+      "path": "src\\app\\api\\projects\\[id]\\assignments\\route.ts",
+      "size": 12928,
+      "lines": 398,
+      "methods": [
+        "GET",
+        "POST",
+        "DELETE"
+      ],
+      "issues": [
+        {
+          "type": "heavyComputations",
+          "count": 2,
+          "severity": "medium",
+          "description": "Heavy computational operations in request handler",
+          "examples": [
+            "    const missingUsers = userIds.filter(",
+            "    const inactiveUsers = users.filter("
+          ],
+          "recommendation": "Move heavy computations to background jobs"
+        },
+        {
+          "type": "fileOperations",
+          "count": 10,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "access",
+            "access",
+            "access"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 20,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await context.params",
+            "await checkProjectAccess(supabase, user, projectId)",
+            "await supabase"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 3,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "sync function checkProjectAccess(",
+            "sync function sendAssignmentNotifications(",
+            "sync function logProjectActivity("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 336,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        },
+        {
+          "type": "missing_transactions",
+          "count": 4,
+          "severity": "high",
+          "description": "Multiple write operations without transactions",
+          "recommendation": "Wrap related database operations in transactions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\projects\\[id]\\material-specs\\route.ts": {
+      "path": "src\\app\\api\\projects\\[id]\\material-specs\\route.ts",
+      "size": 25706,
+      "lines": 730,
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "issues": [
+        {
+          "type": "fileOperations",
+          "count": 64,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "access",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 19,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await context.params",
+            "await verifyProjectAccess(supabase, user, projectId)",
+            "await supabase"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 3,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "sync function verifyProjectAccess(",
+            "sync function calculateProjectMaterialSpecStatistics(",
+            "function getEmptyStatistics("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 628,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        },
+        {
+          "type": "missing_transactions",
+          "count": 2,
+          "severity": "high",
+          "description": "Multiple write operations without transactions",
+          "recommendation": "Wrap related database operations in transactions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\projects\\[id]\\milestones\\route.ts": {
+      "path": "src\\app\\api\\projects\\[id]\\milestones\\route.ts",
+      "size": 15646,
+      "lines": 489,
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "issues": [
+        {
+          "type": "fileOperations",
+          "count": 49,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "access",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 16,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await context.params",
+            "await verifyProjectAccess(supabase, user, projectId)",
+            "await supabase"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 4,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "sync function verifyProjectAccess(",
+            "function calculateDaysUntilDue(",
+            "sync function calculateProjectMilestoneStatistics("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 415,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\projects\\[id]\\route.ts": {
+      "path": "src\\app\\api\\projects\\[id]\\route.ts",
+      "size": 16263,
+      "lines": 486,
+      "methods": [
+        "GET",
+        "PUT",
+        "DELETE"
+      ],
+      "issues": [
+        {
+          "type": "heavyComputations",
+          "count": 3,
+          "severity": "medium",
+          "description": "Heavy computational operations in request handler",
+          "examples": [
+            "    const scopeItemsCompleted = scopeItems.filter(",
+            "    const scopeItemsInProgress = scopeItems.filter(",
+            "    const scopeItemsBlocked = scopeItems.filter("
+          ],
+          "recommendation": "Move heavy computations to background jobs"
+        },
+        {
+          "type": "fileOperations",
+          "count": 23,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "access",
+            "access"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 19,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await context.params",
+            "await checkProjectAccess(supabase, user, projectId)",
+            "await supabase"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 2,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "sync function checkProjectAccess(",
+            "sync function logProjectActivity("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 415,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        },
+        {
+          "type": "missing_transactions",
+          "count": 3,
+          "severity": "high",
+          "description": "Multiple write operations without transactions",
+          "recommendation": "Wrap related database operations in transactions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\projects\\[id]\\tasks\\route.ts": {
+      "path": "src\\app\\api\\projects\\[id]\\tasks\\route.ts",
+      "size": 19323,
+      "lines": 593,
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "issues": [
+        {
+          "type": "fileOperations",
+          "count": 53,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "access",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 19,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await context.params",
+            "await verifyProjectAccess(supabase, user, projectId)",
+            "await supabase"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 4,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "sync function verifyProjectAccess(",
+            "function calculateDaysUntilDue(",
+            "sync function calculateProjectTaskStatistics("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 505,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\projects\\metrics\\route.ts": {
+      "path": "src\\app\\api\\projects\\metrics\\route.ts",
+      "size": 13301,
+      "lines": 370,
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "issues": [
+        {
+          "type": "heavyComputations",
+          "count": 9,
+          "severity": "medium",
+          "description": "Heavy computational operations in request handler",
+          "examples": [
+            "    const activeProjects = allProjects.filter(",
+            "    const completedProjects = allProjects.filter(",
+            "    const projectsOnHold = allProjects.filter("
+          ],
+          "recommendation": "Move heavy computations to background jobs"
+        },
+        {
+          "type": "fileOperations",
+          "count": 15,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "stat",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 13,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await supabase",
+            "await supabase",
+            "await supabase"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "large_function",
+          "count": 315,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\projects\\route.ts": {
+      "path": "src\\app\\api\\projects\\route.ts",
+      "size": 12933,
+      "lines": 383,
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "issues": [
+        {
+          "type": "missingPagination",
+          "count": 1,
+          "severity": "high",
+          "description": "Missing pagination on potentially large datasets",
+          "examples": [
+            ".select()"
+          ],
+          "recommendation": "Implement pagination with LIMIT and OFFSET"
+        },
+        {
+          "type": "fileOperations",
+          "count": 14,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "access",
+            "stat",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 13,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await import('@/lib/supabase')",
+            "await query",
+            "await request.json()"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 4,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "sync function initializeProjectFromTemplate(",
+            "sync function createDefaultScopeItems(",
+            "function getDefaultCategoriesForType("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 329,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        },
+        {
+          "type": "missing_transactions",
+          "count": 4,
+          "severity": "high",
+          "description": "Multiple write operations without transactions",
+          "recommendation": "Wrap related database operations in transactions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\reports\\route.ts": {
+      "path": "src\\app\\api\\reports\\route.ts",
+      "size": 6360,
+      "lines": 201,
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "issues": [
+        {
+          "type": "fileOperations",
+          "count": 9,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "stat",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 4,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await query",
+            "await request.json()",
+            "await supabase"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "large_function",
+          "count": 173,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\scope\\[id]\\dependencies\\route.ts": {
+      "path": "src\\app\\api\\scope\\[id]\\dependencies\\route.ts",
+      "size": 8968,
+      "lines": 298,
+      "methods": [
+        "GET",
+        "POST",
+        "DELETE"
+      ],
+      "issues": [
+        {
+          "type": "heavyComputations",
+          "count": 1,
+          "severity": "medium",
+          "description": "Heavy computational operations in request handler",
+          "examples": [
+            "          blocking_dependencies: (dependsOn || []).filter("
+          ],
+          "recommendation": "Move heavy computations to background jobs"
+        },
+        {
+          "type": "fileOperations",
+          "count": 8,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "stat",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 16,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await context.params",
+            "await supabase",
+            "await supabase"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 1,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "sync function checkCircularDependency("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 249,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        },
+        {
+          "type": "missing_transactions",
+          "count": 2,
+          "severity": "high",
+          "description": "Multiple write operations without transactions",
+          "recommendation": "Wrap related database operations in transactions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\scope\\[id]\\route.ts": {
+      "path": "src\\app\\api\\scope\\[id]\\route.ts",
+      "size": 17650,
+      "lines": 511,
+      "methods": [
+        "GET",
+        "PUT",
+        "DELETE"
+      ],
+      "issues": [
+        {
+          "type": "syncDatabase",
+          "count": 3,
+          "severity": "medium",
+          "description": "Synchronous database operations may block execution",
+          "examples": [
+            "await supabase.from('material_requirements').delete().eq('scope_item_id', scopeItemId)",
+            "await supabase.from('scope_dependencies').delete().eq('scope_item_id', scopeItemId)",
+            "await supabase.from('scope_dependencies').delete().eq('depends_on_id', scopeItemId)"
+          ],
+          "recommendation": "Use async/await pattern for all database operations"
+        },
+        {
+          "type": "missingCaching",
+          "count": 3,
+          "severity": "medium",
+          "description": "Database queries without caching mechanism",
+          "examples": [
+            "      await supabase.from",
+            "      await supabase.from",
+            "      await supabase.from"
+          ],
+          "recommendation": "Implement caching for frequently accessed data"
+        },
+        {
+          "type": "fileOperations",
+          "count": 24,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "stat",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 25,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await context.params",
+            "await supabase",
+            "await verifyProjectAccess(supabase, user, scopeItem.project_id)"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 1,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "sync function verifyProjectAccess("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 435,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        },
+        {
+          "type": "missing_transactions",
+          "count": 10,
+          "severity": "high",
+          "description": "Multiple write operations without transactions",
+          "recommendation": "Wrap related database operations in transactions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\scope\\[id]\\supplier\\route.ts": {
+      "path": "src\\app\\api\\scope\\[id]\\supplier\\route.ts",
+      "size": 3761,
+      "lines": 124,
+      "methods": [
+        "PUT",
+        "GET"
+      ],
+      "issues": [
+        {
+          "type": "fileOperations",
+          "count": 2,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 7,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await context.params",
+            "await request.json()",
+            "await supabase"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "large_function",
+          "count": 105,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\scope\\bulk\\route.ts": {
+      "path": "src\\app\\api\\scope\\bulk\\route.ts",
+      "size": 14635,
+      "lines": 417,
+      "methods": [
+        "POST",
+        "DELETE"
+      ],
+      "issues": [
+        {
+          "type": "syncDatabase",
+          "count": 3,
+          "severity": "medium",
+          "description": "Synchronous database operations may block execution",
+          "examples": [
+            "await supabase.from('material_requirements').delete().eq('scope_item_id', itemId)",
+            "await supabase.from('scope_dependencies').delete().eq('scope_item_id', itemId)",
+            "await supabase.from('scope_dependencies').delete().eq('depends_on_id', itemId)"
+          ],
+          "recommendation": "Use async/await pattern for all database operations"
+        },
+        {
+          "type": "heavyComputations",
+          "count": 2,
+          "severity": "medium",
+          "description": "Heavy computational operations in request handler",
+          "examples": [
+            "    const inaccessibleProjects = projectIds.filter(",
+            "    const inaccessibleProjects = projectIds.filter("
+          ],
+          "recommendation": "Move heavy computations to background jobs"
+        },
+        {
+          "type": "missingCaching",
+          "count": 3,
+          "severity": "medium",
+          "description": "Database queries without caching mechanism",
+          "examples": [
+            "          await supabase.from",
+            "          await supabase.from",
+            "          await supabase.from"
+          ],
+          "recommendation": "Implement caching for frequently accessed data"
+        },
+        {
+          "type": "fileOperations",
+          "count": 28,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "stat",
+            "access"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 17,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await request.json()",
+            "await supabase",
+            "await getAccessibleProjects(supabase, user)"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 1,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "sync function getAccessibleProjects("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 359,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        },
+        {
+          "type": "missing_transactions",
+          "count": 7,
+          "severity": "high",
+          "description": "Multiple write operations without transactions",
+          "recommendation": "Wrap related database operations in transactions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\scope\\excel\\export\\route.ts": {
+      "path": "src\\app\\api\\scope\\excel\\export\\route.ts",
+      "size": 12236,
+      "lines": 380,
+      "methods": [
+        "GET"
+      ],
+      "issues": [
+        {
+          "type": "heavyComputations",
+          "count": 4,
+          "severity": "medium",
+          "description": "Heavy computational operations in request handler",
+          "examples": [
+            "        const categoryItems = scopeItems.filter(",
+            "        const completed = categoryItems.filter(",
+            "        const inProgress = categoryItems.filter("
+          ],
+          "recommendation": "Move heavy computations to background jobs"
+        },
+        {
+          "type": "fileOperations",
+          "count": 12,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "access",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 5,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await verifyProjectAccess(supabase, user, projectId)",
+            "await query",
+            "await supabase"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 1,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "sync function verifyProjectAccess("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 325,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\scope\\excel\\import\\route.ts": {
+      "path": "src\\app\\api\\scope\\excel\\import\\route.ts",
+      "size": 14146,
+      "lines": 412,
+      "methods": [
+        "POST"
+      ],
+      "issues": [
+        {
+          "type": "fileOperations",
+          "count": 3,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "access",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 9,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await request.formData()",
+            "await verifyProjectAccess(supabase, user, projectId)",
+            "await file.arrayBuffer()"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 7,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "function mapExcelColumns(",
+            "function mapRowToScopeItem(",
+            "function normalizeCategory("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 348,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        },
+        {
+          "type": "missing_transactions",
+          "count": 2,
+          "severity": "high",
+          "description": "Multiple write operations without transactions",
+          "recommendation": "Wrap related database operations in transactions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\scope\\overview\\route.ts": {
+      "path": "src\\app\\api\\scope\\overview\\route.ts",
+      "size": 6546,
+      "lines": 209,
+      "methods": [
+        "GET"
+      ],
+      "issues": [
+        {
+          "type": "heavyComputations",
+          "count": 2,
+          "severity": "medium",
+          "description": "Heavy computational operations in request handler",
+          "examples": [
+            "      .filter(",
+            "      .sort("
+          ],
+          "recommendation": "Move heavy computations to background jobs"
+        },
+        {
+          "type": "fileOperations",
+          "count": 12,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "access",
+            "access"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 6,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await getAccessibleProjects(supabase, user)",
+            "await supabase",
+            "await supabase"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 2,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "sync function getAccessibleProjects(",
+            "function getEmptyOverview("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 181,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\scope\\route.ts": {
+      "path": "src\\app\\api\\scope\\route.ts",
+      "size": 23097,
+      "lines": 684,
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "issues": [
+        {
+          "type": "heavyComputations",
+          "count": 1,
+          "severity": "medium",
+          "description": "Heavy computational operations in request handler",
+          "examples": [
+            "    const itemsOverBudget = items.filter("
+          ],
+          "recommendation": "Move heavy computations to background jobs"
+        },
+        {
+          "type": "fileOperations",
+          "count": 57,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "access",
+            "stat",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 22,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await getAccessibleProjects(supabase, user)",
+            "await query",
+            "await Promise.all("
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 5,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "sync function getAccessibleProjects(",
+            "sync function verifyProjectAccess(",
+            "sync function getDependencyDetails("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 598,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        },
+        {
+          "type": "missing_transactions",
+          "count": 3,
+          "severity": "high",
+          "description": "Multiple write operations without transactions",
+          "recommendation": "Wrap related database operations in transactions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\suppliers\\[id]\\route.ts": {
+      "path": "src\\app\\api\\suppliers\\[id]\\route.ts",
+      "size": 2724,
+      "lines": 93,
+      "methods": [
+        "GET",
+        "PUT",
+        "DELETE"
+      ],
+      "issues": [
+        {
+          "type": "missingPagination",
+          "count": 1,
+          "severity": "high",
+          "description": "Missing pagination on potentially large datasets",
+          "examples": [
+            ".select()"
+          ],
+          "recommendation": "Implement pagination with LIMIT and OFFSET"
+        },
+        {
+          "type": "fileOperations",
+          "count": 7,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "stat",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 7,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await context.params;",
+            "await supabase",
+            "await context.params;"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 3,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "export async function GET(",
+            "export async function PUT(",
+            "export async function DELETE("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "missing_transactions",
+          "count": 2,
+          "severity": "high",
+          "description": "Multiple write operations without transactions",
+          "recommendation": "Wrap related database operations in transactions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\suppliers\\route.ts": {
+      "path": "src\\app\\api\\suppliers\\route.ts",
+      "size": 2195,
+      "lines": 70,
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "issues": [
+        {
+          "type": "missingPagination",
+          "count": 1,
+          "severity": "high",
+          "description": "Missing pagination on potentially large datasets",
+          "examples": [
+            ".select()"
+          ],
+          "recommendation": "Implement pagination with LIMIT and OFFSET"
+        },
+        {
+          "type": "fileOperations",
+          "count": 7,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "stat",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 3,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await query;",
+            "await request.json();",
+            "await supabase"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 2,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "export async function GET(",
+            "export async function POST("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\suppliers\\totals\\route.ts": {
+      "path": "src\\app\\api\\suppliers\\totals\\route.ts",
+      "size": 2847,
+      "lines": 90,
+      "methods": [
+        "GET"
+      ],
+      "issues": [
+        {
+          "type": "heavyComputations",
+          "count": 1,
+          "severity": "medium",
+          "description": "Heavy computational operations in request handler",
+          "examples": [
+            "    const totalsArray = Array.from(supplierTotals.values()).sort("
+          ],
+          "recommendation": "Move heavy computations to background jobs"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 1,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await query"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\tasks\\[id]\\comments\\route.ts": {
+      "path": "src\\app\\api\\tasks\\[id]\\comments\\route.ts",
+      "size": 8890,
+      "lines": 284,
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "issues": [
+        {
+          "type": "fileOperations",
+          "count": 10,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "access",
+            "access"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 13,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await context.params",
+            "await supabase",
+            "await verifyProjectAccess(supabase, user, task.project_id)"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 1,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "sync function verifyProjectAccess("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 238,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\tasks\\[id]\\route.ts": {
+      "path": "src\\app\\api\\tasks\\[id]\\route.ts",
+      "size": 16283,
+      "lines": 471,
+      "methods": [
+        "GET",
+        "PUT",
+        "DELETE"
+      ],
+      "issues": [
+        {
+          "type": "fileOperations",
+          "count": 61,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "stat",
+            "access"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 20,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await context.params",
+            "await supabase",
+            "await verifyProjectAccess(supabase, user, task.project_id)"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 2,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "sync function verifyProjectAccess(",
+            "function calculateDaysUntilDue("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 396,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        },
+        {
+          "type": "missing_transactions",
+          "count": 3,
+          "severity": "high",
+          "description": "Multiple write operations without transactions",
+          "recommendation": "Wrap related database operations in transactions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\tasks\\route.ts": {
+      "path": "src\\app\\api\\tasks\\route.ts",
+      "size": 18804,
+      "lines": 577,
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "issues": [
+        {
+          "type": "fileOperations",
+          "count": 60,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "access",
+            "stat",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 16,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await getAccessibleProjects(supabase, user)",
+            "await verifyProjectAccess(supabase, user, queryParams.project_id)",
+            "await query"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 5,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "sync function getAccessibleProjects(",
+            "sync function verifyProjectAccess(",
+            "function calculateDaysUntilDue("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 500,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\tasks\\statistics\\route.ts": {
+      "path": "src\\app\\api\\tasks\\statistics\\route.ts",
+      "size": 12327,
+      "lines": 391,
+      "methods": [
+        "GET"
+      ],
+      "issues": [
+        {
+          "type": "fileOperations",
+          "count": 46,
+          "severity": "medium",
+          "description": "File system operations that may block execution",
+          "examples": [
+            "stat",
+            "stat",
+            "stat"
+          ],
+          "recommendation": "Use async file operations and consider caching"
+        },
+        {
+          "type": "missingErrorHandling",
+          "count": 10,
+          "severity": "high",
+          "description": "Database operations without proper error handling",
+          "examples": [
+            "await verifyProjectAccess(supabase, user, queryParams.project_id)",
+            "await getAccessibleProjects(supabase, user)",
+            "await query"
+          ],
+          "recommendation": "Add comprehensive error handling and logging"
+        },
+        {
+          "type": "syncOperations",
+          "count": 8,
+          "severity": "low",
+          "description": "Synchronous operations that may block execution",
+          "examples": [
+            "sync function getAccessibleProjects(",
+            "sync function verifyProjectAccess(",
+            "sync function calculateComprehensiveStatistics("
+          ],
+          "recommendation": "Convert to async operations where possible"
+        },
+        {
+          "type": "large_function",
+          "count": 338,
+          "severity": "medium",
+          "description": "Large function detected - may be hard to maintain and optimize",
+          "recommendation": "Consider breaking down large functions into smaller, focused functions"
+        }
+      ],
+      "severity": "high",
+      "recommendations": []
+    },
+    "src\\app\\api\\test-auth\\route.ts": {
+      "path": "src\\app\\api\\test-auth\\route.ts",
+      "size": 816,
+      "lines": 23,
+      "methods": [
+        "GET"
+      ],
+      "issues": [],
+      "severity": "low",
+      "recommendations": []
+    }
+  },
+  "bottlenecks": [
+    {
+      "route": "src\\app\\api\\admin\\auth-state\\route.ts",
+      "type": "heavyComputations",
+      "count": 3,
+      "severity": "medium",
+      "description": "Heavy computational operations in request handler",
+      "examples": [
+        "    const userIds = [...new Set(metrics.recentFailures.map(f => f.userId).filter(",
+        "JSON.parse",
+        "JSON.parse"
+      ],
+      "recommendation": "Move heavy computations to background jobs"
+    },
+    {
+      "route": "src\\app\\api\\admin\\auth-state\\route.ts",
+      "type": "fileOperations",
+      "count": 26,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "stat",
+        "access"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\admin\\auth-state\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 8,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await supabase.auth.getUser(token)",
+        "await supabase",
+        "await supabase"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\admin\\auth-state\\route.ts",
+      "type": "syncOperations",
+      "count": 4,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "export async function GET(",
+        "sync function getRecentFailedUsers(",
+        "sync function getCircuitBreakerStats("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\admin\\create-test-users\\route.ts",
+      "type": "missingPagination",
+      "count": 1,
+      "severity": "high",
+      "description": "Missing pagination on potentially large datasets",
+      "examples": [
+        ".select()"
+      ],
+      "recommendation": "Implement pagination with LIMIT and OFFSET"
+    },
+    {
+      "route": "src\\app\\api\\admin\\create-test-users\\route.ts",
+      "type": "heavyComputations",
+      "count": 1,
+      "severity": "medium",
+      "description": "Heavy computational operations in request handler",
+      "examples": [
+        "    const successCount = results.filter("
+      ],
+      "recommendation": "Move heavy computations to background jobs"
+    },
+    {
+      "route": "src\\app\\api\\admin\\create-test-users\\route.ts",
+      "type": "fileOperations",
+      "count": 1,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\admin\\create-test-users\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 3,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await supabase.auth.admin.createUser({",
+        "await supabase.auth.admin.listUsers()",
+        "await supabase"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\admin\\create-test-users\\route.ts",
+      "type": "syncOperations",
+      "count": 1,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "export async function POST("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\admin\\reset-auth\\route.ts",
+      "type": "heavyComputations",
+      "count": 6,
+      "severity": "medium",
+      "description": "Heavy computational operations in request handler",
+      "examples": [
+        "JSON.stringify",
+        "JSON.parse",
+        "        const filteredEvents = events.filter("
+      ],
+      "recommendation": "Move heavy computations to background jobs"
+    },
+    {
+      "route": "src\\app\\api\\admin\\reset-auth\\route.ts",
+      "type": "fileOperations",
+      "count": 17,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "access",
+        "stat",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\admin\\reset-auth\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 8,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await supabase.auth.getUser(token)",
+        "await supabase",
+        "await request.json()"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\admin\\reset-auth\\route.ts",
+      "type": "syncOperations",
+      "count": 4,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "export async function POST(",
+        "sync function resetCircuitBreaker(",
+        "sync function clearAuthLoops("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\admin\\users\\route.ts",
+      "type": "heavyComputations",
+      "count": 5,
+      "severity": "medium",
+      "description": "Heavy computational operations in request handler",
+      "examples": [
+        "      Object.entries(usersByRole).filter(",
+        "    const availableForImpersonation = flatUserList.filter(",
+        "      secureList = availableForImpersonation.filter("
+      ],
+      "recommendation": "Move heavy computations to background jobs"
+    },
+    {
+      "route": "src\\app\\api\\admin\\users\\route.ts",
+      "type": "fileOperations",
+      "count": 1,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "access"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\admin\\users\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 2,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await import('@/lib/supabase')",
+        "await supabaseAdmin"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\auth\\change-password\\route.ts",
+      "type": "syncDatabase",
+      "count": 1,
+      "severity": "medium",
+      "description": "Synchronous database operations may block execution",
+      "examples": [
+        "await supabase.auth.updateUser({"
+      ],
+      "recommendation": "Use async/await pattern for all database operations"
+    },
+    {
+      "route": "src\\app\\api\\auth\\change-password\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 5,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await request.json()",
+        "await supabase.auth.getSession()",
+        "await supabase.auth.signInWithPassword({"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\auth\\diagnostics\\route.ts",
+      "type": "fileOperations",
+      "count": 4,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "access",
+        "access",
+        "access"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\auth\\diagnostics\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 2,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await supabase.auth.getUser(token)",
+        "await supabase"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\auth\\diagnostics\\route.ts",
+      "type": "syncOperations",
+      "count": 1,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "export async function GET("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\auth\\login\\route.ts",
+      "type": "syncDatabase",
+      "count": 1,
+      "severity": "medium",
+      "description": "Synchronous database operations may block execution",
+      "examples": [
+        "await supabaseAdmin.auth.admin.updateUserById("
+      ],
+      "recommendation": "Use async/await pattern for all database operations"
+    },
+    {
+      "route": "src\\app\\api\\auth\\login\\route.ts",
+      "type": "fileOperations",
+      "count": 5,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "stat",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\auth\\login\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 4,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await request.json()",
+        "await supabase.auth.signInWithPassword({",
+        "await supabaseAdmin"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\auth\\login\\route.ts",
+      "type": "syncOperations",
+      "count": 1,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "export async function POST("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\auth\\logout\\route.ts",
+      "type": "fileOperations",
+      "count": 2,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\auth\\logout\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 2,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await supabase.auth.getSession()",
+        "await supabase.auth.signOut()"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\auth\\logout\\route.ts",
+      "type": "syncOperations",
+      "count": 1,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "export async function POST("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\auth\\profile\\route.ts",
+      "type": "missingPagination",
+      "count": 1,
+      "severity": "high",
+      "description": "Missing pagination on potentially large datasets",
+      "examples": [
+        ".select()"
+      ],
+      "recommendation": "Implement pagination with LIMIT and OFFSET"
+    },
+    {
+      "route": "src\\app\\api\\auth\\profile\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 5,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await import('@/lib/supabase')",
+        "await supabaseAdmin",
+        "await request.json()"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\auth\\recover-profile\\route.ts",
+      "type": "missingPagination",
+      "count": 2,
+      "severity": "high",
+      "description": "Missing pagination on potentially large datasets",
+      "examples": [
+        ".select()",
+        ".select()"
+      ],
+      "recommendation": "Implement pagination with LIMIT and OFFSET"
+    },
+    {
+      "route": "src\\app\\api\\auth\\recover-profile\\route.ts",
+      "type": "fileOperations",
+      "count": 8,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "stat",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\auth\\recover-profile\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 5,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await supabase.auth.getUser(token)",
+        "await supabase",
+        "await import('@/lib/supabase')"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\auth\\recover-profile\\route.ts",
+      "type": "syncOperations",
+      "count": 1,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "export async function POST("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\auth\\register\\route.ts",
+      "type": "syncDatabase",
+      "count": 1,
+      "severity": "medium",
+      "description": "Synchronous database operations may block execution",
+      "examples": [
+        "await supabase.auth.admin.deleteUser(authData.user.id)"
+      ],
+      "recommendation": "Use async/await pattern for all database operations"
+    },
+    {
+      "route": "src\\app\\api\\auth\\register\\route.ts",
+      "type": "fileOperations",
+      "count": 8,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "stat",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\auth\\register\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 6,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await request.json()",
+        "await import('@/lib/supabase')",
+        "await supabase"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\auth\\register\\route.ts",
+      "type": "syncOperations",
+      "count": 1,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "export async function POST("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\auth\\reset-password\\route.ts",
+      "type": "syncDatabase",
+      "count": 1,
+      "severity": "medium",
+      "description": "Synchronous database operations may block execution",
+      "examples": [
+        "await supabase.auth.updateUser({"
+      ],
+      "recommendation": "Use async/await pattern for all database operations"
+    },
+    {
+      "route": "src\\app\\api\\auth\\reset-password\\route.ts",
+      "type": "fileOperations",
+      "count": 11,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "stat",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\auth\\reset-password\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 6,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await request.json()",
+        "await supabase",
+        "await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\auth\\reset-password\\route.ts",
+      "type": "syncOperations",
+      "count": 2,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "export async function POST(",
+        "export async function PUT("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\dashboard\\activity\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 1,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await supabase"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\dashboard\\comprehensive-stats\\route.ts",
+      "type": "heavyComputations",
+      "count": 2,
+      "severity": "medium",
+      "description": "Heavy computational operations in request handler",
+      "examples": [
+        "    const completedScopeItems = scopeItems?.filter(",
+        "    const overdueScopeItems = scopeItems?.filter("
+      ],
+      "recommendation": "Move heavy computations to background jobs"
+    },
+    {
+      "route": "src\\app\\api\\dashboard\\comprehensive-stats\\route.ts",
+      "type": "fileOperations",
+      "count": 8,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "stat",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\dashboard\\comprehensive-stats\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 2,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await supabase",
+        "await Promise.all(["
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\dashboard\\recent-activity\\route.ts",
+      "type": "heavyComputations",
+      "count": 1,
+      "severity": "medium",
+      "description": "Heavy computational operations in request handler",
+      "examples": [
+        "      .sort("
+      ],
+      "recommendation": "Move heavy computations to background jobs"
+    },
+    {
+      "route": "src\\app\\api\\dashboard\\recent-activity\\route.ts",
+      "type": "fileOperations",
+      "count": 13,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "access",
+        "access"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\dashboard\\recent-activity\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 4,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await supabase",
+        "await projectQuery;",
+        "await scopeQuery;"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\dashboard\\stats\\route.ts",
+      "type": "fileOperations",
+      "count": 11,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "stat",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\dashboard\\stats\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 1,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await Promise.all(["
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\dashboard\\tasks\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 1,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await query;"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\debug-profile\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 1,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await supabaseAdmin"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\debug-profile\\route.ts",
+      "type": "syncOperations",
+      "count": 1,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "export async function GET("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\debug\\create-test-profiles\\route.ts",
+      "type": "missingPagination",
+      "count": 1,
+      "severity": "high",
+      "description": "Missing pagination on potentially large datasets",
+      "examples": [
+        ".select()"
+      ],
+      "recommendation": "Implement pagination with LIMIT and OFFSET"
+    },
+    {
+      "route": "src\\app\\api\\debug\\create-test-profiles\\route.ts",
+      "type": "fileOperations",
+      "count": 4,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "stat",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\debug\\create-test-profiles\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 2,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await supabase",
+        "await supabase"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\debug\\create-test-profiles\\route.ts",
+      "type": "syncOperations",
+      "count": 1,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "export async function POST("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\[id]\\approve\\route.ts",
+      "type": "fileOperations",
+      "count": 16,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "access",
+        "stat",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\[id]\\approve\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 10,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await context.params",
+        "await supabase",
+        "await verifyProjectAccess(supabase, user, existingMaterialSpec.project_id)"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\[id]\\approve\\route.ts",
+      "type": "syncOperations",
+      "count": 1,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "sync function verifyProjectAccess("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\[id]\\link-scope\\route.ts",
+      "type": "fileOperations",
+      "count": 5,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "access",
+        "stat",
+        "access"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\[id]\\link-scope\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 16,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await context.params",
+        "await supabase",
+        "await verifyProjectAccess(supabase, user, existingMaterialSpec.project_id)"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\[id]\\link-scope\\route.ts",
+      "type": "syncOperations",
+      "count": 1,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "sync function verifyProjectAccess("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\[id]\\reject\\route.ts",
+      "type": "fileOperations",
+      "count": 17,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "access",
+        "stat",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\[id]\\reject\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 10,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await context.params",
+        "await supabase",
+        "await verifyProjectAccess(supabase, user, existingMaterialSpec.project_id)"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\[id]\\reject\\route.ts",
+      "type": "syncOperations",
+      "count": 1,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "sync function verifyProjectAccess("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\[id]\\request-revision\\route.ts",
+      "type": "fileOperations",
+      "count": 16,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "access",
+        "stat",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\[id]\\request-revision\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 10,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await context.params",
+        "await supabase",
+        "await verifyProjectAccess(supabase, user, existingMaterialSpec.project_id)"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\[id]\\request-revision\\route.ts",
+      "type": "syncOperations",
+      "count": 1,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "sync function verifyProjectAccess("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\[id]\\route.ts",
+      "type": "fileOperations",
+      "count": 14,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "access",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\[id]\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 17,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await context.params",
+        "await supabase",
+        "await verifyProjectAccess(supabase, user, materialSpec.project_id)"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\[id]\\route.ts",
+      "type": "syncOperations",
+      "count": 1,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "sync function verifyProjectAccess("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\[id]\\unlink-scope\\route.ts",
+      "type": "fileOperations",
+      "count": 4,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "access",
+        "stat",
+        "access"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\[id]\\unlink-scope\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 21,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await context.params",
+        "await supabase",
+        "await verifyProjectAccess(supabase, user, existingMaterialSpec.project_id)"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\[id]\\unlink-scope\\route.ts",
+      "type": "syncOperations",
+      "count": 1,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "sync function verifyProjectAccess("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\bulk\\route.ts",
+      "type": "fileOperations",
+      "count": 32,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "access",
+        "stat",
+        "access"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\bulk\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 15,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await request.json()",
+        "await supabase",
+        "await Promise.all("
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\bulk\\route.ts",
+      "type": "syncOperations",
+      "count": 1,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "sync function verifyProjectAccess("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\route.ts",
+      "type": "fileOperations",
+      "count": 71,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "access",
+        "stat",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 16,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await getAccessibleProjects(supabase, user)",
+        "await verifyProjectAccess(supabase, user, queryParams.project_id)",
+        "await query"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\route.ts",
+      "type": "syncOperations",
+      "count": 4,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "sync function getAccessibleProjects(",
+        "sync function verifyProjectAccess(",
+        "sync function calculateMaterialSpecStatistics("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\statistics\\route.ts",
+      "type": "heavyComputations",
+      "count": 3,
+      "severity": "medium",
+      "description": "Heavy computational operations in request handler",
+      "examples": [
+        "    const approved = specs.filter(",
+        "    const weekSpecs = specs.filter(",
+        "  const onTime = specs.filter("
+      ],
+      "recommendation": "Move heavy computations to background jobs"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\statistics\\route.ts",
+      "type": "fileOperations",
+      "count": 93,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "stat",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\statistics\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 23,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await verifyProjectAccess(supabase, user, queryParams.project_id)",
+        "await getAccessibleProjects(supabase, user)",
+        "await calculateComprehensiveMaterialSpecStatistics("
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\statistics\\route.ts",
+      "type": "syncOperations",
+      "count": 9,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "sync function getAccessibleProjects(",
+        "sync function verifyProjectAccess(",
+        "sync function calculateComprehensiveMaterialSpecStatistics("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\milestones\\[id]\\route.ts",
+      "type": "fileOperations",
+      "count": 43,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "access",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\milestones\\[id]\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 17,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await context.params",
+        "await supabase",
+        "await verifyProjectAccess(supabase, user, milestone.project_id)"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\milestones\\[id]\\route.ts",
+      "type": "syncOperations",
+      "count": 2,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "sync function verifyProjectAccess(",
+        "function calculateDaysUntilDue("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\milestones\\[id]\\status\\route.ts",
+      "type": "fileOperations",
+      "count": 28,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "stat",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\milestones\\[id]\\status\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 9,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await context.params",
+        "await supabase",
+        "await verifyProjectAccess(supabase, user, existingMilestone.project_id)"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\milestones\\[id]\\status\\route.ts",
+      "type": "syncOperations",
+      "count": 2,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "sync function verifyProjectAccess(",
+        "function calculateDaysUntilDue("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\milestones\\bulk\\route.ts",
+      "type": "heavyComputations",
+      "count": 4,
+      "severity": "medium",
+      "description": "Heavy computational operations in request handler",
+      "examples": [
+        "    const unauthorizedMilestones = milestones.filter(",
+        "    const unauthorizedMilestones = milestones.filter(",
+        "    const completedMilestones = milestones.filter("
+      ],
+      "recommendation": "Move heavy computations to background jobs"
+    },
+    {
+      "route": "src\\app\\api\\milestones\\bulk\\route.ts",
+      "type": "fileOperations",
+      "count": 30,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "stat",
+        "access"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\milestones\\bulk\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 17,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await request.json()",
+        "await supabase",
+        "await getAccessibleProjects(supabase, user, profile.role as any)"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\milestones\\bulk\\route.ts",
+      "type": "syncOperations",
+      "count": 4,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "sync function getAccessibleProjects(",
+        "function calculateDaysUntilDue(",
+        "sync function logBulkOperation("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\milestones\\route.ts",
+      "type": "fileOperations",
+      "count": 53,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "access",
+        "stat",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\milestones\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 13,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await getAccessibleProjects(supabase, user)",
+        "await verifyProjectAccess(supabase, user, queryParams.project_id)",
+        "await query"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\milestones\\route.ts",
+      "type": "syncOperations",
+      "count": 5,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "sync function getAccessibleProjects(",
+        "sync function verifyProjectAccess(",
+        "function calculateDaysUntilDue("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\milestones\\statistics\\route.ts",
+      "type": "heavyComputations",
+      "count": 6,
+      "severity": "medium",
+      "description": "Heavy computational operations in request handler",
+      "examples": [
+        "    .filter(",
+        "    .sort(",
+        "  const overdueMilestones = milestones.filter("
+      ],
+      "recommendation": "Move heavy computations to background jobs"
+    },
+    {
+      "route": "src\\app\\api\\milestones\\statistics\\route.ts",
+      "type": "fileOperations",
+      "count": 67,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "stat",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\milestones\\statistics\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 5,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await getAccessibleProjects(supabase, user, profile.role as any)",
+        "await query",
+        "await supabase"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\milestones\\statistics\\route.ts",
+      "type": "syncOperations",
+      "count": 8,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "sync function getAccessibleProjects(",
+        "function calculateComprehensiveStatistics(",
+        "function calculateBreakdown("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\projects\\[id]\\assignments\\route.ts",
+      "type": "heavyComputations",
+      "count": 2,
+      "severity": "medium",
+      "description": "Heavy computational operations in request handler",
+      "examples": [
+        "    const missingUsers = userIds.filter(",
+        "    const inactiveUsers = users.filter("
+      ],
+      "recommendation": "Move heavy computations to background jobs"
+    },
+    {
+      "route": "src\\app\\api\\projects\\[id]\\assignments\\route.ts",
+      "type": "fileOperations",
+      "count": 10,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "access",
+        "access",
+        "access"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\projects\\[id]\\assignments\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 20,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await context.params",
+        "await checkProjectAccess(supabase, user, projectId)",
+        "await supabase"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\projects\\[id]\\assignments\\route.ts",
+      "type": "syncOperations",
+      "count": 3,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "sync function checkProjectAccess(",
+        "sync function sendAssignmentNotifications(",
+        "sync function logProjectActivity("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\projects\\[id]\\material-specs\\route.ts",
+      "type": "fileOperations",
+      "count": 64,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "access",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\projects\\[id]\\material-specs\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 19,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await context.params",
+        "await verifyProjectAccess(supabase, user, projectId)",
+        "await supabase"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\projects\\[id]\\material-specs\\route.ts",
+      "type": "syncOperations",
+      "count": 3,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "sync function verifyProjectAccess(",
+        "sync function calculateProjectMaterialSpecStatistics(",
+        "function getEmptyStatistics("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\projects\\[id]\\milestones\\route.ts",
+      "type": "fileOperations",
+      "count": 49,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "access",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\projects\\[id]\\milestones\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 16,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await context.params",
+        "await verifyProjectAccess(supabase, user, projectId)",
+        "await supabase"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\projects\\[id]\\milestones\\route.ts",
+      "type": "syncOperations",
+      "count": 4,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "sync function verifyProjectAccess(",
+        "function calculateDaysUntilDue(",
+        "sync function calculateProjectMilestoneStatistics("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\projects\\[id]\\route.ts",
+      "type": "heavyComputations",
+      "count": 3,
+      "severity": "medium",
+      "description": "Heavy computational operations in request handler",
+      "examples": [
+        "    const scopeItemsCompleted = scopeItems.filter(",
+        "    const scopeItemsInProgress = scopeItems.filter(",
+        "    const scopeItemsBlocked = scopeItems.filter("
+      ],
+      "recommendation": "Move heavy computations to background jobs"
+    },
+    {
+      "route": "src\\app\\api\\projects\\[id]\\route.ts",
+      "type": "fileOperations",
+      "count": 23,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "access",
+        "access"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\projects\\[id]\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 19,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await context.params",
+        "await checkProjectAccess(supabase, user, projectId)",
+        "await supabase"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\projects\\[id]\\route.ts",
+      "type": "syncOperations",
+      "count": 2,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "sync function checkProjectAccess(",
+        "sync function logProjectActivity("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\projects\\[id]\\tasks\\route.ts",
+      "type": "fileOperations",
+      "count": 53,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "access",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\projects\\[id]\\tasks\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 19,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await context.params",
+        "await verifyProjectAccess(supabase, user, projectId)",
+        "await supabase"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\projects\\[id]\\tasks\\route.ts",
+      "type": "syncOperations",
+      "count": 4,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "sync function verifyProjectAccess(",
+        "function calculateDaysUntilDue(",
+        "sync function calculateProjectTaskStatistics("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\projects\\metrics\\route.ts",
+      "type": "heavyComputations",
+      "count": 9,
+      "severity": "medium",
+      "description": "Heavy computational operations in request handler",
+      "examples": [
+        "    const activeProjects = allProjects.filter(",
+        "    const completedProjects = allProjects.filter(",
+        "    const projectsOnHold = allProjects.filter("
+      ],
+      "recommendation": "Move heavy computations to background jobs"
+    },
+    {
+      "route": "src\\app\\api\\projects\\metrics\\route.ts",
+      "type": "fileOperations",
+      "count": 15,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "stat",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\projects\\metrics\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 13,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await supabase",
+        "await supabase",
+        "await supabase"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\projects\\route.ts",
+      "type": "missingPagination",
+      "count": 1,
+      "severity": "high",
+      "description": "Missing pagination on potentially large datasets",
+      "examples": [
+        ".select()"
+      ],
+      "recommendation": "Implement pagination with LIMIT and OFFSET"
+    },
+    {
+      "route": "src\\app\\api\\projects\\route.ts",
+      "type": "fileOperations",
+      "count": 14,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "access",
+        "stat",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\projects\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 13,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await import('@/lib/supabase')",
+        "await query",
+        "await request.json()"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\projects\\route.ts",
+      "type": "syncOperations",
+      "count": 4,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "sync function initializeProjectFromTemplate(",
+        "sync function createDefaultScopeItems(",
+        "function getDefaultCategoriesForType("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\reports\\route.ts",
+      "type": "fileOperations",
+      "count": 9,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "stat",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\reports\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 4,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await query",
+        "await request.json()",
+        "await supabase"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\scope\\[id]\\dependencies\\route.ts",
+      "type": "heavyComputations",
+      "count": 1,
+      "severity": "medium",
+      "description": "Heavy computational operations in request handler",
+      "examples": [
+        "          blocking_dependencies: (dependsOn || []).filter("
+      ],
+      "recommendation": "Move heavy computations to background jobs"
+    },
+    {
+      "route": "src\\app\\api\\scope\\[id]\\dependencies\\route.ts",
+      "type": "fileOperations",
+      "count": 8,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "stat",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\scope\\[id]\\dependencies\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 16,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await context.params",
+        "await supabase",
+        "await supabase"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\scope\\[id]\\dependencies\\route.ts",
+      "type": "syncOperations",
+      "count": 1,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "sync function checkCircularDependency("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\scope\\[id]\\route.ts",
+      "type": "syncDatabase",
+      "count": 3,
+      "severity": "medium",
+      "description": "Synchronous database operations may block execution",
+      "examples": [
+        "await supabase.from('material_requirements').delete().eq('scope_item_id', scopeItemId)",
+        "await supabase.from('scope_dependencies').delete().eq('scope_item_id', scopeItemId)",
+        "await supabase.from('scope_dependencies').delete().eq('depends_on_id', scopeItemId)"
+      ],
+      "recommendation": "Use async/await pattern for all database operations"
+    },
+    {
+      "route": "src\\app\\api\\scope\\[id]\\route.ts",
+      "type": "missingCaching",
+      "count": 3,
+      "severity": "medium",
+      "description": "Database queries without caching mechanism",
+      "examples": [
+        "      await supabase.from",
+        "      await supabase.from",
+        "      await supabase.from"
+      ],
+      "recommendation": "Implement caching for frequently accessed data"
+    },
+    {
+      "route": "src\\app\\api\\scope\\[id]\\route.ts",
+      "type": "fileOperations",
+      "count": 24,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "stat",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\scope\\[id]\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 25,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await context.params",
+        "await supabase",
+        "await verifyProjectAccess(supabase, user, scopeItem.project_id)"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\scope\\[id]\\route.ts",
+      "type": "syncOperations",
+      "count": 1,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "sync function verifyProjectAccess("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\scope\\[id]\\supplier\\route.ts",
+      "type": "fileOperations",
+      "count": 2,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\scope\\[id]\\supplier\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 7,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await context.params",
+        "await request.json()",
+        "await supabase"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\scope\\bulk\\route.ts",
+      "type": "syncDatabase",
+      "count": 3,
+      "severity": "medium",
+      "description": "Synchronous database operations may block execution",
+      "examples": [
+        "await supabase.from('material_requirements').delete().eq('scope_item_id', itemId)",
+        "await supabase.from('scope_dependencies').delete().eq('scope_item_id', itemId)",
+        "await supabase.from('scope_dependencies').delete().eq('depends_on_id', itemId)"
+      ],
+      "recommendation": "Use async/await pattern for all database operations"
+    },
+    {
+      "route": "src\\app\\api\\scope\\bulk\\route.ts",
+      "type": "heavyComputations",
+      "count": 2,
+      "severity": "medium",
+      "description": "Heavy computational operations in request handler",
+      "examples": [
+        "    const inaccessibleProjects = projectIds.filter(",
+        "    const inaccessibleProjects = projectIds.filter("
+      ],
+      "recommendation": "Move heavy computations to background jobs"
+    },
+    {
+      "route": "src\\app\\api\\scope\\bulk\\route.ts",
+      "type": "missingCaching",
+      "count": 3,
+      "severity": "medium",
+      "description": "Database queries without caching mechanism",
+      "examples": [
+        "          await supabase.from",
+        "          await supabase.from",
+        "          await supabase.from"
+      ],
+      "recommendation": "Implement caching for frequently accessed data"
+    },
+    {
+      "route": "src\\app\\api\\scope\\bulk\\route.ts",
+      "type": "fileOperations",
+      "count": 28,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "stat",
+        "access"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\scope\\bulk\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 17,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await request.json()",
+        "await supabase",
+        "await getAccessibleProjects(supabase, user)"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\scope\\bulk\\route.ts",
+      "type": "syncOperations",
+      "count": 1,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "sync function getAccessibleProjects("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\scope\\excel\\export\\route.ts",
+      "type": "heavyComputations",
+      "count": 4,
+      "severity": "medium",
+      "description": "Heavy computational operations in request handler",
+      "examples": [
+        "        const categoryItems = scopeItems.filter(",
+        "        const completed = categoryItems.filter(",
+        "        const inProgress = categoryItems.filter("
+      ],
+      "recommendation": "Move heavy computations to background jobs"
+    },
+    {
+      "route": "src\\app\\api\\scope\\excel\\export\\route.ts",
+      "type": "fileOperations",
+      "count": 12,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "access",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\scope\\excel\\export\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 5,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await verifyProjectAccess(supabase, user, projectId)",
+        "await query",
+        "await supabase"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\scope\\excel\\export\\route.ts",
+      "type": "syncOperations",
+      "count": 1,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "sync function verifyProjectAccess("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\scope\\excel\\import\\route.ts",
+      "type": "fileOperations",
+      "count": 3,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "access",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\scope\\excel\\import\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 9,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await request.formData()",
+        "await verifyProjectAccess(supabase, user, projectId)",
+        "await file.arrayBuffer()"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\scope\\excel\\import\\route.ts",
+      "type": "syncOperations",
+      "count": 7,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "function mapExcelColumns(",
+        "function mapRowToScopeItem(",
+        "function normalizeCategory("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\scope\\overview\\route.ts",
+      "type": "heavyComputations",
+      "count": 2,
+      "severity": "medium",
+      "description": "Heavy computational operations in request handler",
+      "examples": [
+        "      .filter(",
+        "      .sort("
+      ],
+      "recommendation": "Move heavy computations to background jobs"
+    },
+    {
+      "route": "src\\app\\api\\scope\\overview\\route.ts",
+      "type": "fileOperations",
+      "count": 12,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "access",
+        "access"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\scope\\overview\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 6,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await getAccessibleProjects(supabase, user)",
+        "await supabase",
+        "await supabase"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\scope\\overview\\route.ts",
+      "type": "syncOperations",
+      "count": 2,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "sync function getAccessibleProjects(",
+        "function getEmptyOverview("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\scope\\route.ts",
+      "type": "heavyComputations",
+      "count": 1,
+      "severity": "medium",
+      "description": "Heavy computational operations in request handler",
+      "examples": [
+        "    const itemsOverBudget = items.filter("
+      ],
+      "recommendation": "Move heavy computations to background jobs"
+    },
+    {
+      "route": "src\\app\\api\\scope\\route.ts",
+      "type": "fileOperations",
+      "count": 57,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "access",
+        "stat",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\scope\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 22,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await getAccessibleProjects(supabase, user)",
+        "await query",
+        "await Promise.all("
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\scope\\route.ts",
+      "type": "syncOperations",
+      "count": 5,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "sync function getAccessibleProjects(",
+        "sync function verifyProjectAccess(",
+        "sync function getDependencyDetails("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\suppliers\\[id]\\route.ts",
+      "type": "missingPagination",
+      "count": 1,
+      "severity": "high",
+      "description": "Missing pagination on potentially large datasets",
+      "examples": [
+        ".select()"
+      ],
+      "recommendation": "Implement pagination with LIMIT and OFFSET"
+    },
+    {
+      "route": "src\\app\\api\\suppliers\\[id]\\route.ts",
+      "type": "fileOperations",
+      "count": 7,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "stat",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\suppliers\\[id]\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 7,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await context.params;",
+        "await supabase",
+        "await context.params;"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\suppliers\\[id]\\route.ts",
+      "type": "syncOperations",
+      "count": 3,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "export async function GET(",
+        "export async function PUT(",
+        "export async function DELETE("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\suppliers\\route.ts",
+      "type": "missingPagination",
+      "count": 1,
+      "severity": "high",
+      "description": "Missing pagination on potentially large datasets",
+      "examples": [
+        ".select()"
+      ],
+      "recommendation": "Implement pagination with LIMIT and OFFSET"
+    },
+    {
+      "route": "src\\app\\api\\suppliers\\route.ts",
+      "type": "fileOperations",
+      "count": 7,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "stat",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\suppliers\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 3,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await query;",
+        "await request.json();",
+        "await supabase"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\suppliers\\route.ts",
+      "type": "syncOperations",
+      "count": 2,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "export async function GET(",
+        "export async function POST("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\suppliers\\totals\\route.ts",
+      "type": "heavyComputations",
+      "count": 1,
+      "severity": "medium",
+      "description": "Heavy computational operations in request handler",
+      "examples": [
+        "    const totalsArray = Array.from(supplierTotals.values()).sort("
+      ],
+      "recommendation": "Move heavy computations to background jobs"
+    },
+    {
+      "route": "src\\app\\api\\suppliers\\totals\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 1,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await query"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\tasks\\[id]\\comments\\route.ts",
+      "type": "fileOperations",
+      "count": 10,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "access",
+        "access"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\tasks\\[id]\\comments\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 13,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await context.params",
+        "await supabase",
+        "await verifyProjectAccess(supabase, user, task.project_id)"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\tasks\\[id]\\comments\\route.ts",
+      "type": "syncOperations",
+      "count": 1,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "sync function verifyProjectAccess("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\tasks\\[id]\\route.ts",
+      "type": "fileOperations",
+      "count": 61,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "stat",
+        "access"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\tasks\\[id]\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 20,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await context.params",
+        "await supabase",
+        "await verifyProjectAccess(supabase, user, task.project_id)"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\tasks\\[id]\\route.ts",
+      "type": "syncOperations",
+      "count": 2,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "sync function verifyProjectAccess(",
+        "function calculateDaysUntilDue("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\tasks\\route.ts",
+      "type": "fileOperations",
+      "count": 60,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "access",
+        "stat",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\tasks\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 16,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await getAccessibleProjects(supabase, user)",
+        "await verifyProjectAccess(supabase, user, queryParams.project_id)",
+        "await query"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\tasks\\route.ts",
+      "type": "syncOperations",
+      "count": 5,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "sync function getAccessibleProjects(",
+        "sync function verifyProjectAccess(",
+        "function calculateDaysUntilDue("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    },
+    {
+      "route": "src\\app\\api\\tasks\\statistics\\route.ts",
+      "type": "fileOperations",
+      "count": 46,
+      "severity": "medium",
+      "description": "File system operations that may block execution",
+      "examples": [
+        "stat",
+        "stat",
+        "stat"
+      ],
+      "recommendation": "Use async file operations and consider caching"
+    },
+    {
+      "route": "src\\app\\api\\tasks\\statistics\\route.ts",
+      "type": "missingErrorHandling",
+      "count": 10,
+      "severity": "high",
+      "description": "Database operations without proper error handling",
+      "examples": [
+        "await verifyProjectAccess(supabase, user, queryParams.project_id)",
+        "await getAccessibleProjects(supabase, user)",
+        "await query"
+      ],
+      "recommendation": "Add comprehensive error handling and logging"
+    },
+    {
+      "route": "src\\app\\api\\tasks\\statistics\\route.ts",
+      "type": "syncOperations",
+      "count": 8,
+      "severity": "low",
+      "description": "Synchronous operations that may block execution",
+      "examples": [
+        "sync function getAccessibleProjects(",
+        "sync function verifyProjectAccess(",
+        "sync function calculateComprehensiveStatistics("
+      ],
+      "recommendation": "Convert to async operations where possible"
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "high",
+      "category": "Critical Performance Issues",
+      "description": "Address high-impact performance bottlenecks immediately",
+      "actions": [
+        "Optimize N+1 query patterns with batch operations",
+        "Implement pagination for large datasets",
+        "Add database indexes for frequently queried columns",
+        "Review and optimize complex database joins"
+      ],
+      "affectedRoutes": [
+        null
+      ]
+    },
+    {
+      "priority": "medium",
+      "category": "Caching Strategy",
+      "description": "Implement caching to reduce database load",
+      "actions": [
+        "Add Redis caching for frequently accessed data",
+        "Implement response caching for read-heavy endpoints",
+        "Cache expensive computation results",
+        "Use browser caching headers appropriately"
+      ],
+      "affectedRoutes": [
+        null
+      ]
+    },
+    {
+      "priority": "high",
+      "category": "Error Handling",
+      "description": "Improve error handling for better reliability",
+      "actions": [
+        "Add comprehensive try-catch blocks",
+        "Implement proper error logging",
+        "Add request timeout handling",
+        "Implement circuit breaker pattern for external calls"
+      ],
+      "affectedRoutes": [
+        "src\\app\\api\\admin\\auth-state\\route.ts",
+        "src\\app\\api\\admin\\create-test-users\\route.ts",
+        "src\\app\\api\\admin\\reset-auth\\route.ts",
+        "src\\app\\api\\admin\\users\\route.ts",
+        "src\\app\\api\\auth\\change-password\\route.ts",
+        "src\\app\\api\\auth\\diagnostics\\route.ts",
+        "src\\app\\api\\auth\\login\\route.ts",
+        "src\\app\\api\\auth\\logout\\route.ts",
+        "src\\app\\api\\auth\\profile\\route.ts",
+        "src\\app\\api\\auth\\recover-profile\\route.ts",
+        "src\\app\\api\\auth\\register\\route.ts",
+        "src\\app\\api\\auth\\reset-password\\route.ts",
+        "src\\app\\api\\dashboard\\activity\\route.ts",
+        "src\\app\\api\\dashboard\\comprehensive-stats\\route.ts",
+        "src\\app\\api\\dashboard\\recent-activity\\route.ts",
+        "src\\app\\api\\dashboard\\stats\\route.ts",
+        "src\\app\\api\\dashboard\\tasks\\route.ts",
+        "src\\app\\api\\debug-profile\\route.ts",
+        "src\\app\\api\\debug\\create-test-profiles\\route.ts",
+        "src\\app\\api\\material-specs\\[id]\\approve\\route.ts",
+        "src\\app\\api\\material-specs\\[id]\\link-scope\\route.ts",
+        "src\\app\\api\\material-specs\\[id]\\reject\\route.ts",
+        "src\\app\\api\\material-specs\\[id]\\request-revision\\route.ts",
+        "src\\app\\api\\material-specs\\[id]\\route.ts",
+        "src\\app\\api\\material-specs\\[id]\\unlink-scope\\route.ts",
+        "src\\app\\api\\material-specs\\bulk\\route.ts",
+        "src\\app\\api\\material-specs\\route.ts",
+        "src\\app\\api\\material-specs\\statistics\\route.ts",
+        "src\\app\\api\\milestones\\[id]\\route.ts",
+        "src\\app\\api\\milestones\\[id]\\status\\route.ts",
+        "src\\app\\api\\milestones\\bulk\\route.ts",
+        "src\\app\\api\\milestones\\route.ts",
+        "src\\app\\api\\milestones\\statistics\\route.ts",
+        "src\\app\\api\\projects\\[id]\\assignments\\route.ts",
+        "src\\app\\api\\projects\\[id]\\material-specs\\route.ts",
+        "src\\app\\api\\projects\\[id]\\milestones\\route.ts",
+        "src\\app\\api\\projects\\[id]\\route.ts",
+        "src\\app\\api\\projects\\[id]\\tasks\\route.ts",
+        "src\\app\\api\\projects\\metrics\\route.ts",
+        "src\\app\\api\\projects\\route.ts",
+        "src\\app\\api\\reports\\route.ts",
+        "src\\app\\api\\scope\\[id]\\dependencies\\route.ts",
+        "src\\app\\api\\scope\\[id]\\route.ts",
+        "src\\app\\api\\scope\\[id]\\supplier\\route.ts",
+        "src\\app\\api\\scope\\bulk\\route.ts",
+        "src\\app\\api\\scope\\excel\\export\\route.ts",
+        "src\\app\\api\\scope\\excel\\import\\route.ts",
+        "src\\app\\api\\scope\\overview\\route.ts",
+        "src\\app\\api\\scope\\route.ts",
+        "src\\app\\api\\suppliers\\[id]\\route.ts",
+        "src\\app\\api\\suppliers\\route.ts",
+        "src\\app\\api\\suppliers\\totals\\route.ts",
+        "src\\app\\api\\tasks\\[id]\\comments\\route.ts",
+        "src\\app\\api\\tasks\\[id]\\route.ts",
+        "src\\app\\api\\tasks\\route.ts",
+        "src\\app\\api\\tasks\\statistics\\route.ts"
+      ]
+    }
+  ]
+}

@@ -96,7 +96,12 @@
       "mcp__supabase__execute_sql",
       "Bash(docker logs:*)",
       "Bash(echo:*)",
-      "Bash(mcp list:*)"
+      "Bash(mcp list:*)",
+      "Bash(where npx)",
+      "Bash(where python)",
+      "Bash(docker:*)",
+      "Bash(set SUPABASE_URL=http://127.0.0.1:54321)",
+      "Bash(set:*)"
     ],
     "deny": []
   }
