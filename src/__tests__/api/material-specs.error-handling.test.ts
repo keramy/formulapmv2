@@ -73,17 +73,16 @@ describe('Material Specifications Error Handling', () => {
     
     it('should properly validate user permissions for different roles', () => {
       const testCases = [
-        { role: 'field_worker', action: 'create', expected: false },
-        { role: 'field_worker', action: 'delete', expected: false },
-        { role: 'field_worker', action: 'approve', expected: false },
         { role: 'client', action: 'create', expected: false },
         { role: 'client', action: 'update', expected: false },
+        { role: 'client', action: 'delete', expected: false },
         { role: 'client', action: 'approve', expected: false },
         { role: 'project_manager', action: 'read', expected: true },
         { role: 'project_manager', action: 'create', expected: true },
         { role: 'project_manager', action: 'approve', expected: true },
+        { role: 'technical_lead', action: 'approve', expected: true },
         { role: 'admin', action: 'delete', expected: true },
-        { role: 'company_owner', action: 'approve', expected: true },
+        { role: 'management', action: 'approve', expected: true },
         { role: 'invalid_role', action: 'read', expected: false },
       ]
       

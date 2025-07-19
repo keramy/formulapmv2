@@ -48,21 +48,21 @@ export const TEST_USERS: Record<string, TestUser> = {
     first_name: 'Project',
     last_name: 'Manager'
   },
-  company_owner: {
+  management: {
     id: '22222222-2222-4222-8222-222222222222',
-    email: 'owner.test@formulapm.com', 
+    email: 'management.test@formulapm.com', 
     password: 'testpass123',
-    role: 'company_owner',
-    first_name: 'Company',
-    last_name: 'Owner'
+    role: 'management',
+    first_name: 'Management',
+    last_name: 'User'
   },
-  general_manager: {
+  technical_lead: {
     id: '33333333-3333-4333-8333-333333333333',
-    email: 'gm.test@formulapm.com',
+    email: 'tech.lead@formulapm.com',
     password: 'testpass123',
-    role: 'general_manager',
-    first_name: 'General',
-    last_name: 'Manager'
+    role: 'technical_lead',
+    first_name: 'Technical',
+    last_name: 'Lead'
   },
   client: {
     id: '44444444-4444-4444-8444-444444444444',
@@ -72,13 +72,13 @@ export const TEST_USERS: Record<string, TestUser> = {
     first_name: 'Test',
     last_name: 'Client'
   },
-  architect: {
+  purchase_manager: {
     id: '55555555-5555-4555-8555-555555555555',
-    email: 'architect.test@formulapm.com',
+    email: 'purchase.manager@formulapm.com',
     password: 'testpass123',
-    role: 'architect',
-    first_name: 'Test', 
-    last_name: 'Architect'
+    role: 'purchase_manager',
+    first_name: 'Purchase', 
+    last_name: 'Manager'
   }
 }
 

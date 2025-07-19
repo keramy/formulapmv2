@@ -1,0 +1,217 @@
+{
+  "title": "Performance Advisor High-Priority Tables",
+  "description": "Detailed definitions of tables requiring RLS optimization based on Supabase Performance Advisor analysis",
+  "total_tables": 17,
+  "total_expected_optimizations": 23,
+  "performance_impact": "HIGH - 10-100x improvement expected",
+  
+  "execution_phases": {
+    "phase_1_critical": {
+      "priority": "CRITICAL",
+      "description": "Core user access tables with highest performance impact",
+      "tables": {
+        "activity_summary": {
+          "direct_calls": 2,
+          "description": "User activity tracking with frequent RLS checks",
+          "optimization_impact": "VERY_HIGH",
+          "policies_to_optimize": [
+            "activity_summary_select_policy",
+            "activity_summary_insert_policy"
+          ],
+          "expected_transformations": [
+            "user_id = auth.uid() → user_id = (SELECT auth.uid())",
+            "(auth.jwt() ->> 'role') → ((SELECT auth.jwt()) ->> 'role')"
+          ]
+        },
+        "audit_logs": {
+          "direct_calls": 1,
+          "description": "System audit logging with user-based filtering",
+          "optimization_impact": "HIGH",
+          "policies_to_optimize": [
+            "audit_logs_select_policy"
+          ],
+          "expected_transformations": [
+            "user_id = auth.uid() → user_id = (SELECT auth.uid())"
+          ]
+        },
+        "notifications": {
+          "direct_calls": 1,
+          "description": "User notification system with high query volume",
+          "optimization_impact": "HIGH",
+          "policies_to_optimize": [
+            "notifications_select_policy"
+          ],
+          "expected_transformations": [
+            "recipient_id = auth.uid() → recipient_id = (SELECT auth.uid())"
+          ]
+        }
+      }
+    },
+    
+    "phase_2_high": {
+      "priority": "HIGH",
+      "description": "Task management and financial tables",
+      "tables": {
+        "tasks": {
+          "direct_calls": 1,
+          "description": "Project task management with user assignments",
+          "optimization_impact": "HIGH",
+          "policies_to_optimize": [
+            "tasks_select_policy"
+          ]
+        },
+        "task_comments": {
+          "direct_calls": 1,
+          "description": "Task discussion threads with user permissions",
+          "optimization_impact": "MEDIUM",
+          "policies_to_optimize": [
+            "task_comments_select_policy"
+          ]
+        },
+        "field_reports": {
+          "direct_calls": 1,
+          "description": "Field reporting system with user-based access",
+          "optimization_impact": "MEDIUM",
+          "policies_to_optimize": [
+            "field_reports_select_policy"
+          ]
+        },
+        "invoices": {
+          "direct_calls": 3,
+          "description": "Invoice management with complex user permissions",
+          "optimization_impact": "HIGH",
+          "policies_to_optimize": [
+            "invoices_select_policy",
+            "invoices_update_policy", 
+            "invoices_insert_policy"
+          ]
+        },
+        "invoice_items": {
+          "direct_calls": 1,
+          "description": "Invoice line items with inherited permissions",
+          "optimization_impact": "MEDIUM",
+          "policies_to_optimize": [
+            "invoice_items_select_policy"
+          ]
+        },
+        "payments": {
+          "direct_calls": 1,
+          "description": "Payment processing with user-based access",
+          "optimization_impact": "MEDIUM",
+          "policies_to_optimize": [
+            "payments_select_policy"
+          ]
+        },
+        "project_budgets": {
+          "direct_calls": 2,
+          "description": "Project budget management with role-based access",
+          "optimization_impact": "HIGH",
+          "policies_to_optimize": [
+            "project_budgets_select_policy",
+            "project_budgets_update_policy"
+          ]
+        }
+      }
+    },
+    
+    "phase_3_medium": {
+      "priority": "MEDIUM",
+      "description": "System and document management tables",
+      "tables": {
+        "system_settings": {
+          "direct_calls": 1,
+          "description": "System configuration with admin access controls",
+          "optimization_impact": "LOW",
+          "policies_to_optimize": [
+            "system_settings_select_policy"
+          ]
+        },
+        "permission_templates": {
+          "direct_calls": 1,
+          "description": "Permission template management",
+          "optimization_impact": "LOW",
+          "policies_to_optimize": [
+            "permission_templates_select_policy"
+          ]
+        },
+        "documents": {
+          "direct_calls": 2,
+          "description": "Document management with user-based permissions",
+          "optimization_impact": "MEDIUM",
+          "policies_to_optimize": [
+            "documents_select_policy",
+            "documents_update_policy"
+          ]
+        },
+        "document_approvals": {
+          "direct_calls": 1,
+          "description": "Document approval workflow",
+          "optimization_impact": "LOW",
+          "policies_to_optimize": [
+            "document_approvals_select_policy"
+          ]
+        },
+        "suppliers": {
+          "direct_calls": 2,
+          "description": "Supplier management with user-based access",
+          "optimization_impact": "MEDIUM",
+          "policies_to_optimize": [
+            "suppliers_select_policy",
+            "suppliers_update_policy"
+          ]
+        },
+        "mobile_devices": {
+          "direct_calls": 1,
+          "description": "Mobile device registration and management",
+          "optimization_impact": "LOW",
+          "policies_to_optimize": [
+            "mobile_devices_select_policy"
+          ]
+        },
+        "tenders": {
+          "direct_calls": 1,
+          "description": "Tender management with role-based permissions",
+          "optimization_impact": "MEDIUM",
+          "policies_to_optimize": [
+            "tenders_select_policy"
+          ]
+        }
+      }
+    }
+  },
+  
+  "execution_order": [
+    "activity_summary",
+    "audit_logs", 
+    "notifications",
+    "invoices",
+    "project_budgets",
+    "tasks",
+    "documents",
+    "suppliers",
+    "task_comments",
+    "field_reports",
+    "payments",
+    "invoice_items",
+    "tenders",
+    "system_settings",
+    "permission_templates",
+    "document_approvals",
+    "mobile_devices"
+  ],
+  
+  "success_criteria": {
+    "total_optimizations_expected": 23,
+    "minimum_success_rate": "90%",
+    "performance_improvement_expected": "10-100x faster RLS evaluation",
+    "zero_direct_auth_calls": "All direct auth.uid() and auth.jwt() calls converted to subqueries"
+  },
+  
+  "validation_requirements": [
+    "All policies must preserve original security behavior",
+    "No direct auth function calls should remain",
+    "All optimized policies must use (SELECT auth.uid()) pattern",
+    "Role-based access controls must continue working",
+    "User data isolation must be maintained"
+  ]
+}

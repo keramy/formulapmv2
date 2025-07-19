@@ -1,0 +1,16 @@
+{
+  "title": "RLS Pattern Transformation Report",
+  "generated_at": "2025-07-19T10:31:16.371Z",
+  "summary": {
+    "total_processed": 3,
+    "successful_transformations": 3,
+    "failed_transformations": 0,
+    "success_rate": 100
+  },
+  "patterns_found": {
+    "direct_uid_calls": 13,
+    "direct_jwt_calls": 1,
+    "already_optimized": 1
+  },
+  "transformations": []
+}

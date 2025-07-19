@@ -1,0 +1,223 @@
+{
+  "summary": {
+    "totalTables": 4,
+    "coreTables": 23,
+    "systemTables": 0,
+    "unexpectedTables": 0,
+    "missingTables": 0,
+    "timestamp": "2025-07-18T11:39:59.590Z"
+  },
+  "tables": [
+    {
+      "table_name": "user_profiles",
+      "table_schema": "public",
+      "table_type": "BASE TABLE"
+    },
+    {
+      "table_name": "projects",
+      "table_schema": "public",
+      "table_type": "BASE TABLE"
+    },
+    {
+      "table_name": "scope_items",
+      "table_schema": "public",
+      "table_type": "BASE TABLE"
+    },
+    {
+      "table_name": "tasks",
+      "table_schema": "public",
+      "table_type": "BASE TABLE"
+    }
+  ],
+  "coreTableStatus": {
+    "user_profiles": {
+      "exists": true,
+      "rowCount": 2,
+      "hasData": true,
+      "columns": [
+        "id",
+        "role",
+        "first_name",
+        "last_name",
+        "email",
+        "phone",
+        "company",
+        "department",
+        "hire_date",
+        "is_active",
+        "permissions",
+        "created_at",
+        "updated_at",
+        "seniority_level",
+        "approval_limits",
+        "dashboard_preferences",
+        "previous_role",
+        "role_migrated_at"
+      ]
+    },
+    "clients": {
+      "exists": true,
+      "rowCount": 0,
+      "hasData": false,
+      "columns": []
+    },
+    "suppliers": {
+      "exists": true,
+      "rowCount": 0,
+      "hasData": false,
+      "columns": []
+    },
+    "projects": {
+      "exists": true,
+      "rowCount": 0,
+      "hasData": false,
+      "columns": []
+    },
+    "project_assignments": {
+      "exists": true,
+      "rowCount": 0,
+      "hasData": false,
+      "columns": []
+    },
+    "scope_items": {
+      "exists": true,
+      "rowCount": 0,
+      "hasData": false,
+      "columns": []
+    },
+    "scope_dependencies": {
+      "exists": true,
+      "rowCount": 0,
+      "hasData": false,
+      "columns": []
+    },
+    "documents": {
+      "exists": true,
+      "rowCount": 0,
+      "hasData": false,
+      "columns": []
+    },
+    "document_approvals": {
+      "exists": true,
+      "rowCount": 0,
+      "hasData": false,
+      "columns": []
+    },
+    "subcontractors": {
+      "exists": true,
+      "rowCount": 0,
+      "hasData": false,
+      "columns": []
+    },
+    "subcontractor_assignments": {
+      "exists": true,
+      "rowCount": 0,
+      "hasData": false,
+      "columns": []
+    },
+    "approval_requests": {
+      "exists": true,
+      "rowCount": 0,
+      "hasData": false,
+      "columns": []
+    },
+    "vendors": {
+      "exists": true,
+      "rowCount": 0,
+      "hasData": false,
+      "columns": []
+    },
+    "purchase_requests": {
+      "exists": true,
+      "rowCount": 0,
+      "hasData": false,
+      "columns": []
+    },
+    "purchase_orders": {
+      "exists": true,
+      "rowCount": 0,
+      "hasData": false,
+      "columns": []
+    },
+    "vendor_ratings": {
+      "exists": true,
+      "rowCount": 0,
+      "hasData": false,
+      "columns": []
+    },
+    "purchase_approval_workflows": {
+      "exists": false,
+      "rowCount": 0,
+      "columns": [],
+      "error": "relation \"public.purchase_approval_workflows\" does not exist"
+    },
+    "delivery_confirmations": {
+      "exists": true,
+      "rowCount": 0,
+      "hasData": false,
+      "columns": []
+    },
+    "tasks": {
+      "exists": true,
+      "rowCount": 0,
+      "hasData": false,
+      "columns": []
+    },
+    "task_comments": {
+      "exists": true,
+      "rowCount": 0,
+      "hasData": false,
+      "columns": []
+    },
+    "milestones": {
+      "exists": false,
+      "rowCount": 0,
+      "columns": [],
+      "error": "relation \"public.milestones\" does not exist"
+    },
+    "material_specifications": {
+      "exists": false,
+      "rowCount": 0,
+      "columns": [],
+      "error": "relation \"public.material_specifications\" does not exist"
+    },
+    "audit_logs": {
+      "exists": true,
+      "rowCount": 0,
+      "hasData": false,
+      "columns": []
+    },
+    "notifications": {
+      "exists": true,
+      "rowCount": 0,
+      "hasData": false,
+      "columns": []
+    },
+    "system_settings": {
+      "exists": true,
+      "rowCount": 0,
+      "hasData": false,
+      "columns": []
+    },
+    "migration_log": {
+      "exists": true,
+      "rowCount": 3,
+      "hasData": true,
+      "columns": [
+        "id",
+        "migration_name",
+        "status",
+        "completed_at",
+        "created_at"
+      ]
+    }
+  },
+  "unexpectedTables": [],
+  "missingTables": [
+    "purchase_approval_workflows",
+    "milestones",
+    "material_specifications"
+  ],
+  "schemaAnalysis": {},
+  "recommendations": []
+}

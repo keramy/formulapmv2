@@ -222,7 +222,7 @@ export async function getProjectsOptimized(
     `,
     (query) => {
       // Apply role-based filtering
-      if (!['company_owner', 'general_manager', 'deputy_general_manager', 'admin'].includes(userRole)) {
+      if (!['management', 'technical_lead', 'admin'].includes(userRole)) {
         // Non-admin users only see their assigned projects
         return query.or(`project_manager_id.eq.${userId},created_by.eq.${userId}`)
       }
@@ -257,7 +257,7 @@ export async function getTasksOptimized(
     `,
     (query) => {
       // Apply role-based filtering
-      if (!['company_owner', 'general_manager', 'deputy_general_manager', 'admin'].includes(userRole)) {
+      if (!['management', 'technical_lead', 'admin'].includes(userRole)) {
         return query.eq('assigned_to', userId)
       }
       return query

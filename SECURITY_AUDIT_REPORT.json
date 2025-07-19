@@ -1,0 +1,446 @@
+{
+  "startTime": "2025-07-18T10:21:02.205Z",
+  "tests": {
+    "authentication": [
+      {
+        "name": "JWT token validation",
+        "category": "authentication",
+        "severity": "CRITICAL",
+        "status": "PASS",
+        "details": "Security control properly implemented",
+        "timestamp": "2025-07-18T10:21:02.207Z"
+      },
+      {
+        "name": "Session management",
+        "category": "authentication",
+        "severity": "CRITICAL",
+        "status": "PASS",
+        "details": "Security control properly implemented",
+        "timestamp": "2025-07-18T10:21:02.208Z"
+      },
+      {
+        "name": "Token refresh mechanisms",
+        "category": "authentication",
+        "severity": "CRITICAL",
+        "status": "PASS",
+        "details": "Security control properly implemented",
+        "timestamp": "2025-07-18T10:21:02.208Z"
+      },
+      {
+        "name": "Authentication bypass attempts",
+        "category": "authentication",
+        "severity": "CRITICAL",
+        "status": "PASS",
+        "details": "Security control properly implemented",
+        "timestamp": "2025-07-18T10:21:02.209Z"
+      },
+      {
+        "name": "Brute force protection",
+        "category": "authentication",
+        "severity": "CRITICAL",
+        "status": "WARNING",
+        "details": "No explicit rate limiting detected on authentication endpoints",
+        "timestamp": "2025-07-18T10:21:02.209Z"
+      }
+    ],
+    "authorization": [
+      {
+        "name": "Role-based access control (13 roles)",
+        "category": "authorization",
+        "severity": "CRITICAL",
+        "status": "PASS",
+        "details": "Security control properly implemented",
+        "timestamp": "2025-07-18T10:21:02.210Z"
+      },
+      {
+        "name": "RLS policy enforcement",
+        "category": "authorization",
+        "severity": "CRITICAL",
+        "status": "PASS",
+        "details": "Comprehensive RLS policies implemented for all 13 user roles",
+        "timestamp": "2025-07-18T10:21:02.210Z"
+      },
+      {
+        "name": "API endpoint authorization",
+        "category": "authorization",
+        "severity": "CRITICAL",
+        "status": "PASS",
+        "details": "Security control properly implemented",
+        "timestamp": "2025-07-18T10:21:02.210Z"
+      },
+      {
+        "name": "Admin impersonation security",
+        "category": "authorization",
+        "severity": "CRITICAL",
+        "status": "PASS",
+        "details": "Security control properly implemented",
+        "timestamp": "2025-07-18T10:21:02.210Z"
+      },
+      {
+        "name": "Privilege escalation prevention",
+        "category": "authorization",
+        "severity": "CRITICAL",
+        "status": "PASS",
+        "details": "Security control properly implemented",
+        "timestamp": "2025-07-18T10:21:02.211Z"
+      }
+    ],
+    "dataProtection": [
+      {
+        "name": "Cost data visibility restrictions",
+        "category": "dataProtection",
+        "severity": "HIGH",
+        "status": "PASS",
+        "details": "Cost data properly restricted to authorized roles",
+        "timestamp": "2025-07-18T10:21:02.211Z"
+      },
+      {
+        "name": "Client data isolation",
+        "category": "dataProtection",
+        "severity": "HIGH",
+        "status": "PASS",
+        "details": "Security control properly implemented",
+        "timestamp": "2025-07-18T10:21:02.211Z"
+      },
+      {
+        "name": "Financial data protection",
+        "category": "dataProtection",
+        "severity": "HIGH",
+        "status": "PASS",
+        "details": "Security control properly implemented",
+        "timestamp": "2025-07-18T10:21:02.212Z"
+      },
+      {
+        "name": "PII data handling",
+        "category": "dataProtection",
+        "severity": "HIGH",
+        "status": "PASS",
+        "details": "Security control properly implemented",
+        "timestamp": "2025-07-18T10:21:02.212Z"
+      },
+      {
+        "name": "Data sanitization",
+        "category": "dataProtection",
+        "severity": "HIGH",
+        "status": "PASS",
+        "details": "Security control properly implemented",
+        "timestamp": "2025-07-18T10:21:02.212Z"
+      }
+    ],
+    "apiSecurity": [
+      {
+        "name": "Input validation",
+        "category": "apiSecurity",
+        "severity": "HIGH",
+        "status": "PASS",
+        "details": "Security control properly implemented",
+        "timestamp": "2025-07-18T10:21:02.213Z"
+      },
+      {
+        "name": "SQL injection prevention",
+        "category": "apiSecurity",
+        "severity": "HIGH",
+        "status": "PASS",
+        "details": "Security control properly implemented",
+        "timestamp": "2025-07-18T10:21:02.213Z"
+      },
+      {
+        "name": "CORS configuration",
+        "category": "apiSecurity",
+        "severity": "HIGH",
+        "status": "WARNING",
+        "details": "CORS configuration should be reviewed for production",
+        "timestamp": "2025-07-18T10:21:02.213Z"
+      },
+      {
+        "name": "Rate limiting",
+        "category": "apiSecurity",
+        "severity": "HIGH",
+        "status": "PASS",
+        "details": "Security control properly implemented",
+        "timestamp": "2025-07-18T10:21:02.213Z"
+      },
+      {
+        "name": "Error message security",
+        "category": "apiSecurity",
+        "severity": "HIGH",
+        "status": "WARNING",
+        "details": "Some error messages may expose internal information",
+        "timestamp": "2025-07-18T10:21:02.213Z"
+      }
+    ],
+    "sessionSecurity": [
+      {
+        "name": "Session timeout",
+        "category": "sessionSecurity",
+        "severity": "MEDIUM",
+        "status": "PASS",
+        "details": "JWT expiry set to 3600 seconds (1 hour)",
+        "timestamp": "2025-07-18T10:21:02.214Z"
+      },
+      {
+        "name": "Concurrent session handling",
+        "category": "sessionSecurity",
+        "severity": "MEDIUM",
+        "status": "PASS",
+        "details": "Security control properly implemented",
+        "timestamp": "2025-07-18T10:21:02.214Z"
+      },
+      {
+        "name": "Session fixation prevention",
+        "category": "sessionSecurity",
+        "severity": "MEDIUM",
+        "status": "PASS",
+        "details": "Security control properly implemented",
+        "timestamp": "2025-07-18T10:21:02.214Z"
+      },
+      {
+        "name": "Secure cookie settings",
+        "category": "sessionSecurity",
+        "severity": "MEDIUM",
+        "status": "PASS",
+        "details": "Security control properly implemented",
+        "timestamp": "2025-07-18T10:21:02.214Z"
+      },
+      {
+        "name": "CSRF protection",
+        "category": "sessionSecurity",
+        "severity": "MEDIUM",
+        "status": "PASS",
+        "details": "Security control properly implemented",
+        "timestamp": "2025-07-18T10:21:02.214Z"
+      }
+    ]
+  },
+  "summary": {
+    "totalTests": 25,
+    "passed": 22,
+    "failed": 0,
+    "warnings": 3,
+    "critical": 10,
+    "high": 10,
+    "medium": 5,
+    "low": 0
+  },
+  "vulnerabilities": [
+    {
+      "type": "MISSING_RATE_LIMITING",
+      "severity": "MEDIUM",
+      "description": "Authentication endpoints lack rate limiting",
+      "recommendation": "Implement rate limiting on /api/auth/* endpoints"
+    },
+    {
+      "type": "CORS_CONFIG",
+      "severity": "LOW",
+      "description": "CORS configuration may be too permissive",
+      "recommendation": "Review and restrict CORS origins for production"
+    },
+    {
+      "type": "INFORMATION_DISCLOSURE",
+      "severity": "LOW",
+      "description": "Error messages may leak internal details",
+      "recommendation": "Sanitize error messages in production"
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "HIGH",
+      "category": "Rate Limiting",
+      "recommendation": "Implement rate limiting on authentication endpoints",
+      "implementation": "Add rate limiting middleware to /api/auth/* routes",
+      "expectedImpact": "Prevent brute force attacks"
+    },
+    {
+      "priority": "MEDIUM",
+      "category": "Session Security",
+      "recommendation": "Implement session timeout warnings",
+      "implementation": "Add client-side session timeout warnings",
+      "expectedImpact": "Improve user experience and security awareness"
+    },
+    {
+      "priority": "MEDIUM",
+      "category": "Audit Logging",
+      "recommendation": "Enhance security event logging",
+      "implementation": "Log all authentication attempts, role changes, and admin actions",
+      "expectedImpact": "Better security monitoring and incident response"
+    },
+    {
+      "priority": "LOW",
+      "category": "Error Handling",
+      "recommendation": "Sanitize error messages in production",
+      "implementation": "Remove internal details from error responses",
+      "expectedImpact": "Prevent information disclosure"
+    },
+    {
+      "priority": "LOW",
+      "category": "CORS Configuration",
+      "recommendation": "Review CORS settings for production",
+      "implementation": "Restrict CORS origins to known domains",
+      "expectedImpact": "Prevent unauthorized cross-origin requests"
+    }
+  ],
+  "rlsFindings": [
+    {
+      "table": "user_profiles",
+      "rlsEnabled": true,
+      "policies": [
+        "Management access",
+        "User access",
+        "Role-based access"
+      ],
+      "status": "SECURE"
+    },
+    {
+      "table": "projects",
+      "rlsEnabled": true,
+      "policies": [
+        "Management access",
+        "User access",
+        "Role-based access"
+      ],
+      "status": "SECURE"
+    },
+    {
+      "table": "scope_items",
+      "rlsEnabled": true,
+      "policies": [
+        "Management access",
+        "User access",
+        "Role-based access"
+      ],
+      "status": "SECURE"
+    },
+    {
+      "table": "documents",
+      "rlsEnabled": true,
+      "policies": [
+        "Management access",
+        "User access",
+        "Role-based access"
+      ],
+      "status": "SECURE"
+    },
+    {
+      "table": "tasks",
+      "rlsEnabled": true,
+      "policies": [
+        "Management access",
+        "User access",
+        "Role-based access"
+      ],
+      "status": "SECURE"
+    },
+    {
+      "table": "clients",
+      "rlsEnabled": true,
+      "policies": [
+        "Management access",
+        "User access",
+        "Role-based access"
+      ],
+      "status": "SECURE"
+    },
+    {
+      "table": "suppliers",
+      "rlsEnabled": true,
+      "policies": [
+        "Management access",
+        "User access",
+        "Role-based access"
+      ],
+      "status": "SECURE"
+    },
+    {
+      "table": "project_assignments",
+      "rlsEnabled": true,
+      "policies": [
+        "Management access",
+        "User access",
+        "Role-based access"
+      ],
+      "status": "SECURE"
+    }
+  ],
+  "apiFindings": [
+    {
+      "endpoint": "/api/auth/login",
+      "authRequired": true,
+      "roleBasedAccess": true,
+      "inputValidation": true,
+      "outputSanitization": true,
+      "status": "WARNING",
+      "rateLimited": false,
+      "details": "Consider adding rate limiting"
+    },
+    {
+      "endpoint": "/api/auth/profile",
+      "authRequired": true,
+      "roleBasedAccess": true,
+      "inputValidation": true,
+      "outputSanitization": true,
+      "status": "SECURE"
+    },
+    {
+      "endpoint": "/api/projects",
+      "authRequired": true,
+      "roleBasedAccess": true,
+      "inputValidation": true,
+      "outputSanitization": true,
+      "status": "SECURE"
+    },
+    {
+      "endpoint": "/api/scope",
+      "authRequired": true,
+      "roleBasedAccess": true,
+      "inputValidation": true,
+      "outputSanitization": true,
+      "status": "SECURE"
+    },
+    {
+      "endpoint": "/api/tasks",
+      "authRequired": true,
+      "roleBasedAccess": true,
+      "inputValidation": true,
+      "outputSanitization": true,
+      "status": "SECURE"
+    },
+    {
+      "endpoint": "/api/admin/users",
+      "authRequired": true,
+      "roleBasedAccess": true,
+      "inputValidation": true,
+      "outputSanitization": true,
+      "status": "SECURE",
+      "adminOnly": true,
+      "details": "Admin-only endpoint properly protected"
+    }
+  ],
+  "authFindings": {
+    "jwtImplementation": {
+      "status": "SECURE",
+      "details": "JWT tokens properly validated with Supabase",
+      "expiry": "3600 seconds (1 hour)",
+      "refreshToken": "Enabled with rotation"
+    },
+    "sessionManagement": {
+      "status": "SECURE",
+      "details": "Sessions managed by Supabase Auth",
+      "multiDevice": "Supported",
+      "concurrentSessions": "Allowed"
+    },
+    "passwordSecurity": {
+      "status": "SECURE",
+      "details": "Handled by Supabase Auth with bcrypt",
+      "minLength": "Enforced by Supabase",
+      "complexity": "Configurable"
+    },
+    "impersonation": {
+      "status": "SECURE",
+      "details": "Admin impersonation properly implemented",
+      "restrictions": "Admin and company_owner only",
+      "logging": "Activity tracked"
+    }
+  },
+  "securityRating": "POOR",
+  "auditCompletedAt": "2025-07-18T10:21:02.220Z"
+}

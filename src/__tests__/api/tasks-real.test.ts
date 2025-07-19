@@ -151,7 +151,7 @@ describe('Tasks API - Real Supabase', () => {
 
     it('should return 403 for unauthorized project access', async () => {
       // Create a different user without access to the project
-      const restrictedEnv = await setupBasicTestEnvironment('architect')
+      const restrictedEnv = await setupBasicTestEnvironment('purchase_manager')
       
       try {
         const request = createAuthenticatedRequest(

@@ -255,7 +255,7 @@ export async function getProjectsOptimized(
     `,
     (query) => {
       // Apply role-based filtering
-      if (!['company_owner', 'general_manager', 'deputy_general_manager', 'admin', 'management'].includes(userRole)) {
+      if (!['management', 'technical_lead', 'admin'].includes(userRole)) {
         // Non-admin users only see their assigned projects
         return query.or(`project_manager_id.eq.${userId},created_by.eq.${userId}`);
       }
@@ -293,7 +293,7 @@ export async function getTasksOptimized(
     `,
     (query) => {
       // Apply role-based filtering
-      if (!['company_owner', 'general_manager', 'deputy_general_manager', 'admin', 'management'].includes(userRole)) {
+      if (!['management', 'technical_lead', 'admin'].includes(userRole)) {
         return query.eq('assigned_to', userId);
       }
       return query;
@@ -321,7 +321,7 @@ export async function getDashboardStatsOptimized(
         .from('projects')
         .select('id, status', { count: 'exact' });
       
-      if (!['company_owner', 'general_manager', 'deputy_general_manager', 'admin', 'management'].includes(userRole)) {
+      if (!['management', 'technical_lead', 'admin'].includes(userRole)) {
         projectQuery = projectQuery.or(`project_manager_id.eq.${userId},created_by.eq.${userId}`);
       }
       
@@ -332,7 +332,7 @@ export async function getDashboardStatsOptimized(
         .from('tasks')
         .select('id, status', { count: 'exact' });
       
-      if (!['company_owner', 'general_manager', 'deputy_general_manager', 'admin', 'management'].includes(userRole)) {
+      if (!['management', 'technical_lead', 'admin'].includes(userRole)) {
         taskQuery = taskQuery.eq('assigned_to', userId);
       }
       
@@ -343,7 +343,7 @@ export async function getDashboardStatsOptimized(
         .from('scope_items')
         .select('id, status', { count: 'exact' });
       
-      if (!['company_owner', 'general_manager', 'deputy_general_manager', 'admin', 'management'].includes(userRole)) {
+      if (!['management', 'technical_lead', 'admin'].includes(userRole)) {
         scopeQuery = scopeQuery.in('project_id', 
           supabase
             .from('projects')

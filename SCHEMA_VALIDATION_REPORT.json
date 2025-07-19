@@ -1,0 +1,38 @@
+{
+  "summary": {
+    "totalIssues": 1,
+    "critical": 0,
+    "high": 0,
+    "medium": 1,
+    "timestamp": "2025-07-18T11:27:52.644Z"
+  },
+  "issues": [
+    {
+      "severity": "MEDIUM",
+      "category": "CODE",
+      "description": "Manual code review needed for old role references",
+      "recommendation": "Search codebase for old role names and update to new role system",
+      "details": null,
+      "timestamp": "2025-07-18T11:27:52.642Z"
+    }
+  ],
+  "recommendations": [
+    "Search codebase for old role names and update to new role system"
+  ],
+  "expectedRoles": [
+    "management",
+    "purchase_manager",
+    "technical_lead",
+    "project_manager",
+    "client",
+    "admin"
+  ],
+  "typescriptRoles": [
+    "management",
+    "purchase_manager",
+    "technical_lead",
+    "project_manager",
+    "client",
+    "admin"
+  ]
+}

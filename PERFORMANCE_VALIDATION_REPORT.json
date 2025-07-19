@@ -1,0 +1,84 @@
+{
+  "timestamp": "2025-07-18T18:45:10.532Z",
+  "summary": {
+    "totalTests": 8,
+    "passed": 8,
+    "failed": 0,
+    "avgResponseTime": 37
+  },
+  "tests": [
+    {
+      "name": "User Profiles Query",
+      "description": "Basic user profile access",
+      "responseTime": 75,
+      "success": true,
+      "rowCount": 2,
+      "status": "PASS"
+    },
+    {
+      "name": "Projects Query",
+      "description": "Project listing with basic fields",
+      "responseTime": 44,
+      "success": true,
+      "rowCount": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "Tasks Query",
+      "description": "Task listing with assignments",
+      "responseTime": 25,
+      "success": true,
+      "rowCount": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "Documents Query",
+      "description": "Document access with metadata",
+      "responseTime": 40,
+      "success": true,
+      "rowCount": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "Suppliers Query",
+      "description": "Supplier listing",
+      "responseTime": 45,
+      "success": true,
+      "rowCount": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "Notifications Query",
+      "description": "User notifications",
+      "responseTime": 40,
+      "success": true,
+      "rowCount": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "Audit Logs Query",
+      "description": "Audit log access",
+      "responseTime": 15,
+      "success": true,
+      "rowCount": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "Invoices Query",
+      "description": "Invoice listing",
+      "responseTime": 14,
+      "success": true,
+      "rowCount": 0,
+      "status": "PASS"
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "CRITICAL",
+      "issue": "Supabase Performance Advisor identified 15+ RLS policy issues",
+      "solution": "Apply the RLS performance optimization migration immediately",
+      "impact": "50-90% query performance improvement expected"
+    }
+  ],
+  "status": "HEALTHY"
+}

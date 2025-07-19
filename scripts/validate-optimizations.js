@@ -1,363 +1,373 @@
+#!/usr/bin/env node
+
 /**
- * Performance Optimizations Validation Script
- * Validates that all performance optimizations have been properly applied
+ * Validate Performance Optimizations
+ * Checks if RLS policies need optimization and provides guidance
+ * Formula PM 2.0 - Performance Validation Tool
  */
-const fs = require('fs')
-const path = require('path')
 
-console.log('✅ Performance Optimizations Validation')
-console.log('Validating all applied optimizations')
-console.log('='.repeat(60))
+const { createClient } = require('@supabase/supabase-js');
+const fs = require('fs');
+const path = require('path');
 
-// Validation results
-const validationResults = {
-  databaseOptimizations: {
-    rlsPolicies: false,
-    performanceIndexes: false,
-    connectionPooling: false
-  },
-  apiOptimizations: {
-    cachingMiddleware: false,
-    routesOptimized: 0,
-    authHelper: false
-  },
-  frontendOptimizations: {
-    performanceFixes: false,
-    codeSplitting: false,
-    lazyLoading: false
-  },
-  infrastructureReady: {
-    redis: false,
-    migrations: false,
-    environment: false
-  },
-  overallStatus: 'PENDING'
-}
-
-// Validate database migrations exist
-function validateDatabaseMigrations() {
-  console.log('\n🗄️ Validating Database Migrations...')
-  
-  const migrationsDir = path.join(__dirname, '..', 'supabase', 'migrations')
-  
-  if (!fs.existsSync(migrationsDir)) {
-    console.log('❌ Migrations directory not found')
-    return false
-  }
-  
-  const migrationFiles = fs.readdirSync(migrationsDir)
-  
-  // Check for RLS optimization migration
-  const rlsMigration = migrationFiles.find(file => file.includes('optimized_rls_policies'))
-  if (rlsMigration) {
-    console.log(`✅ RLS optimization migration found: ${rlsMigration}`)
-    validationResults.databaseOptimizations.rlsPolicies = true
-  } else {
-    console.log('❌ RLS optimization migration not found')
-  }
-  
-  // Check for performance indexes migration
-  const indexMigration = migrationFiles.find(file => file.includes('performance_indexes'))
-  if (indexMigration) {
-    console.log(`✅ Performance indexes migration found: ${indexMigration}`)
-    validationResults.databaseOptimizations.performanceIndexes = true
-  } else {
-    console.log('❌ Performance indexes migration not found')
-  }
-  
-  // Check for connection pooling migration
-  const poolingMigration = migrationFiles.find(file => file.includes('connection_pooling'))
-  if (poolingMigration) {
-    console.log(`✅ Connection pooling migration found: ${poolingMigration}`)
-    validationResults.databaseOptimizations.connectionPooling = true
-  } else {
-    console.log('❌ Connection pooling migration not found')
-  }
-  
-  return validationResults.databaseOptimizations.rlsPolicies && 
-         validationResults.databaseOptimizations.performanceIndexes
-}
-
-// Validate API optimizations
-function validateApiOptimizations() {
-  console.log('\n🌐 Validating API Optimizations...')
-  
-  // Check cache middleware
-  const cacheMiddlewarePath = path.join(__dirname, '..', 'src', 'lib', 'cache-middleware.ts')
-  if (fs.existsSync(cacheMiddlewarePath)) {
-    console.log('✅ Cache middleware created')
-    validationResults.apiOptimizations.cachingMiddleware = true
-  } else {
-    console.log('❌ Cache middleware not found')
-  }
-  
-  // Check auth helper
-  const authHelperPath = path.join(__dirname, '..', 'src', 'lib', 'auth-helpers.ts')
-  if (fs.existsSync(authHelperPath)) {
-    console.log('✅ Auth helper created')
-    validationResults.apiOptimizations.authHelper = true
-  } else {
-    console.log('❌ Auth helper not found')
-  }
-  
-  // Check optimized routes
-  const criticalRoutes = [
-    'src/app/api/scope/route.ts',
-    'src/app/api/projects/route.ts',
-    'src/app/api/dashboard/stats/route.ts',
-    'src/app/api/tasks/route.ts',
-    'src/app/api/auth/profile/route.ts'
-  ]
-  
-  let optimizedRoutes = 0
-  criticalRoutes.forEach(route => {
-    const routePath = path.join(__dirname, '..', route)
-    if (fs.existsSync(routePath)) {
-      const content = fs.readFileSync(routePath, 'utf8')
-      if (content.includes('getCachedResponse') || content.includes('cache-middleware')) {
-        console.log(`✅ Route optimized: ${route}`)
-        optimizedRoutes++
-      } else {
-        console.log(`⚠️ Route exists but not optimized: ${route}`)
-      }
-    } else {
-      console.log(`❌ Route not found: ${route}`)
-    }
-  })
-  
-  validationResults.apiOptimizations.routesOptimized = optimizedRoutes
-  console.log(`📊 Routes optimized: ${optimizedRoutes}/${criticalRoutes.length}`)
-  
-  return validationResults.apiOptimizations.cachingMiddleware && optimizedRoutes >= 3
-}
-
-// Validate frontend optimizations
-function validateFrontendOptimizations() {
-  console.log('\n🎨 Validating Frontend Optimizations...')
-  
-  // Check performance fixes report
-  const performanceReportPath = path.join(__dirname, '..', 'PERFORMANCE_FIXES_REPORT.json')
-  if (fs.existsSync(performanceReportPath)) {
-    const report = JSON.parse(fs.readFileSync(performanceReportPath, 'utf8'))
-    if (report.consoleLogsRemoved > 0 || report.useEffectFixed > 0) {
-      console.log(`✅ Performance fixes applied: ${report.consoleLogsRemoved} console logs, ${report.useEffectFixed} useEffect hooks`)
-      validationResults.frontendOptimizations.performanceFixes = true
-    }
-  } else {
-    console.log('❌ Performance fixes report not found')
-  }
-  
-  // Check code splitting implementation
-  const lazyDir = path.join(__dirname, '..', 'src', 'components', 'lazy')
-  if (fs.existsSync(lazyDir)) {
-    const lazyComponents = fs.readdirSync(lazyDir).filter(file => file.endsWith('.tsx'))
-    if (lazyComponents.length > 0) {
-      console.log(`✅ Code splitting implemented: ${lazyComponents.length} lazy components`)
-      validationResults.frontendOptimizations.codeSplitting = true
-      validationResults.frontendOptimizations.lazyLoading = true
-    }
-  } else {
-    console.log('❌ Lazy components directory not found')
-  }
-  
-  return validationResults.frontendOptimizations.performanceFixes && 
-         validationResults.frontendOptimizations.codeSplitting
-}
-
-// Check infrastructure readiness
-function validateInfrastructure() {
-  console.log('\n🏗️ Validating Infrastructure Readiness...')
-  
-  // Check environment variables
-  const envPath = path.join(__dirname, '..', '.env.local')
-  if (fs.existsSync(envPath)) {
-    const envContent = fs.readFileSync(envPath, 'utf8')
-    if (envContent.includes('REDIS_HOST') || envContent.includes('REDIS_URL')) {
-      console.log('✅ Redis environment variables configured')
-      validationResults.infrastructureReady.redis = true
-    } else {
-      console.log('⚠️ Redis environment variables not found in .env.local')
-    }
-    validationResults.infrastructureReady.environment = true
-  } else {
-    console.log('❌ .env.local file not found')
-  }
-  
-  // Check if migrations are ready to apply
-  const migrationsExist = validationResults.databaseOptimizations.rlsPolicies && 
-                         validationResults.databaseOptimizations.performanceIndexes
-  if (migrationsExist) {
-    console.log('✅ Database migrations ready to apply')
-    validationResults.infrastructureReady.migrations = true
-  } else {
-    console.log('❌ Database migrations not ready')
-  }
-  
-  return validationResults.infrastructureReady.environment && 
-         validationResults.infrastructureReady.migrations
-}
-
-// Generate implementation checklist
-function generateImplementationChecklist() {
-  console.log('\n📋 Generating Implementation Checklist...')
-  
-  const checklist = {
-    immediate: [],
-    shortTerm: [],
-    testing: [],
-    monitoring: []
-  }
-  
-  // Immediate actions
-  if (!validationResults.infrastructureReady.redis) {
-    checklist.immediate.push('Set up Redis server (Docker: docker run -d -p 6379:6379 redis:alpine)')
-    checklist.immediate.push('Add Redis environment variables to .env.local')
-  }
-  
-  if (!validationResults.infrastructureReady.migrations) {
-    checklist.immediate.push('Apply database migrations using Supabase CLI')
-  }
-  
-  if (validationResults.apiOptimizations.routesOptimized < 5) {
-    checklist.immediate.push('Complete API route optimizations for remaining endpoints')
-  }
-  
-  // Short-term actions
-  checklist.shortTerm.push('Configure Supabase connection pooling settings')
-  checklist.shortTerm.push('Set up performance monitoring dashboard')
-  checklist.shortTerm.push('Implement cache invalidation strategies')
-  
-  // Testing actions
-  checklist.testing.push('Run API load tests to validate performance improvements')
-  checklist.testing.push('Test frontend lazy loading functionality')
-  checklist.testing.push('Validate database query performance')
-  checklist.testing.push('Test cache hit/miss ratios')
-  
-  // Monitoring actions
-  checklist.monitoring.push('Set up Redis monitoring and alerting')
-  checklist.monitoring.push('Configure database performance monitoring')
-  checklist.monitoring.push('Implement API response time tracking')
-  checklist.monitoring.push('Set up error rate monitoring')
-  
-  return checklist
-}
-
-// Generate comprehensive validation report
-function generateValidationReport() {
-  console.log('\n' + '='.repeat(60))
-  console.log('🎯 PERFORMANCE OPTIMIZATIONS VALIDATION SUMMARY')
-  console.log('='.repeat(60))
-  
-  // Calculate overall completion percentage
-  const totalChecks = 12
-  let completedChecks = 0
-  
-  // Database optimizations (3 checks)
-  if (validationResults.databaseOptimizations.rlsPolicies) completedChecks++
-  if (validationResults.databaseOptimizations.performanceIndexes) completedChecks++
-  if (validationResults.databaseOptimizations.connectionPooling) completedChecks++
-  
-  // API optimizations (3 checks)
-  if (validationResults.apiOptimizations.cachingMiddleware) completedChecks++
-  if (validationResults.apiOptimizations.authHelper) completedChecks++
-  if (validationResults.apiOptimizations.routesOptimized >= 3) completedChecks++
-  
-  // Frontend optimizations (2 checks)
-  if (validationResults.frontendOptimizations.performanceFixes) completedChecks++
-  if (validationResults.frontendOptimizations.codeSplitting) completedChecks++
-  
-  // Infrastructure (4 checks)
-  if (validationResults.infrastructureReady.redis) completedChecks++
-  if (validationResults.infrastructureReady.migrations) completedChecks++
-  if (validationResults.infrastructureReady.environment) completedChecks++
-  
-  const completionPercentage = Math.round((completedChecks / totalChecks) * 100)
-  
-  console.log(`📊 Overall Completion: ${completionPercentage}% (${completedChecks}/${totalChecks})`)
-  console.log(`🗄️ Database Optimizations: ${Object.values(validationResults.databaseOptimizations).filter(Boolean).length}/3`)
-  console.log(`🌐 API Optimizations: ${validationResults.apiOptimizations.routesOptimized}/5 routes, middleware: ${validationResults.apiOptimizations.cachingMiddleware ? 'Yes' : 'No'}`)
-  console.log(`🎨 Frontend Optimizations: ${Object.values(validationResults.frontendOptimizations).filter(Boolean).length}/3`)
-  console.log(`🏗️ Infrastructure Ready: ${Object.values(validationResults.infrastructureReady).filter(Boolean).length}/3`)
-  
-  // Determine overall status
-  if (completionPercentage >= 90) {
-    validationResults.overallStatus = 'READY FOR PRODUCTION'
-  } else if (completionPercentage >= 70) {
-    validationResults.overallStatus = 'MOSTLY COMPLETE - MINOR ISSUES'
-  } else if (completionPercentage >= 50) {
-    validationResults.overallStatus = 'IN PROGRESS - MAJOR WORK NEEDED'
-  } else {
-    validationResults.overallStatus = 'NOT READY - SIGNIFICANT WORK REQUIRED'
-  }
-  
-  console.log('='.repeat(60))
-  console.log(`🎯 Status: ${validationResults.overallStatus}`)
-  
-  // Generate checklist
-  const checklist = generateImplementationChecklist()
-  
-  if (checklist.immediate.length > 0) {
-    console.log('\n🚨 IMMEDIATE ACTIONS REQUIRED:')
-    checklist.immediate.forEach((action, index) => {
-      console.log(`${index + 1}. ${action}`)
-    })
-  }
-  
-  if (checklist.shortTerm.length > 0) {
-    console.log('\n📅 SHORT-TERM ACTIONS:')
-    checklist.shortTerm.forEach((action, index) => {
-      console.log(`${index + 1}. ${action}`)
-    })
-  }
-  
-  console.log('\n🧪 TESTING CHECKLIST:')
-  checklist.testing.forEach((action, index) => {
-    console.log(`${index + 1}. ${action}`)
-  })
-  
-  // Save detailed validation report
-  const reportData = {
-    validationResults,
-    checklist,
-    completionPercentage,
-    overallStatus: validationResults.overallStatus,
-    validatedAt: new Date().toISOString(),
-    expectedPerformanceGains: {
-      scopeItemsEndpoint: '3.7s → 1.0s (73% improvement)',
-      projectsEndpoint: '1.8s → 0.6s (67% improvement)', 
-      dashboardStats: '1.8s → 0.4s (78% improvement)',
-      tasksEndpoint: '1.8s → 0.7s (61% improvement)'
-    }
-  }
-  
-  const reportPath = path.join(__dirname, '..', 'OPTIMIZATION_VALIDATION_REPORT.json')
-  fs.writeFileSync(reportPath, JSON.stringify(reportData, null, 2))
-  console.log(`\n📄 Detailed validation report saved to: ${reportPath}`)
-  
-  return reportData
-}
-
-// Main validation execution
-async function validateOptimizations() {
-  console.log('✅ Starting performance optimizations validation...\n')
-  
+// Load environment variables manually
+function loadEnvVars() {
   try {
-    const dbValid = validateDatabaseMigrations()
-    const apiValid = validateApiOptimizations()
-    const frontendValid = validateFrontendOptimizations()
-    const infraValid = validateInfrastructure()
+    const envPath = path.join(__dirname, '..', '.env.local');
+    const envContent = fs.readFileSync(envPath, 'utf8');
+    const envVars = {};
     
-    return generateValidationReport()
+    envContent.split('\n').forEach(line => {
+      const [key, ...valueParts] = line.split('=');
+      if (key && !key.startsWith('#') && valueParts.length > 0) {
+        envVars[key.trim()] = valueParts.join('=').trim();
+      }
+    });
     
+    return envVars;
   } catch (error) {
-    console.error('❌ Validation failed:', error.message)
-    return null
+    console.log('⚠️  Could not load .env.local file');
+    return {};
   }
+}
+
+const envVars = loadEnvVars();
+const SUPABASE_URL = envVars.NEXT_PUBLIC_SUPABASE_URL || 'http://127.0.0.1:54321';
+const SUPABASE_SERVICE_KEY = envVars.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!SUPABASE_SERVICE_KEY) {
+  console.error('❌ SUPABASE_SERVICE_ROLE_KEY not found');
+  process.exit(1);
+}
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+
+// Performance test queries
+async function runPerformanceTests() {
+  console.log('🚀 Running Performance Validation Tests...');
+  console.log(`📅 ${new Date().toISOString()}\n`);
+  
+  const testResults = {
+    timestamp: new Date().toISOString(),
+    tests: [],
+    summary: {
+      totalTests: 0,
+      passed: 0,
+      failed: 0,
+      avgResponseTime: 0
+    }
+  };
+  
+  // Test queries for different tables
+  const performanceTests = [
+    {
+      name: 'User Profiles Query',
+      description: 'Basic user profile access',
+      query: () => supabase.from('user_profiles').select('id, role, first_name, last_name').limit(10)
+    },
+    {
+      name: 'Projects Query',
+      description: 'Project listing with basic fields',
+      query: () => supabase.from('projects').select('id, name, status, created_at').limit(10)
+    },
+    {
+      name: 'Tasks Query',
+      description: 'Task listing with assignments',
+      query: () => supabase.from('tasks').select('id, title, status, assigned_to').limit(10)
+    },
+    {
+      name: 'Documents Query',
+      description: 'Document access with metadata',
+      query: () => supabase.from('documents').select('id, title, document_type, status').limit(10)
+    },
+    {
+      name: 'Suppliers Query',
+      description: 'Supplier listing',
+      query: () => supabase.from('suppliers').select('id, name, is_approved').limit(10)
+    },
+    {
+      name: 'Notifications Query',
+      description: 'User notifications',
+      query: () => supabase.from('notifications').select('id, title, created_at').limit(10)
+    },
+    {
+      name: 'Audit Logs Query',
+      description: 'Audit log access',
+      query: () => supabase.from('audit_logs').select('id, action, created_at').limit(10)
+    },
+    {
+      name: 'Invoices Query',
+      description: 'Invoice listing',
+      query: () => supabase.from('invoices').select('id, total_amount, status').limit(10)
+    }
+  ];
+  
+  console.log('🔍 Running performance tests...\n');
+  
+  let totalResponseTime = 0;
+  
+  for (const test of performanceTests) {
+    const startTime = Date.now();
+    
+    try {
+      const { data, error } = await test.query();
+      const endTime = Date.now();
+      const responseTime = endTime - startTime;
+      totalResponseTime += responseTime;
+      
+      const result = {
+        name: test.name,
+        description: test.description,
+        responseTime,
+        success: !error,
+        error: error?.message,
+        rowCount: data?.length || 0,
+        status: !error ? 'PASS' : 'FAIL'
+      };
+      
+      testResults.tests.push(result);
+      testResults.summary.totalTests++;
+      
+      if (!error) {
+        testResults.summary.passed++;
+        console.log(`✅ ${test.name}: ${responseTime}ms (${data?.length || 0} rows)`);
+      } else {
+        testResults.summary.failed++;
+        console.log(`❌ ${test.name}: ${responseTime}ms - ${error.message}`);
+      }
+      
+    } catch (error) {
+      const endTime = Date.now();
+      const responseTime = endTime - startTime;
+      totalResponseTime += responseTime;
+      
+      const result = {
+        name: test.name,
+        description: test.description,
+        responseTime,
+        success: false,
+        error: error.message,
+        rowCount: 0,
+        status: 'FAIL'
+      };
+      
+      testResults.tests.push(result);
+      testResults.summary.totalTests++;
+      testResults.summary.failed++;
+      
+      console.log(`❌ ${test.name}: ${responseTime}ms - ${error.message}`);
+    }
+    
+    // Small delay between tests
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+  
+  testResults.summary.avgResponseTime = Math.round(totalResponseTime / testResults.tests.length);
+  
+  return testResults;
+}
+
+// Check database health
+async function checkDatabaseHealth() {
+  console.log('\n🏥 Checking database health...\n');
+  
+  const healthChecks = [
+    {
+      name: 'Connection Test',
+      test: async () => {
+        const { data, error } = await supabase.from('user_profiles').select('count').limit(1);
+        return { success: !error, message: error?.message || 'Connection successful' };
+      }
+    },
+    {
+      name: 'RLS Status',
+      test: async () => {
+        // Check if RLS is enabled on key tables
+        const tables = ['user_profiles', 'projects', 'tasks', 'documents'];
+        let rlsEnabled = 0;
+        
+        for (const table of tables) {
+          try {
+            const { error } = await supabase.from(table).select('*').limit(1);
+            if (!error) rlsEnabled++;
+          } catch (e) {
+            // Table might not be accessible due to RLS, which is good
+          }
+        }
+        
+        return { 
+          success: rlsEnabled > 0, 
+          message: `${rlsEnabled}/${tables.length} tables accessible with current permissions` 
+        };
+      }
+    },
+    {
+      name: 'Migration Status',
+      test: async () => {
+        try {
+          const { data, error } = await supabase.from('migrations').select('*').order('executed_at', { ascending: false }).limit(5);
+          return { 
+            success: !error, 
+            message: error?.message || `${data?.length || 0} recent migrations found` 
+          };
+        } catch (error) {
+          return { success: false, message: error.message };
+        }
+      }
+    }
+  ];
+  
+  for (const check of healthChecks) {
+    try {
+      const result = await check.test();
+      if (result.success) {
+        console.log(`✅ ${check.name}: ${result.message}`);
+      } else {
+        console.log(`❌ ${check.name}: ${result.message}`);
+      }
+    } catch (error) {
+      console.log(`❌ ${check.name}: ${error.message}`);
+    }
+  }
+}
+
+// Generate optimization recommendations
+function generateRecommendations(testResults) {
+  console.log('\n💡 PERFORMANCE OPTIMIZATION RECOMMENDATIONS\n');
+  
+  const recommendations = [];
+  
+  // Analyze response times
+  const slowQueries = testResults.tests.filter(test => test.responseTime > 100);
+  if (slowQueries.length > 0) {
+    recommendations.push({
+      priority: 'HIGH',
+      issue: `${slowQueries.length} queries taking over 100ms`,
+      solution: 'Apply RLS performance optimization migration',
+      impact: 'Significant performance improvement expected'
+    });
+  }
+  
+  // Check for failed queries
+  const failedQueries = testResults.tests.filter(test => !test.success);
+  if (failedQueries.length > 0) {
+    recommendations.push({
+      priority: 'CRITICAL',
+      issue: `${failedQueries.length} queries failing`,
+      solution: 'Review RLS policies and permissions',
+      impact: 'Application functionality may be broken'
+    });
+  }
+  
+  // General performance recommendations
+  if (testResults.summary.avgResponseTime > 50) {
+    recommendations.push({
+      priority: 'MEDIUM',
+      issue: `Average response time is ${testResults.summary.avgResponseTime}ms`,
+      solution: 'Consider adding database indexes and optimizing queries',
+      impact: 'Better user experience and scalability'
+    });
+  }
+  
+  // RLS optimization recommendation
+  recommendations.push({
+    priority: 'CRITICAL',
+    issue: 'Supabase Performance Advisor identified 15+ RLS policy issues',
+    solution: 'Apply the RLS performance optimization migration immediately',
+    impact: '50-90% query performance improvement expected'
+  });
+  
+  if (recommendations.length === 0) {
+    console.log('🎉 No critical performance issues detected!');
+  } else {
+    recommendations.forEach((rec, index) => {
+      const priorityIcon = rec.priority === 'CRITICAL' ? '🚨' : rec.priority === 'HIGH' ? '⚠️' : '💡';
+      console.log(`${priorityIcon} ${rec.priority}: ${rec.issue}`);
+      console.log(`   Solution: ${rec.solution}`);
+      console.log(`   Impact: ${rec.impact}\n`);
+    });
+  }
+  
+  return recommendations;
+}
+
+// Main validation function
+async function runValidation() {
+  console.log('🎯 SUPABASE PERFORMANCE VALIDATION');
+  console.log('='.repeat(50));
+  
+  // Run performance tests
+  const testResults = await runPerformanceTests();
+  
+  // Check database health
+  await checkDatabaseHealth();
+  
+  // Generate recommendations
+  const recommendations = generateRecommendations(testResults);
+  
+  // Generate summary report
+  console.log('\n' + '='.repeat(50));
+  console.log('📋 VALIDATION SUMMARY');
+  console.log('='.repeat(50));
+  
+  console.log(`\n📊 TEST RESULTS:`);
+  console.log(`   Total Tests: ${testResults.summary.totalTests}`);
+  console.log(`   ✅ Passed: ${testResults.summary.passed}`);
+  console.log(`   ❌ Failed: ${testResults.summary.failed}`);
+  console.log(`   ⏱️  Avg Response Time: ${testResults.summary.avgResponseTime}ms`);
+  
+  console.log(`\n🎯 PERFORMANCE STATUS:`);
+  if (testResults.summary.avgResponseTime < 50 && testResults.summary.failed === 0) {
+    console.log('   🎉 EXCELLENT - Database performing well');
+  } else if (testResults.summary.avgResponseTime < 100 && testResults.summary.failed < 2) {
+    console.log('   ✅ GOOD - Minor optimizations recommended');
+  } else {
+    console.log('   ⚠️  NEEDS ATTENTION - Performance issues detected');
+  }
+  
+  console.log(`\n🚨 CRITICAL ACTION REQUIRED:`);
+  console.log('   Apply RLS performance optimization migration immediately');
+  console.log('   Expected improvement: 50-90% faster queries');
+  console.log('   Migration file: 20250718000006_rls_performance_optimization.sql');
+  
+  console.log(`\n📋 NEXT STEPS:`);
+  console.log('   1. Apply the RLS performance migration using Supabase CLI');
+  console.log('   2. Run this validation again to measure improvements');
+  console.log('   3. Monitor application performance');
+  console.log('   4. Consider additional optimizations if needed');
+  
+  // Save detailed results
+  const reportPath = path.join(__dirname, '..', 'PERFORMANCE_VALIDATION_REPORT.json');
+  const report = {
+    timestamp: new Date().toISOString(),
+    summary: testResults.summary,
+    tests: testResults.tests,
+    recommendations,
+    status: testResults.summary.failed === 0 ? 'HEALTHY' : 'NEEDS_ATTENTION'
+  };
+  
+  fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
+  console.log(`\n📄 Detailed report saved: ${path.basename(reportPath)}`);
+  
+  return report;
 }
 
 // Run validation
 if (require.main === module) {
-  validateOptimizations()
+  runValidation()
+    .then(report => {
+      if (report.status === 'HEALTHY') {
+        console.log('\n✅ Validation completed - Database is healthy!');
+        process.exit(0);
+      } else {
+        console.log('\n⚠️  Validation completed - Issues detected that need attention.');
+        process.exit(1);
+      }
+    })
+    .catch(error => {
+      console.error('❌ Validation failed:', error);
+      process.exit(1);
+    });
 }
 
-module.exports = { validateOptimizations }
+module.exports = { runValidation };

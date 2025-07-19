@@ -1,0 +1,794 @@
+{
+  "summary": {
+    "totalTables": 44,
+    "publicTables": 42,
+    "systemTables": 2,
+    "timestamp": "2025-07-18T11:46:53.264Z"
+  },
+  "tables": {
+    "public.user_profiles": {
+      "name": "user_profiles",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.clients": {
+      "name": "clients",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.suppliers": {
+      "name": "suppliers",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.projects": {
+      "name": "projects",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.project_assignments": {
+      "name": "project_assignments",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.scope_items": {
+      "name": "scope_items",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.scope_dependencies": {
+      "name": "scope_dependencies",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.documents": {
+      "name": "documents",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.document_approvals": {
+      "name": "document_approvals",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.subcontractors": {
+      "name": "subcontractors",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.subcontractor_assignments": {
+      "name": "subcontractor_assignments",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.approval_requests": {
+      "name": "approval_requests",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.vendors": {
+      "name": "vendors",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.purchase_requests": {
+      "name": "purchase_requests",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.purchase_orders": {
+      "name": "purchase_orders",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.vendor_ratings": {
+      "name": "vendor_ratings",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.delivery_confirmations": {
+      "name": "delivery_confirmations",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.tasks": {
+      "name": "tasks",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.task_comments": {
+      "name": "task_comments",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.audit_logs": {
+      "name": "audit_logs",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.notifications": {
+      "name": "notifications",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.system_settings": {
+      "name": "system_settings",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.migration_log": {
+      "name": "migration_log",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.migrations": {
+      "name": "migrations",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.shop_drawings": {
+      "name": "shop_drawings",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.shop_drawing_revisions": {
+      "name": "shop_drawing_revisions",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.field_reports": {
+      "name": "field_reports",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.mobile_forms": {
+      "name": "mobile_forms",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.invoices": {
+      "name": "invoices",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.tenders": {
+      "name": "tenders",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.tender_submissions": {
+      "name": "tender_submissions",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.messages": {
+      "name": "messages",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.client_companies": {
+      "name": "client_companies",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.client_users": {
+      "name": "client_users",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.client_project_access": {
+      "name": "client_project_access",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.client_permissions": {
+      "name": "client_permissions",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.client_document_access": {
+      "name": "client_document_access",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.client_document_approvals": {
+      "name": "client_document_approvals",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.client_document_comments": {
+      "name": "client_document_comments",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.client_notifications": {
+      "name": "client_notifications",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.client_communication_threads": {
+      "name": "client_communication_threads",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "public.client_messages": {
+      "name": "client_messages",
+      "schema": "public",
+      "type": "BASE TABLE",
+      "method": "pattern_test"
+    },
+    "storage.buckets": {
+      "name": "buckets",
+      "schema": "storage",
+      "type": "SYSTEM TABLE",
+      "method": "system_test"
+    },
+    "storage.objects": {
+      "name": "objects",
+      "schema": "storage",
+      "type": "SYSTEM TABLE",
+      "method": "system_test"
+    }
+  },
+  "analysis": {
+    "user_profiles": {
+      "rowCount": 2,
+      "hasData": true,
+      "accessible": true,
+      "columns": 18
+    },
+    "clients": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "suppliers": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "projects": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "project_assignments": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "scope_items": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "scope_dependencies": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "documents": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "document_approvals": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "subcontractors": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "subcontractor_assignments": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "approval_requests": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "vendors": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "purchase_requests": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "purchase_orders": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "vendor_ratings": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "delivery_confirmations": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "tasks": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "task_comments": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "audit_logs": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "notifications": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "system_settings": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "migration_log": {
+      "rowCount": 3,
+      "hasData": true,
+      "accessible": true,
+      "columns": 5
+    },
+    "migrations": {
+      "rowCount": 15,
+      "hasData": true,
+      "accessible": true,
+      "columns": 3
+    },
+    "shop_drawings": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "shop_drawing_revisions": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "field_reports": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "mobile_forms": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "invoices": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "tenders": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "tender_submissions": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "messages": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "client_companies": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "client_users": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "client_project_access": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "client_permissions": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "client_document_access": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "client_document_approvals": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "client_document_comments": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "client_notifications": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "client_communication_threads": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    },
+    "client_messages": {
+      "rowCount": 0,
+      "hasData": false,
+      "accessible": true,
+      "columns": 0
+    }
+  },
+  "categories": {
+    "core": [
+      {
+        "name": "user_profiles",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "projects",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "scope_items",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "documents",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "tasks",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      }
+    ],
+    "purchase": [
+      {
+        "name": "vendors",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "purchase_requests",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "purchase_orders",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "vendor_ratings",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "delivery_confirmations",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      }
+    ],
+    "client": [
+      {
+        "name": "clients",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "client_companies",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "client_users",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "client_project_access",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "client_permissions",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "client_document_access",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "client_document_approvals",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "client_document_comments",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "client_notifications",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "client_communication_threads",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "client_messages",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      }
+    ],
+    "system": [
+      {
+        "name": "audit_logs",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "notifications",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "migration_log",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "migrations",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      }
+    ],
+    "backup": [],
+    "test": [],
+    "unknown": [
+      {
+        "name": "suppliers",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "project_assignments",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "scope_dependencies",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "document_approvals",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "subcontractors",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "subcontractor_assignments",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "approval_requests",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "task_comments",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "system_settings",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "shop_drawings",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "shop_drawing_revisions",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "field_reports",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "mobile_forms",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "invoices",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "tenders",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "tender_submissions",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      },
+      {
+        "name": "messages",
+        "schema": "public",
+        "type": "BASE TABLE",
+        "method": "pattern_test"
+      }
+    ]
+  }
+}

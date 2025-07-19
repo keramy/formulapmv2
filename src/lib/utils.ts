@@ -8,18 +8,12 @@ export function cn(...inputs: ClassValue[]) {
 
 export function getRoleColorClass(role: UserRole): string {
   const roleColors: Record<UserRole, string> = {
-    company_owner: 'border-l-management',
-    general_manager: 'border-l-management', 
-    deputy_general_manager: 'border-l-management',
-    technical_director: 'border-l-management',
-    admin: 'border-l-management',
+    management: 'border-l-management',
+    technical_lead: 'border-l-technical',
     project_manager: 'border-l-project',
-    architect: 'border-l-project',
-    technical_engineer: 'border-l-technical',
-    purchase_director: 'border-l-purchase',
-    purchase_specialist: 'border-l-purchase',
-    field_worker: 'border-l-field',
+    purchase_manager: 'border-l-purchase',
     client: 'border-l-client',
+    admin: 'border-l-management',
   }
   return roleColors[role] || 'border-l-gray-300'
 }
@@ -40,18 +34,12 @@ export function getUserInitials(firstName: string, lastName: string): string {
  */
 export function getRoleBadgeClass(role: UserRole): string {
   const roleColors: Record<UserRole, string> = {
-    company_owner: 'bg-management/10 text-management border-management/20',
-    general_manager: 'bg-management/10 text-management border-management/20',
-    deputy_general_manager: 'bg-management/10 text-management border-management/20',
-    technical_director: 'bg-management/10 text-management border-management/20',
-    admin: 'bg-management/10 text-management border-management/20',
+    management: 'bg-management/10 text-management border-management/20',
+    technical_lead: 'bg-technical/10 text-technical border-technical/20',
     project_manager: 'bg-project/10 text-project border-project/20',
-    architect: 'bg-project/10 text-project border-project/20',
-    technical_engineer: 'bg-technical/10 text-technical border-technical/20',
-    purchase_director: 'bg-purchase/10 text-purchase border-purchase/20',
-    purchase_specialist: 'bg-purchase/10 text-purchase border-purchase/20',
-    field_worker: 'bg-field/10 text-field border-field/20',
+    purchase_manager: 'bg-purchase/10 text-purchase border-purchase/20',
     client: 'bg-client/10 text-client border-client/20',
+    admin: 'bg-management/10 text-management border-management/20',
   }
   return roleColors[role] || 'bg-muted text-muted-foreground'
 }

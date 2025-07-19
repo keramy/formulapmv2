@@ -447,7 +447,7 @@ export interface ProjectValidationResult {
 // Role-based project access helper
 export const getProjectAccessLevel = (userRole: string, assignment?: ProjectAssignmentWithUser): 'full' | 'limited' | 'read_only' | 'none' => {
   // Management roles get full access to all projects
-  if (['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'].includes(userRole)) {
+  if (['management', 'technical_lead', 'admin'].includes(userRole)) {
     return 'full'
   }
   

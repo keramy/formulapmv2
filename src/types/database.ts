@@ -11,18 +11,12 @@
 // ============================================================================
 
 export type UserRole = 
-  | 'company_owner'
-  | 'general_manager'
-  | 'deputy_general_manager'
-  | 'technical_director'
-  | 'admin'
-  | 'project_manager'
-  | 'architect'
-  | 'technical_engineer'
-  | 'purchase_director'
-  | 'purchase_specialist'
-  | 'field_worker'
-  | 'client'
+  | 'management'        // Unified: company_owner, general_manager, deputy_general_manager
+  | 'purchase_manager'  // Unified: purchase_director, purchase_specialist  
+  | 'technical_lead'    // Renamed from: technical_director
+  | 'project_manager'   // Unified: project_manager, architect, technical_engineer, field_worker
+  | 'client'           // Unchanged
+  | 'admin'            // Unchanged (system admin)
 ;
 
 export type ProjectStatus = 
@@ -1284,23 +1278,17 @@ export interface PaginationOptions {
 
 // Management role check helper type
 export const MANAGEMENT_ROLES: UserRole[] = [
-  'company_owner',
-  'general_manager',
-  'deputy_general_manager',
-  'technical_director',
+  'management',
+  'technical_lead',
   'admin'
 ];
 
 // Cost tracking access roles
 export const COST_TRACKING_ROLES: UserRole[] = [
-  'company_owner',
-  'general_manager',
-  'deputy_general_manager',
-  'technical_director',
+  'management',
+  'technical_lead',
   'admin',
-  'technical_engineer',
-  'purchase_director',
-  'purchase_specialist'
+  'purchase_manager'
 ];
 
 // Client Portal Types
@@ -1330,9 +1318,9 @@ export const EXTERNAL_ROLES: UserRole[] = [
   'client',
 ];
 
-// Field operation roles
+// Field operation roles (now part of project_manager role)
 export const FIELD_ROLES: UserRole[] = [
-  'field_worker',
+  'project_manager',
 ];
 
 // Type guards
