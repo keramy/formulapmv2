@@ -101,7 +101,8 @@
       "Bash(where python)",
       "Bash(docker:*)",
       "Bash(set SUPABASE_URL=http://127.0.0.1:54321)",
-      "Bash(set:*)"
+      "Bash(set:*)",
+      "Bash(tail:*)"
     ],
     "deny": []
   }

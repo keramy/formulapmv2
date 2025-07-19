@@ -28,7 +28,7 @@ interface UseMilestonesReturn {
 }
 
 export function useMilestones(projectId: string, filters?: MilestoneFilters): UseMilestonesReturn {
-  const { user, profile } = useAuth()
+  const { user, profile, getAccessToken } = useAuth()
   const [milestones, setMilestones] = useState<Milestone[]>([])
   const [statistics, setStatistics] = useState<MilestoneStatistics | null>(null)
   const [loading, setLoading] = useState(false)
@@ -85,9 +85,14 @@ export function useMilestones(projectId: string, filters?: MilestoneFilters): Us
         }
       }
 
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
       const response = await fetch(`/api/projects/${projectId}/milestones?${params}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          'Authorization': `Bearer ${token}`
         }
       })
 
@@ -98,8 +103,8 @@ export function useMilestones(projectId: string, filters?: MilestoneFilters): Us
       const data = await response.json()
       
       if (data.success) {
-        setMilestones(data.data.milestones || [])
-        setStatistics(data.data.statistics || null)
+        setMilestones(data.data || [])
+        setStatistics(data.pagination?.statistics || null)
       } else {
         throw new Error(data.error || 'Failed to fetch milestones')
       }
@@ -116,11 +121,16 @@ export function useMilestones(projectId: string, filters?: MilestoneFilters): Us
     if (!projectId || !user) return null
 
     try {
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
       const response = await fetch(`/api/projects/${projectId}/milestones`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(data)
       })
@@ -132,9 +142,10 @@ export function useMilestones(projectId: string, filters?: MilestoneFilters): Us
       const result = await response.json()
       
       if (result.success) {
-        const newMilestone = result.data.milestone
+        const newMilestone = result.data
         setMilestones(prev => [...prev, newMilestone])
-        setStatistics(result.data.statistics)
+        // Refetch to get updated statistics
+        await fetchMilestones()
         return newMilestone
       } else {
         throw new Error(result.error || 'Failed to create milestone')
@@ -151,11 +162,16 @@ export function useMilestones(projectId: string, filters?: MilestoneFilters): Us
     if (!user) return null
 
     try {
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
       const response = await fetch(`/api/milestones/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(data)
       })
@@ -167,7 +183,7 @@ export function useMilestones(projectId: string, filters?: MilestoneFilters): Us
       const result = await response.json()
       
       if (result.success) {
-        const updatedMilestone = result.data.milestone
+        const updatedMilestone = result.data
         setMilestones(prev => prev.map(m => m.id === id ? updatedMilestone : m))
         return updatedMilestone
       } else {
@@ -185,10 +201,15 @@ export function useMilestones(projectId: string, filters?: MilestoneFilters): Us
     if (!user) return false
 
     try {
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
       const response = await fetch(`/api/milestones/${id}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          'Authorization': `Bearer ${token}`
         }
       })
 
@@ -216,11 +237,16 @@ export function useMilestones(projectId: string, filters?: MilestoneFilters): Us
     if (!user) return false
 
     try {
-      const response = await fetch(`/api/milestones/${id}/status`, {
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
+      const response = await fetch(`/api/milestones/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ status })
       })
@@ -232,7 +258,7 @@ export function useMilestones(projectId: string, filters?: MilestoneFilters): Us
       const result = await response.json()
       
       if (result.success) {
-        const updatedMilestone = result.data.milestone
+        const updatedMilestone = result.data
         setMilestones(prev => prev.map(m => m.id === id ? updatedMilestone : m))
         return true
       } else {
@@ -250,11 +276,16 @@ export function useMilestones(projectId: string, filters?: MilestoneFilters): Us
     if (!user) return false
 
     try {
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
       const response = await fetch('/api/milestones/bulk', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ milestone_ids: ids, updates })
       })

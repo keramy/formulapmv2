@@ -7,6 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DataStateWrapper } from '@/components/ui/loading-states';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useShopDrawings, ShopDrawingFilters } from '@/hooks/useShopDrawings';
 import { 
   Search,
   Filter,
@@ -26,113 +28,42 @@ interface ShopDrawingsTabProps {
   projectId: string;
 }
 
-interface ShopDrawing {
-  id: string;
-  name: string;
-  description: string;
-  status: 'pending' | 'under_review' | 'approved' | 'rejected' | 'revision_required';
-  priority: 'low' | 'medium' | 'high';
-  submittedBy: string;
-  submittedDate: string;
-  reviewedBy?: string;
-  reviewedDate?: string;
-  version: number;
-  category: string;
-  notes?: string;
-  fileSize: string;
-  fileType: string;
-}
-
 export function ShopDrawingsTab({ projectId }: ShopDrawingsTabProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [filterDiscipline, setFilterDiscipline] = useState('all');
 
+  // Build filters object for the hook
+  const filters: ShopDrawingFilters = {
+    search: searchTerm || undefined,
+    status: filterStatus !== 'all' ? filterStatus : undefined,
+    discipline: filterDiscipline !== 'all' ? filterDiscipline : undefined,
+  };
 
-  // Mock data for demonstration - in real app, this would come from API
-  const mockShopDrawings: ShopDrawing[] = [
-    {
-      id: '1',
-      name: 'Structural Steel Frame - Section A',
-      description: 'Detailed shop drawings for structural steel frame section A including connections and specifications',
-      status: 'approved',
-      priority: 'high',
-      submittedBy: 'Steel Works Inc.',
-      submittedDate: '2024-01-15',
-      reviewedBy: 'John Smith',
-      reviewedDate: '2024-01-20',
-      version: 2,
-      category: 'Structural',
-      notes: 'Approved with minor notes. Proceed with fabrication.',
-      fileSize: '2.4 MB',
-      fileType: 'PDF'
-    },
-    {
-      id: '2',
-      name: 'HVAC Ductwork Layout - Floor 1',
-      description: 'Shop drawings for HVAC ductwork layout and connections for first floor',
-      status: 'under_review',
-      priority: 'medium',
-      submittedBy: 'Climate Control Co.',
-      submittedDate: '2024-02-01',
-      version: 1,
-      category: 'HVAC',
-      fileSize: '1.8 MB',
-      fileType: 'PDF'
-    },
-    {
-      id: '3',
-      name: 'Electrical Panel Schedule',
-      description: 'Detailed electrical panel schedule and circuit layouts',
-      status: 'revision_required',
-      priority: 'high',
-      submittedBy: 'Electric Solutions LLC',
-      submittedDate: '2024-01-28',
-      reviewedBy: 'Mike Johnson',
-      reviewedDate: '2024-02-02',
-      version: 1,
-      category: 'Electrical',
-      notes: 'Revision required - panel sizing needs adjustment for load calculations',
-      fileSize: '3.1 MB',
-      fileType: 'PDF'
-    },
-    {
-      id: '4',
-      name: 'Precast Concrete Panels',
-      description: 'Shop drawings for precast concrete panels including reinforcement details',
-      status: 'pending',
-      priority: 'medium',
-      submittedBy: 'Precast Solutions',
-      submittedDate: '2024-02-05',
-      version: 1,
-      category: 'Concrete',
-      fileSize: '4.2 MB',
-      fileType: 'PDF'
-    },
-    {
-      id: '5',
-      name: 'Curtain Wall System',
-      description: 'Detailed shop drawings for curtain wall system installation',
-      status: 'rejected',
-      priority: 'high',
-      submittedBy: 'Glass & Glazing Co.',
-      submittedDate: '2024-01-25',
-      reviewedBy: 'Sarah Wilson',
-      reviewedDate: '2024-01-30',
-      version: 1,
-      category: 'Exterior',
-      notes: 'Rejected - thermal performance calculations do not meet specifications',
-      fileSize: '5.6 MB',
-      fileType: 'PDF'
-    }
-  ];
+  // Use the real shop drawings hook instead of mock data
+  const {
+    shopDrawings,
+    statistics,
+    loading,
+    error,
+    permissions,
+    createShopDrawing,
+    deleteShopDrawing,
+    updateShopDrawingStatus,
+    downloadShopDrawing,
+    refetch
+  } = useShopDrawings(projectId, filters);
 
-  const filteredDrawings = mockShopDrawings.filter(drawing => {
-    const matchesSearch = drawing.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         drawing.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         drawing.category.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = filterStatus === 'all' || drawing.status === filterStatus;
-    return matchesSearch && matchesStatus;
-  });
+  // Handle error state
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertTriangle className="h-4 w-4" />
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
+    );
+  }
+
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -165,16 +96,23 @@ export function ShopDrawingsTab({ projectId }: ShopDrawingsTabProps) {
     }
   };
 
-  const statusCounts = mockShopDrawings.reduce((acc, drawing) => {
+  // Calculate counts from real data
+  const statusCounts = shopDrawings.reduce((acc, drawing) => {
     acc[drawing.status] = (acc[drawing.status] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const disciplineCounts = shopDrawings.reduce((acc, drawing) => {
+    acc[drawing.category] = (acc[drawing.category] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 
   return (
     <DataStateWrapper
-      loading={false}
+      loading={loading}
       error={null}
-      data={filteredDrawings}
+      data={shopDrawings}
+      onRetry={refetch}
       emptyComponent={
         <Card>
           <CardContent className="text-center py-12">
@@ -183,10 +121,12 @@ export function ShopDrawingsTab({ projectId }: ShopDrawingsTabProps) {
             <p className="text-muted-foreground mb-4">
               Upload your first shop drawing to get started.
             </p>
-            <Button>
-              <Upload className="h-4 w-4 mr-2" />
-              Upload Drawing
-            </Button>
+            {permissions.canCreate && (
+              <Button onClick={() => console.log('Open shop drawing upload form')}>
+                <Upload className="h-4 w-4 mr-2" />
+                Upload Drawing
+              </Button>
+            )}
           </CardContent>
         </Card>
       }
@@ -199,7 +139,7 @@ export function ShopDrawingsTab({ projectId }: ShopDrawingsTabProps) {
             <CardTitle className="text-sm font-medium">Total Drawings</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{mockShopDrawings.length}</div>
+            <div className="text-2xl font-bold">{shopDrawings.length}</div>
             <div className="text-sm text-gray-600">Submitted drawings</div>
           </CardContent>
         </Card>
@@ -240,10 +180,12 @@ export function ShopDrawingsTab({ projectId }: ShopDrawingsTabProps) {
               <CardTitle>Shop Drawings</CardTitle>
               <CardDescription>Manage shop drawing submissions and approvals</CardDescription>
             </div>
-            <Button>
-              <Upload className="w-4 h-4 mr-2" />
-              Upload Drawing
-            </Button>
+            {permissions.canCreate && (
+              <Button onClick={() => console.log('Open shop drawing upload form')}>
+                <Upload className="w-4 h-4 mr-2" />
+                Upload Drawing
+              </Button>
+            )}
           </div>
         </CardHeader>
         <CardContent>
@@ -271,6 +213,22 @@ export function ShopDrawingsTab({ projectId }: ShopDrawingsTabProps) {
                 <option value="revision_required">Revision Required</option>
                 <option value="rejected">Rejected</option>
               </select>
+              <select
+                value={filterDiscipline}
+                onChange={(e) => setFilterDiscipline(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="all">All Disciplines</option>
+                <option value="architectural">Architectural</option>
+                <option value="structural">Structural</option>
+                <option value="mechanical">Mechanical</option>
+                <option value="electrical">Electrical</option>
+                <option value="plumbing">Plumbing</option>
+                <option value="millwork">Millwork</option>
+                <option value="landscape">Landscape</option>
+                <option value="interior_design">Interior Design</option>
+                <option value="other">Other</option>
+              </select>
               <Button variant="outline" size="sm">
                 <Filter className="w-4 h-4 mr-2" />
                 More Filters
@@ -280,21 +238,21 @@ export function ShopDrawingsTab({ projectId }: ShopDrawingsTabProps) {
 
           {/* Drawings List */}
           <div className="space-y-4">
-            {filteredDrawings.length === 0 ? (
+            {shopDrawings.length === 0 ? (
               <div className="text-center py-8">
                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <FileText className="w-8 h-8 text-gray-400" />
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">No shop drawings found</h3>
                 <p className="text-gray-600">
-                  {searchTerm || filterStatus !== 'all' 
+                  {searchTerm || filterStatus !== 'all' || filterDiscipline !== 'all'
                     ? 'Try adjusting your search or filter criteria.' 
                     : 'No shop drawings have been submitted for this project yet.'
                   }
                 </p>
               </div>
             ) : (
-              filteredDrawings.map((drawing) => (
+              shopDrawings.map((drawing) => (
                 <Card key={drawing.id} className="hover:shadow-md transition-shadow">
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">
@@ -361,12 +319,26 @@ export function ShopDrawingsTab({ projectId }: ShopDrawingsTabProps) {
                       <div className="ml-4 flex flex-col gap-2">
                         <Badge variant="secondary">{drawing.category}</Badge>
                         <div className="flex gap-1">
-                          <Button variant="outline" size="sm">
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            <Download className="w-4 h-4" />
-                          </Button>
+                          {permissions.canView && (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => console.log('View drawing:', drawing.id)}
+                              title="View drawing"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                          )}
+                          {permissions.canDownload && (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => downloadShopDrawing(drawing.id)}
+                              title="Download drawing"
+                            >
+                              <Download className="w-4 h-4" />
+                            </Button>
+                          )}
                         </div>
                       </div>
                     </div>

@@ -1,0 +1,299 @@
+/**
+ * Formula PM 2.0 Reports Hook
+ * V3 Phase 1 Implementation
+ * 
+ * Hook for report data management and API integration
+ */
+
+'use client'
+
+import { useState, useEffect, useCallback } from 'react'
+import { useAuth } from './useAuth'
+import { hasPermission } from '@/lib/permissions'
+
+// Report types based on frontend interface
+export interface ProjectReport {
+  id: string;
+  name: string;
+  description: string;
+  type: 'daily' | 'weekly' | 'monthly' | 'safety' | 'financial' | 'progress' | 'quality' | 'custom' | 'incident';
+  status: 'draft' | 'completed' | 'reviewed' | 'approved';
+  generatedBy: string;
+  generatedDate: string;
+  reviewedBy?: string;
+  reviewedDate?: string;
+  fileSize: string;
+  fileType: string;
+  reportPeriod?: string;
+  priority: 'low' | 'medium' | 'high';
+  summary?: string;
+  
+  // Additional field report specific data
+  weather_conditions?: string;
+  workers_present?: number;
+  work_performed?: string;
+  issues_encountered?: string;
+  materials_used?: any[];
+  equipment_used?: any[];
+  photos?: string[];
+  safety_incidents?: number;
+  incident_details?: string;
+  next_steps?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface ReportFormData {
+  report_type: 'daily' | 'weekly' | 'incident' | 'quality' | 'safety';
+  report_date: string;
+  weather_conditions?: string;
+  workers_present?: number;
+  work_performed: string;
+  issues_encountered?: string;
+  materials_used?: any[];
+  equipment_used?: any[];
+  photos?: string[];
+  safety_incidents?: number;
+  incident_details?: string;
+  next_steps?: string;
+}
+
+export interface ReportFilters {
+  type?: string;
+  status?: string;
+  date_from?: string;
+  date_to?: string;
+  has_incidents?: boolean;
+  has_photos?: boolean;
+  search?: string;
+}
+
+export interface ReportStatistics {
+  total: number;
+  byType: Record<string, number>;
+  safetyIncidents: number;
+  recentReports: number;
+}
+
+export interface ReportPermissions {
+  canCreate: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
+  canView: boolean;
+  canDownload: boolean;
+}
+
+interface UseReportsReturn {
+  reports: ProjectReport[];
+  statistics: ReportStatistics | null;
+  loading: boolean;
+  error: string | null;
+  permissions: ReportPermissions;
+  createReport: (data: ReportFormData) => Promise<ProjectReport | null>;
+  updateReport: (id: string, data: Partial<ReportFormData>) => Promise<ProjectReport | null>;
+  deleteReport: (id: string) => Promise<boolean>;
+  downloadReport: (id: string) => Promise<boolean>;
+  refetch: () => Promise<void>;
+}
+
+export function useReports(projectId: string, filters?: ReportFilters): UseReportsReturn {
+  const { user, profile, getAccessToken } = useAuth()
+  const [reports, setReports] = useState<ProjectReport[]>([])
+  const [statistics, setStatistics] = useState<ReportStatistics | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  // Calculate permissions based on user role
+  const permissions: ReportPermissions = {
+    canCreate: profile?.role ? (hasPermission(profile.role, 'projects.create') || 
+               hasPermission(profile.role, 'projects.update')) : false,
+    canEdit: profile?.role ? (hasPermission(profile.role, 'projects.update') || 
+             hasPermission(profile.role, 'projects.create')) : false,
+    canDelete: profile?.role ? hasPermission(profile.role, 'projects.delete') : false,
+    canView: profile?.role ? (hasPermission(profile.role, 'projects.read.all') || 
+             hasPermission(profile.role, 'projects.read.assigned')) : false,
+    canDownload: profile?.role ? (hasPermission(profile.role, 'projects.read.all') || 
+                 hasPermission(profile.role, 'projects.read.assigned')) : false
+  }
+
+  // Fetch reports for the project
+  const fetchReports = useCallback(async () => {
+    if (!projectId || !user) return
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const params = new URLSearchParams()
+
+      // Add filters if provided
+      if (filters) {
+        if (filters.type && filters.type !== 'all') {
+          params.set('type', filters.type)
+        }
+        if (filters.status && filters.status !== 'all') {
+          params.set('status', filters.status)
+        }
+        if (filters.search) {
+          params.set('search', filters.search)
+        }
+        if (filters.date_from) {
+          params.set('date_from', filters.date_from)
+        }
+        if (filters.date_to) {
+          params.set('date_to', filters.date_to)
+        }
+        if (filters.has_incidents) {
+          params.set('has_incidents', 'true')
+        }
+        if (filters.has_photos) {
+          params.set('has_photos', 'true')
+        }
+      }
+
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
+      const response = await fetch(`/api/projects/${projectId}/reports?${params}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch reports')
+      }
+
+      const data = await response.json()
+      
+      if (data.success) {
+        setReports(data.data || [])
+        setStatistics(data.pagination?.statistics || null)
+      } else {
+        throw new Error(data.error || 'Failed to fetch reports')
+      }
+    } catch (err) {
+      console.error('Error fetching reports:', err)
+      setError(err instanceof Error ? err.message : 'An error occurred')
+    } finally {
+      setLoading(false)
+    }
+  }, [projectId, user, filters, getAccessToken])
+
+  // Create new report
+  const createReport = async (data: ReportFormData): Promise<ProjectReport | null> => {
+    if (!projectId || !user) return null
+
+    try {
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
+      const response = await fetch(`/api/projects/${projectId}/reports`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(data)
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to create report')
+      }
+
+      const result = await response.json()
+      
+      if (result.success) {
+        const newReport = result.data
+        setReports(prev => [...prev, newReport])
+        // Refetch to get updated statistics
+        await fetchReports()
+        return newReport
+      } else {
+        throw new Error(result.error || 'Failed to create report')
+      }
+    } catch (err) {
+      console.error('Error creating report:', err)
+      setError(err instanceof Error ? err.message : 'An error occurred')
+      return null
+    }
+  }
+
+  // Update existing report (for future implementation)
+  const updateReport = async (id: string, data: Partial<ReportFormData>): Promise<ProjectReport | null> => {
+    // Field reports are typically not editable once submitted
+    // This is a placeholder for future report types that might support editing
+    console.warn('Report editing not implemented - field reports are immutable once submitted')
+    return null
+  }
+
+  // Delete report
+  const deleteReport = async (id: string): Promise<boolean> => {
+    if (!user) return false
+
+    try {
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
+      const response = await fetch(`/api/reports/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to delete report')
+      }
+
+      const result = await response.json()
+      
+      if (result.success) {
+        setReports(prev => prev.filter(r => r.id !== id))
+        return true
+      } else {
+        throw new Error(result.error || 'Failed to delete report')
+      }
+    } catch (err) {
+      console.error('Error deleting report:', err)
+      setError(err instanceof Error ? err.message : 'An error occurred')
+      return false
+    }
+  }
+
+  // Download report (placeholder for future implementation)
+  const downloadReport = async (id: string): Promise<boolean> => {
+    // This would generate and download a PDF or other format
+    console.warn('Report download not implemented yet')
+    return false
+  }
+
+  // Refetch reports
+  const refetch = useCallback(async () => {
+    await fetchReports()
+  }, [fetchReports])
+
+  // Fetch reports on mount and when dependencies change
+  useEffect(() => {
+    fetchReports()
+  }, [fetchReports])
+
+  return {
+    reports,
+    statistics,
+    loading,
+    error,
+    permissions,
+    createReport,
+    updateReport,
+    deleteReport,
+    downloadReport,
+    refetch
+  }
+}

@@ -7,6 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DataStateWrapper } from '@/components/ui/loading-states';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useReports, ProjectReport, ReportFilters } from '@/hooks/useReports';
 import { 
   Search,
   Filter,
@@ -27,129 +29,40 @@ interface ReportsTabProps {
   projectId: string;
 }
 
-interface ProjectReport {
-  id: string;
-  name: string;
-  description: string;
-  type: 'daily' | 'weekly' | 'monthly' | 'safety' | 'financial' | 'progress' | 'quality' | 'custom';
-  status: 'draft' | 'completed' | 'reviewed' | 'approved';
-  generatedBy: string;
-  generatedDate: string;
-  reviewedBy?: string;
-  reviewedDate?: string;
-  fileSize: string;
-  fileType: string;
-  reportPeriod?: string;
-  priority: 'low' | 'medium' | 'high';
-  summary?: string;
-}
-
 export function ReportsTab({ projectId }: ReportsTabProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
 
+  // Build filters object for the hook
+  const filters: ReportFilters = {
+    search: searchTerm || undefined,
+    type: filterType !== 'all' ? filterType : undefined,
+    status: filterStatus !== 'all' ? filterStatus : undefined,
+  };
 
-  // Mock data for demonstration - in real app, this would come from API
-  const mockReports: ProjectReport[] = [
-    {
-      id: '1',
-      name: 'Weekly Progress Report - Week 6',
-      description: 'Comprehensive weekly progress report covering all project activities',
-      type: 'weekly',
-      status: 'approved',
-      generatedBy: 'John Smith',
-      generatedDate: '2024-02-05',
-      reviewedBy: 'Mike Johnson',
-      reviewedDate: '2024-02-06',
-      fileSize: '2.1 MB',
-      fileType: 'PDF',
-      reportPeriod: 'Jan 29 - Feb 4, 2024',
-      priority: 'high',
-      summary: 'Project on track, foundation work completed ahead of schedule'
-    },
-    {
-      id: '2',
-      name: 'Safety Inspection Report',
-      description: 'Monthly safety inspection and compliance report',
-      type: 'safety',
-      status: 'completed',
-      generatedBy: 'Sarah Wilson',
-      generatedDate: '2024-02-01',
-      fileSize: '1.5 MB',
-      fileType: 'PDF',
-      reportPeriod: 'January 2024',
-      priority: 'high',
-      summary: 'No major safety issues identified, minor recommendations provided'
-    },
-    {
-      id: '3',
-      name: 'Financial Status Report - Q1',
-      description: 'Quarterly financial analysis and budget tracking',
-      type: 'financial',
-      status: 'reviewed',
-      generatedBy: 'David Brown',
-      generatedDate: '2024-01-31',
-      reviewedBy: 'Lisa Garcia',
-      reviewedDate: '2024-02-02',
-      fileSize: '3.2 MB',
-      fileType: 'Excel',
-      reportPeriod: 'Q1 2024',
-      priority: 'medium',
-      summary: 'Budget utilization at 65%, within acceptable variance'
-    },
-    {
-      id: '4',
-      name: 'Daily Report - Construction Activities',
-      description: 'Daily report of construction activities and resource utilization',
-      type: 'daily',
-      status: 'completed',
-      generatedBy: 'Robert Davis',
-      generatedDate: '2024-02-07',
-      fileSize: '0.8 MB',
-      fileType: 'PDF',
-      reportPeriod: 'February 7, 2024',
-      priority: 'low',
-      summary: 'Concrete pour completed, steel delivery on schedule'
-    },
-    {
-      id: '5',
-      name: 'Quality Control Inspection',
-      description: 'Quality control inspection report for foundation work',
-      type: 'quality',
-      status: 'draft',
-      generatedBy: 'Lisa Garcia',
-      generatedDate: '2024-02-08',
-      fileSize: '1.2 MB',
-      fileType: 'PDF',
-      reportPeriod: 'February 2024',
-      priority: 'medium',
-      summary: 'Quality inspection in progress, preliminary results positive'
-    },
-    {
-      id: '6',
-      name: 'Project Progress Dashboard',
-      description: 'Comprehensive project progress and milestone tracking',
-      type: 'progress',
-      status: 'completed',
-      generatedBy: 'Mike Johnson',
-      generatedDate: '2024-02-03',
-      fileSize: '2.8 MB',
-      fileType: 'PDF',
-      reportPeriod: 'January 2024',
-      priority: 'high',
-      summary: 'Overall progress at 45%, critical path items on schedule'
-    }
-  ];
+  // Use the real reports hook instead of mock data
+  const {
+    reports,
+    statistics,
+    loading,
+    error,
+    permissions,
+    createReport,
+    deleteReport,
+    downloadReport,
+    refetch
+  } = useReports(projectId, filters);
 
-  const filteredReports = mockReports.filter(report => {
-    const matchesSearch = report.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         report.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         report.generatedBy.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = filterType === 'all' || report.type === filterType;
-    const matchesStatus = filterStatus === 'all' || report.status === filterStatus;
-    return matchesSearch && matchesType && matchesStatus;
-  });
+  // Handle error state
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertTriangle className="h-4 w-4" />
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
+    );
+  }
 
   const getTypeColor = (type: string) => {
     switch (type) {
@@ -197,12 +110,13 @@ export function ReportsTab({ projectId }: ReportsTabProps) {
     }
   };
 
-  const typeCounts = mockReports.reduce((acc, report) => {
+  // Calculate counts from real data
+  const typeCounts = reports.reduce((acc, report) => {
     acc[report.type] = (acc[report.type] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 
-  const statusCounts = mockReports.reduce((acc, report) => {
+  const statusCounts = reports.reduce((acc, report) => {
     acc[report.status] = (acc[report.status] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
@@ -211,17 +125,24 @@ export function ReportsTab({ projectId }: ReportsTabProps) {
 
   return (
     <DataStateWrapper
-      loading={false}
+      loading={loading}
       error={null}
-      data={filteredReports}
+      data={reports}
+      onRetry={refetch}
       emptyComponent={
         <Card>
           <CardContent className="text-center py-12">
             <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">No reports available</h3>
             <p className="text-muted-foreground mb-4">
-              Reports will appear here once they are generated.
+              Reports will appear here once they are generated for this project.
             </p>
+            {permissions.canCreate && (
+              <Button onClick={() => console.log('Open report creation form')}>
+                <FileText className="h-4 w-4 mr-2" />
+                Create First Report
+              </Button>
+            )}
           </CardContent>
         </Card>
       }
@@ -234,17 +155,17 @@ export function ReportsTab({ projectId }: ReportsTabProps) {
             <CardTitle className="text-sm font-medium">Total Reports</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{mockReports.length}</div>
+            <div className="text-2xl font-bold">{reports.length}</div>
             <div className="text-sm text-gray-600">Generated reports</div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Approved</CardTitle>
+            <CardTitle className="text-sm font-medium">Completed</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{statusCounts.approved || 0}</div>
-            <div className="text-sm text-gray-600">Final reports</div>
+            <div className="text-2xl font-bold text-green-600">{statusCounts.completed || 0}</div>
+            <div className="text-sm text-gray-600">Submitted reports</div>
           </CardContent>
         </Card>
         <Card>
@@ -258,11 +179,11 @@ export function ReportsTab({ projectId }: ReportsTabProps) {
         </Card>
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Draft Reports</CardTitle>
+            <CardTitle className="text-sm font-medium">Recent Reports</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{statusCounts.draft || 0}</div>
-            <div className="text-sm text-gray-600">In progress</div>
+            <div className="text-2xl font-bold text-blue-600">{statistics?.recentReports || 0}</div>
+            <div className="text-sm text-gray-600">Last 7 days</div>
           </CardContent>
         </Card>
       </div>
@@ -275,10 +196,12 @@ export function ReportsTab({ projectId }: ReportsTabProps) {
               <CardTitle>Project Reports</CardTitle>
               <CardDescription>View and manage all project reports and documentation</CardDescription>
             </div>
-            <Button>
-              <FileText className="w-4 h-4 mr-2" />
-              Generate Report
-            </Button>
+            {permissions.canCreate && (
+              <Button onClick={() => console.log('Open report creation form')}>
+                <FileText className="w-4 h-4 mr-2" />
+                Generate Report
+              </Button>
+            )}
           </div>
         </CardHeader>
         <CardContent>
@@ -302,12 +225,9 @@ export function ReportsTab({ projectId }: ReportsTabProps) {
                 <option value="all">All Types</option>
                 <option value="daily">Daily</option>
                 <option value="weekly">Weekly</option>
-                <option value="monthly">Monthly</option>
                 <option value="safety">Safety</option>
-                <option value="financial">Financial</option>
-                <option value="progress">Progress</option>
                 <option value="quality">Quality</option>
-                <option value="custom">Custom</option>
+                <option value="incident">Incident</option>
               </select>
               <select
                 value={filterStatus}
@@ -315,10 +235,8 @@ export function ReportsTab({ projectId }: ReportsTabProps) {
                 className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="all">All Status</option>
-                <option value="draft">Draft</option>
                 <option value="completed">Completed</option>
-                <option value="reviewed">Reviewed</option>
-                <option value="approved">Approved</option>
+                <option value="draft">Draft</option>
               </select>
               <Button variant="outline" size="sm">
                 <Filter className="w-4 h-4 mr-2" />
@@ -329,7 +247,7 @@ export function ReportsTab({ projectId }: ReportsTabProps) {
 
           {/* Reports List */}
           <div className="space-y-4">
-            {filteredReports.length === 0 ? (
+            {reports.length === 0 ? (
               <div className="text-center py-8">
                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <FileText className="w-8 h-8 text-gray-400" />
@@ -343,7 +261,7 @@ export function ReportsTab({ projectId }: ReportsTabProps) {
                 </p>
               </div>
             ) : (
-              filteredReports.map((report) => (
+              reports.map((report) => (
                 <Card key={report.id} className="hover:shadow-md transition-shadow">
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">
@@ -420,12 +338,26 @@ export function ReportsTab({ projectId }: ReportsTabProps) {
                       
                       <div className="ml-4 flex flex-col gap-2">
                         <div className="flex gap-1">
-                          <Button variant="outline" size="sm">
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            <Download className="w-4 h-4" />
-                          </Button>
+                          {permissions.canView && (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => console.log('View report:', report.id)}
+                              title="View report"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                          )}
+                          {permissions.canDownload && (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => downloadReport(report.id)}
+                              title="Download report"
+                            >
+                              <Download className="w-4 h-4" />
+                            </Button>
+                          )}
                         </div>
                       </div>
                     </div>

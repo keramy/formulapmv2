@@ -22,7 +22,7 @@ import { useApiQuery } from './useApiQuery'
  * This is the new recommended way to fetch tasks
  */
 export const useTasksOptimized = (projectId: string, filters?: TaskFilters) => {
-  const { profile } = useAuth()
+  const { profile, getAccessToken } = useAuth()
 
   // Calculate permissions
   const permissions: TaskPermissions = {
@@ -115,7 +115,7 @@ interface UseTasksReturn {
 }
 
 export function useTasks(projectId: string, filters?: TaskFilters): UseTasksReturn {
-  const { user, profile } = useAuth()
+  const { user, profile, getAccessToken } = useAuth()
   const [tasks, setTasks] = useState<Task[]>([])
   const [statistics, setStatistics] = useState<TaskStatistics | null>(null)
   const [loading, setLoading] = useState(false)
@@ -196,9 +196,14 @@ export function useTasks(projectId: string, filters?: TaskFilters): UseTasksRetu
         }
       }
 
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
       const response = await fetch(`/api/projects/${projectId}/tasks?${params}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          'Authorization': `Bearer ${token}`
         }
       })
 
@@ -209,8 +214,8 @@ export function useTasks(projectId: string, filters?: TaskFilters): UseTasksRetu
       const data = await response.json()
       
       if (data.success) {
-        setTasks(data.data.tasks || [])
-        setStatistics(data.data.statistics || null)
+        setTasks(data.data || [])
+        setStatistics(data.pagination?.statistics || null)
       } else {
         throw new Error(data.error || 'Failed to fetch tasks')
       }
@@ -227,11 +232,16 @@ export function useTasks(projectId: string, filters?: TaskFilters): UseTasksRetu
     if (!projectId || !user) return null
 
     try {
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
       const response = await fetch(`/api/projects/${projectId}/tasks`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(data)
       })
@@ -243,9 +253,10 @@ export function useTasks(projectId: string, filters?: TaskFilters): UseTasksRetu
       const result = await response.json()
       
       if (result.success) {
-        const newTask = result.data.task
+        const newTask = result.data
         setTasks(prev => [...prev, newTask])
-        setStatistics(result.data.statistics)
+        // Refetch to get updated statistics
+        await fetchTasks()
         return newTask
       } else {
         throw new Error(result.error || 'Failed to create task')
@@ -262,11 +273,16 @@ export function useTasks(projectId: string, filters?: TaskFilters): UseTasksRetu
     if (!user) return null
 
     try {
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
       const response = await fetch(`/api/tasks/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(data)
       })
@@ -278,7 +294,7 @@ export function useTasks(projectId: string, filters?: TaskFilters): UseTasksRetu
       const result = await response.json()
       
       if (result.success) {
-        const updatedTask = result.data.task
+        const updatedTask = result.data
         setTasks(prev => prev.map(t => t.id === id ? updatedTask : t))
         return updatedTask
       } else {
@@ -296,10 +312,15 @@ export function useTasks(projectId: string, filters?: TaskFilters): UseTasksRetu
     if (!user) return false
 
     try {
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
       const response = await fetch(`/api/tasks/${id}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          'Authorization': `Bearer ${token}`
         }
       })
 
@@ -327,11 +348,16 @@ export function useTasks(projectId: string, filters?: TaskFilters): UseTasksRetu
     if (!user) return false
 
     try {
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
       const response = await fetch(`/api/tasks/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ status })
       })
@@ -343,7 +369,7 @@ export function useTasks(projectId: string, filters?: TaskFilters): UseTasksRetu
       const result = await response.json()
       
       if (result.success) {
-        const updatedTask = result.data.task
+        const updatedTask = result.data
         setTasks(prev => prev.map(t => t.id === id ? updatedTask : t))
         return true
       } else {
