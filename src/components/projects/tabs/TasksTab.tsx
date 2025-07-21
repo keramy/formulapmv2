@@ -165,7 +165,7 @@ export function TasksTab({ projectId }: TasksTabProps) {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{statistics.byStatus.in_progress}</div>
+              <div className="text-2xl font-bold text-status-info">{statistics.byStatus.in_progress}</div>
               <div className="text-sm text-gray-600">Currently active</div>
             </CardContent>
           </Card>
@@ -178,7 +178,7 @@ export function TasksTab({ projectId }: TasksTabProps) {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{statistics.completed}</div>
+              <div className="text-2xl font-bold text-status-success">{statistics.completed}</div>
               <div className="text-sm text-gray-600">
                 {statistics.total > 0 ? Math.round((statistics.completed / statistics.total) * 100) : 0}% completion rate
               </div>
@@ -193,7 +193,7 @@ export function TasksTab({ projectId }: TasksTabProps) {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-red-600">{statistics.overdue}</div>
+              <div className="text-2xl font-bold text-status-danger">{statistics.overdue}</div>
               <div className="text-sm text-gray-600">Require attention</div>
             </CardContent>
           </Card>
@@ -211,7 +211,7 @@ export function TasksTab({ projectId }: TasksTabProps) {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-purple-600">{statistics.assignedToMe}</div>
+              <div className="text-2xl font-bold text-primary">{statistics.assignedToMe}</div>
               <div className="text-sm text-gray-600">Assigned to me</div>
             </CardContent>
           </Card>
@@ -224,7 +224,7 @@ export function TasksTab({ projectId }: TasksTabProps) {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-orange-600">{statistics.byStatus.blocked}</div>
+              <div className="text-2xl font-bold text-status-warning">{statistics.byStatus.blocked}</div>
               <div className="text-sm text-gray-600">Need resolution</div>
             </CardContent>
           </Card>
@@ -325,7 +325,7 @@ export function TasksTabOptimized({ projectId }: TasksTabProps) {
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center space-x-2">
-                  <CheckSquare className="h-4 w-4 text-green-600" />
+                  <CheckSquare className="h-4 w-4 text-status-success" />
                   <div>
                     <p className="text-sm font-medium">Completed</p>
                     <p className="text-2xl font-bold">{statistics.completed}</p>
@@ -337,7 +337,7 @@ export function TasksTabOptimized({ projectId }: TasksTabProps) {
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center space-x-2">
-                  <Clock className="h-4 w-4 text-blue-600" />
+                  <Clock className="h-4 w-4 text-status-info" />
                   <div>
                     <p className="text-sm font-medium">In Progress</p>
                     <p className="text-2xl font-bold">{statistics.in_progress}</p>
@@ -349,7 +349,7 @@ export function TasksTabOptimized({ projectId }: TasksTabProps) {
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center space-x-2">
-                  <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                  <AlertTriangle className="h-4 w-4 text-status-warning" />
                   <div>
                     <p className="text-sm font-medium">Pending</p>
                     <p className="text-2xl font-bold">{statistics.pending}</p>
@@ -361,7 +361,7 @@ export function TasksTabOptimized({ projectId }: TasksTabProps) {
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center space-x-2">
-                  <TrendingUp className="h-4 w-4 text-purple-600" />
+                  <TrendingUp className="h-4 w-4 text-primary" />
                   <div>
                     <p className="text-sm font-medium">Total</p>
                     <p className="text-2xl font-bold">{statistics.total}</p>

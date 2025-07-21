@@ -65,23 +65,27 @@ const CATEGORY_ICONS = {
 }
 
 const CATEGORY_COLORS = {
-  construction: 'bg-blue-500',
-  millwork: 'bg-amber-500',
-  electrical: 'bg-yellow-500',
-  mechanical: 'bg-green-500'
+  construction: 'bg-scope-construction',
+  millwork: 'bg-scope-millwork',
+  electrical: 'bg-scope-electrical',
+  mechanical: 'bg-scope-mechanical'
 }
 
-const STATUS_COLORS = {
-  not_started: 'bg-gray-100 text-gray-800',
-  planning: 'bg-blue-100 text-blue-800',
-  materials_ordered: 'bg-yellow-100 text-yellow-800',
-  in_progress: 'bg-green-100 text-green-800',
-  quality_check: 'bg-purple-100 text-purple-800',
-  client_review: 'bg-orange-100 text-orange-800',
-  completed: 'bg-emerald-100 text-emerald-800',
-  blocked: 'bg-red-100 text-red-800',
-  on_hold: 'bg-amber-100 text-amber-800',
-  cancelled: 'bg-gray-100 text-gray-800'
+// Map scope status to semantic Badge variants
+const getStatusBadgeVariant = (status: ScopeStatus) => {
+  const variants = {
+    not_started: 'pending' as const,
+    planning: 'planning' as const,
+    materials_ordered: 'status-warning' as const,
+    in_progress: 'in-progress' as const,
+    quality_check: 'review' as const,
+    client_review: 'status-review' as const,
+    completed: 'completed' as const,
+    blocked: 'blocked' as const,
+    on_hold: 'on-hold' as const,
+    cancelled: 'cancelled' as const
+  }
+  return variants[status] || 'pending'
 }
 
 export const useScopeTableColumns = ({
@@ -241,7 +245,7 @@ export const useScopeTableColumns = ({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-auto p-0">
-                  <Badge className={STATUS_COLORS[status]}>
+                  <Badge variant={getStatusBadgeVariant(status)}>
                     {status.replace('_', ' ')}
                   </Badge>
                 </Button>
@@ -274,7 +278,7 @@ export const useScopeTableColumns = ({
         }
 
         return (
-          <Badge className={STATUS_COLORS[status]}>
+          <Badge variant={getStatusBadgeVariant(status)}>
             {status.replace('_', ' ')}
           </Badge>
         )
@@ -400,14 +404,14 @@ export const useScopeTableColumns = ({
       header: "Priority",
       cell: ({ row }) => {
         const priority = row.getValue("priority") as number
-        const getPriorityColor = () => {
-          if (priority >= 8) return 'bg-red-100 text-red-800'
-          if (priority >= 5) return 'bg-yellow-100 text-yellow-800'
-          return 'bg-green-100 text-green-800'
+        const getPriorityBadgeVariant = () => {
+          if (priority >= 8) return 'priority-high' as const
+          if (priority >= 5) return 'priority-medium' as const
+          return 'priority-low' as const
         }
         
         return (
-          <Badge className={getPriorityColor()}>
+          <Badge variant={getPriorityBadgeVariant()}>
             {priority}
           </Badge>
         )

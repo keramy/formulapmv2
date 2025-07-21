@@ -85,28 +85,29 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
     }
   }
 
-  const getStatusColor = (status: MilestoneStatus) => {
+  // Map milestone status to semantic Card background classes
+  const getStatusCardClasses = (status: MilestoneStatus) => {
     switch (status) {
       case 'completed':
-        return 'bg-green-50 border-green-200 text-green-800'
+        return 'bg-status-success/5 border-status-success/20 text-status-success'
       case 'in_progress':
-        return 'bg-blue-50 border-blue-200 text-blue-800'
+        return 'bg-status-info/5 border-status-info/20 text-status-info'
       case 'overdue':
-        return 'bg-red-50 border-red-200 text-red-800'
+        return 'bg-status-danger/5 border-status-danger/20 text-status-danger'
       case 'cancelled':
-        return 'bg-gray-50 border-gray-200 text-gray-800'
+        return 'bg-muted/5 border-muted/20 text-muted-foreground'
       default:
-        return 'bg-gray-50 border-gray-200 text-gray-800'
+        return 'bg-muted/5 border-muted/20 text-muted-foreground'
     }
   }
 
   const getStatusBadge = (status: Milestone['status']) => {
     const variants = {
-      upcoming: 'secondary',
-      in_progress: 'default',
-      completed: 'default',
-      overdue: 'destructive',
-      cancelled: 'secondary'
+      upcoming: 'pending',
+      in_progress: 'in-progress',
+      completed: 'completed',
+      overdue: 'status-danger',
+      cancelled: 'cancelled'
     } as const
 
     return (
@@ -120,7 +121,7 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
   const getDateInfo = () => {
     if (milestone.status === 'completed' && actualDate) {
       return (
-        <div className="flex items-center gap-1 text-sm text-green-600">
+        <div className="flex items-center gap-1 text-sm text-status-success">
           <CheckCircle className="h-3 w-3" />
           Completed {format(actualDate, 'MMM d, yyyy')}
         </div>
@@ -223,7 +224,7 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
       selected && 'ring-2 ring-primary',
       isOverdue && 'border-red-200 bg-red-50/50',
       isDueToday && 'border-yellow-200 bg-yellow-50/50',
-      getStatusColor(milestone.status)
+      getStatusCardClasses(milestone.status)
     )}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">

@@ -59,18 +59,20 @@ export const MilestoneProgressBar: React.FC<MilestoneProgressBarProps> = ({
     }
   }, [milestones])
 
+  // Map progress percentage to semantic text colors
   const getProgressColor = (percentage: number) => {
-    if (percentage >= 80) return 'text-green-600'
-    if (percentage >= 60) return 'text-blue-600'
-    if (percentage >= 40) return 'text-yellow-600'
-    return 'text-red-600'
+    if (percentage >= 80) return 'text-status-success'
+    if (percentage >= 60) return 'text-status-info'
+    if (percentage >= 40) return 'text-status-warning'
+    return 'text-status-danger'
   }
 
+  // Map progress percentage to semantic color classes
   const getProgressBarColor = (percentage: number) => {
-    if (percentage >= 80) return 'bg-green-500'
-    if (percentage >= 60) return 'bg-blue-500'
-    if (percentage >= 40) return 'bg-yellow-500'
-    return 'bg-red-500'
+    if (percentage >= 80) return 'bg-status-success'
+    if (percentage >= 60) return 'bg-status-info'
+    if (percentage >= 40) return 'bg-status-warning'
+    return 'bg-status-danger'
   }
 
   if (variant === 'compact') {
@@ -229,7 +231,7 @@ export const MilestoneProgressBar: React.FC<MilestoneProgressBarProps> = ({
             {progress.total} total milestones
           </Badge>
           {progress.percentage === 100 && (
-            <Badge variant="default" className="text-xs bg-green-500">
+            <Badge variant="status-success" className="text-xs">
               <CheckCircle className="h-3 w-3 mr-1" />
               Project Complete
             </Badge>

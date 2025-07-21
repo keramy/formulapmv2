@@ -50,14 +50,55 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Formula PM Role-based colors
+        // Formula PM Role-based colors - Updated 6-Role System
         management: "hsl(var(--management))",
-        project: "hsl(var(--project))",
-        technical: "hsl(var(--technical))",
         purchase: "hsl(var(--purchase))",
-        field: "hsl(var(--field))",
+        technical: "hsl(var(--technical))",
+        project: "hsl(var(--project))",
         client: "hsl(var(--client))",
-        external: "hsl(var(--external))",
+        admin: "hsl(var(--admin))",
+        
+        // Comprehensive Status Color System
+        "status-success": "hsl(var(--status-success))",
+        "status-warning": "hsl(var(--status-warning))",
+        "status-danger": "hsl(var(--status-danger))",
+        "status-info": "hsl(var(--status-info))",
+        "status-pending": "hsl(var(--status-pending))",
+        "status-review": "hsl(var(--status-review))",
+        "status-blocked": "hsl(var(--status-blocked))",
+        
+        // Priority System
+        "priority-low": "hsl(var(--priority-low))",
+        "priority-medium": "hsl(var(--priority-medium))",
+        "priority-high": "hsl(var(--priority-high))",
+        "priority-urgent": "hsl(var(--priority-urgent))",
+        
+        // Scope Categories - Construction Industry
+        "scope-construction": "hsl(var(--scope-construction))",
+        "scope-millwork": "hsl(var(--scope-millwork))",
+        "scope-electrical": "hsl(var(--scope-electrical))",
+        "scope-mechanical": "hsl(var(--scope-mechanical))",
+        
+        // Risk Levels - Safety-First
+        "risk-low": "hsl(var(--risk-low))",
+        "risk-medium": "hsl(var(--risk-medium))",
+        "risk-high": "hsl(var(--risk-high))",
+        
+        // Project Status Extended
+        "project-planning": "hsl(var(--project-planning))",
+        "project-bidding": "hsl(var(--project-bidding))",
+        "project-active": "hsl(var(--project-active))",
+        "project-on-hold": "hsl(var(--project-on-hold))",
+        "project-completed": "hsl(var(--project-completed))",
+        "project-cancelled": "hsl(var(--project-cancelled))",
+        
+        // Task Status Extended
+        "task-pending": "hsl(var(--task-pending))",
+        "task-in-progress": "hsl(var(--task-in-progress))",
+        "task-review": "hsl(var(--task-review))",
+        "task-completed": "hsl(var(--task-completed))",
+        "task-cancelled": "hsl(var(--task-cancelled))",
+        "task-blocked": "hsl(var(--task-blocked))",
       },
       borderRadius: {
         lg: "var(--radius)",

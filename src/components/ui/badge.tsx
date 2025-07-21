@@ -15,24 +15,58 @@ const badgeVariants = cva(
         destructive:
           "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
         outline: "text-foreground",
-        // Status badges
-        planning: "border-transparent bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
-        active: "border-transparent bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
-        "on-hold": "border-transparent bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
-        completed: "border-transparent bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300",
-        cancelled: "border-transparent bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
-        todo: "border-transparent bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300",
-        "in-progress": "border-transparent bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
-        review: "border-transparent bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300",
-        done: "border-transparent bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
-        // Role badges
+        // Project Status badges
+        planning: "border-transparent bg-project-planning/10 text-project-planning border-project-planning/20",
+        active: "border-transparent bg-project-active/10 text-project-active border-project-active/20",
+        bidding: "border-transparent bg-project-bidding/10 text-project-bidding border-project-bidding/20",
+        "on-hold": "border-transparent bg-project-on-hold/10 text-project-on-hold border-project-on-hold/20",
+        completed: "border-transparent bg-project-completed/10 text-project-completed border-project-completed/20",
+        cancelled: "border-transparent bg-project-cancelled/10 text-project-cancelled border-project-cancelled/20",
+        
+        // Task Status badges
+        pending: "border-transparent bg-task-pending/10 text-task-pending border-task-pending/20",
+        "in-progress": "border-transparent bg-task-in-progress/10 text-task-in-progress border-task-in-progress/20",
+        review: "border-transparent bg-task-review/10 text-task-review border-task-review/20",
+        done: "border-transparent bg-task-completed/10 text-task-completed border-task-completed/20",
+        blocked: "border-transparent bg-task-blocked/10 text-task-blocked border-task-blocked/20",
+        
+        // Priority badges
+        "priority-low": "border-transparent bg-priority-low/10 text-priority-low border-priority-low/20",
+        "priority-medium": "border-transparent bg-priority-medium/10 text-priority-medium border-priority-medium/20",
+        "priority-high": "border-transparent bg-priority-high/10 text-priority-high border-priority-high/20",
+        "priority-urgent": "border-transparent bg-priority-urgent/10 text-priority-urgent border-priority-urgent/20",
+        
+        // Scope Category badges
+        "scope-construction": "border-transparent bg-scope-construction/10 text-scope-construction border-scope-construction/20",
+        "scope-millwork": "border-transparent bg-scope-millwork/10 text-scope-millwork border-scope-millwork/20",
+        "scope-electrical": "border-transparent bg-scope-electrical/10 text-scope-electrical border-scope-electrical/20",
+        "scope-mechanical": "border-transparent bg-scope-mechanical/10 text-scope-mechanical border-scope-mechanical/20",
+        
+        // Risk Level badges
+        "risk-low": "border-transparent bg-risk-low/10 text-risk-low border-risk-low/20",
+        "risk-medium": "border-transparent bg-risk-medium/10 text-risk-medium border-risk-medium/20",
+        "risk-high": "border-transparent bg-risk-high/10 text-risk-high border-risk-high/20",
+        
+        // Role badges - Updated 6-Role System
         management: "border-transparent bg-management/10 text-management border-management/20",
-        project: "border-transparent bg-project/10 text-project border-project/20",
-        technical: "border-transparent bg-technical/10 text-technical border-technical/20",
         purchase: "border-transparent bg-purchase/10 text-purchase border-purchase/20",
-        field: "border-transparent bg-field/10 text-field border-field/20",
+        technical: "border-transparent bg-technical/10 text-technical border-technical/20",
+        project: "border-transparent bg-project/10 text-project border-project/20",
         client: "border-transparent bg-client/10 text-client border-client/20",
-        external: "border-transparent bg-external/10 text-external border-external/20",
+        admin: "border-transparent bg-admin/10 text-admin border-admin/20",
+        
+        // Status badges - Semantic system
+        "status-success": "border-transparent bg-status-success/10 text-status-success border-status-success/20",
+        "status-warning": "border-transparent bg-status-warning/10 text-status-warning border-status-warning/20",
+        "status-info": "border-transparent bg-status-info/10 text-status-info border-status-info/20",
+        "status-danger": "border-transparent bg-status-danger/10 text-status-danger border-status-danger/20",
+        
+        // Shop Drawing Status badges
+        "shop-pending": "border-transparent bg-task-pending/10 text-task-pending border-task-pending/20",
+        "shop-under-review": "border-transparent bg-task-review/10 text-task-review border-task-review/20",
+        "shop-approved": "border-transparent bg-status-success/10 text-status-success border-status-success/20",
+        "shop-rejected": "border-transparent bg-status-danger/10 text-status-danger border-status-danger/20",
+        "shop-revision-required": "border-transparent bg-status-warning/10 text-status-warning border-status-warning/20",
       },
     },
     defaultVariants: {

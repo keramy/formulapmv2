@@ -245,12 +245,12 @@ export const MilestoneList: React.FC<MilestoneListProps> = ({
               <Badge variant="destructive">{statistics.overdue} overdue</Badge>
             )}
             {statistics.dueToday > 0 && (
-              <Badge variant="outline" className="border-yellow-500 text-yellow-600">
+              <Badge variant="status-warning">
                 {statistics.dueToday} due today
               </Badge>
             )}
             {statistics.inProgress > 0 && (
-              <Badge variant="outline" className="border-blue-500 text-blue-600">
+              <Badge variant="status-info">
                 {statistics.inProgress} in progress
               </Badge>
             )}

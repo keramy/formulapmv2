@@ -301,32 +301,34 @@ export function RealtimeScopeListTab({ projectId }: RealtimeScopeListTabProps) {
     return matchesSearch && matchesStatus;
   });
 
-  const getStatusColor = (status: string) => {
+  // Map scope status to semantic Badge variants
+  const getStatusBadgeVariant = (status: string) => {
     switch (status) {
-      case 'completed': return 'bg-green-100 text-green-800';
-      case 'in_progress': return 'bg-blue-100 text-blue-800';
-      case 'on_hold': return 'bg-yellow-100 text-yellow-800';
-      case 'not_started': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'completed': return 'completed' as const;
+      case 'in_progress': return 'in-progress' as const;
+      case 'on_hold': return 'on-hold' as const;
+      case 'not_started': return 'pending' as const;
+      default: return 'pending' as const;
     }
   };
 
-  const getPriorityColor = (priority: string) => {
+  // Map priority to semantic Badge variants
+  const getPriorityBadgeVariant = (priority: string) => {
     switch (priority) {
-      case 'high': return 'bg-red-100 text-red-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'low': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'high': return 'priority-high' as const;
+      case 'medium': return 'priority-medium' as const;
+      case 'low': return 'priority-low' as const;
+      default: return 'priority-medium' as const;
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'completed': return <CheckCircle className="w-4 h-4 text-green-500" />;
-      case 'in_progress': return <Clock className="w-4 h-4 text-blue-500" />;
-      case 'on_hold': return <AlertTriangle className="w-4 h-4 text-yellow-500" />;
-      case 'not_started': return <Clock className="w-4 h-4 text-gray-500" />;
-      default: return <Clock className="w-4 h-4 text-gray-500" />;
+      case 'completed': return <CheckCircle className="w-4 h-4 text-status-success" />;
+      case 'in_progress': return <Clock className="w-4 h-4 text-status-info" />;
+      case 'on_hold': return <AlertTriangle className="w-4 h-4 text-status-warning" />;
+      case 'not_started': return <Clock className="w-4 h-4 text-muted-foreground" />;
+      default: return <Clock className="w-4 h-4 text-muted-foreground" />;
     }
   };
 
@@ -553,10 +555,10 @@ export function RealtimeScopeListTab({ projectId }: RealtimeScopeListTabProps) {
                         <div className="flex items-center gap-2 mb-2">
                           {getStatusIcon(item.status)}
                           <h3 className="font-semibold text-lg">{item.name}</h3>
-                          <Badge className={getStatusColor(item.status)}>
+                          <Badge variant={getStatusBadgeVariant(item.status)}>
                             {item.status.replace('_', ' ')}
                           </Badge>
-                          <Badge variant="outline" className={getPriorityColor(item.priority)}>
+                          <Badge variant={getPriorityBadgeVariant(item.priority)}>
                             {item.priority}
                           </Badge>
                           {item.isBeingEdited && (

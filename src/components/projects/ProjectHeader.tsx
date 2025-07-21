@@ -27,23 +27,26 @@ export function ProjectHeader({ projectId }: ProjectHeaderProps) {
   const { user } = useAuth();
   const { project, loading, error, accessLevel } = useProject(projectId);
 
-  const getStatusColor = (status: string) => {
+  // Map project status to semantic Badge variants
+  const getStatusBadgeVariant = (status: string) => {
     switch (status) {
-      case 'active': return 'bg-green-100 text-green-800';
-      case 'completed': return 'bg-blue-100 text-blue-800';
-      case 'on_hold': return 'bg-yellow-100 text-yellow-800';
-      case 'cancelled': return 'bg-red-100 text-red-800';
-      case 'planning': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'active': return 'active' as const;
+      case 'completed': return 'completed' as const;
+      case 'on_hold': return 'on-hold' as const;
+      case 'cancelled': return 'cancelled' as const;
+      case 'planning': return 'planning' as const;
+      default: return 'planning' as const;
     }
   };
 
-  const getPriorityColor = (priority: string) => {
+  // Map priority to semantic Badge variants
+  const getPriorityBadgeVariant = (priority: string) => {
     switch (priority) {
-      case 'high': return 'bg-red-100 text-red-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'low': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'high': return 'priority-high' as const;
+      case 'medium': return 'priority-medium' as const;
+      case 'low': return 'priority-low' as const;
+      case 'urgent': return 'priority-urgent' as const;
+      default: return 'priority-medium' as const;
     }
   };
 
@@ -92,10 +95,10 @@ export function ProjectHeader({ projectId }: ProjectHeaderProps) {
             <div>
               <div className="flex items-center space-x-2 mb-1">
                 <h1 className="text-2xl font-bold text-gray-900">{project.name}</h1>
-                <Badge className={getStatusColor(project.status)}>
+                <Badge variant={getStatusBadgeVariant(project.status)}>
                   {project.status.replace('_', ' ')}
                 </Badge>
-                <Badge className={getPriorityColor(String(project.priority))}>
+                <Badge variant={getPriorityBadgeVariant(String(project.priority))}>
                   {project.priority}
                 </Badge>
               </div>
@@ -149,7 +152,7 @@ export function ProjectHeader({ projectId }: ProjectHeaderProps) {
             </div>
             <div className="w-full bg-gray-200 rounded-full h-3">
               <div 
-                className="bg-blue-600 h-3 rounded-full transition-all duration-300"
+                className="bg-status-info h-3 rounded-full transition-all duration-300"
                 style={{ width: `${project.progress_percentage}%` }}
               />
             </div>

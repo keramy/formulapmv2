@@ -30,31 +30,31 @@ const priorityConfig: Record<TaskPriority, {
   label: string
   icon: React.ElementType
   color: string
-  badgeClass: string
+  badgeVariant: string
 }> = {
   low: {
     label: 'Low',
     icon: TrendingDown,
-    color: 'text-blue-600',
-    badgeClass: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'
+    color: 'text-priority-low',
+    badgeVariant: 'priority-low'
   },
   medium: {
     label: 'Medium',
     icon: Minus,
-    color: 'text-yellow-600',
-    badgeClass: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
+    color: 'text-priority-medium',
+    badgeVariant: 'priority-medium'
   },
   high: {
     label: 'High',
     icon: TrendingUp,
-    color: 'text-orange-600',
-    badgeClass: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300'
+    color: 'text-priority-high',
+    badgeVariant: 'priority-high'
   },
   urgent: {
     label: 'Urgent',
     icon: AlertTriangle,
-    color: 'text-red-600',
-    badgeClass: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+    color: 'text-priority-urgent',
+    badgeVariant: 'priority-urgent'
   }
 }
 
@@ -70,7 +70,7 @@ export const TaskPrioritySelector: React.FC<TaskPrioritySelectorProps> = ({
 
   if (showBadge) {
     return (
-      <Badge className={cn('gap-1', config.badgeClass)}>
+      <Badge variant={config.badgeVariant as any} className="gap-1">
         <Icon className="h-3 w-3" />
         {config.label}
       </Badge>

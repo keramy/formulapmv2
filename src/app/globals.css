@@ -25,14 +25,55 @@
     --ring: 201 96% 32%;
     --radius: 0.5rem;
     
-    /* Formula PM Brand Colors */
-    --management: 237 73% 30%;
-    --project: 270 91% 29%;
-    --technical: 122 39% 33%;
-    --purchase: 14 76% 47%;
-    --field: 14 25% 33%;
-    --client: 291 47% 71%;
-    --external: 21 25% 40%;
+    /* Formula PM Brand Colors - Updated 6-Role System */
+    --management: 222 31% 21%;        /* Slate-800 - Executive unified */
+    --purchase: 24 86% 55%;           /* Orange-600 - Procurement unified */
+    --technical: 142 70% 37%;         /* Green-600 - Technical + scope lead */
+    --project: 261 83% 48%;           /* Purple-600 - Unified project delivery */
+    --client: 330 72% 60%;            /* Pink-500 - External stakeholder */
+    --admin: 221 83% 53%;             /* Blue-600 - System administration */
+    
+    /* Comprehensive Status Color System */
+    --status-success: 142 76% 36%;    /* Green-500 */
+    --status-warning: 45 93% 47%;     /* Yellow-500 */
+    --status-danger: 0 84% 60%;       /* Red-500 */
+    --status-info: 217 91% 60%;       /* Blue-500 */
+    --status-pending: 215 20% 65%;    /* Gray-400 */
+    --status-review: 262 83% 58%;     /* Purple-500 */
+    --status-blocked: 25 95% 53%;     /* Orange-500 */
+    
+    /* Priority System */
+    --priority-low: 173 58% 39%;      /* Teal-500 */
+    --priority-medium: 262 83% 58%;   /* Purple-500 */
+    --priority-high: 25 95% 53%;      /* Orange-500 */
+    --priority-urgent: 0 84% 60%;     /* Red-600 */
+    
+    /* Scope Categories - Construction Industry */
+    --scope-construction: 33 94% 38%; /* Amber-700 */
+    --scope-millwork: 37 99% 20%;     /* Brown-600 */
+    --scope-electrical: 48 96% 53%;   /* Yellow-500 */
+    --scope-mechanical: 215 25% 27%;  /* Slate-600 */
+    
+    /* Risk Levels - Safety-First */
+    --risk-low: 142 76% 36%;          /* Green-500 - Safe */
+    --risk-medium: 45 93% 47%;        /* Yellow-500 - Caution */
+    --risk-high: 0 84% 60%;           /* Red-500 - Danger */
+    
+    /* Project Status Extended */
+    --project-planning: 217 91% 60%;  /* Blue-400 */
+    --project-bidding: 45 93% 47%;    /* Yellow-500 */
+    --project-active: 142 76% 36%;    /* Green-500 */
+    --project-on-hold: 45 96% 64%;    /* Amber-500 */
+    --project-completed: 156 73% 46%; /* Emerald-600 */
+    --project-cancelled: 0 84% 60%;   /* Red-500 */
+    
+    /* Task Status Extended */
+    --task-pending: 215 20% 65%;      /* Gray-400 */
+    --task-in-progress: 217 91% 60%;  /* Blue-500 */
+    --task-review: 262 83% 58%;       /* Purple-500 */
+    --task-completed: 142 76% 36%;    /* Green-500 */
+    --task-cancelled: 0 84% 60%;      /* Red-500 */
+    --task-blocked: 25 95% 53%;       /* Orange-500 */
   }
 
   .dark {
@@ -55,6 +96,23 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 201 96% 32%;
+    
+    /* Dark mode variants for Formula PM colors */
+    --management: 222 31% 35%;        /* Lighter slate for dark mode */
+    --purchase: 24 86% 65%;           /* Lighter orange for dark mode */
+    --technical: 142 70% 47%;         /* Lighter green for dark mode */
+    --project: 261 83% 58%;           /* Lighter purple for dark mode */
+    --client: 330 72% 70%;            /* Lighter pink for dark mode */
+    --admin: 221 83% 63%;             /* Lighter blue for dark mode */
+    
+    /* Dark mode status colors - maintain accessibility */
+    --status-success: 142 76% 46%;    /* Lighter green for dark mode */
+    --status-warning: 45 93% 57%;     /* Lighter yellow for dark mode */
+    --status-danger: 0 84% 70%;       /* Lighter red for dark mode */
+    --status-info: 217 91% 70%;       /* Lighter blue for dark mode */
+    --status-pending: 215 20% 75%;    /* Lighter gray for dark mode */
+    --status-review: 262 83% 68%;     /* Lighter purple for dark mode */
+    --status-blocked: 25 95% 63%;     /* Lighter orange for dark mode */
   }
 }
 

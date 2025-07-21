@@ -49,21 +49,21 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
     .filter(m => m.status === 'upcoming' || m.status === 'in_progress')
     .sort((a, b) => new Date(a.target_date).getTime() - new Date(b.target_date).getTime())[0];
 
-  const getRiskColor = (risk: string) => {
+  const getRiskBadgeVariant = (risk: string) => {
     switch (risk) {
-      case 'high': return 'bg-red-100 text-red-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'low': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'high': return 'status-danger' as const;
+      case 'medium': return 'status-warning' as const;
+      case 'low': return 'status-success' as const;
+      default: return 'secondary' as const;
     }
   };
 
   const getRiskIcon = (risk: string) => {
     switch (risk) {
-      case 'high': return <XCircle className="w-5 h-5 text-red-500" />;
-      case 'medium': return <AlertTriangle className="w-5 h-5 text-yellow-500" />;
-      case 'low': return <CheckCircle className="w-5 h-5 text-green-500" />;
-      default: return <AlertTriangle className="w-5 h-5 text-gray-500" />;
+      case 'high': return <XCircle className="w-5 h-5 text-status-danger" />;
+      case 'medium': return <AlertTriangle className="w-5 h-5 text-status-warning" />;
+      case 'low': return <CheckCircle className="w-5 h-5 text-status-success" />;
+      default: return <AlertTriangle className="w-5 h-5 text-muted-foreground" />;
     }
   };
 
@@ -132,7 +132,7 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
             <div className="flex items-center space-x-2">
               {getRiskIcon(mockStats.riskLevel)}
               <span className="text-sm font-medium">Risk Level:</span>
-              <Badge className={getRiskColor(mockStats.riskLevel)}>
+              <Badge variant={getRiskBadgeVariant(mockStats.riskLevel)}>
                 {mockStats.riskLevel}
               </Badge>
             </div>
@@ -157,7 +157,7 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-3">
                   <div 
-                    className="bg-blue-600 h-3 rounded-full transition-all duration-300"
+                    className="bg-status-info h-3 rounded-full transition-all duration-300"
                     style={{ width: `${project.progress_percentage}%` }}
                   />
                 </div>
@@ -167,7 +167,7 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
             {/* Key Metrics */}
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">{mockStats.completedTasks}</div>
+                <div className="text-2xl font-bold text-status-info">{mockStats.completedTasks}</div>
                 <div className="text-sm text-gray-600">Completed Tasks</div>
               </div>
               <div className="text-center">
@@ -175,11 +175,11 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
                 <div className="text-sm text-gray-600">Total Tasks</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">{mockStats.teamMembers}</div>
+                <div className="text-2xl font-bold text-status-success">{mockStats.teamMembers}</div>
                 <div className="text-sm text-gray-600">Team Members</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-purple-600">{mockStats.documents}</div>
+                <div className="text-2xl font-bold text-primary">{mockStats.documents}</div>
                 <div className="text-sm text-gray-600">Documents</div>
               </div>
             </div>
@@ -193,15 +193,15 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
                 </h4>
                 <div className="grid grid-cols-3 gap-3">
                   <div className="text-center">
-                    <div className="text-xl font-bold text-green-600">{milestoneStats.completed}</div>
+                    <div className="text-xl font-bold text-status-success">{milestoneStats.completed}</div>
                     <div className="text-xs text-gray-600">Completed</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-xl font-bold text-blue-600">{milestoneStats.byStatus.in_progress}</div>
+                    <div className="text-xl font-bold text-status-info">{milestoneStats.byStatus.in_progress}</div>
                     <div className="text-xs text-gray-600">In Progress</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-xl font-bold text-red-600">{milestoneStats.overdue}</div>
+                    <div className="text-xl font-bold text-status-danger">{milestoneStats.overdue}</div>
                     <div className="text-xs text-gray-600">Overdue</div>
                   </div>
                 </div>
@@ -233,11 +233,11 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm">Budget Spent</span>
-                  <span className="text-sm text-red-600">${mockStats.budgetSpent.toLocaleString()}</span>
+                  <span className="text-sm text-status-danger">${mockStats.budgetSpent.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm">Remaining</span>
-                  <span className="text-sm text-green-600">${mockStats.budgetRemaining.toLocaleString()}</span>
+                  <span className="text-sm text-status-success">${mockStats.budgetRemaining.toLocaleString()}</span>
                 </div>
               </div>
               
@@ -249,7 +249,7 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-3">
                   <div 
-                    className="bg-orange-500 h-3 rounded-full transition-all duration-300"
+                    className="bg-status-warning h-3 rounded-full transition-all duration-300"
                     style={{ width: `${(mockStats.budgetSpent / project.budget) * 100}%` }}
                   />
                 </div>
@@ -315,7 +315,7 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
           <CardContent>
             <div className="space-y-3">
               <div className="text-center py-4">
-                <div className="text-2xl font-bold text-blue-600">{mockStats.teamMembers}</div>
+                <div className="text-2xl font-bold text-status-info">{mockStats.teamMembers}</div>
                 <div className="text-sm text-gray-600">Active Team Members</div>
               </div>
               <div className="text-sm text-gray-600">

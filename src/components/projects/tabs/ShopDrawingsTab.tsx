@@ -65,23 +65,38 @@ export function ShopDrawingsTab({ projectId }: ShopDrawingsTabProps) {
   }
 
 
-  const getStatusColor = (status: string) => {
+  // Map shop drawing status to semantic Badge variants
+  const getStatusBadgeVariant = (status: string) => {
     switch (status) {
-      case 'approved': return 'bg-green-100 text-green-800';
-      case 'under_review': return 'bg-blue-100 text-blue-800';
-      case 'revision_required': return 'bg-yellow-100 text-yellow-800';
-      case 'rejected': return 'bg-red-100 text-red-800';
-      case 'pending': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'approved': return 'shop-approved' as const;
+      case 'under_review': return 'shop-under-review' as const;
+      case 'revision_required': return 'shop-revision-required' as const;
+      case 'rejected': return 'shop-rejected' as const;
+      case 'pending': return 'shop-pending' as const;
+      default: return 'secondary' as const;
     }
   };
 
-  const getPriorityColor = (priority: string) => {
+  // Map priority to semantic Badge variants
+  const getPriorityBadgeVariant = (priority: string) => {
     switch (priority) {
-      case 'high': return 'bg-red-100 text-red-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'low': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'high': return 'priority-high' as const;
+      case 'medium': return 'priority-medium' as const;
+      case 'low': return 'priority-low' as const;
+      case 'urgent': return 'priority-urgent' as const;
+      default: return 'secondary' as const;
+    }
+  };
+
+  // Map category/discipline to semantic Badge variants
+  const getCategoryBadgeVariant = (category: string) => {
+    switch (category) {
+      case 'electrical': return 'scope-electrical' as const;
+      case 'mechanical': return 'scope-mechanical' as const;
+      case 'millwork': return 'scope-millwork' as const;
+      case 'architectural': case 'structural': case 'plumbing': case 'landscape': case 'interior_design': 
+        return 'scope-construction' as const;
+      default: return 'secondary' as const;
     }
   };
 
@@ -260,11 +275,11 @@ export function ShopDrawingsTab({ projectId }: ShopDrawingsTabProps) {
                         <div className="flex items-center gap-2 mb-2">
                           <FileText className="w-5 h-5 text-blue-500" />
                           <h3 className="font-semibold text-lg">{drawing.name}</h3>
-                          <Badge className={getStatusColor(drawing.status)}>
+                          <Badge variant={getStatusBadgeVariant(drawing.status)}>
                             {getStatusIcon(drawing.status)}
                             <span className="ml-1">{drawing.status.replace('_', ' ')}</span>
                           </Badge>
-                          <Badge variant="outline" className={getPriorityColor(drawing.priority)}>
+                          <Badge variant={getPriorityBadgeVariant(drawing.priority)}>
                             {drawing.priority}
                           </Badge>
                           <Badge variant="secondary">v{drawing.version}</Badge>
@@ -317,7 +332,7 @@ export function ShopDrawingsTab({ projectId }: ShopDrawingsTabProps) {
                       </div>
                       
                       <div className="ml-4 flex flex-col gap-2">
-                        <Badge variant="secondary">{drawing.category}</Badge>
+                        <Badge variant={getCategoryBadgeVariant(drawing.category)}>{drawing.category}</Badge>
                         <div className="flex gap-1">
                           {permissions.canView && (
                             <Button 

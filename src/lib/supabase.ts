@@ -23,7 +23,10 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   },
   global: {
     headers: {
-      'X-Client-Info': 'formulapm-web'
+      'X-Client-Info': 'formulapm-web',
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation'
     }
   }
 })

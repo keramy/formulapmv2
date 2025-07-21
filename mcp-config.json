@@ -13,6 +13,13 @@
       "env": {
         "SUPABASE_ACCESS_TOKEN": "sbp_f9eeca405156f6f4170f22e9312c8ce8a67a0d44"
       }
+    },
+    "postgres": {
+      "command": "postgres-mcp",
+      "args": [
+        "--access-mode=unrestricted",
+        "postgresql://postgres:postgres@127.0.0.1:54322/postgres"
+      ]
     }
   }
 }

@@ -43,23 +43,23 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <Card className="border-red-200 bg-red-50">
+        <Card className="border-destructive/20 bg-destructive/5">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-red-700">
+            <CardTitle className="flex items-center gap-2 text-destructive">
               <AlertTriangle className="h-5 w-5" />
               Something went wrong
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-red-600 mb-4">
+            <p className="text-destructive mb-4">
               This component encountered an error and couldn't load properly.
             </p>
             {process.env.NODE_ENV === 'development' && (
               <details className="mb-4">
-                <summary className="cursor-pointer text-sm text-red-500 mb-2">
+                <summary className="cursor-pointer text-sm text-destructive/80 mb-2">
                   Error details (development only)
                 </summary>
-                <pre className="text-xs bg-red-100 p-2 rounded overflow-auto">
+                <pre className="text-xs bg-destructive/10 p-2 rounded overflow-auto">
                   {this.state.error?.stack}
                 </pre>
               </details>
@@ -68,7 +68,7 @@ export class ErrorBoundary extends Component<Props, State> {
               onClick={this.handleRetry}
               variant="outline"
               size="sm"
-              className="border-red-300 text-red-700 hover:bg-red-100"
+              className="border-destructive/30 text-destructive hover:bg-destructive/10"
             >
               <RefreshCw className="h-4 w-4 mr-2" />
               Try Again
@@ -116,23 +116,23 @@ export function EnhancedErrorBoundary({
           error="Component Error"
           data={null}
           emptyComponent={
-            <Card className="border-red-200 bg-red-50">
+            <Card className="border-destructive/20 bg-destructive/5">
               <CardHeader>
-                <CardTitle className="flex items-center text-red-700">
+                <CardTitle className="flex items-center text-destructive">
                   <AlertTriangle className="mr-2 h-5 w-5" />
                   Component Error
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-red-600 mb-4">
+                <p className="text-destructive mb-4">
                   This component encountered an error and couldn't load properly.
                 </p>
                 {showDetails && (
                   <details className="mb-4">
-                    <summary className="cursor-pointer text-sm text-red-500 mb-2">
+                    <summary className="cursor-pointer text-sm text-destructive/80 mb-2">
                       Error details (development only)
                     </summary>
-                    <pre className="text-xs bg-red-100 p-2 rounded overflow-auto">
+                    <pre className="text-xs bg-destructive/10 p-2 rounded overflow-auto">
                       Component failed to render
                     </pre>
                   </details>
@@ -142,7 +142,7 @@ export function EnhancedErrorBoundary({
                     variant="outline"
                     size="sm"
                     onClick={() => window.location.reload()}
-                    className="border-red-300 text-red-700 hover:bg-red-100"
+                    className="border-destructive/30 text-destructive hover:bg-destructive/10"
                   >
                     <RefreshCw className="mr-2 h-4 w-4" />
                     Reload Page

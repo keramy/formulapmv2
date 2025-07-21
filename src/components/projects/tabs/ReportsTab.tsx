@@ -64,36 +64,40 @@ export function ReportsTab({ projectId }: ReportsTabProps) {
     );
   }
 
-  const getTypeColor = (type: string) => {
+  // Map report types to semantic Badge variants
+  const getTypeBadgeVariant = (type: string) => {
     switch (type) {
-      case 'daily': return 'bg-blue-100 text-blue-800';
-      case 'weekly': return 'bg-green-100 text-green-800';
-      case 'monthly': return 'bg-purple-100 text-purple-800';
-      case 'safety': return 'bg-red-100 text-red-800';
-      case 'financial': return 'bg-yellow-100 text-yellow-800';
-      case 'progress': return 'bg-indigo-100 text-indigo-800';
-      case 'quality': return 'bg-orange-100 text-orange-800';
-      case 'custom': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'daily': return 'status-info' as const;
+      case 'weekly': return 'status-success' as const;
+      case 'monthly': return 'status-review' as const;
+      case 'safety': return 'status-danger' as const;
+      case 'financial': return 'status-warning' as const;
+      case 'progress': return 'status-info' as const;
+      case 'quality': return 'status-blocked' as const;
+      case 'custom': return 'secondary' as const;
+      default: return 'secondary' as const;
     }
   };
 
-  const getStatusColor = (status: string) => {
+  // Map report status to semantic Badge variants
+  const getStatusBadgeVariant = (status: string) => {
     switch (status) {
-      case 'approved': return 'bg-green-100 text-green-800';
-      case 'reviewed': return 'bg-blue-100 text-blue-800';
-      case 'completed': return 'bg-purple-100 text-purple-800';
-      case 'draft': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'approved': return 'status-success' as const;
+      case 'reviewed': return 'status-review' as const;
+      case 'completed': return 'completed' as const;
+      case 'draft': return 'pending' as const;
+      default: return 'secondary' as const;
     }
   };
 
-  const getPriorityColor = (priority: string) => {
+  // Map priority to semantic Badge variants
+  const getPriorityBadgeVariant = (priority: string) => {
     switch (priority) {
-      case 'high': return 'bg-red-100 text-red-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'low': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'high': return 'priority-high' as const;
+      case 'medium': return 'priority-medium' as const;
+      case 'low': return 'priority-low' as const;
+      case 'urgent': return 'priority-urgent' as const;
+      default: return 'secondary' as const;
     }
   };
 
@@ -271,13 +275,13 @@ export function ReportsTab({ projectId }: ReportsTabProps) {
                             {getTypeIcon(report.type)}
                             <h3 className="font-semibold text-lg">{report.name}</h3>
                           </div>
-                          <Badge className={getTypeColor(report.type)}>
+                          <Badge variant={getTypeBadgeVariant(report.type)}>
                             {report.type}
                           </Badge>
-                          <Badge className={getStatusColor(report.status)}>
+                          <Badge variant={getStatusBadgeVariant(report.status)}>
                             {report.status}
                           </Badge>
-                          <Badge variant="outline" className={getPriorityColor(report.priority)}>
+                          <Badge variant={getPriorityBadgeVariant(report.priority)}>
                             {report.priority}
                           </Badge>
                         </div>

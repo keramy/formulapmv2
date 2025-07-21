@@ -173,28 +173,23 @@ export const UserImpersonationModal = ({ open, onOpenChange }: UserImpersonation
     }
   }
 
-  const getRoleBadgeColor = (role: string) => {
+  // Map user roles to semantic Badge variants (6-role system)
+  const getRoleBadgeVariant = (role: string) => {
     switch (role) {
       case 'management':
+        return 'management' as const
       case 'admin':
-        return 'bg-purple-100 text-purple-800'
-      case 'management':
-      case 'management':
+        return 'admin' as const
       case 'technical_lead':
-        return 'bg-blue-100 text-blue-800'
+        return 'technical' as const
       case 'project_manager':
-      case 'project_manager':
-      case 'project_manager':
-        return 'bg-green-100 text-green-800'
+        return 'project' as const
       case 'purchase_manager':
-      case 'purchase_manager':
-        return 'bg-orange-100 text-orange-800'
-      case 'project_manager':
-        return 'bg-yellow-100 text-yellow-800'
+        return 'purchase' as const
       case 'client':
-        return 'bg-gray-100 text-gray-800'
+        return 'client' as const
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'secondary' as const
     }
   }
 
@@ -283,7 +278,7 @@ export const UserImpersonationModal = ({ open, onOpenChange }: UserImpersonation
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <h3 className="font-medium text-gray-900">{user.display_name}</h3>
-                        <Badge className={getRoleBadgeColor(user.role)}>
+                        <Badge variant={getRoleBadgeVariant(user.role)}>
                           <span className="flex items-center gap-1">
                             {getRoleIcon(user.role)}
                             {user.role_display}

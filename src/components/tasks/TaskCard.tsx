@@ -84,7 +84,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
           'flex items-center justify-between p-3 rounded-lg border transition-colors',
           'hover:bg-muted/50',
           selected && 'bg-muted',
-          isOverdue && 'border-red-200 dark:border-red-900'
+          isOverdue && 'border-status-danger/50'
         )}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -116,8 +116,8 @@ export const TaskCard: React.FC<TaskCardProps> = ({
               {task.due_date && (
                 <span className={cn(
                   'flex items-center gap-1',
-                  isOverdue && 'text-red-600',
-                  isDueToday && 'text-yellow-600'
+                  isOverdue && 'text-status-danger',
+                  isDueToday && 'text-status-warning'
                 )}>
                   <Calendar className="h-3 w-3" />
                   {format(new Date(task.due_date), 'MMM d')}
@@ -155,7 +155,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
               {permissions.canDelete && onDelete && (
                 <>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={onDelete} className="text-red-600">
+                  <DropdownMenuItem onClick={onDelete} className="text-destructive">
                     <Trash2 className="h-4 w-4 mr-2" />
                     Delete
                   </DropdownMenuItem>
@@ -172,7 +172,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
     <Card className={cn(
       'transition-shadow hover:shadow-md',
       selected && 'ring-2 ring-primary',
-      isOverdue && 'border-red-200 dark:border-red-900'
+      isOverdue && 'border-status-danger/50'
     )}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
@@ -211,7 +211,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
               {permissions.canDelete && onDelete && (
                 <>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={onDelete} className="text-red-600">
+                  <DropdownMenuItem onClick={onDelete} className="text-destructive">
                     <Trash2 className="h-4 w-4 mr-2" />
                     Delete
                   </DropdownMenuItem>
@@ -252,8 +252,8 @@ export const TaskCard: React.FC<TaskCardProps> = ({
           {task.due_date && (
             <div className={cn(
               'flex items-center gap-2',
-              isOverdue && 'text-red-600 font-medium',
-              isDueToday && 'text-yellow-600 font-medium'
+              isOverdue && 'text-status-danger font-medium',
+              isDueToday && 'text-status-warning font-medium'
             )}>
               <Calendar className="h-4 w-4" />
               <span>

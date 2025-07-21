@@ -119,20 +119,14 @@ export function ProjectsOverview() {
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusBadgeVariant = (status: string) => {
     switch (status) {
-      case 'active':
-        return 'bg-green-500';
-      case 'planning':
-        return 'bg-blue-500';
-      case 'bidding':
-        return 'bg-yellow-500';
-      case 'on_hold':
-        return 'bg-orange-500';
-      case 'completed':
-        return 'bg-gray-500';
-      default:
-        return 'bg-gray-400';
+      case 'active': return 'active' as const;
+      case 'planning': return 'planning' as const;
+      case 'bidding': return 'bidding' as const;
+      case 'on_hold': return 'on-hold' as const;
+      case 'completed': return 'completed' as const;
+      default: return 'secondary' as const;
     }
   };
 
@@ -219,7 +213,7 @@ export function ProjectsOverview() {
                         </div>
                       </div>
                     </div>
-                    <Badge className={`${getStatusColor(project.status)} text-white`}>
+                    <Badge variant={getStatusBadgeVariant(project.status)}>
                       {getStatusLabel(project.status)}
                     </Badge>
                   </div>

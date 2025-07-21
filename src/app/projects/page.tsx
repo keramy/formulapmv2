@@ -50,22 +50,22 @@ export default function ProjectsPage() {
     return matchesSearch && matchesStatus;
   });
 
-  const getStatusColor = (status: string) => {
+  const getStatusBadgeVariant = (status: string) => {
     switch (status) {
-      case 'active': return 'bg-green-100 text-green-800';
-      case 'completed': return 'bg-blue-100 text-blue-800';
-      case 'on_hold': return 'bg-yellow-100 text-yellow-800';
-      case 'cancelled': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'active': return 'active' as const;
+      case 'completed': return 'completed' as const;
+      case 'on_hold': return 'on-hold' as const;
+      case 'cancelled': return 'cancelled' as const;
+      default: return 'secondary' as const;
     }
   };
 
-  const getPriorityColor = (priority: string) => {
+  const getPriorityBadgeVariant = (priority: string) => {
     switch (priority) {
-      case 'high': return 'bg-red-100 text-red-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'low': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'high': return 'priority-high' as const;
+      case 'medium': return 'priority-medium' as const;
+      case 'low': return 'priority-low' as const;
+      default: return 'secondary' as const;
     }
   };
 
@@ -197,10 +197,10 @@ export default function ProjectsPage() {
                     </CardDescription>
                   </div>
                   <div className="flex gap-1">
-                    <Badge className={getStatusColor(project.status)}>
+                    <Badge variant={getStatusBadgeVariant(project.status)}>
                       {project.status.replace('_', ' ')}
                     </Badge>
-                    <Badge variant="outline" className={getPriorityColor(String(project.priority))}>
+                    <Badge variant={getPriorityBadgeVariant(String(project.priority))}>
                       {project.priority}
                     </Badge>
                   </div>

@@ -148,28 +148,28 @@ export function RealtimeDashboard() {
 
   const getConnectionStatusColor = (status: string) => {
     switch (status) {
-      case 'connected': return 'bg-green-500';
-      case 'connecting': return 'bg-yellow-500';
-      case 'disconnected': return 'bg-red-500';
-      case 'error': return 'bg-red-600';
-      default: return 'bg-gray-500';
+      case 'connected': return 'bg-status-success';
+      case 'connecting': return 'bg-status-warning';
+      case 'disconnected': return 'bg-status-danger';
+      case 'error': return 'bg-status-danger';
+      default: return 'bg-muted-foreground';
     }
   };
 
   const getTaskStatusIcon = (status: string) => {
     switch (status) {
-      case 'completed': return <CheckCircle className="w-4 h-4 text-green-500" />;
-      case 'in_progress': return <Clock className="w-4 h-4 text-blue-500" />;
-      case 'blocked': return <AlertTriangle className="w-4 h-4 text-red-500" />;
-      default: return <Clock className="w-4 h-4 text-gray-500" />;
+      case 'completed': return <CheckCircle className="w-4 h-4 text-status-success" />;
+      case 'in_progress': return <Clock className="w-4 h-4 text-status-info" />;
+      case 'blocked': return <AlertTriangle className="w-4 h-4 text-status-danger" />;
+      default: return <Clock className="w-4 h-4 text-muted-foreground" />;
     }
   };
 
   const getActivityIcon = (entityType: string, action: string) => {
-    if (entityType === 'project' && action === 'created') return <TrendingUp className="w-4 h-4 text-blue-500" />;
-    if (entityType === 'task' && action === 'updated') return <Edit3 className="w-4 h-4 text-yellow-500" />;
-    if (entityType === 'task' && action === 'completed') return <CheckCircle className="w-4 h-4 text-green-500" />;
-    return <Activity className="w-4 h-4 text-gray-500" />;
+    if (entityType === 'project' && action === 'created') return <TrendingUp className="w-4 h-4 text-status-info" />;
+    if (entityType === 'task' && action === 'updated') return <Edit3 className="w-4 h-4 text-status-warning" />;
+    if (entityType === 'task' && action === 'completed') return <CheckCircle className="w-4 h-4 text-status-success" />;
+    return <Activity className="w-4 h-4 text-muted-foreground" />;
   };
 
   const formatTimeAgo = (timestamp: string) => {
@@ -225,7 +225,7 @@ export function RealtimeDashboard() {
               Realtime: {connectionStatus === 'connected' ? 'Connected' : connectionStatus}
             </span>
           </div>
-          <Zap className="w-4 h-4 text-blue-500" />
+          <Zap className="w-4 h-4 text-status-info" />
         </div>
         
         {/* Online Users */}
@@ -344,8 +344,8 @@ export function RealtimeDashboard() {
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                  <span className="text-xs text-green-600">Live</span>
+                  <div className="w-2 h-2 bg-status-success rounded-full animate-pulse" />
+                  <span className="text-xs text-status-success">Live</span>
                 </div>
               </div>
             ))}

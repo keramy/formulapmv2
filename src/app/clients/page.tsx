@@ -108,12 +108,12 @@ export default function ClientsPage() {
     return matchesSearch && matchesStatus && matchesType;
   });
 
-  const getStatusColor = (status: string) => {
+  const getStatusBadgeVariant = (status: string) => {
     switch (status) {
-      case 'active': return 'bg-green-100 text-green-800';
-      case 'inactive': return 'bg-gray-100 text-gray-800';
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'active': return 'active' as const;
+      case 'inactive': return 'secondary' as const;
+      case 'pending': return 'pending' as const;
+      default: return 'secondary' as const;
     }
   };
 
@@ -277,7 +277,7 @@ export default function ClientsPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center space-x-2">
                         <h3 className="text-lg font-semibold truncate">{client.name}</h3>
-                        <Badge className={getStatusColor(client.status)}>
+                        <Badge variant={getStatusBadgeVariant(client.status)}>
                           {client.status}
                         </Badge>
                       </div>

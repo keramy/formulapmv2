@@ -107,33 +107,34 @@ export const MilestoneCalendar: React.FC<MilestoneCalendarProps> = ({
     return { total: monthEvents.length, completed, overdue, upcoming, inProgress }
   }, [currentDate, calendarEvents])
 
-  const getStatusColor = (status: Milestone['status']) => {
+  // Map milestone status to semantic color classes
+  const getStatusColorClass = (status: Milestone['status']) => {
     switch (status) {
       case 'completed':
-        return 'bg-green-500'
+        return 'bg-status-success'
       case 'in_progress':
-        return 'bg-blue-500'
+        return 'bg-status-info'
       case 'overdue':
-        return 'bg-red-500'
+        return 'bg-status-danger'
       case 'cancelled':
-        return 'bg-gray-500'
+        return 'bg-muted-foreground'
       default:
-        return 'bg-gray-400'
+        return 'bg-muted'
     }
   }
 
   const getStatusIcon = (status: Milestone['status']) => {
     switch (status) {
       case 'completed':
-        return <CheckCircle className="h-3 w-3 text-green-600" />
+        return <CheckCircle className="h-3 w-3 text-status-success" />
       case 'in_progress':
-        return <PlayCircle className="h-3 w-3 text-blue-600" />
+        return <PlayCircle className="h-3 w-3 text-status-info" />
       case 'overdue':
-        return <AlertTriangle className="h-3 w-3 text-red-600" />
+        return <AlertTriangle className="h-3 w-3 text-status-danger" />
       case 'cancelled':
-        return <XCircle className="h-3 w-3 text-gray-600" />
+        return <XCircle className="h-3 w-3 text-muted-foreground" />
       default:
-        return <Circle className="h-3 w-3 text-gray-400" />
+        return <Circle className="h-3 w-3 text-muted" />
     }
   }
 
@@ -251,23 +252,23 @@ export const MilestoneCalendar: React.FC<MilestoneCalendarProps> = ({
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-green-500" />
+                  <div className="w-3 h-3 rounded-full bg-status-success" />
                   <span className="text-sm">Completed</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-blue-500" />
+                  <div className="w-3 h-3 rounded-full bg-status-info" />
                   <span className="text-sm">In Progress</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-gray-400" />
+                  <div className="w-3 h-3 rounded-full bg-muted" />
                   <span className="text-sm">Upcoming</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500" />
+                  <div className="w-3 h-3 rounded-full bg-status-danger" />
                   <span className="text-sm">Overdue</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-gray-500" />
+                  <div className="w-3 h-3 rounded-full bg-muted-foreground" />
                   <span className="text-sm">Cancelled</span>
                 </div>
               </CardContent>

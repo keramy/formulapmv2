@@ -26,16 +26,19 @@ export const useAuth = () => {
         .from('user_profiles')
         .select('*')
         .eq('id', userId)
-        .single()
+        .maybeSingle()
 
-      if (error) {
-        console.error('🔐 [useAuth] Profile fetch error:', error)
+      if (error || !data) {
+        if (error) {
+          console.error('🔐 [useAuth] Profile fetch error:', error)
+        } else {
+          console.log('🔐 [useAuth] No profile found for user:', userId)
+        }
         
-        // Handle admin profile creation if needed
-        if (error.code === 'PGRST116') {
-          const { data: { user } } = await supabase.auth.getUser()
-          if (user?.email === 'admin@formulapm.com') {
-            console.log('🔐 [useAuth] Creating missing admin profile')
+        // Handle profile creation for any authenticated user
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          console.log('🔐 [useAuth] Creating missing profile for:', user.email)
             
             const { supabaseAdmin } = await import('@/lib/supabase')
             const { data: newProfile, error: createError } = await supabaseAdmin

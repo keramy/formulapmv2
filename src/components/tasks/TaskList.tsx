@@ -237,7 +237,7 @@ export const TaskList: React.FC<TaskListProps> = ({
               <Badge variant="destructive">{statistics.overdue} overdue</Badge>
             )}
             {statistics.dueToday > 0 && (
-              <Badge variant="outline" className="border-yellow-500 text-yellow-600">
+              <Badge variant="status-warning">
                 {statistics.dueToday} due today
               </Badge>
             )}

@@ -102,8 +102,19 @@
       "Bash(docker:*)",
       "Bash(set SUPABASE_URL=http://127.0.0.1:54321)",
       "Bash(set:*)",
-      "Bash(tail:*)"
+      "Bash(tail:*)",
+      "Bash(postgres-mcp:*)",
+      "Bash(pipx list:*)",
+      "mcp__supabase__list_tables"
     ],
     "deny": []
-  }
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "supabase",
+    "context7",
+    "sequential-thinking",
+    "memory",
+    "postgres"
+  ]
 }

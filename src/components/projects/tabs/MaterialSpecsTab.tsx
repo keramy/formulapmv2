@@ -76,37 +76,39 @@ export function MaterialSpecsTab({ projectId }: MaterialSpecsTabProps) {
   
 
 
-  const getStatusColor = (status: string) => {
+  // Map material status to semantic Badge variants
+  const getStatusBadgeVariant = (status: string) => {
     switch (status) {
-      case 'approved': return 'bg-green-100 text-green-800';
-      case 'pending_approval': return 'bg-yellow-100 text-yellow-800';
-      case 'rejected': return 'bg-red-100 text-red-800';
-      case 'revision_required': return 'bg-orange-100 text-orange-800';
-      case 'discontinued': return 'bg-gray-100 text-gray-800';
-      case 'substitution_required': return 'bg-purple-100 text-purple-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'approved': return 'status-success' as const;
+      case 'pending_approval': return 'pending' as const;
+      case 'rejected': return 'status-danger' as const;
+      case 'revision_required': return 'status-warning' as const;
+      case 'discontinued': return 'cancelled' as const;
+      case 'substitution_required': return 'status-review' as const;
+      default: return 'pending' as const;
     }
   };
 
-  const getPriorityColor = (priority: string) => {
+  // Map material priority to semantic Badge variants
+  const getPriorityBadgeVariant = (priority: string) => {
     switch (priority) {
-      case 'critical': return 'bg-red-100 text-red-800';
-      case 'high': return 'bg-orange-100 text-orange-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'low': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'critical': return 'priority-urgent' as const;
+      case 'high': return 'priority-high' as const;
+      case 'medium': return 'priority-medium' as const;
+      case 'low': return 'priority-low' as const;
+      default: return 'priority-medium' as const;
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'approved': return <CheckCircle className="w-4 h-4 text-green-500" />;
-      case 'pending_approval': return <Clock className="w-4 h-4 text-yellow-500" />;
-      case 'rejected': return <XCircle className="w-4 h-4 text-red-500" />;
-      case 'revision_required': return <AlertTriangle className="w-4 h-4 text-orange-500" />;
-      case 'discontinued': return <Package className="w-4 h-4 text-gray-500" />;
-      case 'substitution_required': return <Package className="w-4 h-4 text-purple-500" />;
-      default: return <Clock className="w-4 h-4 text-gray-500" />;
+      case 'approved': return <CheckCircle className="w-4 h-4 text-status-success" />;
+      case 'pending_approval': return <Clock className="w-4 h-4 text-status-warning" />;
+      case 'rejected': return <XCircle className="w-4 h-4 text-status-danger" />;
+      case 'revision_required': return <AlertTriangle className="w-4 h-4 text-status-warning" />;
+      case 'discontinued': return <Package className="w-4 h-4 text-muted-foreground" />;
+      case 'substitution_required': return <Package className="w-4 h-4 text-status-review" />;
+      default: return <Clock className="w-4 h-4 text-muted-foreground" />;
     }
   };
 
@@ -262,10 +264,10 @@ export function MaterialSpecsTab({ projectId }: MaterialSpecsTabProps) {
                         <div className="flex items-center gap-2 mb-2">
                           {getStatusIcon(spec.status)}
                           <h3 className="font-semibold text-lg">{spec.name}</h3>
-                          <Badge className={getStatusColor(spec.status)}>
+                          <Badge variant={getStatusBadgeVariant(spec.status)}>
                             {spec.status.replace('_', ' ')}
                           </Badge>
-                          <Badge variant="outline" className={getPriorityColor(spec.priority)}>
+                          <Badge variant={getPriorityBadgeVariant(spec.priority)}>
                             {spec.priority}
                           </Badge>
                         </div>

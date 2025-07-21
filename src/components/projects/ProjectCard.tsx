@@ -44,32 +44,35 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
 }) => {
   const { canViewPricing } = usePermissions()
 
-  const getStatusColor = (status: string) => {
-    const colors = {
-      planning: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
-      active: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-      on_hold: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
-      completed: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300',
-      cancelled: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+  // Map project status to semantic Badge variants
+  const getStatusBadgeVariant = (status: string) => {
+    const variants = {
+      planning: 'planning' as const,
+      active: 'active' as const,
+      on_hold: 'on-hold' as const,
+      completed: 'completed' as const,
+      cancelled: 'cancelled' as const
     }
-    return colors[status as keyof typeof colors] || colors.planning
+    return variants[status as keyof typeof variants] || 'planning'
   }
 
-  const getPriorityColor = (priority: string) => {
+  // Map priority to semantic text color classes
+  const getPriorityColorClass = (priority: string) => {
     const colors = {
-      low: 'text-green-600 dark:text-green-400',
-      medium: 'text-yellow-600 dark:text-yellow-400',
-      high: 'text-orange-600 dark:text-orange-400',
-      urgent: 'text-red-600 dark:text-red-400'
+      low: 'text-priority-low',
+      medium: 'text-priority-medium',
+      high: 'text-priority-high',
+      urgent: 'text-priority-urgent'
     }
-    return colors[priority as keyof typeof colors] || colors.medium
+    return colors[priority as keyof typeof colors] || 'text-priority-medium'
   }
 
-  const getProgressColor = (progress: number) => {
-    if (progress >= 80) return 'bg-green-500'
-    if (progress >= 50) return 'bg-blue-500'
-    if (progress >= 25) return 'bg-yellow-500'
-    return 'bg-red-500'
+  // Map progress percentage to semantic color classes
+  const getProgressColorClass = (progress: number) => {
+    if (progress >= 80) return 'bg-status-success'
+    if (progress >= 50) return 'bg-status-info'
+    if (progress >= 25) return 'bg-status-warning'
+    return 'bg-status-danger'
   }
 
   return (
@@ -97,10 +100,10 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
             )}
           </div>
           <div className="flex flex-col items-end space-y-2 ml-4">
-            <Badge className={cn("text-xs font-medium", getStatusColor(project.status))}>
+            <Badge variant={getStatusBadgeVariant(project.status)} className="text-xs font-medium">
               {project.status.replace('_', ' ')}
             </Badge>
-            <div className={cn("flex items-center text-xs font-medium", getPriorityColor(project.priority))}>
+            <div className={cn("flex items-center text-xs font-medium", getPriorityColorClass(project.priority))}>
               <AlertTriangle className="h-3 w-3 mr-1" />
               {project.priority}
             </div>
@@ -118,7 +121,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
           <div className="relative">
             <Progress value={project.progress} className="h-2" />
             <div 
-              className={cn("absolute top-0 left-0 h-2 rounded-full transition-all", getProgressColor(project.progress))}
+              className={cn("absolute top-0 left-0 h-2 rounded-full transition-all", getProgressColorClass(project.progress))}
               style={{ width: `${project.progress}%` }}
             />
           </div>

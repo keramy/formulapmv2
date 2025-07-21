@@ -74,16 +74,16 @@ interface ServerProjectsOverviewProps {
 export async function ServerProjectsOverview({ userId, role }: ServerProjectsOverviewProps) {
   const projects = await getRecentProjects(userId, role);
 
-  const getStatusColor = (status: string) => {
-    const colors = {
-      'active': 'bg-green-100 text-green-800',
-      'planning': 'bg-blue-100 text-blue-800',
-      'bidding': 'bg-yellow-100 text-yellow-800',
-      'completed': 'bg-gray-100 text-gray-800',
-      'on_hold': 'bg-orange-100 text-orange-800',
-      'cancelled': 'bg-red-100 text-red-800'
-    };
-    return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-800';
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status) {
+      case 'active': return 'active' as const;
+      case 'planning': return 'planning' as const;
+      case 'bidding': return 'bidding' as const;
+      case 'completed': return 'completed' as const;
+      case 'on_hold': return 'on-hold' as const;
+      case 'cancelled': return 'cancelled' as const;
+      default: return 'secondary' as const;
+    }
   };
 
   const formatCurrency = (amount: number) => {
@@ -155,7 +155,7 @@ export async function ServerProjectsOverview({ userId, role }: ServerProjectsOve
                       )}
                     </div>
                   </div>
-                  <Badge className={getStatusColor(project.status)}>
+                  <Badge variant={getStatusBadgeVariant(project.status)}>
                     {project.status.replace('_', ' ')}
                   </Badge>
                 </div>

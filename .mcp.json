@@ -1,21 +1,30 @@
 {
-  "supabase": {
-    "command": "npx",
-    "args": ["-y", "@supabase/mcp-server-supabase@latest", "--read-only", "--project-ref=xrrrtwrfadcilwkgwacs"],
-    "env": {
-      "SUPABASE_ACCESS_TOKEN": "sbp_f9eeca405156f6f4170f22e9312c8ce8a67a0d44"
+  "mcpServers": {
+    "supabase": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@supabase/mcp-server-supabase@latest", "--read-only", "--project-ref=xrrrtwrfadcilwkgwacs"],
+      "env": {
+        "SUPABASE_ACCESS_TOKEN": "sbp_f9eeca405156f6f4170f22e9312c8ce8a67a0d44"
+      }
+    },
+    "context7": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@upstash/context7-mcp"]
+    },
+    "sequential-thinking": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@modelcontextprotocol/server-sequential-thinking@latest"]
+    },
+    "memory": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "mcp-server-memory@latest"]
+    },
+    "postgres": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@modelcontextprotocol/server-postgres@latest"],
+      "env": {
+        "POSTGRES_CONNECTION_STRING": "postgresql://postgres:postgres@127.0.0.1:54322/postgres"
+      }
     }
-  },
-  "context7": {
-    "command": "npx",
-    "args": ["-y", "@upstash/context7-mcp"]
-  },
-  "sequential-thinking": {
-    "command": "npx",
-    "args": ["-y", "@modelcontextprotocol/server-sequential-thinking@latest"]
-  },
-  "memory": {
-    "command": "npx",
-    "args": ["-y", "mcp-server-memory@latest"]
   }
 }
