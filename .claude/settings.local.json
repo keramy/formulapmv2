@@ -105,7 +105,16 @@
       "Bash(tail:*)",
       "Bash(postgres-mcp:*)",
       "Bash(pipx list:*)",
-      "mcp__supabase__list_tables"
+      "mcp__supabase__list_tables",
+      "mcp__sequential-thinking__sequentialthinking",
+      "mcp__supabase__apply_migration",
+      "mcp__supabase__get_project_url",
+      "Bash(powershell:*)",
+      "mcp__supabase__list_migrations",
+      "Bash(taskkill:*)",
+      "mcp__playwright__playwright_navigate",
+      "WebFetch(domain:localhost)",
+      "mcp__supabase__get_advisors"
     ],
     "deny": []
   },

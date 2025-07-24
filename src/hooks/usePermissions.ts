@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 'use client'
 
 import { useAuth } from './useAuth'
-import { hasPermission as checkUserPermission, getUserPermissions, Permission, isManagementRole, isProjectRole, isPurchaseRole, isFieldRole, isExternalRole, hasHigherRole, canManageUser } from '@/lib/permissions'
+import { hasPermission as checkUserPermission, getUserPermissions, Permission, isManagementRole, isProjectRole, isPurchaseRole, isTechnicalRole, isExternalRole, hasHigherRole, canManageUser } from '@/lib/permissions'
 import { UserRole } from '@/types/auth'
 
 export const usePermissions = () => {
@@ -29,12 +29,12 @@ export const usePermissions = () => {
     // Other roles need to be assigned to the project
     // For project-level access, use project hooks for actual assignment checking
     if (!projectId) {
-      return isProjectRole(profile.role) || isPurchaseRole(profile.role) || isFieldRole(profile.role)
+      return isProjectRole(profile.role) || isPurchaseRole(profile.role) || isTechnicalRole(profile.role)
     }
     
     // For specific project access, this should be checked via the project hooks
     // which have access to the actual project assignment data
-    return isProjectRole(profile.role) || isPurchaseRole(profile.role) || isFieldRole(profile.role)
+    return isProjectRole(profile.role) || isPurchaseRole(profile.role) || isTechnicalRole(profile.role)
   }
 
   // Helper function for checking if user can access certain role-based features
@@ -113,7 +113,7 @@ export const usePermissions = () => {
   }
 
   const canManageAllTasks = (): boolean => {
-    return checkPermission('tasks.manage_all')
+    return checkPermission('tasks.read.all')
   }
 
   const canComment = (): boolean => {
@@ -145,7 +145,7 @@ export const usePermissions = () => {
   }
 
   const canApproveShopDrawings = (): boolean => {
-    return checkPermission('shop_drawings.approve.internal')
+    return checkPermission('shop_drawings.approve')
   }
 
   const canViewClients = (): boolean => {
@@ -248,9 +248,9 @@ export const usePermissions = () => {
   }
 
   const canCreateReports = (): boolean => {
-    return checkPermission('reports.create.internal') || 
+    return checkPermission('projects.update') || 
            checkPermission('reports.create.client') || 
-           checkPermission('reports.create.field')
+           checkPermission('projects.read.assigned')
   }
 
   const canViewDocuments = (): boolean => {
@@ -264,7 +264,7 @@ export const usePermissions = () => {
   }
 
   const canApproveDocuments = (): boolean => {
-    return checkPermission('documents.approve.internal') || 
+    return checkPermission('projects.update') || 
            checkPermission('documents.approve.client')
   }
 
@@ -290,7 +290,7 @@ export const usePermissions = () => {
   }
 
   const canCommentClientPortalDocuments = (): boolean => {
-    return checkPermission('client_portal.documents.comment')
+    return checkPermission('client_portal.admin.manage')
   }
 
   const canApproveClientPortalDocuments = (): boolean => {
@@ -298,23 +298,23 @@ export const usePermissions = () => {
   }
 
   const canViewClientPortalCommunications = (): boolean => {
-    return checkPermission('client_portal.communications.view')
+    return checkPermission('client_portal.admin.manage')
   }
 
   const canCreateClientPortalCommunications = (): boolean => {
-    return checkPermission('client_portal.communications.create')
+    return checkPermission('client_portal.admin.manage')
   }
 
   const canReplyClientPortalCommunications = (): boolean => {
-    return checkPermission('client_portal.communications.reply')
+    return checkPermission('client_portal.admin.manage')
   }
 
   const canViewClientPortalNotifications = (): boolean => {
-    return checkPermission('client_portal.notifications.view')
+    return checkPermission('client_portal.admin.manage')
   }
 
   const canManageClientPortalNotifications = (): boolean => {
-    return checkPermission('client_portal.notifications.manage')
+    return checkPermission('client_portal.admin.manage')
   }
 
   const canViewClientPortalProfile = (): boolean => {
@@ -331,27 +331,27 @@ export const usePermissions = () => {
   }
 
   const canManageClientPortalUsers = (): boolean => {
-    return checkPermission('client_portal.admin.manage_users')
+    return checkPermission('client_portal.admin.manage')
   }
 
   const canManageClientPortalCompanies = (): boolean => {
-    return checkPermission('client_portal.admin.manage_companies')
+    return checkPermission('client_portal.admin.manage')
   }
 
   const canManageClientPortalAccess = (): boolean => {
-    return checkPermission('client_portal.admin.manage_access')
+    return checkPermission('client_portal.admin.manage')
   }
 
   const canManageClientPortalPermissions = (): boolean => {
-    return checkPermission('client_portal.admin.manage_permissions')
+    return checkPermission('client_portal.admin.manage')
   }
 
   const canViewClientPortalAnalytics = (): boolean => {
-    return checkPermission('client_portal.admin.view_analytics')
+    return checkPermission('client_portal.admin.manage')
   }
 
   const canManageClientPortalBranding = (): boolean => {
-    return checkPermission('client_portal.admin.manage_branding')
+    return checkPermission('client_portal.admin.manage')
   }
 
   // User Management Permissions
@@ -398,7 +398,7 @@ export const usePermissions = () => {
 
   const isField = (): boolean => {
     if (!profile) return false
-    return isFieldRole(profile.role)
+    return isTechnicalRole(profile.role)
   }
 
   const isExternal = (): boolean => {

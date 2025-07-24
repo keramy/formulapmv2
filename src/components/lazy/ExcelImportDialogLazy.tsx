@@ -6,7 +6,7 @@ import { lazy, Suspense } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 
 // Lazy load the component
-const ExcelImportDialogLazy = lazy(() => import('../scope/ExcelImportDialog.tsx'))
+const ExcelImportDialogLazy = lazy(() => import('../scope/ExcelImportDialog').then(module => ({ default: module.ExcelImportDialog })))
 
 // Loading fallback component
 function ExcelImportDialogLoading() {

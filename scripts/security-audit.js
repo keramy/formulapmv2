@@ -275,7 +275,7 @@ function auditAuthenticationMechanisms() {
     impersonation: {
       status: 'SECURE',
       details: 'Admin impersonation properly implemented',
-      restrictions: 'Admin and company_owner only',
+      restrictions: 'Admin and management only',
       logging: 'Activity tracked'
     }
   };

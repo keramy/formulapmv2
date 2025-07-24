@@ -40,7 +40,7 @@ export function ShopDrawingsTab({ projectId }: ShopDrawingsTabProps) {
     discipline: filterDiscipline !== 'all' ? filterDiscipline : undefined,
   };
 
-  // Use the real shop drawings hook instead of mock data
+  // Use the real shop drawings hook instead of real data
   const {
     shopDrawings,
     statistics,

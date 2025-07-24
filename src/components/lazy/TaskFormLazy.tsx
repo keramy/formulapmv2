@@ -6,7 +6,7 @@ import { lazy, Suspense } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 
 // Lazy load the component
-const TaskFormLazy = lazy(() => import('../tasks/TaskForm.tsx'))
+const TaskFormLazy = lazy(() => import('../tasks/TaskForm').then(module => ({ default: module.TaskForm })))
 
 // Loading fallback component
 function TaskFormLoading() {

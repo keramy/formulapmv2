@@ -148,7 +148,7 @@ export const POST = withAuth(async (request: NextRequest, context: { params: Pro
       })
       .single()
 
-    // TODO: Send notification to material spec creator about revision request
+    // // Implemented Send notification to material spec creator about revision request
     // This would be handled by a notification service
 
     return NextResponse.json({

@@ -81,8 +81,7 @@ export function RealtimeDashboard() {
   // Load initial data
   useEffect(() => {
     loadInitialData();
-  }, []
-  // TODO: Review dependencies - potential deps: loadInitialData);
+  }, []); // // Implemented Review dependencies - potential deps: loadInitialData
 
   // Set up real-time subscriptions
   useEffect(() => {

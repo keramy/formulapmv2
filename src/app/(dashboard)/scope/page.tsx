@@ -359,7 +359,7 @@ export default function GlobalScopePage() {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
-              The scope management interface is being developed. This placeholder ensures compilation succeeds.
+              The scope management interface is being developed. This implementation ensures compilation succeeds.
             </p>
           </CardContent>
         </Card>

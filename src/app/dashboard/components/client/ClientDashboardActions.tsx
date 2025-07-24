@@ -26,8 +26,8 @@ interface ClientDashboardActionsProps {
 export function ClientDashboardActions({ userId, role }: ClientDashboardActionsProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const canCreateProjects = ['company_owner', 'admin', 'general_manager', 'technical_director'].includes(role);
-  const canCreateUsers = ['company_owner', 'admin'].includes(role);
+  const canCreateProjects = ['management', 'admin', 'technical_lead'].includes(role);
+  const canCreateUsers = ['management', 'admin'].includes(role);
 
   return (
     <div className="flex items-center gap-2">

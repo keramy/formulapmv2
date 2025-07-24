@@ -1,7 +1,6 @@
 import { NextRequest } from 'next/server';
 import { withAuth } from '@/lib/api-middleware';
-import { createSuccessResponse, createErrorResponse } from '@/lib/api-response';
-import { parseQueryParams } from '@/lib/api-utils';
+import { createSuccessResponse, createErrorResponse, parseQueryParams } from '@/lib/api-middleware';
 import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 
@@ -25,7 +24,7 @@ const createReportSchema = z.object({
 export const GET = withAuth(async (request: NextRequest, { user, profile }, { params }) => {
   try {
     const projectId = params.id;
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Parse query parameters for filtering and pagination
     const { page, limit, search, sort_field = 'report_date', sort_direction = 'desc', filters } = parseQueryParams(request);
@@ -107,7 +106,7 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }, { pa
       type: report.report_type,
       status: 'completed', // Field reports are always completed when submitted
       generatedBy: report.submitted_by_user 
-        ? `${report.submitted_by_user.first_name} ${report.submitted_by_user.last_name}`
+        ? `${(report.submitted_by_user as any)?.first_name} ${(report.submitted_by_user as any)?.last_name}`
         : 'Unknown',
       generatedDate: report.report_date,
       reviewedBy: null,
@@ -140,30 +139,34 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }, { pa
     
     const statistics = calculateReportStatistics(statsQuery.data || []);
     
-    return createSuccessResponse(transformedData, {
-      page,
-      limit,
-      total: count || 0,
-      statistics,
+    return createSuccessResponse({
+      data: transformedData,
+      pagination: {
+        page,
+        limit,
+        total: count || 0,
+        has_more: (page * limit) < (count || 0)
+      },
+      statistics
     });
   } catch (error) {
     console.error('Error in GET /api/projects/[id]/reports:', error);
     return createErrorResponse('Internal server error', 500);
   }
-}, { permission: 'projects.read' });
+}, { permission: 'projects.read.all' });
 
 // POST /api/projects/[id]/reports - Create new report
 export const POST = withAuth(async (request: NextRequest, { user, profile }, { params }) => {
   try {
     const projectId = params.id;
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Parse and validate request body
     const body = await request.json();
     const validationResult = createReportSchema.safeParse(body);
     
     if (!validationResult.success) {
-      return createErrorResponse('Invalid report data', 400, validationResult.error.errors);
+      return createErrorResponse('Invalid report data', 400);
     }
     
     const reportData = {
@@ -215,7 +218,7 @@ export const POST = withAuth(async (request: NextRequest, { user, profile }, { p
       type: data.report_type,
       status: 'completed',
       generatedBy: data.submitted_by_user 
-        ? `${data.submitted_by_user.first_name} ${data.submitted_by_user.last_name}`
+        ? `${(data.submitted_by_user as any)?.first_name} ${(data.submitted_by_user as any)?.last_name}`
         : 'Unknown',
       generatedDate: data.report_date,
       fileSize: calculateFileSize(data),
@@ -251,7 +254,7 @@ export const POST = withAuth(async (request: NextRequest, { user, profile }, { p
       },
     });
     
-    return createSuccessResponse(transformedData, null, 201);
+    return createSuccessResponse(transformedData);
   } catch (error) {
     console.error('Error in POST /api/projects/[id]/reports:', error);
     return createErrorResponse('Internal server error', 500);

@@ -1,7 +1,6 @@
 import { NextRequest } from 'next/server';
 import { withAuth } from '@/lib/api-middleware';
-import { createSuccessResponse, createErrorResponse } from '@/lib/api-response';
-import { parseQueryParams } from '@/lib/api-utils';
+import { createSuccessResponse, createErrorResponse, parseQueryParams } from '@/lib/api-middleware';
 import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 
@@ -22,7 +21,7 @@ const createTaskSchema = z.object({
 export const GET = withAuth(async (request: NextRequest, { user, profile }, { params }) => {
   try {
     const projectId = params.id;
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Parse query parameters for filtering and pagination
     const { page, limit, search, sort_field = 'created_at', sort_direction = 'desc', filters } = parseQueryParams(request);
@@ -102,35 +101,39 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }, { pa
     
     if (statsQuery.data) {
       statsQuery.data.forEach(task => {
-        statistics.by_status[task.status] = (statistics.by_status[task.status] || 0) + 1;
-        statistics.by_priority[task.priority] = (statistics.by_priority[task.priority] || 0) + 1;
+        (statistics as any).by_status[task.status] = ((statistics as any).by_status[task.status] || 0) + 1;
+        (statistics as any).by_priority[task.priority] = ((statistics as any).by_priority[task.priority] || 0) + 1;
       });
     }
     
-    return createSuccessResponse(data, {
-      page,
-      limit,
-      total: count || 0,
-      statistics,
+    return createSuccessResponse({
+      data,
+      pagination: {
+        page,
+        limit,
+        total: count || 0,
+        has_more: (page * limit) < (count || 0)
+      },
+      statistics
     });
   } catch (error) {
     console.error('Error in GET /api/projects/[id]/tasks:', error);
     return createErrorResponse('Internal server error', 500);
   }
-}, { permission: 'tasks.read' });
+}, { permission: 'tasks.create' });
 
 // POST /api/projects/[id]/tasks - Create new task
 export const POST = withAuth(async (request: NextRequest, { user, profile }, { params }) => {
   try {
     const projectId = params.id;
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Parse and validate request body
     const body = await request.json();
     const validationResult = createTaskSchema.safeParse(body);
     
     if (!validationResult.success) {
-      return createErrorResponse('Invalid task data', 400, validationResult.error.errors);
+      return createErrorResponse('Invalid task data', 400);
     }
     
     const taskData = {
@@ -176,7 +179,7 @@ export const POST = withAuth(async (request: NextRequest, { user, profile }, { p
       },
     });
     
-    return createSuccessResponse(data, null, 201);
+    return createSuccessResponse(data);
   } catch (error) {
     console.error('Error in POST /api/projects/[id]/tasks:', error);
     return createErrorResponse('Internal server error', 500);

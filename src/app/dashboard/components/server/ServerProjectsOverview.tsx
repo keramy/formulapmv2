@@ -47,7 +47,7 @@ async function getRecentProjects(userId: string, role: string): Promise<Project[
       .limit(8);
 
     // Filter based on user role and permissions
-    if (role !== 'company_owner' && role !== 'admin') {
+    if (role !== 'management' && role !== 'admin') {
       // For non-admin users, only show projects they're assigned to
       query = query.in('status', ['active', 'planning', 'bidding']);
     }

@@ -79,7 +79,7 @@ const getStatusBadgeVariant = (status: ScopeStatus) => {
     materials_ordered: 'status-warning' as const,
     in_progress: 'in-progress' as const,
     quality_check: 'review' as const,
-    client_review: 'status-review' as const,
+    client_review: 'review' as const,
     completed: 'completed' as const,
     blocked: 'blocked' as const,
     on_hold: 'on-hold' as const,

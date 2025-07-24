@@ -1,0 +1,336 @@
+#!/usr/bin/env node
+
+/**
+ * Corrected Task 2 Verification
+ * Properly verify Task 2 completion understanding that previous_role SHOULD contain old values
+ */
+
+const { Client } = require('pg');
+
+const dbConfig = {
+    host: '127.0.0.1',
+    port: 54322,
+    database: 'postgres',
+    user: 'postgres',
+    password: 'postgres'
+};
+
+async function correctedTask2Verification() {
+    const client = new Client(dbConfig);
+    
+    try {
+        await client.connect();
+        console.log('🔍 CORRECTED TASK 2 VERIFICATION');
+        console.log('================================');
+
+        let allGood = true;
+        const issues = [];
+
+        // 1. Check user_profiles table - main migration
+        console.log('\n📋 1. USER_PROFILES MIGRATION VERIFICATION:');
+        
+        const userProfilesCheck = await client.query(`
+            SELECT 
+                COUNT(*) as total_users,
+                COUNT(role) as users_with_role,
+                COUNT(seniority_level) as users_with_seniority,
+                COUNT(previous_role) as users_with_previous_role,
+                COUNT(role_migrated_at) as users_migrated
+            FROM user_profiles
+        `);
+
+        const userStats = userProfilesCheck.rows[0];
+        console.table(userStats);
+
+        // Check that all users are migrated
+        if (parseInt(userStats.total_users) !== parseInt(userStats.users_migrated)) {
+            allGood = false;
+            issues.push('Not all users have migration timestamps');
+        }
+
+        if (parseInt(userStats.total_users) !== parseInt(userStats.users_with_seniority)) {
+            allGood = false;
+            issues.push('Not all users have seniority levels');
+        }
+
+        if (parseInt(userStats.total_users) !== parseInt(userStats.users_with_previous_role)) {
+            allGood = false;
+            issues.push('Not all users have previous role audit trail');
+        }
+
+        // 2. Verify current roles are all new format
+        console.log('\n📋 2. CURRENT ROLE VALUES VERIFICATION:');
+        
+        const currentRoles = await client.query(`
+            SELECT 
+                role,
+                COUNT(*) as count
+            FROM user_profiles 
+            GROUP BY role
+            ORDER BY count DESC
+        `);
+
+        console.table(currentRoles.rows);
+
+        const newRoleValues = ['admin', 'management', 'technical_lead', 'project_manager', 'purchase_manager', 'client'];
+        const oldRoleValues = [
+            'management', 'management', 'management',
+            'technical_lead', 'project_manager', 'project_manager',
+            'project_manager', 'purchase_manager', 'purchase_manager',
+            'project_manager'
+        ];
+
+        for (const roleRow of currentRoles.rows) {
+            if (oldRoleValues.includes(roleRow.role)) {
+                allGood = false;
+                issues.push(`Current role column still contains old value: ${roleRow.role}`);
+                console.log(`❌ Found old role in current role column: ${roleRow.role}`);
+            } else if (newRoleValues.includes(roleRow.role)) {
+                console.log(`✅ Current role is correct: ${roleRow.role}`);
+            } else {
+                console.log(`⚠️  Unknown role found: ${roleRow.role}`);
+            }
+        }
+
+        // 3. Verify previous roles contain old values (this is CORRECT)
+        console.log('\n📋 3. PREVIOUS ROLE AUDIT TRAIL VERIFICATION:');
+        
+        const previousRoles = await client.query(`
+            SELECT 
+                previous_role,
+                COUNT(*) as count
+            FROM user_profiles 
+            GROUP BY previous_role
+            ORDER BY count DESC
+        `);
+
+        console.table(previousRoles.rows);
+        console.log('✅ previous_role column correctly contains old role values for audit trail');
+
+        // 4. Verify role mapping is correct
+        console.log('\n📋 4. ROLE MAPPING VERIFICATION:');
+        
+        const roleMappings = await client.query(`
+            SELECT 
+                previous_role,
+                role as current_role,
+                seniority_level,
+                COUNT(*) as count
+            FROM user_profiles 
+            GROUP BY previous_role, role, seniority_level
+            ORDER BY previous_role
+        `);
+
+        console.table(roleMappings.rows);
+
+        // Verify specific mappings are correct
+        const expectedMappings = [
+            { previous: 'management', current: 'management', seniority: 'executive' },
+            { previous: 'technical_lead', current: 'technical_lead', seniority: 'senior' },
+            { previous: 'purchase_manager', current: 'purchase_manager', seniority: 'senior' },
+            { previous: 'project_manager', current: 'project_manager', seniority: 'regular' },
+            { previous: 'admin', current: 'admin', seniority: 'regular' },
+            { previous: 'client', current: 'client', seniority: 'regular' }
+        ];
+
+        for (const expected of expectedMappings) {
+            const found = roleMappings.rows.find(row => 
+                row.previous_role === expected.previous && 
+                row.current_role === expected.current && 
+                row.seniority_level === expected.seniority
+            );
+            
+            if (found) {
+                console.log(`✅ Correct mapping: ${expected.previous} → ${expected.current} (${expected.seniority})`);
+            } else {
+                // Check if this mapping exists in the data
+                const anyMapping = roleMappings.rows.find(row => row.previous_role === expected.previous);
+                if (anyMapping) {
+                    console.log(`⚠️  Different mapping found: ${expected.previous} → ${anyMapping.current_role} (${anyMapping.seniority_level})`);
+                } else {
+                    console.log(`ℹ️  No user found with previous role: ${expected.previous}`);
+                }
+            }
+        }
+
+        // 5. Check other tables don't have old role values in current role columns
+        console.log('\n📋 5. OTHER TABLES VERIFICATION:');
+        
+        const otherRoleTables = await client.query(`
+            SELECT DISTINCT
+                table_name,
+                column_name
+            FROM information_schema.columns 
+            WHERE table_schema = 'public'
+            AND column_name LIKE '%role%'
+            AND table_name != 'user_profiles'
+            AND column_name != 'previous_role'  -- Exclude audit columns
+            AND table_name NOT LIKE '%backup%'
+            ORDER BY table_name, column_name
+        `);
+
+        console.log('📊 Other tables with role columns to check:');
+        console.table(otherRoleTables.rows);
+
+        for (const tableInfo of otherRoleTables.rows) {
+            try {
+                const dataCheck = await client.query(`
+                    SELECT COUNT(*) as total_records
+                    FROM ${tableInfo.table_name}
+                    WHERE ${tableInfo.column_name} IS NOT NULL
+                `);
+
+                const totalRecords = parseInt(dataCheck.rows[0].total_records);
+                
+                if (totalRecords > 0) {
+                    const oldRoleCheck = await client.query(`
+                        SELECT 
+                            ${tableInfo.column_name},
+                            COUNT(*) as count
+                        FROM ${tableInfo.table_name}
+                        WHERE ${tableInfo.column_name} IN (
+                            'management', 'management', 'management',
+                            'technical_lead', 'project_manager', 'project_manager',
+                            'project_manager', 'purchase_manager', 'purchase_manager',
+                            'project_manager'
+                        )
+                        GROUP BY ${tableInfo.column_name}
+                    `);
+
+                    if (oldRoleCheck.rows.length > 0) {
+                        allGood = false;
+                        issues.push(`${tableInfo.table_name}.${tableInfo.column_name} contains old role values`);
+                        console.log(`❌ ${tableInfo.table_name}.${tableInfo.column_name} has old role values:`);
+                        console.table(oldRoleCheck.rows);
+                    } else {
+                        console.log(`✅ ${tableInfo.table_name}.${tableInfo.column_name} has no old role values`);
+                    }
+                } else {
+                    console.log(`ℹ️  ${tableInfo.table_name}.${tableInfo.column_name} has no data`);
+                }
+            } catch (error) {
+                console.log(`⚠️  Could not check ${tableInfo.table_name}.${tableInfo.column_name}: ${error.message}`);
+            }
+        }
+
+        // 6. Verify user_role enum
+        console.log('\n📋 6. USER_ROLE ENUM VERIFICATION:');
+        
+        const enumValues = await client.query(`
+            SELECT enumlabel as role_value
+            FROM pg_enum 
+            WHERE enumtypid = (SELECT oid FROM pg_type WHERE typname = 'user_role')
+            ORDER BY enumsortorder
+        `);
+
+        console.table(enumValues.rows);
+
+        const expectedRoles = ['management', 'purchase_manager', 'technical_lead', 'project_manager', 'client', 'admin'];
+        const actualRoles = enumValues.rows.map(row => row.role_value);
+        const missingRoles = expectedRoles.filter(role => !actualRoles.includes(role));
+
+        if (missingRoles.length > 0) {
+            allGood = false;
+            issues.push(`Missing roles in user_role enum: ${missingRoles.join(', ')}`);
+        } else {
+            console.log('✅ user_role enum contains all required roles');
+        }
+
+        // 7. Check no user_role_old usage
+        console.log('\n📋 7. user_role_old ENUM USAGE CHECK:');
+        
+        const oldEnumUsage = await client.query(`
+            SELECT 
+                table_name,
+                column_name
+            FROM information_schema.columns 
+            WHERE table_schema = 'public'
+            AND udt_name = 'user_role_old'
+        `);
+
+        if (oldEnumUsage.rows.length > 0) {
+            allGood = false;
+            issues.push('Tables still using user_role_old enum');
+            console.log('❌ Tables still using user_role_old enum:');
+            console.table(oldEnumUsage.rows);
+        } else {
+            console.log('✅ No tables using user_role_old enum');
+        }
+
+        // 8. Final Task 2 Requirements Check
+        console.log('\n📋 8. TASK 2 REQUIREMENTS VERIFICATION:');
+        
+        const requirementsCheck = [
+            {
+                requirement: '1.1 - Role migration implemented',
+                check: parseInt(userStats.users_migrated) === parseInt(userStats.total_users),
+                status: parseInt(userStats.users_migrated) === parseInt(userStats.total_users) ? 'PASS' : 'FAIL'
+            },
+            {
+                requirement: '1.2 - Role mapping logic working',
+                check: currentRoles.rows.every(row => newRoleValues.includes(row.role)),
+                status: currentRoles.rows.every(row => newRoleValues.includes(row.role)) ? 'PASS' : 'FAIL'
+            },
+            {
+                requirement: '1.4 - Audit trail preserved',
+                check: parseInt(userStats.users_with_previous_role) === parseInt(userStats.total_users),
+                status: parseInt(userStats.users_with_previous_role) === parseInt(userStats.total_users) ? 'PASS' : 'FAIL'
+            },
+            {
+                requirement: '4.1 - Seniority levels assigned',
+                check: parseInt(userStats.users_with_seniority) === parseInt(userStats.total_users),
+                status: parseInt(userStats.users_with_seniority) === parseInt(userStats.total_users) ? 'PASS' : 'FAIL'
+            }
+        ];
+
+        console.table(requirementsCheck);
+
+        const allRequirementsPassed = requirementsCheck.every(req => req.status === 'PASS');
+        if (!allRequirementsPassed) {
+            allGood = false;
+            issues.push('Not all Task 2 requirements are satisfied');
+        }
+
+        // Final summary
+        console.log('\n📊 FINAL VERIFICATION SUMMARY');
+        console.log('=============================');
+        
+        if (allGood) {
+            console.log('🎉 TASK 2 IS 100% COMPLETE!');
+            console.log('✅ All user_profiles migrated with timestamps');
+            console.log('✅ All current roles use new role system');
+            console.log('✅ All previous roles preserved for audit');
+            console.log('✅ All seniority levels assigned');
+            console.log('✅ Role mappings are correct');
+            console.log('✅ No other tables have old role values');
+            console.log('✅ user_role enum is correct');
+            console.log('✅ No user_role_old references remain');
+            console.log('✅ All Task 2 requirements satisfied');
+        } else {
+            console.log('❌ TASK 2 IS NOT COMPLETE!');
+            console.log('Issues found:');
+            issues.forEach(issue => console.log(`  - ${issue}`));
+        }
+
+        return allGood;
+
+    } catch (error) {
+        console.error('❌ Verification failed:', error.message);
+        return false;
+    } finally {
+        await client.end();
+    }
+}
+
+if (require.main === module) {
+    correctedTask2Verification()
+        .then(success => {
+            process.exit(success ? 0 : 1);
+        })
+        .catch(error => {
+            console.error('Unexpected error:', error);
+            process.exit(1);
+        });
+}
+
+module.exports = { correctedTask2Verification };

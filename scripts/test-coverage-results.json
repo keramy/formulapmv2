@@ -1,0 +1,2238 @@
+{
+  "coverageSummary": null,
+  "apiRouteCoverage": [
+    {
+      "route": "src\\app\\api\\material-specs\\bulk\\route.ts",
+      "testFile": "src\\__tests__\\api\\material-specs.bulk.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 9,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\route.ts",
+      "testFile": "src\\__tests__\\api\\material-specs.bulk.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 9,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\[id]\\approve\\route.ts",
+      "testFile": "src\\__tests__\\api\\material-specs.bulk.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 9,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\[id]\\reject\\route.ts",
+      "testFile": "src\\__tests__\\api\\material-specs.bulk.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 9,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\milestones\\bulk\\route.ts",
+      "testFile": "src\\__tests__\\api\\material-specs.bulk.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 9,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\milestones\\[id]\\status\\route.ts",
+      "testFile": "src\\__tests__\\api\\material-specs.bulk.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 9,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\projects\\[id]\\material-specs\\route.ts",
+      "testFile": "src\\__tests__\\api\\material-specs.bulk.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 9,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\scope\\bulk\\route.ts",
+      "testFile": "src\\__tests__\\api\\material-specs.bulk.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 9,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\scope\\excel\\import\\route.ts",
+      "testFile": "src\\__tests__\\api\\material-specs.bulk.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 9,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\scope\\[id]\\supplier\\route.ts",
+      "testFile": "src\\__tests__\\api\\material-specs.bulk.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 9,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\route.ts",
+      "testFile": "src\\__tests__\\api\\material-specs.error-handling.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 12,
+      "quality": "Fair"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\[id]\\approve\\route.ts",
+      "testFile": "src\\__tests__\\api\\material-specs.error-handling.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 12,
+      "quality": "Fair"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\[id]\\reject\\route.ts",
+      "testFile": "src\\__tests__\\api\\material-specs.error-handling.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 12,
+      "quality": "Fair"
+    },
+    {
+      "route": "src\\app\\api\\milestones\\[id]\\status\\route.ts",
+      "testFile": "src\\__tests__\\api\\material-specs.error-handling.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 12,
+      "quality": "Fair"
+    },
+    {
+      "route": "src\\app\\api\\projects\\[id]\\material-specs\\route.ts",
+      "testFile": "src\\__tests__\\api\\material-specs.error-handling.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 12,
+      "quality": "Fair"
+    },
+    {
+      "route": "src\\app\\api\\scope\\excel\\import\\route.ts",
+      "testFile": "src\\__tests__\\api\\material-specs.error-handling.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 12,
+      "quality": "Fair"
+    },
+    {
+      "route": "src\\app\\api\\clients\\[id]\\route.ts",
+      "testFile": "src\\__tests__\\api\\milestones-real.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 12,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\[id]\\route.ts",
+      "testFile": "src\\__tests__\\api\\milestones-real.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 12,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\milestones\\route.ts",
+      "testFile": "src\\__tests__\\api\\milestones-real.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 12,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\milestones\\[id]\\route.ts",
+      "testFile": "src\\__tests__\\api\\milestones-real.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 12,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\milestones\\[id]\\status\\route.ts",
+      "testFile": "src\\__tests__\\api\\milestones-real.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 12,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\notifications\\[id]\\route.ts",
+      "testFile": "src\\__tests__\\api\\milestones-real.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 12,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\projects\\route.ts",
+      "testFile": "src\\__tests__\\api\\milestones-real.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 12,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\projects\\[id]\\milestones\\route.ts",
+      "testFile": "src\\__tests__\\api\\milestones-real.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 12,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\projects\\[id]\\route.ts",
+      "testFile": "src\\__tests__\\api\\milestones-real.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 12,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\scope\\excel\\import\\route.ts",
+      "testFile": "src\\__tests__\\api\\milestones-real.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 12,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\scope\\[id]\\route.ts",
+      "testFile": "src\\__tests__\\api\\milestones-real.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 12,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\shop-drawings\\[id]\\route.ts",
+      "testFile": "src\\__tests__\\api\\milestones-real.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 12,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\suppliers\\[id]\\route.ts",
+      "testFile": "src\\__tests__\\api\\milestones-real.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 12,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\tasks\\[id]\\route.ts",
+      "testFile": "src\\__tests__\\api\\milestones-real.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 12,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\auth\\login\\route.ts",
+      "testFile": "src\\__tests__\\api\\simple-auth.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 5,
+      "quality": "Fair"
+    },
+    {
+      "route": "src\\app\\api\\milestones\\[id]\\status\\route.ts",
+      "testFile": "src\\__tests__\\api\\simple-auth.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 5,
+      "quality": "Fair"
+    },
+    {
+      "route": "src\\app\\api\\scope\\excel\\export\\route.ts",
+      "testFile": "src\\__tests__\\api\\simple-auth.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 5,
+      "quality": "Fair"
+    },
+    {
+      "route": "src\\app\\api\\scope\\excel\\import\\route.ts",
+      "testFile": "src\\__tests__\\api\\simple-auth.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 5,
+      "quality": "Fair"
+    },
+    {
+      "route": "src\\app\\api\\clients\\[id]\\route.ts",
+      "testFile": "src\\__tests__\\api\\tasks-real.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 10,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\dashboard\\tasks\\route.ts",
+      "testFile": "src\\__tests__\\api\\tasks-real.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 10,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\statistics\\route.ts",
+      "testFile": "src\\__tests__\\api\\tasks-real.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 10,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\[id]\\route.ts",
+      "testFile": "src\\__tests__\\api\\tasks-real.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 10,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\milestones\\statistics\\route.ts",
+      "testFile": "src\\__tests__\\api\\tasks-real.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 10,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\milestones\\[id]\\route.ts",
+      "testFile": "src\\__tests__\\api\\tasks-real.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 10,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\milestones\\[id]\\status\\route.ts",
+      "testFile": "src\\__tests__\\api\\tasks-real.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 10,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\notifications\\[id]\\route.ts",
+      "testFile": "src\\__tests__\\api\\tasks-real.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 10,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\projects\\route.ts",
+      "testFile": "src\\__tests__\\api\\tasks-real.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 10,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\projects\\[id]\\route.ts",
+      "testFile": "src\\__tests__\\api\\tasks-real.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 10,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\projects\\[id]\\tasks\\route.ts",
+      "testFile": "src\\__tests__\\api\\tasks-real.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 10,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\scope\\excel\\import\\route.ts",
+      "testFile": "src\\__tests__\\api\\tasks-real.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 10,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\scope\\[id]\\route.ts",
+      "testFile": "src\\__tests__\\api\\tasks-real.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 10,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\shop-drawings\\[id]\\route.ts",
+      "testFile": "src\\__tests__\\api\\tasks-real.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 10,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\suppliers\\[id]\\route.ts",
+      "testFile": "src\\__tests__\\api\\tasks-real.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 10,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\tasks\\route.ts",
+      "testFile": "src\\__tests__\\api\\tasks-real.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 10,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\tasks\\statistics\\route.ts",
+      "testFile": "src\\__tests__\\api\\tasks-real.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 10,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\tasks\\[id]\\route.ts",
+      "testFile": "src\\__tests__\\api\\tasks-real.test.ts",
+      "hasMocks": false,
+      "hasErrorHandling": true,
+      "testCount": 10,
+      "quality": "Good"
+    },
+    {
+      "route": "src\\app\\api\\admin\\auth-state\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\admin\\create-test-users\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\admin\\reset-auth\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\admin\\users\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\auth\\change-password\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\auth\\diagnostics\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\auth\\logout\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\auth\\profile\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\auth\\recover-profile\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\auth\\register\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\auth\\reset-password\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\clients\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\dashboard\\activity\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\dashboard\\comprehensive-stats\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\dashboard\\recent-activity\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\dashboard\\stats\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\debug\\create-test-profiles\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\debug-profile\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\[id]\\link-scope\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\[id]\\request-revision\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\material-specs\\[id]\\unlink-scope\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\notifications\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\projects\\metrics\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\projects\\[id]\\assignments\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\projects\\[id]\\reports\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\projects\\[id]\\shop-drawings\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\projects\\[id]\\stats\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\reports\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\scope\\overview\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\scope\\route.optimized.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\scope\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\scope\\[id]\\dependencies\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\suppliers\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\suppliers\\totals\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\tasks\\[id]\\comments\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "route": "src\\app\\api\\test-auth\\route.ts",
+      "testFile": null,
+      "hasMocks": false,
+      "hasErrorHandling": false,
+      "testCount": 0,
+      "quality": "Missing"
+    }
+  ],
+  "componentCoverage": [
+    {
+      "component": "src\\components\\admin\\UserImpersonationModal.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\advanced\\AdvancedDataTable.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\auth\\AuthGuard.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\auth\\AuthProvider.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\auth\\LoginForm.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\dashboard\\RealtimeDashboard.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\ErrorBoundary.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\forms\\FormBuilder.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\forms\\SimpleFormBuilder.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\layouts\\Header.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\layouts\\LayoutWrapper.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\layouts\\Sidebar.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\lazy\\AdvancedDataTableLazy.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\lazy\\ExcelImportDialogLazy.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\lazy\\MaterialSpecFormLazy.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\lazy\\MilestoneCalendarLazy.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\lazy\\RealtimeScopeListTabLazy.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\lazy\\TaskFormLazy.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\milestones\\MilestoneCalendar.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\milestones\\MilestoneCard.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\milestones\\MilestoneForm.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\milestones\\MilestoneList.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\milestones\\MilestoneProgressBar.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\projects\\material-approval\\MaterialApprovalActions.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\projects\\material-approval\\ScopeLinkingActions.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\projects\\ProjectCard.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\projects\\ProjectHeader.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\projects\\TabbedWorkspace.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\projects\\TabbedWorkspaceOptimized.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\projects\\tabs\\MaterialSpecsTab.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\projects\\tabs\\MilestonesTab.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\projects\\tabs\\OverviewTab.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\projects\\tabs\\RealtimeScopeListTab.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\projects\\tabs\\ReportsTab.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\projects\\tabs\\ScopeListTab.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\projects\\tabs\\ShopDrawingsTab.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\projects\\tabs\\TasksTab.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\providers\\PerformanceProvider.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\providers\\ThemeProvider.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\scope\\ExcelImportDialog.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\scope\\form\\ScopeFormSections.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\scope\\ScopeCoordinator.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\scope\\ScopeItemEditor.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\scope\\ScopeItemsTable.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\scope\\ScopeStatisticsCards.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\scope\\table\\ScopeBulkActions.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\scope\\table\\ScopeTableColumns.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\StaggeredLoader.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\tasks\\TaskCard.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\tasks\\TaskForm.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\tasks\\TaskList.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\tasks\\TaskPrioritySelector.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\tasks\\TaskStatusBadge.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\test\\ColorSystemTest.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\ui\\alert.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\ui\\avatar.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\ui\\badge.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\ui\\button.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\ui\\calendar.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\ui\\card.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\ui\\checkbox.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\ui\\data-table.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\ui\\dialog.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\ui\\dropdown-menu.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\ui\\form.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\ui\\input.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\ui\\label.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\ui\\loading-states.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\ui\\popover.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\ui\\progress.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\ui\\radio-group.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\ui\\route-loading.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\ui\\scroll-area.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\ui\\select.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\ui\\separator.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\ui\\sheet.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\ui\\skeleton.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\ui\\switch.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\ui\\table.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\ui\\tabs.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\ui\\textarea.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\ui\\toast.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\ui\\tooltip.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    },
+    {
+      "component": "src\\components\\ui\\use-toast.tsx",
+      "testFile": null,
+      "hasRenders": false,
+      "hasInteractions": false,
+      "testCount": 0,
+      "quality": "Missing"
+    }
+  ],
+  "workflowCoverage": [
+    {
+      "workflow": "Authentication",
+      "testFile": "src\\__tests__\\integration\\auth.e2e.test.ts",
+      "testName": "auth.e2e.test",
+      "testCount": 11,
+      "hasMultipleRoles": true,
+      "quality": "Excellent"
+    },
+    {
+      "workflow": "Unknown",
+      "testFile": "src\\__tests__\\integration\\real-supabase-connection.test.ts",
+      "testName": "real-supabase-connection.test",
+      "testCount": 1,
+      "hasMultipleRoles": false,
+      "quality": "Fair"
+    }
+  ],
+  "missingTests": [
+    {
+      "file": "src\\app\\api\\scope\\route.optimized.ts",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\admin\\UserImpersonationModal.tsx",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\advanced\\AdvancedDataTable.tsx",
+      "type": "Other",
+      "complexity": "High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\auth\\AuthGuard.tsx",
+      "type": "Other",
+      "complexity": "High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\auth\\AuthProvider.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\auth\\LoginForm.tsx",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\dashboard\\RealtimeDashboard.tsx",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\ErrorBoundary.tsx",
+      "type": "Other",
+      "complexity": "Medium",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\forms\\FormBuilder.tsx",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\forms\\SimpleFormBuilder.tsx",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\index.ts",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\layouts\\Header.tsx",
+      "type": "Other",
+      "complexity": "High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\layouts\\LayoutWrapper.tsx",
+      "type": "Other",
+      "complexity": "Medium",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\layouts\\Sidebar.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\lazy\\AdvancedDataTableLazy.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\lazy\\ExcelImportDialogLazy.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\lazy\\index.ts",
+      "type": "Other",
+      "complexity": "High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\lazy\\MaterialSpecFormLazy.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\lazy\\MilestoneCalendarLazy.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\lazy\\RealtimeScopeListTabLazy.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\lazy\\TaskFormLazy.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\milestones\\index.ts",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\milestones\\MilestoneCalendar.tsx",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\milestones\\MilestoneCard.tsx",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\milestones\\MilestoneForm.tsx",
+      "type": "Other",
+      "complexity": "High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\milestones\\MilestoneList.tsx",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\milestones\\MilestoneProgressBar.tsx",
+      "type": "Other",
+      "complexity": "Medium",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\projects\\index.ts",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\projects\\material-approval\\MaterialApprovalActions.tsx",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\projects\\material-approval\\ScopeLinkingActions.tsx",
+      "type": "Other",
+      "complexity": "High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\projects\\ProjectCard.tsx",
+      "type": "Other",
+      "complexity": "Medium",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\projects\\ProjectHeader.tsx",
+      "type": "Other",
+      "complexity": "High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\projects\\TabbedWorkspace.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\projects\\TabbedWorkspaceOptimized.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\projects\\tabs\\MaterialSpecsTab.tsx",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\projects\\tabs\\MilestonesTab.tsx",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\projects\\tabs\\OverviewTab.tsx",
+      "type": "Other",
+      "complexity": "High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\projects\\tabs\\RealtimeScopeListTab.tsx",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\projects\\tabs\\ReportsTab.tsx",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\projects\\tabs\\ScopeListTab.tsx",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\projects\\tabs\\ShopDrawingsTab.tsx",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\projects\\tabs\\TasksTab.tsx",
+      "type": "Other",
+      "complexity": "High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\providers\\PerformanceProvider.tsx",
+      "type": "Other",
+      "complexity": "Medium",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\providers\\ThemeProvider.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\scope\\ExcelImportDialog.tsx",
+      "type": "Other",
+      "complexity": "Medium",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\scope\\form\\ScopeFormSections.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\scope\\ScopeCoordinator.tsx",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\scope\\ScopeItemEditor.tsx",
+      "type": "Other",
+      "complexity": "Medium",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\scope\\ScopeItemsTable.tsx",
+      "type": "Other",
+      "complexity": "Medium",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\scope\\ScopeStatisticsCards.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\scope\\table\\ScopeBulkActions.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\scope\\table\\ScopeTableColumns.tsx",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\StaggeredLoader.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\tasks\\index.ts",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\tasks\\TaskCard.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\tasks\\TaskForm.tsx",
+      "type": "Other",
+      "complexity": "High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\tasks\\TaskList.tsx",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\tasks\\TaskPrioritySelector.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\tasks\\TaskStatusBadge.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\test\\ColorSystemTest.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\ui\\alert.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\ui\\avatar.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\ui\\badge.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\ui\\button.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\ui\\calendar.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\ui\\card.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\ui\\checkbox.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\ui\\data-table.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\ui\\dialog.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\ui\\dropdown-menu.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\ui\\form.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\ui\\index.ts",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\ui\\input.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\ui\\label.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\ui\\loading-states.tsx",
+      "type": "Other",
+      "complexity": "Medium",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\ui\\popover.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\ui\\progress.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\ui\\radio-group.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\ui\\route-loading.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\ui\\scroll-area.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\ui\\select.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\ui\\separator.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\ui\\sheet.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\ui\\skeleton.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\ui\\switch.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\ui\\table.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\ui\\tabs.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\ui\\textarea.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\ui\\toast.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\ui\\tooltip.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\components\\ui\\use-toast.tsx",
+      "type": "Other",
+      "complexity": "High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\lib\\api-middleware.ts",
+      "type": "Other",
+      "complexity": "High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\lib\\auth-helpers.ts",
+      "type": "Other",
+      "complexity": "High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\lib\\auth-monitoring.ts",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\lib\\cache-middleware.ts",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\lib\\cache.ts",
+      "type": "Other",
+      "complexity": "Medium",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\lib\\cors-config.ts",
+      "type": "Other",
+      "complexity": "Medium",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\lib\\database.ts",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\lib\\enhanced-auth-middleware.ts",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\lib\\enhanced-middleware.ts",
+      "type": "Other",
+      "complexity": "High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\lib\\enhanced-query-builder.ts",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\lib\\form-validation.ts",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\lib\\middleware.ts",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\lib\\optimized-queries.ts",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\lib\\performance-monitor.ts",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\lib\\performance-utils.tsx",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\lib\\permissions.ts",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\lib\\query-builder.ts",
+      "type": "Other",
+      "complexity": "High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\lib\\rate-limit-middleware.ts",
+      "type": "Other",
+      "complexity": "Medium",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\lib\\secure-error-handler.ts",
+      "type": "Other",
+      "complexity": "Medium",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\lib\\security-headers.ts",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\lib\\supabase\\server.ts",
+      "type": "Other",
+      "complexity": "Medium",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\lib\\supabase.ts",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\lib\\utils.ts",
+      "type": "Other",
+      "complexity": "High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\lib\\validation\\material-specs.ts",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\lib\\validation\\milestones.ts",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\lib\\validation\\projects.ts",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\lib\\validation\\scope.ts",
+      "type": "Other",
+      "complexity": "Medium",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\lib\\validation\\tasks.ts",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\lib\\validation.ts",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\hooks\\useAdvancedApiQuery.ts",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\hooks\\useApiQuery.ts",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\hooks\\useClients.ts",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\hooks\\useDocumentWorkflow.ts",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\hooks\\useImpersonation.ts",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\hooks\\useMaterialSpecs.ts",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\hooks\\useMilestones.ts",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\hooks\\useNotifications.ts",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\hooks\\usePerformance.ts",
+      "type": "Other",
+      "complexity": "Low",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\hooks\\usePermissions.ts",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\hooks\\useProjectMembers.ts",
+      "type": "Other",
+      "complexity": "Medium",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\hooks\\useProjects.ts",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\hooks\\useProjectStats.ts",
+      "type": "Other",
+      "complexity": "Medium",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\hooks\\useRealtimeSubscription.ts",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\hooks\\useReports.ts",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\hooks\\useResponsive.ts",
+      "type": "Other",
+      "complexity": "High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\hooks\\useScope.ts",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\hooks\\useShopDrawings.ts",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    },
+    {
+      "file": "src\\hooks\\useTasks.ts",
+      "type": "Other",
+      "complexity": "Very High",
+      "recommendation": "Create appropriate tests based on file functionality"
+    }
+  ],
+  "filesAnalyzed": 0
+}

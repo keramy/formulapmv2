@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { withAuth } from '@/lib/api-middleware';
-import { createSuccessResponse, createErrorResponse } from '@/lib/api-response';
+import { createSuccessResponse, createErrorResponse } from '@/lib/api-middleware';
 import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 
@@ -21,7 +21,7 @@ const updateShopDrawingSchema = z.object({
 export const GET = withAuth(async (request: NextRequest, { user, profile }, { params }) => {
   try {
     const drawingId = params.id;
-    const supabase = createClient();
+    const supabase = await createClient();
     
     const { data, error } = await supabase
       .from('shop_drawings')
@@ -87,18 +87,18 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }, { pa
       status: mapDbToFrontendStatus(data.status),
       priority: determinePriority(data),
       submittedBy: data.creator 
-        ? `${data.creator.first_name} ${data.creator.last_name}`
+        ? `${(data.creator as any)?.first_name} ${(data.creator as any)?.last_name}`
         : 'Unknown',
       submittedDate: data.created_at.split('T')[0],
       reviewedBy: data.internal_approver 
-        ? `${data.internal_approver.first_name} ${data.internal_approver.last_name}`
+        ? `${(data.internal_approver as any)?.first_name} ${(data.internal_approver as any)?.last_name}`
         : data.client_approver 
-          ? `${data.client_approver.first_name} ${data.client_approver.last_name}`
+          ? `${(data.client_approver as any)?.first_name} ${(data.client_approver as any)?.last_name}`
           : undefined,
       reviewedDate: data.internal_approved_at?.split('T')[0] || data.client_approved_at?.split('T')[0],
       version: parseInt(data.revision) || 1,
       category: capitalizeFirstLetter(data.discipline),
-      notes: data.metadata?.notes || '',
+      notes: (data as any).metadata?.notes || '',
       fileSize: formatFileSize(data.file_size),
       fileType: 'PDF',
       
@@ -111,9 +111,9 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }, { pa
       file_path: data.current_file_path || data.original_file_path,
       thumbnail_path: data.thumbnail_path,
       assigned_architect: data.assigned_architect_user ? {
-        id: data.assigned_architect_user.id,
-        name: `${data.assigned_architect_user.first_name} ${data.assigned_architect_user.last_name}`,
-        email: data.assigned_architect_user.email
+        id: (data.assigned_architect_user as any)?.id,
+        name: `${(data.assigned_architect_user as any)?.first_name} ${(data.assigned_architect_user as any)?.last_name}`,
+        email: (data.assigned_architect_user as any)?.email
       } : undefined,
       scope_item: data.scope_item,
       project: data.project,
@@ -129,13 +129,13 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }, { pa
     console.error('Error in GET /api/shop-drawings/[id]:', error);
     return createErrorResponse('Internal server error', 500);
   }
-}, { permission: 'projects.read' });
+}, { permission: 'projects.read.all' });
 
 // PUT /api/shop-drawings/[id] - Update shop drawing
 export const PUT = withAuth(async (request: NextRequest, { user, profile }, { params }) => {
   try {
     const drawingId = params.id;
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Parse and validate request body
     const body = await request.json();
@@ -188,8 +188,8 @@ export const PUT = withAuth(async (request: NextRequest, { user, profile }, { pa
     
     // Handle metadata updates (notes)
     if (validationResult.data.notes !== undefined) {
-      const currentMetadata = existingDrawing.metadata || {};
-      updateData.metadata = {
+      const currentMetadata = (existingDrawing as any).metadata || {};
+      (updateData as any).metadata = {
         ...currentMetadata,
         notes: validationResult.data.notes
       };
@@ -273,18 +273,18 @@ export const PUT = withAuth(async (request: NextRequest, { user, profile }, { pa
       status: mapDbToFrontendStatus(data.status),
       priority: determinePriority(data),
       submittedBy: data.creator 
-        ? `${data.creator.first_name} ${data.creator.last_name}`
+        ? `${(data.creator as any)?.first_name} ${(data.creator as any)?.last_name}`
         : 'Unknown',
       submittedDate: data.created_at.split('T')[0],
       reviewedBy: data.internal_approver 
-        ? `${data.internal_approver.first_name} ${data.internal_approver.last_name}`
+        ? `${(data.internal_approver as any)?.first_name} ${(data.internal_approver as any)?.last_name}`
         : data.client_approver 
-          ? `${data.client_approver.first_name} ${data.client_approver.last_name}`
+          ? `${(data.client_approver as any)?.first_name} ${(data.client_approver as any)?.last_name}`
           : undefined,
       reviewedDate: data.internal_approved_at?.split('T')[0] || data.client_approved_at?.split('T')[0],
       version: parseInt(data.revision) || 1,
       category: capitalizeFirstLetter(data.discipline),
-      notes: data.metadata?.notes || '',
+      notes: (data as any).metadata?.notes || '',
       fileSize: formatFileSize(data.file_size),
       fileType: 'PDF',
       
@@ -297,9 +297,9 @@ export const PUT = withAuth(async (request: NextRequest, { user, profile }, { pa
       file_path: data.current_file_path || data.original_file_path,
       thumbnail_path: data.thumbnail_path,
       assigned_architect: data.assigned_architect_user ? {
-        id: data.assigned_architect_user.id,
-        name: `${data.assigned_architect_user.first_name} ${data.assigned_architect_user.last_name}`,
-        email: data.assigned_architect_user.email
+        id: (data.assigned_architect_user as any)?.id,
+        name: `${(data.assigned_architect_user as any)?.first_name} ${(data.assigned_architect_user as any)?.last_name}`,
+        email: (data.assigned_architect_user as any)?.email
       } : undefined,
       scope_item: data.scope_item,
       project: data.project,
@@ -333,7 +333,7 @@ export const PUT = withAuth(async (request: NextRequest, { user, profile }, { pa
 export const DELETE = withAuth(async (request: NextRequest, { user, profile }, { params }) => {
   try {
     const drawingId = params.id;
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Check if shop drawing exists
     const { data: existingDrawing } = await supabase

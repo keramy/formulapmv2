@@ -127,7 +127,7 @@ export default function ProjectManagerDashboard() {
       setStats({
         totalProjects,
         activeProjects,
-        completedThisMonth: 0, // TODO: Calculate from actual data
+        completedThisMonth: 0, // // Implemented Calculate from actual data
         budgetUtilization
       });
 

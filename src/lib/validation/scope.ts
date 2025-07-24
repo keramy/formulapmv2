@@ -42,8 +42,10 @@ export const validateScopeUpdate = (data: unknown) => {
 export const validateScopePermissions = (userRole: string, action: string): boolean => {
   const rolePermissions: Record<string, string[]> = {
     'management': ['create', 'read', 'update', 'delete'],
-    'management': ['create', 'read', 'update', 'delete'],
+    'admin': ['create', 'read', 'update', 'delete'],
+    'technical_lead': ['create', 'read', 'update'],
     'project_manager': ['create', 'read', 'update'],
+    'purchase_manager': ['read', 'update'],
     'client': ['read']
   }
   

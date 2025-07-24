@@ -77,7 +77,7 @@ export const projectSchemas = {
       'management', 'management', 'management',
       'technical_lead', 'admin', 'project_manager', 'project_manager',
       'project_manager', 'purchase_manager', 'purchase_manager',
-      'project_manager', 'client', 'subcontractor'
+      'project_manager', 'client', 'project_manager'
     ]),
     company: commonSchemas.optionalString,
     department: commonSchemas.optionalString

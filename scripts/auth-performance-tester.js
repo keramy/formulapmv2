@@ -196,7 +196,7 @@ class AuthPerformanceTester {
     
     const results = [];
     const permissions = ['read:projects', 'write:projects', 'delete:projects', 'admin:users'];
-    const roles = ['admin', 'project_manager', 'architect', 'client'];
+    const roles = ['admin', 'project_manager', 'project_manager', 'client'];
     
     for (let i = 0; i < CONFIG.testIterations; i++) {
       const role = roles[i % roles.length];
@@ -293,7 +293,7 @@ class AuthPerformanceTester {
     const rolePermissions = {
       admin: ['read:projects', 'write:projects', 'delete:projects', 'admin:users'],
       project_manager: ['read:projects', 'write:projects'],
-      architect: ['read:projects', 'write:projects'],
+      project_manager: ['read:projects', 'write:projects'],
       client: ['read:projects']
     };
     

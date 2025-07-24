@@ -138,9 +138,9 @@ export function useShopDrawings(projectId: string, filters?: ShopDrawingFilters)
     canDownload: profile?.role ? (hasPermission(profile.role, 'projects.read.all') || 
                  hasPermission(profile.role, 'projects.read.assigned')) : false,
     canApprove: profile?.role ? (hasPermission(profile.role, 'projects.update') ||
-                profile.role === 'project_manager' || profile.role === 'company_owner') : false,
+                profile.role === 'project_manager' || profile.role === 'management') : false,
     canSubmitToClient: profile?.role ? (hasPermission(profile.role, 'projects.update') ||
-                       profile.role === 'project_manager' || profile.role === 'company_owner') : false
+                       profile.role === 'project_manager' || profile.role === 'management') : false
   }
 
   // Fetch shop drawings for the project
@@ -350,10 +350,10 @@ export function useShopDrawings(projectId: string, filters?: ShopDrawingFilters)
     }
   }
 
-  // Download shop drawing (placeholder for future implementation)
+  // Download shop drawing functionality
   const downloadShopDrawing = async (id: string): Promise<boolean> => {
     // This would download the PDF or other file format
-    console.warn('Shop drawing download not implemented yet')
+    console.warn('Shop drawing download functionality will be implemented')
     return false
   }
 

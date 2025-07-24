@@ -52,7 +52,7 @@ const testUsers: TestUser[] = [
     department: 'Operations'
   },
   {
-    email: 'architect.test@formulapm.com',
+    email: 'project_manager.test@formulapm.com',
     password: 'testpass123',
     role: 'project_manager',
     first_name: 'Emma',

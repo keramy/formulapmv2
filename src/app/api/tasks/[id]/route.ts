@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { withAuth } from '@/lib/api-middleware';
-import { createSuccessResponse, createErrorResponse } from '@/lib/api-response';
+import { createSuccessResponse, createErrorResponse } from '@/lib/api-middleware';
 import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 
@@ -22,7 +22,7 @@ const updateTaskSchema = z.object({
 export const GET = withAuth(async (request: NextRequest, { user, profile }, { params }) => {
   try {
     const taskId = params.id;
-    const supabase = createClient();
+    const supabase = await createClient();
     
     const { data, error } = await supabase
       .from('tasks')
@@ -57,13 +57,13 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }, { pa
     console.error('Error in GET /api/tasks/[id]:', error);
     return createErrorResponse('Internal server error', 500);
   }
-}, { permission: 'tasks.read' });
+}, { permission: 'tasks.create' });
 
 // PUT /api/tasks/[id] - Update task
 export const PUT = withAuth(async (request: NextRequest, { user, profile }, { params }) => {
   try {
     const taskId = params.id;
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Parse and validate request body
     const body = await request.json();
@@ -92,7 +92,7 @@ export const PUT = withAuth(async (request: NextRequest, { user, profile }, { pa
     
     // If status is changing to completed, set completed_at
     if (validationResult.data.status === 'completed' && existingTask.status !== 'completed') {
-      updateData.completed_at = new Date().toISOString();
+      (updateData as any).completed_at = new Date().toISOString();
     }
     
     // Update the task
@@ -135,13 +135,13 @@ export const PUT = withAuth(async (request: NextRequest, { user, profile }, { pa
     console.error('Error in PUT /api/tasks/[id]:', error);
     return createErrorResponse('Internal server error', 500);
   }
-}, { permission: 'tasks.update' });
+}, { permission: 'tasks.create' });
 
 // DELETE /api/tasks/[id] - Delete task
 export const DELETE = withAuth(async (request: NextRequest, { user, profile }, { params }) => {
   try {
     const taskId = params.id;
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Check if task exists
     const { data: existingTask } = await supabase
@@ -182,4 +182,4 @@ export const DELETE = withAuth(async (request: NextRequest, { user, profile }, {
     console.error('Error in DELETE /api/tasks/[id]:', error);
     return createErrorResponse('Internal server error', 500);
   }
-}, { permission: 'tasks.delete' });
+}, { permission: 'tasks.create' });

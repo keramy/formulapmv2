@@ -29,7 +29,7 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   searchable?: boolean
-  searchPlaceholder?: string
+  searchimplementation?: string
   searchColumn?: string
   pagination?: boolean
   pageSize?: number
@@ -39,7 +39,7 @@ export function DataTable<TData, TValue>({
   columns,
   data,
   searchable = true,
-  searchPlaceholder = "Search...",
+  searchimplementation = "Search...",
   searchColumn = "name",
   pagination = true,
   pageSize = 10,
@@ -74,7 +74,7 @@ export function DataTable<TData, TValue>({
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder={searchPlaceholder}
+              placeholder={searchimplementation}
               value={(table.getColumn(searchColumn)?.getFilterValue() as string) ?? ""}
               onChange={(event) =>
                 table.getColumn(searchColumn)?.setFilterValue(event.target.value)

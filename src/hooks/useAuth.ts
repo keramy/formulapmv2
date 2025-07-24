@@ -40,52 +40,49 @@ export const useAuth = () => {
         if (user) {
           console.log('🔐 [useAuth] Creating missing profile for:', user.email)
             
-            const { supabaseAdmin } = await import('@/lib/supabase')
-            const { data: newProfile, error: createError } = await supabaseAdmin
-              .from('user_profiles')
-              .insert({
-                id: userId,
-                role: 'management',
-                first_name: 'Admin',
-                last_name: 'User',
-                email: user.email,
-                phone: null,
-                company: 'Formula PM',
-                department: 'Administration',
-                permissions: {},
-                is_active: true,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
-              })
-              .select('*')
-              .single()
+          const { supabaseAdmin } = await import('@/lib/supabase')
+          const { data: newProfile, error: createError } = await supabaseAdmin
+            .from('user_profiles')
+            .insert({
+              id: userId,
+              role: 'management',
+              first_name: 'Admin',
+              last_name: 'User',
+              email: user.email,
+              phone: null,
+              company: 'Formula PM',
+              department: 'Administration',
+              permissions: {},
+              is_active: true,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            })
+            .select('*')
+            .single()
             
-            if (!createError && newProfile) {
-              const profile: UserProfile = {
-                id: newProfile.id,
-                role: newProfile.role as UserRole,
-                first_name: newProfile.first_name,
-                last_name: newProfile.last_name,
-                email: newProfile.email,
-                phone: newProfile.phone,
-                company: newProfile.company,
-                department: newProfile.department,
-                permissions: newProfile.permissions || {},
-                is_active: newProfile.is_active,
-                created_at: newProfile.created_at,
-                updated_at: newProfile.updated_at
-              }
-              setProfile(profile)
-              return
+          if (!createError && newProfile) {
+            const profile: UserProfile = {
+              id: newProfile.id,
+              role: newProfile.role as UserRole,
+              first_name: newProfile.first_name,
+              last_name: newProfile.last_name,
+              email: newProfile.email,
+              phone: newProfile.phone,
+              company: newProfile.company,
+              department: newProfile.department,
+              permissions: newProfile.permissions || {},
+              is_active: newProfile.is_active,
+              created_at: newProfile.created_at,
+              updated_at: newProfile.updated_at
             }
+            setProfile(profile)
+            return;
           }
         }
         
-        setAuthError('Failed to load user profile')
-        return
-      }
-
-      if (data) {
+        setAuthError('Failed to load user profile');
+        return;
+      } else {
         const profile: UserProfile = {
           id: data.id,
           role: data.role as UserRole,
@@ -105,8 +102,8 @@ export const useAuth = () => {
       }
       
     } catch (error) {
-      console.error('🔐 [useAuth] Profile fetch exception:', error)
-      setAuthError('Profile loading failed')
+      console.error('🔐 [useAuth] Profile fetch exception:', error);
+      setAuthError('Profile loading failed');
     }
   }, [])
 
@@ -365,18 +362,18 @@ export function useAuthAdvanced() {
   const [loading, setLoading] = useState(true)
   const [authError, setAuthError] = useState<string | null>(null)
 
-  // Use advanced API query for user profile
-  const {
-    data: profile,
-    loading: profileLoading,
-    error: profileError,
-    refetch: refetchProfile,
-    mutate: mutateProfile
-  } = useAdvancedApiQuery<UserProfile | null>({
-    queryKey: ['user-profile', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null
-
+  // Use direct profile fetching for auth hook
+  const [profile, setProfile] = useState<UserProfile | null>(null)
+  const [profileLoading, setProfileLoading] = useState(false)
+  const [profileError, setProfileError] = useState<string | null>(null)
+  
+  const refetchProfile = useCallback(async () => {
+    if (!user?.id) return null
+    
+    setProfileLoading(true)
+    setProfileError(null)
+    
+    try {
       const { data, error } = await supabase
         .from('user_profiles')
         .select('*')
@@ -385,17 +382,29 @@ export function useAuthAdvanced() {
 
       if (error) {
         console.error('Error fetching profile:', error)
+        setProfileError(error.message)
         return null
       }
 
+      setProfile(data as UserProfile)
       return data as UserProfile
-    },
-    enabled: !!user?.id,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    cacheTime: 10 * 60 * 1000, // 10 minutes
-    refetchOnWindowFocus: false,
-    refetchInterval: false // Profile doesn't change often
-  })
+    } catch (error) {
+      console.error('Error fetching profile:', error)
+      setProfileError(error instanceof Error ? error.message : 'Unknown error')
+      return null
+    } finally {
+      setProfileLoading(false)
+    }
+  }, [user?.id])
+
+  // Fetch profile when user changes
+  useEffect(() => {
+    refetchProfile()
+  }, [refetchProfile])
+  
+  const mutateProfile = useCallback((newProfile: UserProfile | null) => {
+    setProfile(newProfile)
+  }, [])
 
   // Enhanced authentication state management
   useEffect(() => {
@@ -434,8 +443,10 @@ export function useAuthAdvanced() {
         setAuthError(null)
 
         // Invalidate profile cache on auth changes
-        if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
-          mutateProfile()
+        if (event === 'SIGNED_IN') {
+          refetchProfile()
+        } else if (event === 'SIGNED_OUT') {
+          mutateProfile(null)
         }
       }
     )
@@ -485,7 +496,7 @@ export function useAuthAdvanced() {
       }
 
       // Clear profile cache
-      mutateProfile()
+      mutateProfile(null)
 
       return { success: true }
     } catch (error) {

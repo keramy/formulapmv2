@@ -173,8 +173,7 @@ export const AuthGuard = ({
 }
 
 // Convenience components for common use cases
-export const ManagementGuard = ({ children, fallback }: { children: ReactNode;
-  // TODO: Consider memoizing permission calculations with useMemo fallback?: ReactNode }) => (
+export const ManagementGuard = ({ children, fallback }: { children: ReactNode; fallback?: ReactNode }) => (
   <AuthGuard requireManagement fallback={fallback}>
     {children}
   </AuthGuard>

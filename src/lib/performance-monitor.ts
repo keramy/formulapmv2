@@ -2,7 +2,7 @@
  * Performance Monitoring System
  * Real-time performance tracking and alerting
  */
-import { setCachedData, getCachedData } from './cache-middleware';
+// import { setCachedData, getCachedData } from './cache-middleware'; // Functions not available
 
 interface PerformanceMetrics {
   authTime: number;
@@ -63,7 +63,7 @@ export class PerformanceMonitor {
     }
     
     // Store in cache for dashboard
-    await setCachedData('performance:metrics', this.metrics, 3600);
+    // await setCachedData('performance:metrics', this.metrics, 3600); // Function not available
     
     // Check for performance degradation
     await this.checkPerformanceThresholds(metric);
@@ -146,7 +146,7 @@ export class PerformanceMonitor {
       }
       
       // Store alerts in cache
-      await setCachedData('performance:alerts', this.alerts, 3600);
+      // await setCachedData('performance:alerts', this.alerts, 3600); // Function not available
       
       // Log critical alerts
       alerts.forEach(alert => {
@@ -166,7 +166,7 @@ export class PerformanceMonitor {
     const today = new Date().toISOString().split('T')[0];
     const cacheKey = `performance:daily:${today}`;
     
-    let dailyStats = await getCachedData<any>(cacheKey) || {
+    let dailyStats: any = {
       date: today,
       totalRequests: 0,
       totalAuthTime: 0,
@@ -202,7 +202,7 @@ export class PerformanceMonitor {
     }
     
     // Store updated stats (cache for 25 hours to overlap days)
-    await setCachedData(cacheKey, dailyStats, 90000);
+    // await setCachedData(cacheKey, dailyStats, 90000); // Function not available
   }
   
   /**
@@ -256,13 +256,14 @@ export class PerformanceMonitor {
     const targetDate = date || new Date().toISOString().split('T')[0];
     const cacheKey = `performance:daily:${targetDate}`;
     
-    const dailyStats = await getCachedData<any>(cacheKey);
+    const dailyStats = null; // await getCachedData<any>(cacheKey); // Function not available
     
     if (!dailyStats) {
       return null;
     }
     
-    // Calculate averages
+    // Calculate averages (commented out due to cache function unavailability)
+    /*
     const avgAuthTime = Math.round(dailyStats.totalAuthTime / dailyStats.totalRequests);
     const avgQueryTime = Math.round(dailyStats.totalQueryTime / dailyStats.totalRequests);
     const avgResponseTime = Math.round(dailyStats.totalResponseTime / dailyStats.totalRequests);
@@ -275,6 +276,9 @@ export class PerformanceMonitor {
       avgResponseTime,
       errorRate
     };
+    */
+    
+    return null;
   }
   
   /**
@@ -339,8 +343,8 @@ export class PerformanceMonitor {
     this.alerts = this.alerts.filter(a => a.timestamp > cutoff);
     
     // Update cache
-    await setCachedData('performance:metrics', this.metrics, 3600);
-    await setCachedData('performance:alerts', this.alerts, 3600);
+    // await setCachedData('performance:metrics', this.metrics, 3600); // Function not available
+    // await setCachedData('performance:alerts', this.alerts, 3600); // Function not available
   }
 }
 

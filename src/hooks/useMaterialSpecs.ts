@@ -536,23 +536,14 @@ export function useMaterialSpecsAdvanced(projectId: string, filters?: MaterialSp
     refetch,
     mutate
   } = useAdvancedApiQuery<MaterialSpec[]>({
-    queryKey: ['material-specs', projectId, filters],
-    queryFn: async () => {
-      if (!projectId || !user) return []
-
-      const params = new URLSearchParams({
-        project_id: projectId,
-        ...(filters?.status && { status: filters.status }),
-        ...(filters?.category && { category: filters.category }),
-        ...(filters?.search && { search: filters.search })
-      })
-
-      const response = await fetch(`/api/material-specs?${params}`)
-      if (!response.ok) throw new Error('Failed to fetch material specifications')
-
-      const result = await response.json()
-      return result.success ? result.data.materialSpecs : []
+    endpoint: '/api/material-specs',
+    params: {
+      project_id: projectId,
+      ...(filters?.status && { status: filters.status.join(',') }),
+      ...(filters?.category && { category: filters.category.join(',') }),
+      ...(filters?.search && { search: filters.search })
     },
+    cacheKey: `material-specs-${projectId}-${JSON.stringify(filters)}`,
     enabled: !!projectId && !!user,
     staleTime: 5 * 60 * 1000, // 5 minutes
     cacheTime: 10 * 60 * 1000, // 10 minutes
@@ -562,12 +553,15 @@ export function useMaterialSpecsAdvanced(projectId: string, filters?: MaterialSp
 
   // Calculate permissions
   const permissions: MaterialSpecPermissions = {
-    canView: !!user,
     canCreate: profile?.role === 'admin' || profile?.role === 'project_manager',
     canEdit: profile?.role === 'admin' || profile?.role === 'project_manager',
     canDelete: profile?.role === 'admin',
     canApprove: profile?.role === 'admin' || profile?.role === 'project_manager',
-    canReject: profile?.role === 'admin' || profile?.role === 'project_manager'
+    canReject: profile?.role === 'admin' || profile?.role === 'project_manager',
+    canRequestRevision: profile?.role === 'admin' || profile?.role === 'project_manager',
+    canLinkScope: profile?.role === 'admin' || profile?.role === 'project_manager',
+    canUnlinkScope: profile?.role === 'admin' || profile?.role === 'project_manager',
+    canViewAll: profile?.role === 'admin'
   }
 
   return {

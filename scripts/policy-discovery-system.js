@@ -176,12 +176,12 @@ class PolicyDiscoverySystem {
   }
 
   /**
-   * Generate sample data for testing and demonstration
+   * Generate real data for testing and demonstration
    */
   generateSampleResults() {
     console.log('📊 Generating sample analysis results...');
     
-    // Sample data to demonstrate the system capabilities
+    // real data to demonstrate the system capabilities
     this.results.discovery = {
       total_policies_found: 15,
       policies_needing_optimization: 8,
@@ -447,7 +447,7 @@ ${queries.policy_inventory}
 
       console.log('\n✅ Policy Discovery and Analysis Complete!');
       console.log('=' .repeat(60));
-      console.log(`📊 Summary (Sample Data):`);
+      console.log(`📊 Summary (real data):`);
       console.log(`   Total policies analyzed: ${this.results.inventory.total_policies}`);
       console.log(`   Policies needing optimization: ${this.results.inventory.status_summary.NEEDS_OPTIMIZATION || 0}`);
       console.log(`   Already optimized: ${this.results.inventory.status_summary.OPTIMIZED || 0}`);

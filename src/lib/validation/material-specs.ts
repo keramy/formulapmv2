@@ -539,16 +539,10 @@ export const validateMaterialSpecStatisticsParams = (data: unknown) => {
 export const validateMaterialSpecPermissions = (userRole: string, action: string): boolean => {
   const rolePermissions: Record<string, string[]> = {
     'management': ['create', 'read', 'update', 'delete', 'approve', 'reject', 'link', 'unlink', 'view_all'],
-    'management': ['create', 'read', 'update', 'delete', 'approve', 'reject', 'link', 'unlink', 'view_all'],
-    'management': ['create', 'read', 'update', 'approve', 'reject', 'link', 'unlink', 'view_all'],
-    'technical_lead': ['read', 'update', 'approve', 'reject', 'link', 'unlink', 'view_all'],
     'admin': ['create', 'read', 'update', 'delete', 'approve', 'reject', 'link', 'unlink', 'view_all'],
+    'technical_lead': ['read', 'update', 'approve', 'reject', 'link', 'unlink', 'view_all'],
     'project_manager': ['create', 'read', 'update', 'approve', 'link', 'unlink'],
-    'project_manager': ['create', 'read', 'update', 'link', 'unlink'],
-    'project_manager': ['create', 'read', 'update', 'link', 'unlink'],
-    'purchase_manager': ['read', 'approve', 'reject'],
-    'purchase_manager': ['read', 'update'],
-    'project_manager': ['read'],
+    'purchase_manager': ['read', 'approve', 'reject', 'update'],
     'client': ['read'],
   }
   

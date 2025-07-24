@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware';
-import { createServerClient } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/server';
 import { getCachedResponse, generateCacheKey, invalidateCache } from '@/lib/cache-middleware'
 
 export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
   try {
+    const supabase = await createClient();
 
     // Optimized dashboard stats with aggregated queries
-    const [projectStats, taskStats, scopeStats] = await Promise.all([
+    const [projectStats, taskStats, scopeStats, documentStats] = await Promise.all([
       supabase
         .from('projects')
         .select('status')
@@ -21,15 +22,17 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
       supabase
         .from('scope_items')
         .select('category, status')
-        .eq('status', 'active')
-    ])
-      .from('documents')
-      .select('id', { count: 'exact', head: true })
-      .eq('status', 'review');
+        .eq('status', 'active'),
 
-    if (approvalError) {
-      console.error('Error fetching approvals:', approvalError);
-      // Don't fail the entire request for approvals error
+      supabase
+        .from('documents')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'review')
+    ]);
+
+    if (documentStats.error) {
+      console.error('Error fetching document stats:', documentStats.error);
+      // Don't fail the entire request for document stats error
     }
 
     const stats = {

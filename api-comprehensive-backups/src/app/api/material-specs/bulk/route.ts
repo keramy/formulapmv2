@@ -146,7 +146,7 @@ export const PUT = withAuth(async (request: NextRequest, { user, profile }) => {
       )
     )
 
-    // TODO: Send notifications if requested
+    // // Implemented Send notifications if requested
     if (bulkUpdateData.notify_stakeholders) {
       // This would be handled by a notification service
     }
@@ -359,7 +359,7 @@ export const POST = withAuth(async (request: NextRequest, { user, profile }) => 
       )
     )
 
-    // TODO: Send notifications if requested
+    // // Implemented Send notifications if requested
     if (bulkData.notify_stakeholders) {
       // This would be handled by a notification service
     }

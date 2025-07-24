@@ -20,8 +20,8 @@ import type {
   UpdateSubcontractorUser
 } from '../src/types/database';
 
-// Note: Using database types directly since subcontractor.ts file was removed
-// These would be defined in ../src/types/subcontractor if needed
+// Note: Using database types directly since project_manager.ts file was removed
+// These would be defined in ../src/types/project_manager if needed
 
 // Type validation tests
 const validateEnumTypes = () => {

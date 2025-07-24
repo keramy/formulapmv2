@@ -67,7 +67,7 @@ export function withCORS(handler: Function) {
     if (req.method === 'OPTIONS') {
       return new Response(null, {
         status: 200,
-        headers: getCORSHeaders(origin)
+        headers: getCORSHeaders(origin || undefined)
       });
     }
     
@@ -76,7 +76,7 @@ export function withCORS(handler: Function) {
     
     // Add CORS headers to response
     if (response instanceof Response) {
-      const corsHeaders = getCORSHeaders(origin);
+      const corsHeaders = getCORSHeaders(origin || undefined);
       Object.entries(corsHeaders).forEach(([key, value]) => {
         response.headers.set(key, value);
       });

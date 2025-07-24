@@ -1,0 +1,5309 @@
+{
+  "documentationFiles": [
+    {
+      "file": "docs\\ADMIN_IMPERSONATION_GUIDE.md",
+      "lines": 286,
+      "headings": 48,
+      "codeBlocks": 13,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\ADMIN_USER_GUIDE.md",
+      "lines": 218,
+      "headings": 43,
+      "codeBlocks": 0,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\analysis\\AI_AGENT_COMPARISON_ANALYSIS.md",
+      "lines": 230,
+      "headings": 40,
+      "codeBlocks": 3,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\analysis\\AI_AGENT_PROGRESS_REPORT.md",
+      "lines": 188,
+      "headings": 21,
+      "codeBlocks": 5,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\analysis\\AI_AGENT_VALIDATION_REPORT.md",
+      "lines": 287,
+      "headings": 68,
+      "codeBlocks": 17,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\analysis\\API_PERFORMANCE_LOAD_TEST_ANALYSIS.md",
+      "lines": 215,
+      "headings": 40,
+      "codeBlocks": 0,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\analysis\\AUTH_FLOW_DIAGRAM.md",
+      "lines": 326,
+      "headings": 21,
+      "codeBlocks": 8,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\analysis\\AUTH_LOOP_INVESTIGATION_SUMMARY.md",
+      "lines": 249,
+      "headings": 42,
+      "codeBlocks": 9,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\analysis\\COMPREHENSIVE_API_BOTTLENECK_REPORT.md",
+      "lines": 440,
+      "headings": 60,
+      "codeBlocks": 15,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\analysis\\COMPREHENSIVE_OPTIMIZATION_IMPLEMENTATION_SUMMARY.md",
+      "lines": 240,
+      "headings": 34,
+      "codeBlocks": 1,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\analysis\\DATABASE_VALIDATION_REPORT.md",
+      "lines": 234,
+      "headings": 46,
+      "codeBlocks": 6,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\analysis\\V3_IMPLEMENTATION_STATUS.md",
+      "lines": 335,
+      "headings": 52,
+      "codeBlocks": 2,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\archive\\wave-2c\\Wave-2C-Advanced-Features\\document-approval-workflow-implementation.md",
+      "lines": 117,
+      "headings": 23,
+      "codeBlocks": 0,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\archive\\wave-2c\\Wave-2C-Advanced-Features\\shop-drawings-mobile-implementation.md",
+      "lines": 149,
+      "headings": 29,
+      "codeBlocks": 0,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\archive\\wave-2c\\Wave-2C-Advanced-Features\\WAVE_2C_FINAL_REPORT.md",
+      "lines": 284,
+      "headings": 51,
+      "codeBlocks": 0,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\archive\\wave-3\\Wave-3-Business-Features\\CLIENT_PORTAL_SYSTEM_FINAL_REPORT.md",
+      "lines": 291,
+      "headings": 55,
+      "codeBlocks": 4,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\archive\\wave-3\\Wave-3-Business-Features\\purchase-department-workflow-specification.md",
+      "lines": 448,
+      "headings": 71,
+      "codeBlocks": 3,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\archive\\wave-3\\Wave-3-Business-Features\\PURCHASE_DEPARTMENT_WORKFLOW_FINAL_REPORT.md",
+      "lines": 505,
+      "headings": 52,
+      "codeBlocks": 11,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\archive\\wave-3-external\\Wave-3-External-Access\\client-portal-system.md",
+      "lines": 1226,
+      "headings": 15,
+      "codeBlocks": 4,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\archive\\wave-3-external\\Wave-3-External-Access\\mobile-field-interface.md",
+      "lines": 652,
+      "headings": 26,
+      "codeBlocks": 7,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\archive\\wave-3-external\\Wave-3-External-Access\\photo-reporting-system.md",
+      "lines": 845,
+      "headings": 26,
+      "codeBlocks": 7,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\AUTH_TROUBLESHOOTING_GUIDE.md",
+      "lines": 415,
+      "headings": 44,
+      "codeBlocks": 11,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\COMPLETED_IMPROVEMENTS.md",
+      "lines": 226,
+      "headings": 41,
+      "codeBlocks": 1,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\DEVELOPMENT_PATTERNS.md",
+      "lines": 492,
+      "headings": 32,
+      "codeBlocks": 20,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\guides\\gemini-mcp-usage.md",
+      "lines": 201,
+      "headings": 52,
+      "codeBlocks": 9,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\guides\\GIT_BASH_NPM_TROUBLESHOOTING.md",
+      "lines": 125,
+      "headings": 32,
+      "codeBlocks": 10,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\guides\\sql-migration-validation.md",
+      "lines": 332,
+      "headings": 67,
+      "codeBlocks": 11,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\guides\\ui-components.md",
+      "lines": 208,
+      "headings": 28,
+      "codeBlocks": 6,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\migration\\API_MIGRATION_GUIDE.md",
+      "lines": 59,
+      "headings": 8,
+      "codeBlocks": 5,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\migration\\COMPLETE_MIGRATION_ACCOMPLISHED.md",
+      "lines": 179,
+      "headings": 30,
+      "codeBlocks": 3,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\migration\\FINAL_MIGRATION_COMPLETION_REPORT.md",
+      "lines": 170,
+      "headings": 23,
+      "codeBlocks": 0,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\migration\\MIGRATION_FIXES_SUMMARY.md",
+      "lines": 83,
+      "headings": 15,
+      "codeBlocks": 2,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\migration\\MIGRATION_INSTRUCTIONS.md",
+      "lines": 111,
+      "headings": 19,
+      "codeBlocks": 2,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\migration\\MIGRATION_STATUS_CHECK.md",
+      "lines": 70,
+      "headings": 12,
+      "codeBlocks": 2,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\migration\\role-migration-implementation.md",
+      "lines": 207,
+      "headings": 26,
+      "codeBlocks": 4,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\MIGRATION_TEMPLATES.md",
+      "lines": 374,
+      "headings": 41,
+      "codeBlocks": 16,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\optimization\\COMPREHENSIVE_OPTIMIZATION_COMPLETE.md",
+      "lines": 491,
+      "headings": 74,
+      "codeBlocks": 19,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\optimization\\OPTIMIZATION_FOUNDATION_COMPLETE.md",
+      "lines": 230,
+      "headings": 48,
+      "codeBlocks": 11,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\optimization\\OPTIMIZATION_IMPLEMENTATION_COMPLETE.md",
+      "lines": 213,
+      "headings": 44,
+      "codeBlocks": 7,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\optimization\\OPTIMIZATION_MIGRATION_GUIDE.md",
+      "lines": 311,
+      "headings": 42,
+      "codeBlocks": 16,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\optimization\\OPTIMIZATION_STRATEGY.md",
+      "lines": 109,
+      "headings": 6,
+      "codeBlocks": 0,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\optimization\\PERFORMANCE_OPTIMIZATION_COMPLETION_REPORT.md",
+      "lines": 161,
+      "headings": 25,
+      "codeBlocks": 0,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\optimization\\POST_OPTIMIZATION_ANALYSIS.md",
+      "lines": 142,
+      "headings": 20,
+      "codeBlocks": 5,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\OPTIMIZATION_READINESS_CHECKLIST.md",
+      "lines": 172,
+      "headings": 37,
+      "codeBlocks": 3,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\P1.02-milestone-test-fixes.md",
+      "lines": 103,
+      "headings": 20,
+      "codeBlocks": 3,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\REALTIME_IMPLEMENTATION_GUIDE.md",
+      "lines": 397,
+      "headings": 41,
+      "codeBlocks": 12,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\refactoring\\01-security-fixes-guide.md",
+      "lines": 755,
+      "headings": 51,
+      "codeBlocks": 18,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\refactoring\\02-workflow-engine-refactoring-guide.md",
+      "lines": 1,
+      "headings": 0,
+      "codeBlocks": 0,
+      "quality": "Poor"
+    },
+    {
+      "file": "docs\\refactoring\\03-react-component-refactoring-guide.md",
+      "lines": 1,
+      "headings": 0,
+      "codeBlocks": 0,
+      "quality": "Poor"
+    },
+    {
+      "file": "docs\\refactoring\\04-api-routes-refactoring-guide.md",
+      "lines": 837,
+      "headings": 18,
+      "codeBlocks": 10,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\refactoring\\05-performance-optimization-guide.md",
+      "lines": 442,
+      "headings": 22,
+      "codeBlocks": 10,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\reports\\application-health-report.md",
+      "lines": 54,
+      "headings": 1,
+      "codeBlocks": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\reports\\sql-migration-fixes.md",
+      "lines": 125,
+      "headings": 14,
+      "codeBlocks": 7,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\reports\\technical-checklist.md",
+      "lines": 379,
+      "headings": 69,
+      "codeBlocks": 0,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\reports\\testing-report.md",
+      "lines": 397,
+      "headings": 58,
+      "codeBlocks": 0,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\reports\\ux-feedback.md",
+      "lines": 383,
+      "headings": 68,
+      "codeBlocks": 0,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\reports\\wave3-testing-framework.md",
+      "lines": 195,
+      "headings": 34,
+      "codeBlocks": 2,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\session\\2025-01-10-fixes.md",
+      "lines": 114,
+      "headings": 15,
+      "codeBlocks": 6,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\session\\current-session.md",
+      "lines": 151,
+      "headings": 28,
+      "codeBlocks": 2,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\session\\CURRENT_SESSION_SUMMARY.md",
+      "lines": 106,
+      "headings": 21,
+      "codeBlocks": 1,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\session\\progress-summary.md",
+      "lines": 648,
+      "headings": 94,
+      "codeBlocks": 10,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\session\\TOMORROW_CONTINUATION_PLAN.md",
+      "lines": 177,
+      "headings": 32,
+      "codeBlocks": 3,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\setup\\local-development.md",
+      "lines": 362,
+      "headings": 85,
+      "codeBlocks": 12,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\setup\\migration-guidelines.md",
+      "lines": 1310,
+      "headings": 80,
+      "codeBlocks": 30,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\setup\\setup-complete.md",
+      "lines": 231,
+      "headings": 44,
+      "codeBlocks": 2,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\tasks\\active\\application-health-fixes\\FIX_SUMMARY_AND_PATTERNS.md",
+      "lines": 180,
+      "headings": 20,
+      "codeBlocks": 4,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\tasks\\active\\application-health-fixes\\TASK_APPLICATION_HEALTH_CRITICAL_FIXES.md",
+      "lines": 142,
+      "headings": 20,
+      "codeBlocks": 4,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\tasks\\active\\auth-401-loop-fix\\TASK_AUTH_401_INFINITE_LOOP_FIX.md",
+      "lines": 174,
+      "headings": 19,
+      "codeBlocks": 4,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\tasks\\active\\dashboard-ux-redesign\\TASK_DASHBOARD_UX_REDESIGN.md",
+      "lines": 183,
+      "headings": 25,
+      "codeBlocks": 4,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\tasks\\active\\v3\\p1-highest-priority\\TASK_P1_01_TASK_MANAGEMENT_SYSTEM.md",
+      "lines": 163,
+      "headings": 20,
+      "codeBlocks": 1,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\tasks\\active\\v3\\p1-highest-priority\\TASK_P1_02_MILESTONE_TRACKING_SYSTEM.md",
+      "lines": 211,
+      "headings": 22,
+      "codeBlocks": 3,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\tasks\\active\\v3\\p1-highest-priority\\TASK_P1_03_SHOP_DRAWING_APPROVAL_SYSTEM.md",
+      "lines": 300,
+      "headings": 30,
+      "codeBlocks": 4,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\tasks\\active\\v3\\p1-highest-priority\\TASK_P1_04_MATERIAL_APPROVAL_SYSTEM.md",
+      "lines": 267,
+      "headings": 24,
+      "codeBlocks": 4,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\tasks\\active\\v3\\p1-highest-priority\\TASK_P1_05_REPORT_CREATION_SYSTEM.md",
+      "lines": 344,
+      "headings": 30,
+      "codeBlocks": 4,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\tasks\\active\\v3\\p1-highest-priority\\TASK_P1_06_SCOPE_LIST_ENHANCEMENT.md",
+      "lines": 322,
+      "headings": 31,
+      "codeBlocks": 5,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\tasks\\active\\v3\\p2-medium-priority\\TASK_P2_01_PROJECT_TEAM_MANAGEMENT.md",
+      "lines": 251,
+      "headings": 24,
+      "codeBlocks": 4,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\tasks\\active\\v3\\p2-medium-priority\\TASK_P2_02_DASHBOARD_DESIGN_REFINED.md",
+      "lines": 278,
+      "headings": 30,
+      "codeBlocks": 4,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\tasks\\active\\v3\\p2-medium-priority\\TASK_P2_03_CLIENT_DASHBOARD_VIEW.md",
+      "lines": 293,
+      "headings": 28,
+      "codeBlocks": 4,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\tasks\\active\\v3\\V3_IMPLEMENTATION_MASTER_PLAN.md",
+      "lines": 198,
+      "headings": 37,
+      "codeBlocks": 0,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\tasks\\active\\v3-implementation\\TASK_PHASE_1_FOUNDATION.md",
+      "lines": 208,
+      "headings": 30,
+      "codeBlocks": 4,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\tasks\\active\\v3-implementation\\TASK_PHASE_2_CORE_FEATURES.md",
+      "lines": 280,
+      "headings": 28,
+      "codeBlocks": 5,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\tasks\\active\\v3-implementation\\TASK_PHASE_3_ENHANCED_FEATURES.md",
+      "lines": 409,
+      "headings": 26,
+      "codeBlocks": 5,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\tasks\\active\\v3-implementation\\TASK_PHASE_4_TEAM_CLIENT.md",
+      "lines": 495,
+      "headings": 27,
+      "codeBlocks": 6,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\tasks\\active\\v3-implementation\\TASK_PHASE_5_PRODUCTION.md",
+      "lines": 479,
+      "headings": 38,
+      "codeBlocks": 6,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\tasks\\active\\v3-implementation\\TASK_V3_IMPLEMENTATION_OVERVIEW.md",
+      "lines": 155,
+      "headings": 31,
+      "codeBlocks": 2,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\tasks\\archive\\completed\\app-simplification\\TASK_APP_SIMPLIFICATION_REFACTOR.md",
+      "lines": 149,
+      "headings": 21,
+      "codeBlocks": 4,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\tasks\\archive\\completed\\fix-dashboard-access\\TASK_FIX_DASHBOARD_ACCESS_AFTER_LOGIN.md",
+      "lines": 119,
+      "headings": 18,
+      "codeBlocks": 2,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\tasks\\archive\\completed\\fix-local-deployment\\TASK_FIX_LOCAL_DEPLOYMENT_ISSUES.md",
+      "lines": 228,
+      "headings": 44,
+      "codeBlocks": 7,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\tasks\\archive\\completed\\sql-migration-compatibility\\TASK_SQL_MIGRATION_COMPATIBILITY_FIX.md",
+      "lines": 200,
+      "headings": 27,
+      "codeBlocks": 7,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\tasks\\archive\\completed\\verify-auth-credentials\\TASK_VERIFY_AUTH_CREDENTIALS.md",
+      "lines": 113,
+      "headings": 17,
+      "codeBlocks": 2,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\tasks\\archive\\obsolete\\critical-design-system-fix\\TASK_CRITICAL_DESIGN_SYSTEM_FIX.md",
+      "lines": 235,
+      "headings": 23,
+      "codeBlocks": 5,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\tasks\\archive\\obsolete\\critical-issues-resolution\\TASK_CRITICAL_ISSUES_RESOLUTION.md",
+      "lines": 126,
+      "headings": 18,
+      "codeBlocks": 3,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\tasks\\archive\\obsolete\\local-app-testing\\TASK_LOCAL_APP_TESTING_VALIDATION.md",
+      "lines": 159,
+      "headings": 21,
+      "codeBlocks": 3,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\tasks\\TASK_CLEANUP_SUMMARY.md",
+      "lines": 51,
+      "headings": 10,
+      "codeBlocks": 0,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\v3-plans\\gemini-designs\\client_dashboard_plan.md",
+      "lines": 128,
+      "headings": 9,
+      "codeBlocks": 0,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\v3-plans\\gemini-designs\\dashboard_design_plan.md",
+      "lines": 119,
+      "headings": 3,
+      "codeBlocks": 1,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\v3-plans\\gemini-designs\\Mainplan.md",
+      "lines": 79,
+      "headings": 2,
+      "codeBlocks": 0,
+      "quality": "Poor"
+    },
+    {
+      "file": "docs\\v3-plans\\gemini-designs\\material_approval_plan.md",
+      "lines": 110,
+      "headings": 8,
+      "codeBlocks": 0,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\v3-plans\\gemini-designs\\milestone_tracking_plan.md",
+      "lines": 123,
+      "headings": 9,
+      "codeBlocks": 0,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\v3-plans\\gemini-designs\\project_team_management_plan.md",
+      "lines": 75,
+      "headings": 9,
+      "codeBlocks": 0,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\v3-plans\\gemini-designs\\report_creation_plan.md",
+      "lines": 133,
+      "headings": 9,
+      "codeBlocks": 0,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\v3-plans\\gemini-designs\\scope_list_plan.md",
+      "lines": 118,
+      "headings": 7,
+      "codeBlocks": 1,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\v3-plans\\gemini-designs\\shop_drawing_approval_plan.md",
+      "lines": 167,
+      "headings": 10,
+      "codeBlocks": 0,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\v3-plans\\gemini-designs\\Study\\project_data_study.md",
+      "lines": 204,
+      "headings": 7,
+      "codeBlocks": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\v3-plans\\gemini-designs\\task_management_plan.md",
+      "lines": 96,
+      "headings": 9,
+      "codeBlocks": 0,
+      "quality": "Good"
+    },
+    {
+      "file": "README.md",
+      "lines": 260,
+      "headings": 36,
+      "codeBlocks": 10,
+      "quality": "Excellent"
+    }
+  ],
+  "codeDocumentation": [
+    {
+      "file": "src\\app\\(dashboard)\\scope\\page.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0.5,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\app\\api\\admin\\auth-state\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\admin\\create-test-users\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\admin\\reset-auth\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\admin\\users\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\auth\\change-password\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\auth\\diagnostics\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\auth\\login\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\auth\\logout\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\auth\\profile\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\auth\\recover-profile\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\auth\\register\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\auth\\reset-password\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\clients\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\clients\\[id]\\route.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\dashboard\\activity\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\dashboard\\comprehensive-stats\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\dashboard\\recent-activity\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\dashboard\\stats\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\dashboard\\tasks\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\debug\\create-test-profiles\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\debug-profile\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\material-specs\\bulk\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\material-specs\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\material-specs\\statistics\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\material-specs\\[id]\\approve\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\material-specs\\[id]\\link-scope\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\material-specs\\[id]\\reject\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\material-specs\\[id]\\request-revision\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\material-specs\\[id]\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 3,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\material-specs\\[id]\\unlink-scope\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\milestones\\bulk\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\milestones\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\milestones\\statistics\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\milestones\\[id]\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\milestones\\[id]\\status\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\notifications\\route.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\notifications\\[id]\\route.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\projects\\metrics\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\projects\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\projects\\[id]\\assignments\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 3,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\projects\\[id]\\material-specs\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\projects\\[id]\\milestones\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 3,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\projects\\[id]\\reports\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 4,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\projects\\[id]\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 3,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\projects\\[id]\\shop-drawings\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 5,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\projects\\[id]\\stats\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\projects\\[id]\\tasks\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\reports\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\scope\\bulk\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\scope\\excel\\export\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\scope\\excel\\import\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\scope\\overview\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\scope\\route.optimized.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\scope\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\scope\\[id]\\dependencies\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 3,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\scope\\[id]\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 3,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\scope\\[id]\\supplier\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\shop-drawings\\[id]\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 4,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\suppliers\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\suppliers\\totals\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\suppliers\\[id]\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 3,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\tasks\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\tasks\\statistics\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\tasks\\[id]\\comments\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\tasks\\[id]\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\test-auth\\route.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\auth\\login\\page.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\clients\\page.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 6,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\dashboard\\components\\client\\ClientDashboardActions.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 1,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\app\\dashboard\\components\\DashboardContent.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\dashboard\\components\\DashboardSkeleton.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\dashboard\\components\\DashboardStats.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\dashboard\\components\\owner\\CompanyActivityFeed.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 6,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\dashboard\\components\\owner\\GlobalStatsCards.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 4,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\dashboard\\components\\owner\\ProjectsOverview.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 6,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\dashboard\\components\\ProjectOverview.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 4,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\dashboard\\components\\QuickActions.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\dashboard\\components\\RecentActivity.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 6,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\dashboard\\components\\server\\ServerActivityFeed.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 8,
+      "docRatio": 0.125,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\dashboard\\components\\server\\ServerDashboardStats.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 4,
+      "docRatio": 0.25,
+      "quality": "Good"
+    },
+    {
+      "file": "src\\app\\dashboard\\components\\server\\ServerProjectsOverview.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 5,
+      "docRatio": 0.2,
+      "quality": "Good"
+    },
+    {
+      "file": "src\\app\\dashboard\\components\\TaskSummary.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 5,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\dashboard\\dashboard-server.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 3,
+      "docRatio": 0.3333333333333333,
+      "quality": "Good"
+    },
+    {
+      "file": "src\\app\\dashboard\\error.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\dashboard\\loading.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\dashboard\\page.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0.5,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\app\\dashboard\\project-manager\\page.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 5,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\layout.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\notifications\\page.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 8,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\page.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\projects\\loading.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\projects\\new\\page.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 4,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\projects\\page.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 3,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\projects\\[id]\\page.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\reports\\loading.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\reports\\page.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 3,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\scope\\loading.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\settings\\page.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 9,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\suppliers\\page.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 5,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\test-layout\\page.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\admin\\UserImpersonationModal.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 6,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\advanced\\AdvancedDataTable.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 7,
+      "docRatio": 0.14285714285714285,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\auth\\AuthGuard.tsx",
+      "docCount": 8,
+      "jsdocCount": 7,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 5,
+      "docRatio": 1.4,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\components\\auth\\AuthProvider.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\auth\\LoginForm.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 9,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\dashboard\\RealtimeDashboard.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 6,
+      "docRatio": 0.16666666666666666,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\ErrorBoundary.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 3,
+      "docRatio": 0.3333333333333333,
+      "quality": "Good"
+    },
+    {
+      "file": "src\\components\\forms\\FormBuilder.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 4,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\forms\\SimpleFormBuilder.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 3,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\index.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\layouts\\Header.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 5,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\layouts\\LayoutWrapper.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\layouts\\Sidebar.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\lazy\\AdvancedDataTableLazy.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0.5,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\components\\lazy\\ExcelImportDialogLazy.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0.5,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\components\\lazy\\index.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 4,
+      "docRatio": 0.25,
+      "quality": "Good"
+    },
+    {
+      "file": "src\\components\\lazy\\MaterialSpecFormLazy.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0.5,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\components\\lazy\\MilestoneCalendarLazy.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0.5,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\components\\lazy\\RealtimeScopeListTabLazy.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0.5,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\components\\lazy\\TaskFormLazy.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0.5,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\components\\milestones\\index.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\milestones\\MilestoneCalendar.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 5,
+      "docRatio": 0.2,
+      "quality": "Good"
+    },
+    {
+      "file": "src\\components\\milestones\\MilestoneCard.tsx",
+      "docCount": 2,
+      "jsdocCount": 2,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 9,
+      "docRatio": 0.2222222222222222,
+      "quality": "Good"
+    },
+    {
+      "file": "src\\components\\milestones\\MilestoneForm.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 3,
+      "docRatio": 0.3333333333333333,
+      "quality": "Good"
+    },
+    {
+      "file": "src\\components\\milestones\\MilestoneList.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 7,
+      "docRatio": 0.14285714285714285,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\milestones\\MilestoneProgressBar.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0.5,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\components\\projects\\index.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\projects\\material-approval\\MaterialApprovalActions.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 7,
+      "docRatio": 0.14285714285714285,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\projects\\material-approval\\ScopeLinkingActions.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 3,
+      "docRatio": 0.3333333333333333,
+      "quality": "Good"
+    },
+    {
+      "file": "src\\components\\projects\\ProjectCard.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 3,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\projects\\ProjectHeader.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 3,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\projects\\TabbedWorkspace.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\projects\\TabbedWorkspaceOptimized.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 4,
+      "docRatio": 0.25,
+      "quality": "Good"
+    },
+    {
+      "file": "src\\components\\projects\\tabs\\MaterialSpecsTab.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 4,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\projects\\tabs\\MilestonesTab.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 7,
+      "docRatio": 0.14285714285714285,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\projects\\tabs\\OverviewTab.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 3,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\projects\\tabs\\RealtimeScopeListTab.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 13,
+      "docRatio": 0.07692307692307693,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\projects\\tabs\\ReportsTab.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 5,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\projects\\tabs\\ScopeListTab.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 10,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\projects\\tabs\\ShopDrawingsTab.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 5,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\projects\\tabs\\TasksTab.tsx",
+      "docCount": 2,
+      "jsdocCount": 2,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 8,
+      "docRatio": 0.25,
+      "quality": "Good"
+    },
+    {
+      "file": "src\\components\\providers\\PerformanceProvider.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 4,
+      "docRatio": 0.25,
+      "quality": "Good"
+    },
+    {
+      "file": "src\\components\\providers\\ThemeProvider.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\scope\\ExcelImportDialog.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 3,
+      "docRatio": 0.3333333333333333,
+      "quality": "Good"
+    },
+    {
+      "file": "src\\components\\scope\\form\\ScopeFormSections.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\scope\\ScopeCoordinator.tsx",
+      "docCount": 6,
+      "jsdocCount": 6,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 10,
+      "docRatio": 0.6,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\components\\scope\\ScopeItemEditor.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 1,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\components\\scope\\ScopeItemsTable.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 3,
+      "docRatio": 0.3333333333333333,
+      "quality": "Good"
+    },
+    {
+      "file": "src\\components\\scope\\ScopeStatisticsCards.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\scope\\table\\ScopeBulkActions.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\scope\\table\\ScopeTableColumns.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 4,
+      "docRatio": 0.25,
+      "quality": "Good"
+    },
+    {
+      "file": "src\\components\\StaggeredLoader.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\tasks\\index.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\tasks\\TaskCard.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 1,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\components\\tasks\\TaskForm.tsx",
+      "docCount": 2,
+      "jsdocCount": 2,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 6,
+      "docRatio": 0.3333333333333333,
+      "quality": "Good"
+    },
+    {
+      "file": "src\\components\\tasks\\TaskList.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 6,
+      "docRatio": 0.16666666666666666,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\tasks\\TaskPrioritySelector.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\tasks\\TaskStatusBadge.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\test\\ColorSystemTest.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 1,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\components\\ui\\alert.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\ui\\avatar.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\ui\\badge.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\ui\\button.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\ui\\calendar.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\ui\\card.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\ui\\checkbox.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\ui\\data-table.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\ui\\dialog.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\ui\\dropdown-menu.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\ui\\form.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\ui\\index.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\ui\\input.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\ui\\label.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\ui\\loading-states.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 4,
+      "docRatio": 0.25,
+      "quality": "Good"
+    },
+    {
+      "file": "src\\components\\ui\\popover.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\ui\\progress.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\ui\\radio-group.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\ui\\route-loading.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 1,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\components\\ui\\scroll-area.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\ui\\select.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\ui\\separator.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\ui\\sheet.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\ui\\skeleton.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\ui\\switch.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\ui\\table.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\ui\\tabs.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\ui\\textarea.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\ui\\toast.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\ui\\tooltip.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\components\\ui\\use-toast.tsx",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 7,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\contexts\\RealtimeContext.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 3,
+      "docRatio": 0.3333333333333333,
+      "quality": "Good"
+    },
+    {
+      "file": "src\\hooks\\useAdvancedApiQuery.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 15,
+      "docRatio": 0.06666666666666667,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\hooks\\useApiQuery.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 8,
+      "docRatio": 0.125,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\hooks\\useAuth.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 4,
+      "docRatio": 0.25,
+      "quality": "Good"
+    },
+    {
+      "file": "src\\hooks\\useClients.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 1,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\hooks\\useDocumentWorkflow.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 3,
+      "docRatio": 0.3333333333333333,
+      "quality": "Good"
+    },
+    {
+      "file": "src\\hooks\\useImpersonation.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0.5,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\hooks\\useMaterialSpecs.ts",
+      "docCount": 2,
+      "jsdocCount": 2,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 1,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\hooks\\useMilestones.ts",
+      "docCount": 2,
+      "jsdocCount": 2,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 1,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\hooks\\useNotifications.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 1,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\hooks\\usePerformance.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0.5,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\hooks\\usePermissions.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 4,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\hooks\\useProjectMembers.ts",
+      "docCount": 2,
+      "jsdocCount": 2,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 1,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\hooks\\useProjects.ts",
+      "docCount": 8,
+      "jsdocCount": 8,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 12,
+      "docRatio": 0.6666666666666666,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\hooks\\useProjectStats.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 1,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\hooks\\useRealtimeSubscription.ts",
+      "docCount": 2,
+      "jsdocCount": 2,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 5,
+      "docRatio": 0.4,
+      "quality": "Good"
+    },
+    {
+      "file": "src\\hooks\\useReports.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 1,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\hooks\\useResponsive.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 3,
+      "docRatio": 0.3333333333333333,
+      "quality": "Good"
+    },
+    {
+      "file": "src\\hooks\\useScope.ts",
+      "docCount": 4,
+      "jsdocCount": 4,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 9,
+      "docRatio": 0.4444444444444444,
+      "quality": "Good"
+    },
+    {
+      "file": "src\\hooks\\useShopDrawings.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 1,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\hooks\\useTasks.ts",
+      "docCount": 4,
+      "jsdocCount": 4,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 4,
+      "docRatio": 1,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\lib\\api-middleware.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 8,
+      "docRatio": 0.125,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\lib\\auth-helpers.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 3,
+      "docRatio": 0.3333333333333333,
+      "quality": "Good"
+    },
+    {
+      "file": "src\\lib\\auth-monitoring.ts",
+      "docCount": 20,
+      "jsdocCount": 20,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 20,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\lib\\cache-middleware.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 10,
+      "docRatio": 0.1,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\lib\\cache.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\lib\\cors-config.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0.5,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\lib\\database.ts",
+      "docCount": 11,
+      "jsdocCount": 11,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 10,
+      "docRatio": 1.1,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\lib\\enhanced-auth-middleware.ts",
+      "docCount": 8,
+      "jsdocCount": 8,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 9,
+      "docRatio": 0.8888888888888888,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\lib\\enhanced-middleware.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 6,
+      "docRatio": 0.16666666666666666,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\lib\\enhanced-query-builder.ts",
+      "docCount": 14,
+      "jsdocCount": 14,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 9,
+      "docRatio": 1.5555555555555556,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\lib\\form-validation.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 4,
+      "docRatio": 0.25,
+      "quality": "Good"
+    },
+    {
+      "file": "src\\lib\\middleware.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 12,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\lib\\optimized-queries.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 3,
+      "docRatio": 0.3333333333333333,
+      "quality": "Good"
+    },
+    {
+      "file": "src\\lib\\performance-monitor.ts",
+      "docCount": 12,
+      "jsdocCount": 12,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 3,
+      "docRatio": 4,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\lib\\performance-utils.tsx",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 4,
+      "docRatio": 0.25,
+      "quality": "Good"
+    },
+    {
+      "file": "src\\lib\\permissions.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\lib\\query-builder.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 6,
+      "docRatio": 0.16666666666666666,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\lib\\rate-limit-middleware.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0.5,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\lib\\secure-error-handler.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 2,
+      "docRatio": 0.5,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\lib\\security-headers.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 1,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\lib\\supabase\\server.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\lib\\supabase.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\lib\\utils.ts",
+      "docCount": 7,
+      "jsdocCount": 7,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 12,
+      "docRatio": 0.5833333333333334,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\lib\\validation\\material-specs.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 13,
+      "docRatio": 0.07692307692307693,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\lib\\validation\\milestones.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 7,
+      "docRatio": 0.14285714285714285,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\lib\\validation\\projects.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 8,
+      "docRatio": 0.125,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\lib\\validation\\scope.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 6,
+      "docRatio": 0.16666666666666666,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\lib\\validation\\tasks.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 8,
+      "docRatio": 0.125,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\lib\\validation.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\scripts\\check-task-completion.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 3,
+      "docRatio": 0.3333333333333333,
+      "quality": "Good"
+    },
+    {
+      "file": "src\\types\\auth.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\types\\database.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\types\\index.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\types\\material-specs.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\types\\milestones.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\types\\projects.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\types\\scope.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 1,
+      "docRatio": 1,
+      "quality": "Excellent"
+    },
+    {
+      "file": "src\\types\\tasks.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\__tests__\\api\\material-specs.bulk.test.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\__tests__\\api\\material-specs.error-handling.test.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\__tests__\\api\\milestones-real.test.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\__tests__\\api\\simple-auth.test.ts",
+      "docCount": 0,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\__tests__\\api\\tasks-real.test.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\__tests__\\hooks\\useAuth.test.ts",
+      "docCount": 11,
+      "jsdocCount": 0,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\__tests__\\integration\\auth.e2e.test.ts",
+      "docCount": 18,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\__tests__\\integration\\real-supabase-connection.test.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 0,
+      "docRatio": 0,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\__tests__\\utils\\real-supabase-utils.ts",
+      "docCount": 1,
+      "jsdocCount": 1,
+      "todoCount": 0,
+      "fixmeCount": 0,
+      "functionCount": 14,
+      "docRatio": 0.07142857142857142,
+      "quality": "Fair"
+    }
+  ],
+  "apiDocumentation": [
+    {
+      "file": "src\\app\\api\\admin\\auth-state\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\admin\\create-test-users\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\admin\\reset-auth\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\admin\\users\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\auth\\change-password\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\auth\\diagnostics\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\auth\\login\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\auth\\logout\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\auth\\profile\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\auth\\recover-profile\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\auth\\register\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\auth\\reset-password\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\clients\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\clients\\[id]\\route.ts",
+      "hasJSDoc": true,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\dashboard\\activity\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\dashboard\\comprehensive-stats\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\dashboard\\recent-activity\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\dashboard\\stats\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\dashboard\\tasks\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\debug\\create-test-profiles\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\debug-profile\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\material-specs\\bulk\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\material-specs\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\material-specs\\statistics\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\material-specs\\[id]\\approve\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\material-specs\\[id]\\link-scope\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\material-specs\\[id]\\reject\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\material-specs\\[id]\\request-revision\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\material-specs\\[id]\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\material-specs\\[id]\\unlink-scope\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\milestones\\bulk\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\milestones\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\milestones\\statistics\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\milestones\\[id]\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\milestones\\[id]\\status\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\notifications\\route.ts",
+      "hasJSDoc": true,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\notifications\\[id]\\route.ts",
+      "hasJSDoc": true,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\projects\\metrics\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\projects\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\projects\\[id]\\assignments\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\projects\\[id]\\material-specs\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\projects\\[id]\\milestones\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\projects\\[id]\\reports\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\projects\\[id]\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\projects\\[id]\\shop-drawings\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\projects\\[id]\\stats\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\projects\\[id]\\tasks\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\reports\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\scope\\bulk\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\scope\\excel\\export\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\scope\\excel\\import\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\scope\\overview\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\scope\\route.optimized.ts",
+      "hasJSDoc": true,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Fair"
+    },
+    {
+      "file": "src\\app\\api\\scope\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\scope\\[id]\\dependencies\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\scope\\[id]\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\scope\\[id]\\supplier\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\shop-drawings\\[id]\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\suppliers\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\suppliers\\totals\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\suppliers\\[id]\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\tasks\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\tasks\\statistics\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\tasks\\[id]\\comments\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\tasks\\[id]\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "src\\app\\api\\test-auth\\route.ts",
+      "hasJSDoc": false,
+      "hasParamDocs": false,
+      "hasReturnDocs": false,
+      "hasExamples": false,
+      "hasErrorHandling": true,
+      "hasOpenAPI": false,
+      "quality": "Poor"
+    }
+  ],
+  "workflowDocumentation": [
+    {
+      "file": "docs\\ADMIN_IMPERSONATION_GUIDE.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": true,
+      "hasSteps": true,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\ADMIN_USER_GUIDE.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\analysis\\AI_AGENT_COMPARISON_ANALYSIS.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\analysis\\AI_AGENT_PROGRESS_REPORT.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\analysis\\AI_AGENT_VALIDATION_REPORT.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\analysis\\AUTH_FLOW_DIAGRAM.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\analysis\\AUTH_LOOP_INVESTIGATION_SUMMARY.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\analysis\\COMPREHENSIVE_API_BOTTLENECK_REPORT.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\analysis\\DATABASE_VALIDATION_REPORT.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\analysis\\V3_IMPLEMENTATION_STATUS.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\archive\\wave-2c\\Wave-2C-Advanced-Features\\document-approval-workflow-implementation.md",
+      "workflowType": "Project Management",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\archive\\wave-2c\\Wave-2C-Advanced-Features\\shop-drawings-mobile-implementation.md",
+      "workflowType": "Project Management",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\archive\\wave-2c\\Wave-2C-Advanced-Features\\WAVE_2C_FINAL_REPORT.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\archive\\wave-3\\Wave-3-Business-Features\\CLIENT_PORTAL_SYSTEM_FINAL_REPORT.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\archive\\wave-3\\Wave-3-Business-Features\\purchase-department-workflow-specification.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\archive\\wave-3\\Wave-3-Business-Features\\PURCHASE_DEPARTMENT_WORKFLOW_FINAL_REPORT.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\archive\\wave-3-external\\Wave-3-External-Access\\client-portal-system.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\archive\\wave-3-external\\Wave-3-External-Access\\mobile-field-interface.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\archive\\wave-3-external\\Wave-3-External-Access\\photo-reporting-system.md",
+      "workflowType": "Project Management",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\AUTH_TROUBLESHOOTING_GUIDE.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\COMPLETED_IMPROVEMENTS.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\guides\\gemini-mcp-usage.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\guides\\GIT_BASH_NPM_TROUBLESHOOTING.md",
+      "workflowType": "Project Management",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Poor"
+    },
+    {
+      "file": "docs\\guides\\sql-migration-validation.md",
+      "workflowType": "Project Management",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\migration\\API_MIGRATION_GUIDE.md",
+      "workflowType": "Project Management",
+      "hasDiagrams": true,
+      "hasSteps": true,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\migration\\COMPLETE_MIGRATION_ACCOMPLISHED.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "docs\\migration\\FINAL_MIGRATION_COMPLETION_REPORT.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\migration\\MIGRATION_INSTRUCTIONS.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\migration\\role-migration-implementation.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\optimization\\COMPREHENSIVE_OPTIMIZATION_COMPLETE.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\optimization\\OPTIMIZATION_MIGRATION_GUIDE.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\optimization\\OPTIMIZATION_STRATEGY.md",
+      "workflowType": "Project Management",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\OPTIMIZATION_READINESS_CHECKLIST.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\refactoring\\01-security-fixes-guide.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": false,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\refactoring\\05-performance-optimization-guide.md",
+      "workflowType": "Project Management",
+      "hasDiagrams": false,
+      "hasSteps": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "docs\\reports\\sql-migration-fixes.md",
+      "workflowType": "Project Management",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\reports\\technical-checklist.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\reports\\testing-report.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\reports\\ux-feedback.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\reports\\wave3-testing-framework.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\session\\2025-01-10-fixes.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\session\\current-session.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\session\\progress-summary.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\setup\\local-development.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\setup\\migration-guidelines.md",
+      "workflowType": "Project Management",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\setup\\setup-complete.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\tasks\\active\\application-health-fixes\\TASK_APPLICATION_HEALTH_CRITICAL_FIXES.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\tasks\\active\\dashboard-ux-redesign\\TASK_DASHBOARD_UX_REDESIGN.md",
+      "workflowType": "Project Management",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\tasks\\active\\v3\\p1-highest-priority\\TASK_P1_01_TASK_MANAGEMENT_SYSTEM.md",
+      "workflowType": "Project Management",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\tasks\\active\\v3\\p1-highest-priority\\TASK_P1_02_MILESTONE_TRACKING_SYSTEM.md",
+      "workflowType": "Project Management",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\tasks\\active\\v3\\p1-highest-priority\\TASK_P1_03_SHOP_DRAWING_APPROVAL_SYSTEM.md",
+      "workflowType": "Project Management",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\tasks\\active\\v3\\p1-highest-priority\\TASK_P1_04_MATERIAL_APPROVAL_SYSTEM.md",
+      "workflowType": "Project Management",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\tasks\\active\\v3\\p1-highest-priority\\TASK_P1_05_REPORT_CREATION_SYSTEM.md",
+      "workflowType": "Project Management",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\tasks\\active\\v3\\p1-highest-priority\\TASK_P1_06_SCOPE_LIST_ENHANCEMENT.md",
+      "workflowType": "Project Management",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\tasks\\active\\v3\\p2-medium-priority\\TASK_P2_01_PROJECT_TEAM_MANAGEMENT.md",
+      "workflowType": "Project Management",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\tasks\\active\\v3\\V3_IMPLEMENTATION_MASTER_PLAN.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\tasks\\active\\v3-implementation\\TASK_PHASE_2_CORE_FEATURES.md",
+      "workflowType": "Project Management",
+      "hasDiagrams": true,
+      "hasSteps": true,
+      "quality": "Excellent"
+    },
+    {
+      "file": "docs\\tasks\\active\\v3-implementation\\TASK_PHASE_5_PRODUCTION.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\tasks\\active\\v3-implementation\\TASK_V3_IMPLEMENTATION_OVERVIEW.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\tasks\\archive\\completed\\fix-local-deployment\\TASK_FIX_LOCAL_DEPLOYMENT_ISSUES.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\tasks\\archive\\completed\\sql-migration-compatibility\\TASK_SQL_MIGRATION_COMPATIBILITY_FIX.md",
+      "workflowType": "Project Management",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\tasks\\archive\\obsolete\\critical-issues-resolution\\TASK_CRITICAL_ISSUES_RESOLUTION.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\tasks\\archive\\obsolete\\local-app-testing\\TASK_LOCAL_APP_TESTING_VALIDATION.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Good"
+    },
+    {
+      "file": "docs\\tasks\\TASK_CLEANUP_SUMMARY.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Poor"
+    },
+    {
+      "file": "docs\\v3-plans\\gemini-designs\\client_dashboard_plan.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\v3-plans\\gemini-designs\\dashboard_design_plan.md",
+      "workflowType": "Project Management",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\v3-plans\\gemini-designs\\Mainplan.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": false,
+      "quality": "Poor"
+    },
+    {
+      "file": "docs\\v3-plans\\gemini-designs\\material_approval_plan.md",
+      "workflowType": "Project Management",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\v3-plans\\gemini-designs\\milestone_tracking_plan.md",
+      "workflowType": "Project Management",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\v3-plans\\gemini-designs\\project_team_management_plan.md",
+      "workflowType": "Project Management",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\v3-plans\\gemini-designs\\report_creation_plan.md",
+      "workflowType": "Project Management",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\v3-plans\\gemini-designs\\shop_drawing_approval_plan.md",
+      "workflowType": "Authentication",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\v3-plans\\gemini-designs\\Study\\project_data_study.md",
+      "workflowType": "Project Management",
+      "hasDiagrams": false,
+      "hasSteps": false,
+      "quality": "Fair"
+    },
+    {
+      "file": "docs\\v3-plans\\gemini-designs\\task_management_plan.md",
+      "workflowType": "Project Management",
+      "hasDiagrams": false,
+      "hasSteps": true,
+      "quality": "Fair"
+    }
+  ],
+  "missingDocumentation": [
+    {
+      "file": "src\\app\\api\\projects\\[id]\\reports\\route.ts",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 4 undocumented functions"
+    },
+    {
+      "file": "src\\app\\api\\projects\\[id]\\shop-drawings\\route.ts",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 5 undocumented functions"
+    },
+    {
+      "file": "src\\app\\api\\shop-drawings\\[id]\\route.ts",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 4 undocumented functions"
+    },
+    {
+      "file": "src\\app\\clients\\page.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 6 undocumented functions"
+    },
+    {
+      "file": "src\\app\\dashboard\\components\\owner\\CompanyActivityFeed.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 6 undocumented functions"
+    },
+    {
+      "file": "src\\app\\dashboard\\components\\owner\\GlobalStatsCards.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 4 undocumented functions"
+    },
+    {
+      "file": "src\\app\\dashboard\\components\\owner\\ProjectsOverview.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 6 undocumented functions"
+    },
+    {
+      "file": "src\\app\\dashboard\\components\\ProjectOverview.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 4 undocumented functions"
+    },
+    {
+      "file": "src\\app\\dashboard\\components\\RecentActivity.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 6 undocumented functions"
+    },
+    {
+      "file": "src\\app\\dashboard\\components\\server\\ServerActivityFeed.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 7 undocumented functions"
+    },
+    {
+      "file": "src\\app\\dashboard\\components\\server\\ServerDashboardStats.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 3 undocumented functions"
+    },
+    {
+      "file": "src\\app\\dashboard\\components\\server\\ServerProjectsOverview.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 4 undocumented functions"
+    },
+    {
+      "file": "src\\app\\dashboard\\components\\TaskSummary.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 5 undocumented functions"
+    },
+    {
+      "file": "src\\app\\dashboard\\project-manager\\page.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 5 undocumented functions"
+    },
+    {
+      "file": "src\\app\\notifications\\page.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 8 undocumented functions"
+    },
+    {
+      "file": "src\\app\\projects\\new\\page.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 4 undocumented functions"
+    },
+    {
+      "file": "src\\app\\settings\\page.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 9 undocumented functions"
+    },
+    {
+      "file": "src\\app\\suppliers\\page.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 5 undocumented functions"
+    },
+    {
+      "file": "src\\components\\admin\\UserImpersonationModal.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 6 undocumented functions"
+    },
+    {
+      "file": "src\\components\\advanced\\AdvancedDataTable.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 6 undocumented functions"
+    },
+    {
+      "file": "src\\components\\auth\\LoginForm.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 9 undocumented functions"
+    },
+    {
+      "file": "src\\components\\dashboard\\RealtimeDashboard.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 5 undocumented functions"
+    },
+    {
+      "file": "src\\components\\forms\\FormBuilder.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 4 undocumented functions"
+    },
+    {
+      "file": "src\\components\\layouts\\Header.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 5 undocumented functions"
+    },
+    {
+      "file": "src\\components\\lazy\\index.ts",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 3 undocumented functions"
+    },
+    {
+      "file": "src\\components\\milestones\\MilestoneCalendar.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 4 undocumented functions"
+    },
+    {
+      "file": "src\\components\\milestones\\MilestoneCard.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 7 undocumented functions"
+    },
+    {
+      "file": "src\\components\\milestones\\MilestoneList.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 6 undocumented functions"
+    },
+    {
+      "file": "src\\components\\projects\\material-approval\\MaterialApprovalActions.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 6 undocumented functions"
+    },
+    {
+      "file": "src\\components\\projects\\TabbedWorkspaceOptimized.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 3 undocumented functions"
+    },
+    {
+      "file": "src\\components\\projects\\tabs\\MaterialSpecsTab.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 4 undocumented functions"
+    },
+    {
+      "file": "src\\components\\projects\\tabs\\MilestonesTab.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 6 undocumented functions"
+    },
+    {
+      "file": "src\\components\\projects\\tabs\\RealtimeScopeListTab.tsx",
+      "type": "Code",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments to 12 undocumented functions"
+    },
+    {
+      "file": "src\\components\\projects\\tabs\\ReportsTab.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 5 undocumented functions"
+    },
+    {
+      "file": "src\\components\\projects\\tabs\\ScopeListTab.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 10 undocumented functions"
+    },
+    {
+      "file": "src\\components\\projects\\tabs\\ShopDrawingsTab.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 5 undocumented functions"
+    },
+    {
+      "file": "src\\components\\projects\\tabs\\TasksTab.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 6 undocumented functions"
+    },
+    {
+      "file": "src\\components\\providers\\PerformanceProvider.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 3 undocumented functions"
+    },
+    {
+      "file": "src\\components\\scope\\table\\ScopeTableColumns.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 3 undocumented functions"
+    },
+    {
+      "file": "src\\components\\tasks\\TaskForm.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 4 undocumented functions"
+    },
+    {
+      "file": "src\\components\\tasks\\TaskList.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 5 undocumented functions"
+    },
+    {
+      "file": "src\\components\\ui\\loading-states.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 3 undocumented functions"
+    },
+    {
+      "file": "src\\components\\ui\\use-toast.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 7 undocumented functions"
+    },
+    {
+      "file": "src\\hooks\\useAdvancedApiQuery.ts",
+      "type": "Code",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments to 14 undocumented functions"
+    },
+    {
+      "file": "src\\hooks\\useApiQuery.ts",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 7 undocumented functions"
+    },
+    {
+      "file": "src\\hooks\\useAuth.ts",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 3 undocumented functions"
+    },
+    {
+      "file": "src\\hooks\\usePermissions.ts",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 4 undocumented functions"
+    },
+    {
+      "file": "src\\hooks\\useRealtimeSubscription.ts",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 3 undocumented functions"
+    },
+    {
+      "file": "src\\hooks\\useScope.ts",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 5 undocumented functions"
+    },
+    {
+      "file": "src\\lib\\api-middleware.ts",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 7 undocumented functions"
+    },
+    {
+      "file": "src\\lib\\cache-middleware.ts",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 9 undocumented functions"
+    },
+    {
+      "file": "src\\lib\\enhanced-middleware.ts",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 5 undocumented functions"
+    },
+    {
+      "file": "src\\lib\\form-validation.ts",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 3 undocumented functions"
+    },
+    {
+      "file": "src\\lib\\middleware.ts",
+      "type": "Code",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments to 12 undocumented functions"
+    },
+    {
+      "file": "src\\lib\\performance-utils.tsx",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 3 undocumented functions"
+    },
+    {
+      "file": "src\\lib\\query-builder.ts",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 5 undocumented functions"
+    },
+    {
+      "file": "src\\lib\\validation\\material-specs.ts",
+      "type": "Code",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments to 12 undocumented functions"
+    },
+    {
+      "file": "src\\lib\\validation\\milestones.ts",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 6 undocumented functions"
+    },
+    {
+      "file": "src\\lib\\validation\\projects.ts",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 7 undocumented functions"
+    },
+    {
+      "file": "src\\lib\\validation\\scope.ts",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 5 undocumented functions"
+    },
+    {
+      "file": "src\\lib\\validation\\tasks.ts",
+      "type": "Code",
+      "severity": "Medium",
+      "recommendation": "Add JSDoc comments to 7 undocumented functions"
+    },
+    {
+      "file": "src\\__tests__\\utils\\real-supabase-utils.ts",
+      "type": "Code",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments to 13 undocumented functions"
+    },
+    {
+      "file": "src\\app\\api\\admin\\auth-state\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\admin\\create-test-users\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\admin\\reset-auth\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\admin\\users\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\auth\\change-password\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\auth\\diagnostics\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\auth\\login\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\auth\\logout\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\auth\\profile\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\auth\\recover-profile\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\auth\\register\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\auth\\reset-password\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\clients\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\clients\\[id]\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\dashboard\\activity\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\dashboard\\comprehensive-stats\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\dashboard\\recent-activity\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\dashboard\\stats\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\dashboard\\tasks\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\debug\\create-test-profiles\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\debug-profile\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\material-specs\\bulk\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\material-specs\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\material-specs\\statistics\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\material-specs\\[id]\\approve\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\material-specs\\[id]\\link-scope\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\material-specs\\[id]\\reject\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\material-specs\\[id]\\request-revision\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\material-specs\\[id]\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\material-specs\\[id]\\unlink-scope\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\milestones\\bulk\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\milestones\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\milestones\\statistics\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\milestones\\[id]\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\milestones\\[id]\\status\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\notifications\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\notifications\\[id]\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\projects\\metrics\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\projects\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\projects\\[id]\\assignments\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\projects\\[id]\\material-specs\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\projects\\[id]\\milestones\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\projects\\[id]\\reports\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\projects\\[id]\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\projects\\[id]\\shop-drawings\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\projects\\[id]\\stats\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\projects\\[id]\\tasks\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\reports\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\scope\\bulk\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\scope\\excel\\export\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\scope\\excel\\import\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\scope\\overview\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\scope\\route.optimized.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\scope\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\scope\\[id]\\dependencies\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\scope\\[id]\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\scope\\[id]\\supplier\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\shop-drawings\\[id]\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\suppliers\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\suppliers\\totals\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\suppliers\\[id]\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\tasks\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\tasks\\statistics\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\tasks\\[id]\\comments\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\tasks\\[id]\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "src\\app\\api\\test-auth\\route.ts",
+      "type": "API",
+      "severity": "High",
+      "recommendation": "Add JSDoc comments with @param and @returns annotations"
+    },
+    {
+      "file": "N/A",
+      "type": "Workflow",
+      "severity": "Medium",
+      "recommendation": "Create documentation for Scope Management workflow"
+    },
+    {
+      "file": "N/A",
+      "type": "Workflow",
+      "severity": "Medium",
+      "recommendation": "Create documentation for Material Approval workflow"
+    },
+    {
+      "file": "N/A",
+      "type": "Workflow",
+      "severity": "Medium",
+      "recommendation": "Create documentation for Purchase Process workflow"
+    }
+  ],
+  "filesAnalyzed": 259
+}

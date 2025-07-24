@@ -1,0 +1,18 @@
+{
+  "migrationId": "migration_1753222236667",
+  "startTime": "2025-07-22T22:10:36.667Z",
+  "endTime": "2025-07-22T22:10:36.742Z",
+  "duration": "0s",
+  "status": "FAILED",
+  "statistics": {
+    "usersProcessed": 0,
+    "policiesUpdated": 0,
+    "backupsCreated": 0,
+    "validationsPassed": 0
+  },
+  "errors": [
+    "Validation error: result.rows[0].current_database is not a function",
+    "Pre-migration validation failed"
+  ],
+  "warnings": []
+}

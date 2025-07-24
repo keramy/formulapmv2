@@ -13,21 +13,21 @@ console.log('='.repeat(50))
 // Role mapping for quick fixes
 const ROLE_MAPPINGS = {
   // Management consolidation
-  'company_owner': 'management',
-  'general_manager': 'management', 
-  'deputy_general_manager': 'management',
+  'management': 'management',
+  'management': 'management', 
+  'management': 'management',
   
   // Technical lead
-  'technical_director': 'technical_lead',
+  'technical_lead': 'technical_lead',
   
   // Project manager consolidation
-  'architect': 'project_manager',
-  'technical_engineer': 'project_manager',
-  'field_worker': 'project_manager',
+  'project_manager': 'project_manager',
+  'project_manager': 'project_manager',
+  'project_manager': 'project_manager',
   
   // Purchase manager consolidation
-  'purchase_director': 'purchase_manager',
-  'purchase_specialist': 'purchase_manager',
+  'purchase_manager': 'purchase_manager',
+  'purchase_manager': 'purchase_manager',
   
   // Client remains the same
   'client': 'client',
@@ -71,7 +71,7 @@ function updateFileRoles(filePath) {
     })
     
     // Update common role arrays
-    const oldManagementArray = `['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin']`
+    const oldManagementArray = `['management', 'management', 'management', 'technical_lead', 'admin']`
     const newManagementArray = `['management', 'admin']`
     
     if (content.includes(oldManagementArray)) {
@@ -80,7 +80,7 @@ function updateFileRoles(filePath) {
     }
     
     // Update purchase role arrays
-    const oldPurchaseArray = `['purchase_director', 'purchase_specialist']`
+    const oldPurchaseArray = `['purchase_manager', 'purchase_manager']`
     const newPurchaseArray = `['purchase_manager']`
     
     if (content.includes(oldPurchaseArray)) {
@@ -89,7 +89,7 @@ function updateFileRoles(filePath) {
     }
     
     // Update project role arrays
-    const oldProjectArray = `['project_manager', 'architect', 'technical_engineer', 'field_worker']`
+    const oldProjectArray = `['project_manager', 'project_manager', 'project_manager', 'project_manager']`
     const newProjectArray = `['project_manager']`
     
     if (content.includes(oldProjectArray)) {
@@ -249,7 +249,7 @@ ${Object.entries(ROLE_MAPPINGS).map(([old, new_]) => `- \`${old}\` → \`${new_}
 
 Instead of:
 \`\`\`typescript
-if (!['company_owner', 'general_manager', 'deputy_general_manager'].includes(profile.role)) {
+if (!['management', 'management', 'management'].includes(profile.role)) {
   return NextResponse.json({ error: 'Access denied' }, { status: 403 })
 }
 \`\`\`

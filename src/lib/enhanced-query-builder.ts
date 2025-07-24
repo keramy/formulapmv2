@@ -344,12 +344,13 @@ export async function getDashboardStatsOptimized(
         .select('id, status', { count: 'exact' });
       
       if (!['management', 'technical_lead', 'admin'].includes(userRole)) {
-        scopeQuery = scopeQuery.in('project_id', 
-          supabase
-            .from('projects')
-            .select('id')
-            .or(`project_manager_id.eq.${userId},created_by.eq.${userId}`)
-        );
+        const { data: userProjects } = await supabase
+          .from('projects')
+          .select('id')
+          .or(`project_manager_id.eq.${userId},created_by.eq.${userId}`);
+        
+        const projectIds = userProjects?.map(p => p.id) || [];
+        scopeQuery = scopeQuery.in('project_id', projectIds);
       }
       
       const { count: totalScopeItems } = await scopeQuery;

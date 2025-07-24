@@ -441,16 +441,10 @@ export const validateProjectAssignments = (data: unknown) => {
 export const validateProjectPermissions = (userRole: string, action: string): boolean => {
   const rolePermissions: Record<string, string[]> = {
     'management': ['create', 'read', 'update', 'delete', 'manage_team', 'view_budget', 'edit_budget'],
-    'management': ['create', 'read', 'update', 'delete', 'manage_team', 'view_budget', 'edit_budget'],
-    'management': ['create', 'read', 'update', 'manage_team', 'view_budget', 'edit_budget'],
-    'technical_lead': ['read', 'update', 'view_budget'],
     'admin': ['create', 'read', 'update', 'delete', 'manage_team'],
+    'technical_lead': ['read', 'update', 'view_budget'],
     'project_manager': ['create', 'read', 'update', 'manage_team'],
-    'project_manager': ['read', 'update'],
-    'project_manager': ['read', 'update'],
     'purchase_manager': ['read', 'view_budget'],
-    'purchase_manager': ['read'],
-    'project_manager': ['read'],
     'client': ['read'],
   }
   

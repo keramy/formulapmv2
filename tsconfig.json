@@ -51,6 +51,12 @@
     ".next/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "api-comprehensive-backups/**/*",
+    "api-templates/**/*",
+    "mcp-servers/**/*",
+    "docs/**/*",
+    "**/*.backup",
+    "**/*.bak"
   ]
 }

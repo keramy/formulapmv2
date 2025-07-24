@@ -28,7 +28,7 @@ export interface FormFieldConfig {
   name: string
   label: string
   type: FieldType
-  placeholder?: string
+  implementation?: string
   description?: string
   required?: boolean
   options?: { value: string; label: string }[]
@@ -115,7 +115,7 @@ export function SimpleFormBuilder({
 
   const renderField = (field: FormFieldConfig) => {
     const commonProps = {
-      placeholder: field.placeholder,
+      implementation: field.implementation,
       disabled: field.disabled || loading,
       className: field.className
     }
@@ -128,7 +128,7 @@ export function SimpleFormBuilder({
         return (
           <Select disabled={field.disabled || loading}>
             <SelectTrigger>
-              <SelectValue placeholder={field.placeholder} />
+              <SelectValue placeholder={field.implementation} />
             </SelectTrigger>
             <SelectContent>
               {field.options?.map((option) => (

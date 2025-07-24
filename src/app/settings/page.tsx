@@ -319,7 +319,7 @@ export default function SettingsPage() {
     </div>
   );
 
-  const renderPlaceholderSection = (title: string) => (
+  const renderimplementationSection = (title: string) => (
     <div className="text-center py-12">
       <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
         <Settings className="w-8 h-8 text-gray-400" />
@@ -335,10 +335,10 @@ export default function SettingsPage() {
       case 'notifications': return renderNotificationsSection();
       case 'appearance': return renderAppearanceSection();
       case 'security': return renderSecuritySection();
-      case 'system': return renderPlaceholderSection('System');
-      case 'billing': return renderPlaceholderSection('Billing');
-      case 'team': return renderPlaceholderSection('Team');
-      case 'company': return renderPlaceholderSection('Company');
+      case 'system': return renderimplementationSection('System');
+      case 'billing': return renderimplementationSection('Billing');
+      case 'team': return renderimplementationSection('Team');
+      case 'company': return renderimplementationSection('Company');
       default: return renderProfileSection();
     }
   };

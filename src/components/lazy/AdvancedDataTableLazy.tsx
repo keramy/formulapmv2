@@ -6,7 +6,7 @@ import { lazy, Suspense } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 
 // Lazy load the component
-const AdvancedDataTableLazy = lazy(() => import('../advanced/AdvancedDataTable.tsx'))
+const AdvancedDataTableLazy = lazy(() => import('../advanced/AdvancedDataTable').then(module => ({ default: module.AdvancedDataTable })))
 
 // Loading fallback component
 function AdvancedDataTableLoading() {

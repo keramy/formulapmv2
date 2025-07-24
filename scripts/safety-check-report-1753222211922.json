@@ -1,0 +1,582 @@
+{
+  "timestamp": "2025-07-22T22:10:11.919Z",
+  "summary": {
+    "totalChecks": 24,
+    "passedChecks": 15,
+    "failedChecks": 0,
+    "warningChecks": 0,
+    "safetyScore": 63,
+    "isSafeToMigrate": false
+  },
+  "criticalIssues": [],
+  "warnings": [],
+  "recommendations": [
+    {
+      "check": "Foreign Key Constraints",
+      "recommendation": "Monitor foreign key constraints during migration"
+    },
+    {
+      "check": "Backup Space",
+      "recommendation": "Ensure sufficient disk space for backups"
+    },
+    {
+      "check": "Application State",
+      "recommendation": "Manually verify application is in maintenance mode or low-traffic state"
+    },
+    {
+      "check": "CPU Load",
+      "recommendation": "Monitor CPU usage during migration"
+    },
+    {
+      "check": "Background Jobs",
+      "recommendation": "Manually verify no critical background jobs are running"
+    }
+  ],
+  "allResults": [
+    {
+      "name": "Database Version",
+      "status": "pass",
+      "message": "PostgreSQL version 17.4 is supported",
+      "details": {
+        "version": "PostgreSQL 17.4 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 13.2.0, 64-bit"
+      }
+    },
+    {
+      "name": "Database Connections",
+      "status": "pass",
+      "message": "Connection usage is healthy: 16%",
+      "details": {
+        "total_connections": "16",
+        "active_connections": "1",
+        "max_connections": 100
+      }
+    },
+    {
+      "name": "Database Size",
+      "status": "info",
+      "message": "Database: 16 MB, User profiles: 136 kB, Users: 6",
+      "details": {
+        "database_size": "16 MB",
+        "user_profiles_size": "136 kB",
+        "user_count": "6"
+      }
+    },
+    {
+      "name": "Tablespace Availability",
+      "status": "pass",
+      "message": "2 tablespaces available",
+      "details": [
+        {
+          "spcname": "pg_default",
+          "size": "37 MB"
+        },
+        {
+          "spcname": "pg_global",
+          "size": "741 kB"
+        }
+      ]
+    },
+    {
+      "name": "Replication Status",
+      "status": "info",
+      "message": "No replication configured"
+    },
+    {
+      "name": "User Profiles Integrity",
+      "status": "pass",
+      "message": "User profiles data integrity is good"
+    },
+    {
+      "name": "Role Consistency",
+      "status": "pass",
+      "message": "All 6 role types are valid",
+      "details": [
+        {
+          "role": "project_manager",
+          "count": "1"
+        },
+        {
+          "role": "purchase_manager",
+          "count": "1"
+        },
+        {
+          "role": "management",
+          "count": "1"
+        },
+        {
+          "role": "technical_lead",
+          "count": "1"
+        },
+        {
+          "role": "admin",
+          "count": "1"
+        },
+        {
+          "role": "client",
+          "count": "1"
+        }
+      ]
+    },
+    {
+      "name": "Foreign Key Constraints",
+      "status": "info",
+      "message": "64 foreign key constraints involving user_profiles",
+      "details": [
+        {
+          "conname": "user_profiles_id_fkey",
+          "table_name": "user_profiles",
+          "referenced_table": "auth.users"
+        },
+        {
+          "conname": "clients_user_id_fkey",
+          "table_name": "clients",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "suppliers_created_by_fkey",
+          "table_name": "suppliers",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "projects_project_manager_id_fkey",
+          "table_name": "projects",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "project_assignments_user_id_fkey",
+          "table_name": "project_assignments",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "project_assignments_assigned_by_fkey",
+          "table_name": "project_assignments",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "scope_items_created_by_fkey",
+          "table_name": "scope_items",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "documents_uploaded_by_fkey",
+          "table_name": "documents",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "document_approvals_approver_id_fkey",
+          "table_name": "document_approvals",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "audit_logs_user_id_fkey",
+          "table_name": "audit_logs",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "activity_summary_user_id_fkey",
+          "table_name": "activity_summary",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "notifications_user_id_fkey",
+          "table_name": "notifications",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "tasks_assigned_to_fkey",
+          "table_name": "tasks",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "tasks_assigned_by_fkey",
+          "table_name": "tasks",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "task_comments_user_id_fkey",
+          "table_name": "task_comments",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "field_reports_submitted_by_fkey",
+          "table_name": "field_reports",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "system_settings_updated_by_fkey",
+          "table_name": "system_settings",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "invoices_created_by_fkey",
+          "table_name": "invoices",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "payments_processed_by_fkey",
+          "table_name": "payments",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "project_budgets_created_by_fkey",
+          "table_name": "project_budgets",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "project_budgets_approved_by_fkey",
+          "table_name": "project_budgets",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "tenders_created_by_fkey",
+          "table_name": "tenders",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "tender_evaluations_evaluator_id_fkey",
+          "table_name": "tender_evaluations",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "shop_drawings_created_by_fkey",
+          "table_name": "shop_drawings",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "shop_drawings_assigned_architect_fkey",
+          "table_name": "shop_drawings",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "shop_drawings_internal_approved_by_fkey",
+          "table_name": "shop_drawings",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "shop_drawings_client_approved_by_fkey",
+          "table_name": "shop_drawings",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "shop_drawing_revisions_created_by_fkey",
+          "table_name": "shop_drawing_revisions",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "shop_drawing_comments_resolved_by_fkey",
+          "table_name": "shop_drawing_comments",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "shop_drawing_comments_created_by_fkey",
+          "table_name": "shop_drawing_comments",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "shop_drawing_approvals_approver_id_fkey",
+          "table_name": "shop_drawing_approvals",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "drawing_sets_created_by_fkey",
+          "table_name": "drawing_sets",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "mobile_devices_user_id_fkey",
+          "table_name": "mobile_devices",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "mobile_sync_queue_user_id_fkey",
+          "table_name": "mobile_sync_queue",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "field_photos_uploaded_by_fkey",
+          "table_name": "field_photos",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "mobile_forms_created_by_fkey",
+          "table_name": "mobile_forms",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "mobile_form_submissions_submitted_by_fkey",
+          "table_name": "mobile_form_submissions",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "project_announcements_created_by_fkey",
+          "table_name": "project_announcements",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "messages_sender_id_fkey",
+          "table_name": "messages",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "messages_recipient_id_fkey",
+          "table_name": "messages",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "user_dashboard_settings_user_id_fkey",
+          "table_name": "user_dashboard_settings",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "vendors_created_by_fkey",
+          "table_name": "vendors",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "purchase_requests_requester_id_fkey",
+          "table_name": "purchase_requests",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "client_project_access_granted_by_fkey",
+          "table_name": "client_project_access",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "purchase_orders_phone_confirmed_by_fkey",
+          "table_name": "purchase_orders",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "purchase_orders_created_by_fkey",
+          "table_name": "purchase_orders",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "vendor_ratings_rater_id_fkey",
+          "table_name": "vendor_ratings",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "approval_workflows_approver_id_fkey",
+          "table_name": "approval_workflows",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "approval_workflows_delegated_to_fkey",
+          "table_name": "approval_workflows",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "subcontractor_scope_access_granted_by_fkey",
+          "table_name": "subcontractor_scope_access",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "delivery_confirmations_confirmed_by_fkey",
+          "table_name": "delivery_confirmations",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "client_users_user_profile_id_fkey",
+          "table_name": "client_users",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "client_users_created_by_fkey",
+          "table_name": "client_users",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "client_permissions_granted_by_fkey",
+          "table_name": "client_permissions",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "client_document_access_granted_by_fkey",
+          "table_name": "client_document_access",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "client_document_comments_resolved_by_fkey",
+          "table_name": "client_document_comments",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "client_communication_threads_closed_by_fkey",
+          "table_name": "client_communication_threads",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "client_messages_sender_id_fkey",
+          "table_name": "client_messages",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "subcontractor_users_user_profile_id_fkey",
+          "table_name": "subcontractor_users",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "subcontractor_users_created_by_fkey",
+          "table_name": "subcontractor_users",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "project_milestones_created_by_fkey",
+          "table_name": "project_milestones",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "material_specs_approved_by_fkey",
+          "table_name": "material_specs",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "material_specs_rejected_by_fkey",
+          "table_name": "material_specs",
+          "referenced_table": "user_profiles"
+        },
+        {
+          "conname": "material_specs_created_by_fkey",
+          "table_name": "material_specs",
+          "referenced_table": "user_profiles"
+        }
+      ],
+      "recommendation": "Monitor foreign key constraints during migration"
+    },
+    {
+      "name": "Duplicate Data",
+      "status": "pass",
+      "message": "No significant duplicate data found"
+    },
+    {
+      "name": "Null Values",
+      "status": "pass",
+      "message": "Null value distribution is acceptable",
+      "details": {
+        "total_users": "6",
+        "null_first_name": "0",
+        "null_last_name": "0",
+        "null_email": "0",
+        "null_role": "0"
+      }
+    },
+    {
+      "name": "Backup Infrastructure",
+      "status": "pass",
+      "message": "All 3 backup tables ready"
+    },
+    {
+      "name": "Backup Space",
+      "status": "info",
+      "message": "Current DB: 16 MB, Estimated backup: 272 kB",
+      "details": {
+        "current_size": "16 MB",
+        "estimated_backup_size": "272 kB"
+      },
+      "recommendation": "Ensure sufficient disk space for backups"
+    },
+    {
+      "name": "Backup Permissions",
+      "status": "pass",
+      "message": "Database user has backup creation permissions"
+    },
+    {
+      "name": "Existing Backups",
+      "status": "info",
+      "message": "2 existing backup tables found",
+      "details": [
+        {
+          "table_name": "rls_policy_backup_1753221183016",
+          "backup_type": "policies"
+        },
+        {
+          "table_name": "migration_backup_user_profiles",
+          "backup_type": "user_profiles"
+        }
+      ]
+    },
+    {
+      "name": "User Role Enum",
+      "status": "pass",
+      "message": "All 6 required roles present",
+      "details": {
+        "actualRoles": [
+          "management",
+          "purchase_manager",
+          "technical_lead",
+          "project_manager",
+          "client",
+          "admin"
+        ],
+        "extraRoles": []
+      }
+    },
+    {
+      "name": "Migration Scripts",
+      "status": "pass",
+      "message": "All 3 migration scripts ready"
+    },
+    {
+      "name": "RLS Policies",
+      "status": "pass",
+      "message": "RLS policies ready (0 policies using new roles)"
+    },
+    {
+      "name": "Application State",
+      "status": "info",
+      "message": "Application state check not implemented",
+      "recommendation": "Manually verify application is in maintenance mode or low-traffic state"
+    },
+    {
+      "name": "Memory Usage",
+      "status": "info",
+      "message": "Shared buffers: undefined8kB",
+      "details": {
+        "shared_buffers": "16384",
+        "unit": "8kB"
+      }
+    },
+    {
+      "name": "CPU Load",
+      "status": "info",
+      "message": "CPU load check not implemented",
+      "recommendation": "Monitor CPU usage during migration"
+    },
+    {
+      "name": "Disk I/O",
+      "status": "pass",
+      "message": "Good cache hit ratio: 99.96%",
+      "details": {
+        "blocks_read": "1026",
+        "blocks_hit": "2279487",
+        "cache_hit_ratio": "99.96"
+      }
+    },
+    {
+      "name": "Active Users",
+      "status": "pass",
+      "message": "Low activity: 2 active sessions",
+      "details": {
+        "active_sessions": "2",
+        "unique_users": "2"
+      }
+    },
+    {
+      "name": "Background Jobs",
+      "status": "info",
+      "message": "Background job check not implemented",
+      "recommendation": "Manually verify no critical background jobs are running"
+    },
+    {
+      "name": "System Locks",
+      "status": "pass",
+      "message": "26 locks, none blocked",
+      "details": {
+        "total_locks": "26",
+        "blocked_locks": "0"
+      }
+    }
+  ]
+}

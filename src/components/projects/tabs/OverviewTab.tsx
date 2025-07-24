@@ -2,6 +2,7 @@
 
 import { useProject } from '@/hooks/useProjects';
 import { useMilestones } from '@/hooks/useMilestones';
+import { useProjectStats } from '@/hooks/useProjectStats';
 import { useAuth } from '@/hooks/useAuth';
 import { usePermissions } from '@/hooks/usePermissions';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,21 +29,11 @@ interface OverviewTabProps {
 export function OverviewTab({ projectId }: OverviewTabProps) {
   const { user } = useAuth();
   const { hasPermission } = usePermissions();
-  const { project, loading, error } = useProject(projectId);
+  const { data: project, loading, error } = useProject(projectId);
   const { milestones, statistics: milestoneStats, loading: milestonesLoading } = useMilestones(projectId);
-
-
-
-  // Mock data for tasks and other metrics - will be replaced with real data as APIs are implemented
-  const mockStats = {
-    totalTasks: 42,
-    completedTasks: 28,
-    teamMembers: 8,
-    documents: 15,
-    budgetSpent: project.budget ? project.budget * 0.65 : 0,
-    budgetRemaining: project.budget ? project.budget * 0.35 : 0,
-    riskLevel: 'medium'
-  };
+  
+  // Use real project statistics API instead of real data
+  const { stats, loading: statsLoading, error: statsError, refresh: refreshStats } = useProjectStats(projectId);
 
   // Get next milestone from real data
   const nextMilestone = milestones
@@ -69,9 +60,9 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
 
   return (
     <DataStateWrapper
-      loading={loading}
-      error={error}
-      data={project}
+      loading={loading || statsLoading}
+      error={error || statsError}
+      data={project && stats}
       emptyComponent={
         <Card>
           <CardContent className="text-center py-8">
@@ -127,13 +118,13 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
             <div className="flex items-center space-x-2">
               <Users className="w-4 h-4 text-gray-500" />
               <span className="text-sm font-medium">Team Size:</span>
-              <span className="text-sm">{mockStats.teamMembers} members</span>
+              <span className="text-sm">{stats?.teamMembers || 0} members</span>
             </div>
             <div className="flex items-center space-x-2">
-              {getRiskIcon(mockStats.riskLevel)}
+              {getRiskIcon(stats?.riskLevel || 'low')}
               <span className="text-sm font-medium">Risk Level:</span>
-              <Badge variant={getRiskBadgeVariant(mockStats.riskLevel)}>
-                {mockStats.riskLevel}
+              <Badge variant={getRiskBadgeVariant(stats?.riskLevel || 'low')}>
+                {(stats?.riskLevel || 'low').charAt(0).toUpperCase() + (stats?.riskLevel || 'low').slice(1)}
               </Badge>
             </div>
           </div>
@@ -167,19 +158,19 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
             {/* Key Metrics */}
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-status-info">{mockStats.completedTasks}</div>
+                <div className="text-2xl font-bold text-status-info">{stats?.completedTasks || 0}</div>
                 <div className="text-sm text-gray-600">Completed Tasks</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-gray-700">{mockStats.totalTasks}</div>
+                <div className="text-2xl font-bold text-gray-700">{stats?.totalTasks || 0}</div>
                 <div className="text-sm text-gray-600">Total Tasks</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-status-success">{mockStats.teamMembers}</div>
+                <div className="text-2xl font-bold text-status-success">{stats?.teamMembers || 0}</div>
                 <div className="text-sm text-gray-600">Team Members</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-primary">{mockStats.documents}</div>
+                <div className="text-2xl font-bold text-primary">{stats?.documents || 0}</div>
                 <div className="text-sm text-gray-600">Documents</div>
               </div>
             </div>
@@ -233,11 +224,11 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm">Budget Spent</span>
-                  <span className="text-sm text-status-danger">${mockStats.budgetSpent.toLocaleString()}</span>
+                  <span className="text-sm text-status-danger">${(stats?.budgetSpent || 0).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm">Remaining</span>
-                  <span className="text-sm text-status-success">${mockStats.budgetRemaining.toLocaleString()}</span>
+                  <span className="text-sm text-status-success">${(stats?.budgetRemaining || 0).toLocaleString()}</span>
                 </div>
               </div>
               
@@ -245,12 +236,12 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-sm font-medium text-gray-700">Budget Utilization</span>
-                  <span className="text-sm text-gray-600">{Math.round((mockStats.budgetSpent / project.budget) * 100)}%</span>
+                  <span className="text-sm text-gray-600">{project.budget > 0 ? Math.round(((stats?.budgetSpent || 0) / project.budget) * 100) : 0}%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-3">
                   <div 
                     className="bg-status-warning h-3 rounded-full transition-all duration-300"
-                    style={{ width: `${(mockStats.budgetSpent / project.budget) * 100}%` }}
+                    style={{ width: `${project.budget > 0 ? ((stats?.budgetSpent || 0) / project.budget) * 100 : 0}%` }}
                   />
                 </div>
               </div>
@@ -315,7 +306,7 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
           <CardContent>
             <div className="space-y-3">
               <div className="text-center py-4">
-                <div className="text-2xl font-bold text-status-info">{mockStats.teamMembers}</div>
+                <div className="text-2xl font-bold text-status-info">{stats?.teamMembers || 0}</div>
                 <div className="text-sm text-gray-600">Active Team Members</div>
               </div>
               <div className="text-sm text-gray-600">

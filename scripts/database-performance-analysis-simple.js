@@ -11,17 +11,17 @@ console.log('='.repeat(60))
 
 // 13 User Roles for testing
 const USER_ROLES = [
-  'company_owner',
-  'general_manager', 
-  'deputy_general_manager',
-  'technical_director',
+  'management',
+  'management', 
+  'management',
+  'technical_lead',
   'project_manager',
-  'architect',
-  'technical_engineer',
-  'purchase_director',
-  'purchase_specialist',
-  'field_worker',
-  'subcontractor',
+  'project_manager',
+  'project_manager',
+  'purchase_manager',
+  'purchase_manager',
+  'project_manager',
+  'project_manager',
   'client',
   'admin'
 ]
@@ -48,18 +48,18 @@ function generateMockResponseTimes(role) {
   
   // Role complexity multipliers based on RLS policy analysis
   const complexityMultipliers = {
-    'company_owner': 1.2, // Management roles have complex policies
-    'general_manager': 1.3,
-    'deputy_general_manager': 1.3,
-    'technical_director': 1.4,
+    'management': 1.2, // Management roles have complex policies
+    'management': 1.3,
+    'management': 1.3,
+    'technical_lead': 1.4,
     'admin': 1.1, // Admin has simplified policies
     'project_manager': 2.1, // High complexity due to project-based access
-    'architect': 1.8,
-    'technical_engineer': 1.9,
-    'purchase_director': 1.6,
-    'purchase_specialist': 1.7,
-    'field_worker': 2.5, // Very complex due to assignment-based access
-    'subcontractor': 2.3, // Complex assignment-based filtering
+    'project_manager': 1.8,
+    'project_manager': 1.9,
+    'purchase_manager': 1.6,
+    'purchase_manager': 1.7,
+    'project_manager': 2.5, // Very complex due to assignment-based access
+    'project_manager': 2.3, // Complex assignment-based filtering
     'client': 1.5 // Moderate complexity for client-specific data
   }
   
@@ -274,22 +274,22 @@ function analyzeRoleBasedCostVisibility() {
   
   // Roles with cost access
   const costAccessRoles = [
-    'company_owner',
-    'general_manager', 
-    'deputy_general_manager',
-    'technical_director',
+    'management',
+    'management', 
+    'management',
+    'technical_lead',
     'admin',
-    'technical_engineer',
-    'purchase_director',
-    'purchase_specialist'
+    'project_manager',
+    'purchase_manager',
+    'purchase_manager'
   ]
   
   // Roles without cost access
   const noCostAccessRoles = [
     'project_manager',
-    'architect',
-    'field_worker',
-    'subcontractor',
+    'project_manager',
+    'project_manager',
+    'project_manager',
     'client'
   ]
   

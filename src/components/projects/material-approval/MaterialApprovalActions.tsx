@@ -344,13 +344,13 @@ export function MaterialStatusBadge({ status }: { status: string }) {
   // Map material status to semantic Badge variants
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
-      case 'approved': return 'status-success' as const;
-      case 'pending_approval': return 'pending' as const;
-      case 'rejected': return 'status-danger' as const;
-      case 'revision_required': return 'status-warning' as const;
-      case 'discontinued': return 'cancelled' as const;
-      case 'substitution_required': return 'status-review' as const;
-      default: return 'pending' as const;
+      case 'approved': return 'default' as const;
+      case 'pending_approval': return 'secondary' as const;
+      case 'rejected': return 'destructive' as const;
+      case 'revision_required': return 'outline' as const;
+      case 'discontinued': return 'destructive' as const;
+      case 'substitution_required': return 'secondary' as const;
+      default: return 'secondary' as const;
     }
   };
 

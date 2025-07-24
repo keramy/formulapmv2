@@ -507,7 +507,7 @@ ${rec.description}
 // Export for use as module
 module.exports = SystematicOptimizationWorkflow;
 
-// Run if called directly with sample data
+// Run if called directly with real data
 if (require.main === module) {
   console.log('🧪 Testing Systematic Optimization Workflow');
   console.log('=' .repeat(50));

@@ -165,7 +165,7 @@ ADD CONSTRAINT ck_{{tableName}}_{{constraintName}} CHECK ({{condition}});
 -- 1. Use transactions for complex operations
 -- 2. Add proper constraints and indexes
 -- 3. Include rollback instructions in comments
--- 4. Test with sample data
+-- 4. Test with real data
 -- 5. Consider performance implications
 
 -- Example transaction:

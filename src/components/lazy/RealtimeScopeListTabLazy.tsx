@@ -6,7 +6,7 @@ import { lazy, Suspense } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 
 // Lazy load the component
-const RealtimeScopeListTabLazy = lazy(() => import('../projects/tabs/RealtimeScopeListTab.tsx'))
+const RealtimeScopeListTabLazy = lazy(() => import('../projects/tabs/RealtimeScopeListTab').then(module => ({ default: module.RealtimeScopeListTab })))
 
 // Loading fallback component
 function RealtimeScopeListTabLoading() {

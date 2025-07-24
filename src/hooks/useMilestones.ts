@@ -353,22 +353,13 @@ export function useMilestonesAdvanced(projectId: string, filters?: MilestoneFilt
     refetch,
     mutate
   } = useAdvancedApiQuery<Milestone[]>({
-    queryKey: ['milestones', projectId, filters],
-    queryFn: async () => {
-      if (!projectId || !user) return []
-
-      const params = new URLSearchParams({
-        project_id: projectId,
-        ...(filters?.status && { status: filters.status }),
-        ...(filters?.search && { search: filters.search })
-      })
-
-      const response = await fetch(`/api/projects/${projectId}/milestones?${params}`)
-      if (!response.ok) throw new Error('Failed to fetch milestones')
-
-      const result = await response.json()
-      return result.success ? result.data.milestones : []
+    endpoint: `/api/projects/${projectId}/milestones`,
+    params: {
+      project_id: projectId,
+      ...(filters?.status && { status: filters.status.join(',') }),
+      ...(filters?.search && { search: filters.search })
     },
+    cacheKey: `milestones-${projectId}-${JSON.stringify(filters)}`,
     enabled: !!projectId && !!user,
     staleTime: 3 * 60 * 1000, // 3 minutes
     cacheTime: 8 * 60 * 1000, // 8 minutes
@@ -380,28 +371,21 @@ export function useMilestonesAdvanced(projectId: string, filters?: MilestoneFilt
   const {
     data: statistics = null
   } = useAdvancedApiQuery<MilestoneStatistics>({
-    queryKey: ['milestone-statistics', projectId],
-    queryFn: async () => {
-      if (!projectId || !user) return null
-
-      const response = await fetch(`/api/milestones/statistics?project_id=${projectId}`)
-      if (!response.ok) throw new Error('Failed to fetch milestone statistics')
-
-      const result = await response.json()
-      return result.success ? result.data : null
-    },
+    endpoint: '/api/milestones/statistics',
+    params: { project_id: projectId },
+    cacheKey: `milestone-statistics-${projectId}`,
     enabled: !!projectId && !!user,
     staleTime: 2 * 60 * 1000, // 2 minutes
     cacheTime: 5 * 60 * 1000 // 5 minutes
   })
 
-  // Calculate permissions
+  // Calculate permissions (using project permissions as milestones are part of projects)
   const permissions: MilestonePermissions = {
-    canView: !!user,
-    canCreate: hasPermission(profile, 'milestones', 'create'),
-    canEdit: hasPermission(profile, 'milestones', 'edit'),
-    canDelete: hasPermission(profile, 'milestones', 'delete'),
-    canUpdateStatus: hasPermission(profile, 'milestones', 'edit')
+    canCreate: hasPermission(profile?.role ?? 'client', 'projects.update'),
+    canEdit: hasPermission(profile?.role ?? 'client', 'projects.update'),
+    canDelete: hasPermission(profile?.role ?? 'client', 'projects.delete'),
+    canChangeStatus: hasPermission(profile?.role ?? 'client', 'projects.update'),
+    canViewAll: hasPermission(profile?.role ?? 'client', 'projects.read.all')
   }
 
   return {

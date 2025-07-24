@@ -11,34 +11,34 @@ console.log('='.repeat(70))
 
 // Current 13 User Roles
 const CURRENT_ROLES = [
-  'company_owner',
-  'general_manager', 
-  'deputy_general_manager',
-  'technical_director',
+  'management',
+  'management', 
+  'management',
+  'technical_lead',
   'project_manager',
-  'architect',
-  'technical_engineer',
-  'purchase_director',
-  'purchase_specialist',
-  'field_worker',
-  'subcontractor',
+  'project_manager',
+  'project_manager',
+  'purchase_manager',
+  'purchase_manager',
+  'project_manager',
+  'project_manager',
   'client',
   'admin'
 ]
 
 // Role analysis based on performance data
 const ROLE_PERFORMANCE_DATA = {
-  'company_owner': { complexity: 1.2, avgResponseTime: 131, usage: 'low', criticalFeatures: ['all_access', 'financial_data', 'user_management'] },
-  'general_manager': { complexity: 1.3, avgResponseTime: 274, usage: 'medium', criticalFeatures: ['all_access', 'financial_data', 'reporting'] },
-  'deputy_general_manager': { complexity: 1.3, avgResponseTime: 257, usage: 'low', criticalFeatures: ['all_access', 'financial_data'] },
-  'technical_director': { complexity: 1.4, avgResponseTime: 164, usage: 'medium', criticalFeatures: ['technical_oversight', 'project_approval', 'cost_tracking'] },
+  'management': { complexity: 1.2, avgResponseTime: 131, usage: 'low', criticalFeatures: ['all_access', 'financial_data', 'user_management'] },
+  'management': { complexity: 1.3, avgResponseTime: 274, usage: 'medium', criticalFeatures: ['all_access', 'financial_data', 'reporting'] },
+  'management': { complexity: 1.3, avgResponseTime: 257, usage: 'low', criticalFeatures: ['all_access', 'financial_data'] },
+  'technical_lead': { complexity: 1.4, avgResponseTime: 164, usage: 'medium', criticalFeatures: ['technical_oversight', 'project_approval', 'cost_tracking'] },
   'project_manager': { complexity: 2.1, avgResponseTime: 305, usage: 'high', criticalFeatures: ['project_management', 'team_coordination', 'progress_tracking'] },
-  'architect': { complexity: 1.8, avgResponseTime: 236, usage: 'medium', criticalFeatures: ['design_review', 'technical_specs', 'drawing_approval'] },
-  'technical_engineer': { complexity: 1.9, avgResponseTime: 175, usage: 'high', criticalFeatures: ['technical_specs', 'cost_tracking', 'quality_control'] },
-  'purchase_director': { complexity: 1.6, avgResponseTime: 294, usage: 'low', criticalFeatures: ['purchase_approval', 'vendor_management', 'cost_tracking'] },
-  'purchase_specialist': { complexity: 1.7, avgResponseTime: 172, usage: 'medium', criticalFeatures: ['purchase_processing', 'vendor_coordination'] },
-  'field_worker': { complexity: 2.5, avgResponseTime: 542, usage: 'high', criticalFeatures: ['task_updates', 'photo_upload', 'progress_reporting'] },
-  'subcontractor': { complexity: 2.3, avgResponseTime: 359, usage: 'medium', criticalFeatures: ['assigned_tasks', 'progress_updates', 'document_access'] },
+  'project_manager': { complexity: 1.8, avgResponseTime: 236, usage: 'medium', criticalFeatures: ['design_review', 'technical_specs', 'drawing_approval'] },
+  'project_manager': { complexity: 1.9, avgResponseTime: 175, usage: 'high', criticalFeatures: ['technical_specs', 'cost_tracking', 'quality_control'] },
+  'purchase_manager': { complexity: 1.6, avgResponseTime: 294, usage: 'low', criticalFeatures: ['purchase_approval', 'vendor_management', 'cost_tracking'] },
+  'purchase_manager': { complexity: 1.7, avgResponseTime: 172, usage: 'medium', criticalFeatures: ['purchase_processing', 'vendor_coordination'] },
+  'project_manager': { complexity: 2.5, avgResponseTime: 542, usage: 'high', criticalFeatures: ['task_updates', 'photo_upload', 'progress_reporting'] },
+  'project_manager': { complexity: 2.3, avgResponseTime: 359, usage: 'medium', criticalFeatures: ['assigned_tasks', 'progress_updates', 'document_access'] },
   'client': { complexity: 1.5, avgResponseTime: 324, usage: 'medium', criticalFeatures: ['project_visibility', 'document_review', 'approval_workflows'] },
   'admin': { complexity: 1.1, avgResponseTime: 179, usage: 'low', criticalFeatures: ['system_admin', 'user_management', 'technical_support'] }
 }
@@ -84,7 +84,7 @@ function analyzeCurrentRoles() {
   console.log('  🔍 Identifying role redundancies...')
   
   // Management hierarchy redundancy
-  const managementRoles = ['company_owner', 'general_manager', 'deputy_general_manager']
+  const managementRoles = ['management', 'management', 'management']
   analysis.redundancies.push({
     category: 'management_hierarchy',
     roles: managementRoles,
@@ -93,7 +93,7 @@ function analyzeCurrentRoles() {
   })
   
   // Purchase department redundancy
-  const purchaseRoles = ['purchase_director', 'purchase_specialist']
+  const purchaseRoles = ['purchase_manager', 'purchase_manager']
   analysis.redundancies.push({
     category: 'purchase_department',
     roles: purchaseRoles,
@@ -102,7 +102,7 @@ function analyzeCurrentRoles() {
   })
   
   // Technical roles overlap
-  const technicalRoles = ['technical_director', 'architect', 'technical_engineer']
+  const technicalRoles = ['technical_lead', 'project_manager', 'project_manager']
   analysis.redundancies.push({
     category: 'technical_overlap',
     roles: technicalRoles,
@@ -165,8 +165,8 @@ function generateOptimizationRecommendations() {
     type: 'role_consolidation',
     priority: 'high',
     title: 'Consolidate Management Hierarchy',
-    description: 'Merge company_owner, general_manager, and deputy_general_manager into a single "management" role',
-    currentRoles: ['company_owner', 'general_manager', 'deputy_general_manager'],
+    description: 'Merge management, management, and management into a single "management" role',
+    currentRoles: ['management', 'management', 'management'],
     proposedRole: 'management',
     benefits: [
       'Reduce RLS policy complexity by 60%',
@@ -186,8 +186,8 @@ function generateOptimizationRecommendations() {
     type: 'role_consolidation',
     priority: 'medium',
     title: 'Consolidate Purchase Department',
-    description: 'Merge purchase_director and purchase_specialist into "purchase_manager"',
-    currentRoles: ['purchase_director', 'purchase_specialist'],
+    description: 'Merge purchase_manager and purchase_manager into "purchase_manager"',
+    currentRoles: ['purchase_manager', 'purchase_manager'],
     proposedRole: 'purchase_manager',
     benefits: [
       'Reduce purchase workflow complexity',
@@ -205,15 +205,15 @@ function generateOptimizationRecommendations() {
     type: 'role_optimization',
     priority: 'high',
     title: 'Optimize Field Worker Role',
-    description: 'Simplify field_worker permissions and reduce assignment-based complexity',
-    currentRoles: ['field_worker'],
+    description: 'Simplify project_manager permissions and reduce assignment-based complexity',
+    currentRoles: ['project_manager'],
     proposedChanges: [
       'Pre-compute accessible projects instead of real-time RLS checks',
       'Cache assignment data to reduce JOIN complexity',
       'Implement project-based data partitioning'
     ],
     benefits: [
-      'Reduce field_worker response time from 542ms to ~200ms',
+      'Reduce project_manager response time from 542ms to ~200ms',
       'Improve mobile app performance significantly',
       'Reduce database load during peak field hours'
     ],
@@ -226,7 +226,7 @@ function generateOptimizationRecommendations() {
     priority: 'medium',
     title: 'Restructure Technical Roles',
     description: 'Reorganize technical roles based on actual responsibilities rather than hierarchy',
-    currentRoles: ['technical_director', 'architect', 'technical_engineer'],
+    currentRoles: ['technical_lead', 'project_manager', 'project_manager'],
     proposedRoles: [
       { name: 'technical_lead', description: 'Senior technical oversight and approvals' },
       { name: 'technical_specialist', description: 'Hands-on technical work and specifications' }
@@ -253,8 +253,8 @@ function generateOptimizationRecommendations() {
         { name: 'admin', description: 'System-wide access and management' }
       ],
       roleMapping: {
-        'field_worker': 'basic',
-        'subcontractor': 'basic',
+        'project_manager': 'basic',
+        'project_manager': 'basic',
         'client': 'basic',
         'project_manager': 'standard',
         'technical_specialist': 'standard',
@@ -291,7 +291,7 @@ function proposeOptimizedRoleStructure() {
         name: 'management',
         description: 'Executive and senior management',
         permissions: ['all_access', 'financial_data', 'user_management', 'system_config'],
-        replaces: ['company_owner', 'general_manager', 'deputy_general_manager'],
+        replaces: ['management', 'management', 'management'],
         estimatedUsers: 3,
         complexity: 1.2
       },
@@ -299,7 +299,7 @@ function proposeOptimizedRoleStructure() {
         name: 'technical_lead',
         description: 'Senior technical oversight and approvals',
         permissions: ['technical_oversight', 'cost_tracking', 'project_approval', 'design_review'],
-        replaces: ['technical_director'],
+        replaces: ['technical_lead'],
         estimatedUsers: 5,
         complexity: 1.4
       },
@@ -315,7 +315,7 @@ function proposeOptimizedRoleStructure() {
         name: 'technical_specialist',
         description: 'Technical implementation and specifications',
         permissions: ['technical_specs', 'quality_control', 'drawing_approval', 'limited_cost_access'],
-        replaces: ['architect', 'technical_engineer'],
+        replaces: ['project_manager', 'project_manager'],
         estimatedUsers: 20,
         complexity: 1.5
       },
@@ -323,7 +323,7 @@ function proposeOptimizedRoleStructure() {
         name: 'purchase_manager',
         description: 'Purchase and vendor management',
         permissions: ['purchase_processing', 'vendor_management', 'cost_tracking', 'purchase_approval'],
-        replaces: ['purchase_director', 'purchase_specialist'],
+        replaces: ['purchase_manager', 'purchase_manager'],
         estimatedUsers: 8,
         complexity: 1.4
       },
@@ -331,7 +331,7 @@ function proposeOptimizedRoleStructure() {
         name: 'field_operator',
         description: 'Field work and progress updates',
         permissions: ['task_updates', 'photo_upload', 'progress_reporting', 'assigned_project_access'],
-        replaces: ['field_worker'],
+        replaces: ['project_manager'],
         estimatedUsers: 50,
         complexity: 1.3 // Dramatically reduced from 2.5
       },
@@ -339,7 +339,7 @@ function proposeOptimizedRoleStructure() {
         name: 'external_user',
         description: 'Clients and subcontractors',
         permissions: ['limited_project_visibility', 'document_review', 'progress_updates'],
-        replaces: ['client', 'subcontractor'],
+        replaces: ['client', 'project_manager'],
         estimatedUsers: 30,
         complexity: 1.2
       }

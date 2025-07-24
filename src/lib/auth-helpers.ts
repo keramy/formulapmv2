@@ -25,7 +25,7 @@ export async function getAuthenticatedUser(
   const startTime = Date.now()
   
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     
     // Extract token for caching
     const authHeader = request.headers.get('authorization')
@@ -56,6 +56,12 @@ export async function getAuthenticatedUser(
         await setCachedToken(token, user, 600)
         console.log(`Auth cache MISS for token (${Date.now() - startTime}ms)`)
       }
+    }
+
+    // Ensure user is valid before proceeding
+    if (!user) {
+      console.log('No user found')
+      return null
     }
 
     // Try cached profile first

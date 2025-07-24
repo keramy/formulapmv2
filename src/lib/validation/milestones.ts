@@ -306,16 +306,10 @@ export const validateMilestoneStatisticsParams = (data: unknown) => {
 export const validateMilestonePermissions = (userRole: string, action: string): boolean => {
   const rolePermissions: Record<string, string[]> = {
     'management': ['create', 'read', 'update', 'delete', 'change_status', 'view_all'],
-    'management': ['create', 'read', 'update', 'delete', 'change_status', 'view_all'],
-    'management': ['create', 'read', 'update', 'change_status', 'view_all'],
-    'technical_lead': ['read', 'update', 'change_status', 'view_all'],
     'admin': ['create', 'read', 'update', 'delete', 'change_status', 'view_all'],
+    'technical_lead': ['read', 'update', 'change_status', 'view_all'],
     'project_manager': ['create', 'read', 'update', 'change_status'],
-    'project_manager': ['read', 'update'],
-    'project_manager': ['read', 'update'],
     'purchase_manager': ['read'],
-    'purchase_manager': ['read'],
-    'project_manager': ['read'],
     'client': ['read'],
   }
   

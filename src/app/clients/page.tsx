@@ -1,14 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { usePermissions } from '@/hooks/usePermissions';
+import { useClients } from '@/hooks/useClients';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { DataStateWrapper } from '@/components/ui/loading-states';
 import { 
   Plus, 
   Search, 
@@ -23,7 +25,8 @@ import {
   MessageSquare,
   FileText,
   MoreHorizontal,
-  ExternalLink
+  ExternalLink,
+  RefreshCw
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -44,69 +47,32 @@ interface Client {
 export default function ClientsPage() {
   const { user } = useAuth();
   const { hasPermission } = usePermissions();
-  const [clients, setClients] = useState<Client[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterType, setFilterType] = useState('all');
-
-  useEffect(() => {
-    // Simulate loading clients - in real app this would be an API call
-    const mockClients: Client[] = [
-      {
-        id: '1',
-        name: 'John Smith',
-        email: 'john.smith@email.com',
-        phone: '(555) 123-4567',
-        company: 'Smith Construction',
-        location: 'New York, NY',
-        status: 'active',
-        projects_count: 3,
-        last_activity: '2024-01-15',
-        created_at: '2024-01-01',
-        type: 'company'
-      },
-      {
-        id: '2',
-        name: 'Sarah Johnson',
-        email: 'sarah.johnson@email.com',
-        phone: '(555) 987-6543',
-        location: 'Los Angeles, CA',
-        status: 'active',
-        projects_count: 1,
-        last_activity: '2024-01-10',
-        created_at: '2024-01-05',
-        type: 'individual'
-      },
-      {
-        id: '3',
-        name: 'Michael Brown',
-        email: 'michael.brown@email.com',
-        phone: '(555) 456-7890',
-        company: 'Brown Enterprises',
-        location: 'Chicago, IL',
-        status: 'pending',
-        projects_count: 0,
-        created_at: '2024-01-12',
-        type: 'company'
-      }
-    ];
-
-    setTimeout(() => {
-      setClients(mockClients);
-      setLoading(false);
-    }, 1000);
-  }, []);
-
-  const filteredClients = clients.filter(client => {
-    const matchesSearch = client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         client.company?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = filterStatus === 'all' || client.status === filterStatus;
-    const matchesType = filterType === 'all' || client.type === filterType;
-    return matchesSearch && matchesStatus && matchesType;
+  
+  // Use real API hook instead of real data
+  const {
+    clients,
+    loading,
+    error,
+    pagination,
+    createClient,
+    updateClient,
+    deleteClient,
+    refresh,
+    goToPage,
+    nextPage,
+    prevPage
+  } = useClients({
+    search: searchTerm,
+    status: filterStatus,
+    type: filterType,
+    limit: 20
   });
+
+  // Filtering is now handled by the API hook with query parameters
+  // No need for client-side filtering as it's done server-side
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
@@ -119,6 +85,21 @@ export default function ClientsPage() {
 
   const getTypeIcon = (type: string) => {
     return type === 'company' ? Building : Users;
+  };
+
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+    // The useClients hook will automatically refetch with the new search term
+  };
+
+  const handleStatusFilter = (status: string) => {
+    setFilterStatus(status);
+    // The useClients hook will automatically refetch with the new filter
+  };
+
+  const handleTypeFilter = (type: string) => {
+    setFilterType(type);
+    // The useClients hook will automatically refetch with the new filter
   };
 
   if (!user) {
@@ -147,211 +128,291 @@ export default function ClientsPage() {
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Clients</h1>
-          <p className="text-gray-600">Manage your client relationships and contacts</p>
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-blue-100 rounded-lg">
+            <Users className="w-6 h-6 text-blue-600" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Clients</h1>
+            <p className="text-gray-600">
+              Manage your client relationships and contacts
+              {pagination && (
+                <span className="ml-2 text-sm">
+                  ({pagination.total} clients)
+                </span>
+              )}
+            </p>
+          </div>
         </div>
-        {hasPermission('users.create') && (
-          <Button asChild>
-            <Link href="/clients/new">
-              <Plus className="w-4 h-4 mr-2" />
-              New Client
-            </Link>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={refresh}
+            disabled={loading}
+            className="gap-2"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
           </Button>
-        )}
+          {hasPermission('client_portal.admin.manage') && (
+            <Button className="gap-2">
+              <Plus className="w-4 h-4" />
+              Add Client
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Search and Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-          <Input
-            placeholder="Search clients..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-        <div className="flex gap-2">
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="all">All Status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-            <option value="pending">Pending</option>
-          </select>
-          <select
-            value={filterType}
-            onChange={(e) => setFilterType(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="all">All Types</option>
-            <option value="individual">Individual</option>
-            <option value="company">Company</option>
-          </select>
-          <Button variant="outline" size="sm">
-            <Filter className="w-4 h-4 mr-2" />
-            More Filters
-          </Button>
-        </div>
-      </div>
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-1 items-center gap-2">
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  placeholder="Search clients..."
+                  value={searchTerm}
+                  onChange={(e) => handleSearch(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Filter className="w-4 h-4 text-gray-500" />
+              <select
+                value={filterStatus}
+                onChange={(e) => handleStatusFilter(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+              >
+                <option value="all">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="pending">Pending</option>
+              </select>
+              <select
+                value={filterType}
+                onChange={(e) => handleTypeFilter(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+              >
+                <option value="all">All Types</option>
+                <option value="company">Companies</option>
+                <option value="individual">Individuals</option>
+              </select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* Client Cards */}
-      {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(6)].map((_, i) => (
-            <Card key={i}>
-              <CardHeader>
-                <div className="flex items-center space-x-4">
-                  <Skeleton className="h-12 w-12 rounded-full" />
-                  <div className="space-y-2">
-                    <Skeleton className="h-4 w-32" />
-                    <Skeleton className="h-3 w-24" />
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-2/3" />
-                  <Skeleton className="h-8 w-full" />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      ) : error ? (
-        <Card>
-          <CardContent className="text-center py-8">
-            <div className="text-red-500 mb-4">
-              <h3 className="text-lg font-semibold">Error Loading Clients</h3>
-              <p className="text-sm">{error}</p>
-            </div>
-            <Button onClick={() => window.location.reload()} variant="outline">
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      ) : filteredClients.length === 0 ? (
-        <Card>
-          <CardContent className="text-center py-12">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Users className="w-8 h-8 text-gray-400" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              {searchTerm || filterStatus !== 'all' || filterType !== 'all' ? 'No clients found' : 'No clients yet'}
-            </h3>
-            <p className="text-gray-600 mb-4">
-              {searchTerm || filterStatus !== 'all' || filterType !== 'all'
-                ? 'Try adjusting your search or filter criteria.' 
-                : 'Get started by adding your first client.'
-              }
-            </p>
-            {hasPermission('users.create') && !searchTerm && filterStatus === 'all' && filterType === 'all' && (
-              <Button asChild>
-                <Link href="/clients/new">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Client
-                </Link>
-              </Button>
-            )}
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredClients.map((client) => {
+      {/* Clients List */}
+      <DataStateWrapper
+        loading={loading}
+        error={error}
+        data={clients}
+        onRetry={refresh}
+      >
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {clients.map((client) => {
             const TypeIcon = getTypeIcon(client.type);
             return (
               <Card key={client.id} className="hover:shadow-md transition-shadow">
                 <CardHeader className="pb-3">
-                  <div className="flex items-center space-x-4">
-                    <Avatar className="h-12 w-12">
-                      <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${client.name}`} />
-                      <AvatarFallback>
-                        {client.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center space-x-2">
-                        <h3 className="text-lg font-semibold truncate">{client.name}</h3>
-                        <Badge variant={getStatusBadgeVariant(client.status)}>
-                          {client.status}
-                        </Badge>
-                      </div>
-                      <div className="flex items-center space-x-2 text-sm text-gray-600">
-                        <TypeIcon className="w-4 h-4" />
-                        <span>{client.type}</span>
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="w-10 h-10">
+                        <AvatarFallback>
+                          {client.name
+                            .split(' ')
+                            .map(n => n[0])
+                            .join('')}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <CardTitle className="text-lg">{client.name}</CardTitle>
+                        <div className="flex items-center gap-2 mt-1">
+                          <TypeIcon className="w-3 h-3 text-gray-500" />
+                          <span className="text-xs text-gray-500 capitalize">
+                            {client.type}
+                          </span>
+                          <Badge variant={getStatusBadgeVariant(client.status)}>
+                            {client.status}
+                          </Badge>
+                        </div>
                       </div>
                     </div>
+                    <Button variant="ghost" size="sm">
+                      <MoreHorizontal className="w-4 h-4" />
+                    </Button>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {/* Contact Info */}
                   <div className="space-y-2">
-                    <div className="flex items-center space-x-2 text-sm">
-                      <Mail className="w-4 h-4 text-gray-400" />
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <Mail className="w-4 h-4" />
                       <span className="truncate">{client.email}</span>
                     </div>
                     {client.phone && (
-                      <div className="flex items-center space-x-2 text-sm">
-                        <Phone className="w-4 h-4 text-gray-400" />
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Phone className="w-4 h-4" />
                         <span>{client.phone}</span>
                       </div>
                     )}
-                    {client.company && (
-                      <div className="flex items-center space-x-2 text-sm">
-                        <Building className="w-4 h-4 text-gray-400" />
+                    {client.company && client.type === 'company' && (
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Building className="w-4 h-4" />
                         <span className="truncate">{client.company}</span>
                       </div>
                     )}
                     {client.location && (
-                      <div className="flex items-center space-x-2 text-sm">
-                        <MapPin className="w-4 h-4 text-gray-400" />
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <MapPin className="w-4 h-4" />
                         <span className="truncate">{client.location}</span>
                       </div>
                     )}
                   </div>
 
-                  {/* Stats */}
-                  <div className="flex items-center justify-between py-2 border-t">
-                    <div className="text-center">
-                      <div className="text-lg font-semibold text-blue-600">{client.projects_count}</div>
-                      <div className="text-xs text-gray-600">Projects</div>
+                  <div className="flex items-center justify-between pt-2 border-t">
+                    <div className="text-sm text-gray-500">
+                      <span className="font-medium">{client.projects_count}</span> projects
                     </div>
-                    <div className="text-center">
-                      <div className="text-sm text-gray-600">
-                        {client.last_activity 
-                          ? new Date(client.last_activity).toLocaleDateString()
-                          : 'Never'
-                        }
-                      </div>
-                      <div className="text-xs text-gray-600">Last Activity</div>
+                    <div className="flex items-center gap-1">
+                      {hasPermission('clients.view') && (
+                        <Button variant="ghost" size="sm" asChild>
+                          <Link href={`/clients/${client.id}`}>
+                            <Eye className="w-4 h-4" />
+                          </Link>
+                        </Button>
+                      )}
+                      {hasPermission('client_portal.admin.manage') && (
+                        <Button variant="ghost" size="sm">
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                      )}
+                      <Button variant="ghost" size="sm">
+                        <MessageSquare className="w-4 h-4" />
+                      </Button>
                     </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" className="flex-1" asChild>
-                      <Link href={`/clients/${client.id}`}>
-                        <Eye className="w-4 h-4 mr-1" />
-                        View
-                      </Link>
-                    </Button>
-                    <Button variant="outline" size="sm" asChild>
-                      <Link href={`/client-portal?client=${client.id}`}>
-                        <ExternalLink className="w-4 h-4 mr-1" />
-                        Portal
-                      </Link>
-                    </Button>
                   </div>
                 </CardContent>
               </Card>
             );
           })}
         </div>
+      </DataStateWrapper>
+
+      {/* Loading State */}
+      {loading && (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {[...Array(6)].map((_, i) => (
+            <Card key={i}>
+              <CardHeader className="pb-3">
+                <div className="flex items-start gap-3">
+                  <Skeleton className="w-10 h-10 rounded-full" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-3/4" />
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="h-3 w-12" />
+                      <Skeleton className="h-5 w-16" />
+                    </div>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Skeleton className="h-3 w-full" />
+                <Skeleton className="h-3 w-2/3" />
+                <Skeleton className="h-3 w-1/2" />
+                <div className="flex justify-between pt-2">
+                  <Skeleton className="h-3 w-20" />
+                  <div className="flex gap-1">
+                    <Skeleton className="w-6 h-6" />
+                    <Skeleton className="w-6 h-6" />
+                    <Skeleton className="w-6 h-6" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* Pagination */}
+      {pagination && pagination.total > pagination.limit && (
+        <Card className="mt-6">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-600">
+                Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} clients
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={pagination.page <= 1 || loading}
+                  onClick={prevPage}
+                  className="gap-2"
+                >
+                  Previous
+                </Button>
+                <div className="flex items-center gap-1">
+                  {/* Show page numbers */}
+                  {(() => {
+                    const totalPages = Math.ceil(pagination.total / pagination.limit);
+                    const currentPage = pagination.page;
+                    const pages = [];
+                    
+                    // Always show first page
+                    if (currentPage > 3) {
+                      pages.push(1);
+                      if (currentPage > 4) {
+                        pages.push('...');
+                      }
+                    }
+                    
+                    // Show pages around current page
+                    for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+                      pages.push(i);
+                    }
+                    
+                    // Always show last page
+                    if (currentPage < totalPages - 2) {
+                      if (currentPage < totalPages - 3) {
+                        pages.push('...');
+                      }
+                      pages.push(totalPages);
+                    }
+                    
+                    return pages.map((page, index) => 
+                      page === '...' ? (
+                        <span key={index} className="px-2 text-gray-500">...</span>
+                      ) : (
+                        <Button
+                          key={page}
+                          variant={page === currentPage ? "default" : "outline"}
+                          size="sm"
+                          disabled={loading}
+                          onClick={() => goToPage(page as number)}
+                          className="min-w-[32px]"
+                        >
+                          {page}
+                        </Button>
+                      )
+                    );
+                  })()}
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={!pagination.has_more || loading}
+                  onClick={nextPage}
+                  className="gap-2"
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

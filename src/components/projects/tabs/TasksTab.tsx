@@ -381,9 +381,9 @@ export function TasksTabOptimized({ projectId }: TasksTabProps) {
             <TaskList
               tasks={tasks}
               permissions={permissions}
-              onEdit={() => {/* Handle edit */}}
-              onDelete={() => {/* Handle delete */}}
-              onStatusChange={() => {/* Handle status change */}}
+              onEditTask={(task) => {/* Handle edit */}}
+              onDeleteTask={(task) => {/* Handle delete */}}
+              onStatusChange={(taskId, status) => {/* Handle status change */}}
             />
           </CardContent>
         </Card>

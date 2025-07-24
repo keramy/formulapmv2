@@ -11,15 +11,15 @@ console.log('='.repeat(60))
 
 // Old roles that should no longer exist
 const OLD_ROLES = [
-  'company_owner',
-  'general_manager', 
-  'deputy_general_manager',
-  'technical_director',
-  'architect',
-  'technical_engineer',
-  'field_worker',
-  'purchase_director',
-  'purchase_specialist'
+  'management',
+  'management', 
+  'management',
+  'technical_lead',
+  'project_manager',
+  'project_manager',
+  'project_manager',
+  'purchase_manager',
+  'purchase_manager'
 ]
 
 // New roles that should exist

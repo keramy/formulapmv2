@@ -284,24 +284,14 @@ export function useDocumentWorkflowAdvanced(props: UseDocumentWorkflowProps = {}
     refetch: refetchApprovals,
     mutate: mutateApprovals
   } = useAdvancedApiQuery<WorkflowSubscription[]>({
-    queryKey: ['pending-approvals', projectId, user?.id],
-    queryFn: async () => {
-      if (!user) return []
-
-      const params = new URLSearchParams()
-      if (projectId) params.append('project', projectId)
-
-      const response = await fetch(`/api/documents/approval/pending?${params}`)
-      if (!response.ok) throw new Error('Failed to fetch pending approvals')
-
-      const data = await response.json()
-      return data.workflows || []
-    },
+    endpoint: `/api/documents/approval/pending`,
+    params: projectId ? { project: projectId } : {},
+    cacheKey: `pending-approvals-${projectId}-${user?.id}`,
     enabled: !!user,
     staleTime: 2 * 60 * 1000, // 2 minutes
     cacheTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: true,
-    refetchInterval: autoRefresh ? 30 * 1000 : false // 30 seconds if auto-refresh enabled
+    refetchInterval: autoRefresh ? 30 * 1000 : undefined // 30 seconds if auto-refresh enabled
   })
 
   // Use advanced API query for workflow history
@@ -311,24 +301,14 @@ export function useDocumentWorkflowAdvanced(props: UseDocumentWorkflowProps = {}
     error: historyError,
     refetch: refetchHistory
   } = useAdvancedApiQuery<ApprovalAction[]>({
-    queryKey: ['workflow-history', projectId, user?.id],
-    queryFn: async () => {
-      if (!user) return []
-
-      const params = new URLSearchParams()
-      if (projectId) params.append('project', projectId)
-
-      const response = await fetch(`/api/documents/approval/history?${params}`)
-      if (!response.ok) throw new Error('Failed to fetch workflow history')
-
-      const data = await response.json()
-      return data.actions || []
-    },
+    endpoint: `/api/documents/approval/history`,
+    params: projectId ? { project: projectId } : {},
+    cacheKey: `workflow-history-${projectId}-${user?.id}`,
     enabled: !!user,
     staleTime: 5 * 60 * 1000, // 5 minutes
     cacheTime: 10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: false,
-    refetchInterval: autoRefresh ? 2 * 60 * 1000 : false // 2 minutes if auto-refresh enabled
+    refetchInterval: autoRefresh ? 2 * 60 * 1000 : undefined // 2 minutes if auto-refresh enabled
   })
 
   // Optimized approval action with cache invalidation
@@ -353,7 +333,7 @@ export function useDocumentWorkflowAdvanced(props: UseDocumentWorkflowProps = {}
 
       // Invalidate and refetch related queries
       await Promise.all([
-        mutateApprovals(),
+        refetchApprovals(),
         refetchHistory()
       ])
 
@@ -362,7 +342,7 @@ export function useDocumentWorkflowAdvanced(props: UseDocumentWorkflowProps = {}
       console.error('Error submitting approval:', error)
       throw error
     }
-  }, [user, mutateApprovals, refetchHistory])
+  }, [user, refetchApprovals, refetchHistory])
 
   return {
     // Data
@@ -385,11 +365,8 @@ export function useDocumentWorkflowAdvanced(props: UseDocumentWorkflowProps = {}
     refetchHistory,
 
     // Computed values
-    hasPendingApprovals: pendingApprovals.length > 0,
-    urgentApprovals: pendingApprovals.filter(w => w.priority_level === 4),
-    overdueApprovals: pendingApprovals.filter(w => {
-      if (!w.estimated_completion_date) return false
-      return new Date(w.estimated_completion_date) < new Date()
-    })
+    hasPendingApprovals: (pendingApprovals?.length ?? 0) > 0,
+    urgentApprovals: pendingApprovals?.filter(w => w.priority_level === 4) ?? [],
+    overdueApprovals: [] // No due_date field available in WorkflowSubscription
   }
 }

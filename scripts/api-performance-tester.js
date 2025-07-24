@@ -22,7 +22,7 @@ const CONFIG = {
 const TEST_CREDENTIALS = {
   admin: { email: 'owner.test@formulapm.com', password: 'testpass123' },
   pm: { email: 'pm.test@formulapm.com', password: 'testpass123' },
-  architect: { email: 'architect.test@formulapm.com', password: 'testpass123' }
+  project_manager: { email: 'project_manager.test@formulapm.com', password: 'testpass123' }
 };
 
 // API endpoints to test

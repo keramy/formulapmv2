@@ -13,7 +13,7 @@ console.log('='.repeat(60))
 // Role mapping configuration
 const ROLE_MIGRATION_MAP = {
   // Management consolidation (3 → 1)
-  'company_owner': {
+  'management': {
     newRole: 'management',
     seniorityLevel: 'executive',
     approvalLimits: {
@@ -25,7 +25,7 @@ const ROLE_MIGRATION_MAP = {
     dashboardAccess: ['company_overview', 'pm_workload', 'financial_summary', 'all_projects']
   },
   
-  'general_manager': {
+  'management': {
     newRole: 'management',
     seniorityLevel: 'executive',
     approvalLimits: {
@@ -37,7 +37,7 @@ const ROLE_MIGRATION_MAP = {
     dashboardAccess: ['company_overview', 'pm_workload', 'financial_summary', 'all_projects']
   },
   
-  'deputy_general_manager': {
+  'management': {
     newRole: 'management',
     seniorityLevel: 'executive',
     approvalLimits: {
@@ -50,7 +50,7 @@ const ROLE_MIGRATION_MAP = {
   },
 
   // Purchase department consolidation (2 → 1)
-  'purchase_director': {
+  'purchase_manager': {
     newRole: 'purchase_manager',
     seniorityLevel: 'senior',
     approvalLimits: {
@@ -61,7 +61,7 @@ const ROLE_MIGRATION_MAP = {
     specialPermissions: ['vendor_management', 'cost_tracking', 'purchase_approval']
   },
   
-  'purchase_specialist': {
+  'purchase_manager': {
     newRole: 'purchase_manager',
     seniorityLevel: 'regular',
     approvalLimits: {
@@ -73,7 +73,7 @@ const ROLE_MIGRATION_MAP = {
   },
 
   // Technical lead (1 → 1, enhanced)
-  'technical_director': {
+  'technical_lead': {
     newRole: 'technical_lead',
     seniorityLevel: 'senior',
     approvalLimits: {
@@ -97,7 +97,7 @@ const ROLE_MIGRATION_MAP = {
     specialPermissions: ['project_management', 'team_coordination', 'client_communication']
   },
   
-  'architect': {
+  'project_manager': {
     newRole: 'project_manager',
     seniorityLevel: 'regular',
     approvalLimits: {
@@ -109,7 +109,7 @@ const ROLE_MIGRATION_MAP = {
     specialPermissions: ['architectural_review', 'design_coordination', 'drawing_approval']
   },
   
-  'technical_engineer': {
+  'project_manager': {
     newRole: 'project_manager',
     seniorityLevel: 'regular',
     approvalLimits: {
@@ -121,7 +121,7 @@ const ROLE_MIGRATION_MAP = {
     specialPermissions: ['technical_specs', 'quality_control', 'progress_tracking']
   },
   
-  'field_worker': {
+  'project_manager': {
     newRole: 'project_manager',
     seniorityLevel: 'regular',
     approvalLimits: {
@@ -145,7 +145,7 @@ const ROLE_MIGRATION_MAP = {
   },
 
   // Subcontractor → Database entity (special handling)
-  'subcontractor': {
+  'project_manager': {
     newRole: 'DATABASE_ENTITY', // Special flag for conversion
     conversionType: 'user_to_entity',
     entityTable: 'subcontractors',
@@ -178,7 +178,7 @@ function generateUserMigrationSQL(userId, currentRole, userData = {}) {
     }
   }
 
-  // Handle subcontractor special case
+  // Handle project_manager special case
   if (migration.newRole === 'DATABASE_ENTITY') {
     return generateSubcontractorConversionSQL(userId, userData)
   }
@@ -222,11 +222,11 @@ INSERT INTO role_migration_log (
 }
 
 /**
- * Generate SQL to convert subcontractor user to database entity
+ * Generate SQL to convert project_manager user to database entity
  */
 function generateSubcontractorConversionSQL(userId, userData) {
   const sql = `
--- Convert subcontractor user ${userId} to database entity
+-- Convert project_manager user ${userId} to database entity
 INSERT INTO subcontractors (
     name,
     company,
@@ -279,7 +279,7 @@ WHERE up.id = '${userId}';
 UPDATE user_profiles 
 SET 
     is_active = FALSE,
-    previous_role = 'subcontractor',
+    previous_role = 'project_manager',
     role_migrated_at = NOW(),
     email = email || '_archived_' || extract(epoch from now())
 WHERE id = '${userId}';
@@ -294,11 +294,11 @@ INSERT INTO role_migration_log (
     migration_notes
 ) VALUES (
     '${userId}',
-    'subcontractor',
+    'project_manager',
     'DATABASE_ENTITY',
     'user_to_entity',
     NOW(),
-    'Converted subcontractor user to database entity'
+    'Converted project_manager user to database entity'
 );`
 
   return {
@@ -338,7 +338,7 @@ CREATE TABLE IF NOT EXISTS role_migration_log (
 -- ============================================================================
 
 -- 1. MANAGEMENT CONSOLIDATION (3 → 1)
--- Migrate company_owner, general_manager, deputy_general_manager → management
+-- Migrate management, management, management → management
 UPDATE user_profiles 
 SET 
     previous_role = role::text,
@@ -346,56 +346,56 @@ SET
     seniority_level = 'executive',
     approval_limits = '{"budget": "unlimited", "scope_changes": "all", "timeline_extensions": "unlimited"}',
     dashboard_preferences = '{"dashboardAccess": ["company_overview", "pm_workload", "financial_summary", "all_projects"]}'
-WHERE role IN ('company_owner', 'general_manager', 'deputy_general_manager');
+WHERE role IN ('management', 'management', 'management');
 
 -- Log management migrations
 INSERT INTO role_migration_log (user_id, old_role, new_role, seniority_level, migration_notes)
 SELECT id, role::text, 'management', 'executive', 'Management consolidation migration'
 FROM user_profiles 
-WHERE role IN ('company_owner', 'general_manager', 'deputy_general_manager');
+WHERE role IN ('management', 'management', 'management');
 
 -- 2. PURCHASE DEPARTMENT CONSOLIDATION (2 → 1)
--- Migrate purchase_director → purchase_manager (senior)
+-- Migrate purchase_manager → purchase_manager (senior)
 UPDATE user_profiles 
 SET 
     previous_role = role::text,
     role_migrated_at = NOW(),
     seniority_level = 'senior',
     approval_limits = '{"budget": 100000, "vendor_management": "all", "purchase_orders": "unlimited"}'
-WHERE role = 'purchase_director';
+WHERE role = 'purchase_manager';
 
--- Migrate purchase_specialist → purchase_manager (regular)
+-- Migrate purchase_manager → purchase_manager (regular)
 UPDATE user_profiles 
 SET 
     previous_role = role::text,
     role_migrated_at = NOW(),
     seniority_level = 'regular',
     approval_limits = '{"budget": 25000, "vendor_management": "assigned", "purchase_orders": "standard"}'
-WHERE role = 'purchase_specialist';
+WHERE role = 'purchase_manager';
 
 -- Log purchase migrations
 INSERT INTO role_migration_log (user_id, old_role, new_role, seniority_level, migration_notes)
 SELECT id, role::text, 'purchase_manager', 
-       CASE WHEN role = 'purchase_director' THEN 'senior' ELSE 'regular' END,
+       CASE WHEN role = 'purchase_manager' THEN 'senior' ELSE 'regular' END,
        'Purchase department consolidation'
 FROM user_profiles 
-WHERE role IN ('purchase_director', 'purchase_specialist');
+WHERE role IN ('purchase_manager', 'purchase_manager');
 
 -- 3. TECHNICAL LEAD (1 → 1, enhanced)
--- Migrate technical_director → technical_lead
+-- Migrate technical_lead → technical_lead
 UPDATE user_profiles 
 SET 
     previous_role = role::text,
     role_migrated_at = NOW(),
     seniority_level = 'senior',
     approval_limits = '{"budget": 75000, "scope_changes": "technical", "subcontractor_assignment": "all"}'
-WHERE role = 'technical_director';
+WHERE role = 'technical_lead';
 
 -- Log technical lead migrations
 INSERT INTO role_migration_log (user_id, old_role, new_role, seniority_level, migration_notes)
 SELECT id, role::text, 'technical_lead', 'senior', 'Technical director to technical lead migration'
 FROM user_profiles 
-WHERE role = 'technical_director';
+WHERE role = 'technical_lead';
 
 -- 4. PROJECT MANAGER CONSOLIDATION (4 → 1 with hierarchy)
 -- Existing project_manager → project_manager (senior)
@@ -407,32 +407,32 @@ SET
     approval_limits = '{"budget": 50000, "scope_changes": "major", "timeline_extensions": 30}'
 WHERE role = 'project_manager';
 
--- architect → project_manager (regular)
+-- project_manager → project_manager (regular)
 UPDATE user_profiles 
 SET 
     previous_role = role::text,
     role_migrated_at = NOW(),
     seniority_level = 'regular',
     approval_limits = '{"budget": 15000, "scope_changes": "minor", "timeline_extensions": 7}'
-WHERE role = 'architect';
+WHERE role = 'project_manager';
 
--- technical_engineer → project_manager (regular)
+-- project_manager → project_manager (regular)
 UPDATE user_profiles 
 SET 
     previous_role = role::text,
     role_migrated_at = NOW(),
     seniority_level = 'regular',
     approval_limits = '{"budget": 15000, "scope_changes": "minor", "timeline_extensions": 7}'
-WHERE role = 'technical_engineer';
+WHERE role = 'project_manager';
 
--- field_worker → project_manager (regular)
+-- project_manager → project_manager (regular)
 UPDATE user_profiles 
 SET 
     previous_role = role::text,
     role_migrated_at = NOW(),
     seniority_level = 'regular',
     approval_limits = '{"budget": 5000, "scope_changes": "none", "timeline_extensions": 3}'
-WHERE role = 'field_worker';
+WHERE role = 'project_manager';
 
 -- Log project manager consolidation
 INSERT INTO role_migration_log (user_id, old_role, new_role, seniority_level, migration_notes)
@@ -443,7 +443,7 @@ SELECT id, role::text, 'project_manager',
        END,
        'Project management consolidation - ' || role::text || ' to unified project_manager'
 FROM user_profiles 
-WHERE role IN ('project_manager', 'architect', 'technical_engineer', 'field_worker');
+WHERE role IN ('project_manager', 'project_manager', 'project_manager', 'project_manager');
 
 -- 5. CLIENT SIMPLIFICATION (1 → 1, simplified)
 -- client → client (simplified)
@@ -461,8 +461,8 @@ SELECT id, role::text, 'client', 'standard', 'Client role simplification'
 FROM user_profiles 
 WHERE role = 'client';
 
--- 6. SUBCONTRACTOR CONVERSION (user → database entity)
--- Convert subcontractor users to database entities
+-- 6. PROJECT_MANAGER CONVERSION (user → database entity)
+-- Convert project_manager users to database entities
 INSERT INTO subcontractors (
     name,
     company,
@@ -487,9 +487,9 @@ SELECT
     (SELECT id FROM user_profiles WHERE role = 'admin' LIMIT 1), -- Created by admin
     created_at
 FROM user_profiles 
-WHERE role = 'subcontractor';
+WHERE role = 'project_manager';
 
--- Migrate existing subcontractor assignments
+-- Migrate existing project_manager assignments
 INSERT INTO subcontractor_assignments (
     subcontractor_id,
     scope_item_id,
@@ -510,23 +510,23 @@ SELECT
 FROM user_profiles up
 JOIN subcontractors s ON s.email = up.email
 JOIN scope_items si ON si.assigned_to = up.id
-WHERE up.role = 'subcontractor';
+WHERE up.role = 'project_manager';
 
--- Archive subcontractor user accounts (don't delete for audit)
+-- Archive project_manager user accounts (don't delete for audit)
 UPDATE user_profiles 
 SET 
     is_active = FALSE,
-    previous_role = 'subcontractor',
+    previous_role = 'project_manager',
     role_migrated_at = NOW(),
     email = email || '_archived_' || extract(epoch from now())::text
-WHERE role = 'subcontractor';
+WHERE role = 'project_manager';
 
--- Log subcontractor conversions
+-- Log project_manager conversions
 INSERT INTO role_migration_log (user_id, old_role, new_role, conversion_type, migration_notes)
-SELECT id, 'subcontractor', 'DATABASE_ENTITY', 'user_to_entity', 
-       'Converted subcontractor user to database entity'
+SELECT id, 'project_manager', 'DATABASE_ENTITY', 'user_to_entity', 
+       'Converted project_manager user to database entity'
 FROM user_profiles 
-WHERE previous_role = 'subcontractor' AND is_active = FALSE;
+WHERE previous_role = 'project_manager' AND is_active = FALSE;
 
 -- 7. ADMIN REMAINS (1 → 1, unchanged)
 -- admin → admin (no change needed, just log)
@@ -596,7 +596,7 @@ WHERE is_active = TRUE
 AND role NOT IN ('management', 'purchase_manager', 'technical_lead', 'project_manager', 'client', 'admin')
 GROUP BY role;
 
--- Check subcontractor conversion
+-- Check project_manager conversion
 SELECT 
     'Subcontractor Conversion Check' as check_type,
     COUNT(DISTINCT s.id) as entities_created,
@@ -604,7 +604,7 @@ SELECT
     COUNT(DISTINCT up.id) as users_archived
 FROM subcontractors s
 FULL OUTER JOIN subcontractor_assignments sa ON s.id = sa.subcontractor_id
-FULL OUTER JOIN user_profiles up ON up.previous_role = 'subcontractor' AND up.is_active = FALSE;
+FULL OUTER JOIN user_profiles up ON up.previous_role = 'project_manager' AND up.is_active = FALSE;
 
 -- Validate approval limits are set
 SELECT 

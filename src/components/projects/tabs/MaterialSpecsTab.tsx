@@ -24,7 +24,7 @@ import {
 import { useMaterialSpecs } from '@/hooks/useMaterialSpecs';
 import { MaterialSpec, MaterialSpecFilters } from '@/types/material-specs';
 import { MaterialApprovalActions } from '@/components/projects/material-approval/MaterialApprovalActions';
-import { MaterialSpecForm } from '@/components/projects/material-approval/MaterialSpecForm';
+// import { MaterialSpecForm } from '@/components/projects/material-approval/MaterialSpecForm'; // Temporarily disabled
 import { ScopeLinkingActions } from '@/components/projects/material-approval/ScopeLinkingActions';
 import { DataStateWrapper } from '@/components/ui/loading-states';
 
@@ -264,10 +264,10 @@ export function MaterialSpecsTab({ projectId }: MaterialSpecsTabProps) {
                         <div className="flex items-center gap-2 mb-2">
                           {getStatusIcon(spec.status)}
                           <h3 className="font-semibold text-lg">{spec.name}</h3>
-                          <Badge variant={getStatusBadgeVariant(spec.status)}>
+                          <Badge variant="default">
                             {spec.status.replace('_', ' ')}
                           </Badge>
-                          <Badge variant={getPriorityBadgeVariant(spec.priority)}>
+                          <Badge variant="default">
                             {spec.priority}
                           </Badge>
                         </div>
@@ -401,8 +401,8 @@ export function MaterialSpecsTab({ projectId }: MaterialSpecsTabProps) {
         </CardContent>
       </Card>
       
-      {/* Material Specification Form */}
-      <MaterialSpecForm
+      {/* Material Specification Form - Temporarily disabled */}
+      {/* <MaterialSpecForm
         projectId={projectId}
         materialSpec={selectedMaterialSpec}
         isOpen={isFormOpen}
@@ -414,7 +414,7 @@ export function MaterialSpecsTab({ projectId }: MaterialSpecsTabProps) {
           // Refresh data after successful creation/update
           refetch();
         }}
-      />
+      /> */}
       </div>
     </DataStateWrapper>
   );

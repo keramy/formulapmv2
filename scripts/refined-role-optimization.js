@@ -26,7 +26,7 @@ const REFINED_STRUCTURE = {
         'user_management',
         'system_configuration'
       ],
-      replaces: ['company_owner', 'general_manager', 'deputy_general_manager'],
+      replaces: ['management', 'management', 'management'],
       estimatedUsers: 3,
       complexity: 1.1, // Very simple - see everything
       dashboardFeatures: [
@@ -48,7 +48,7 @@ const REFINED_STRUCTURE = {
         'purchase_approval',
         'supplier_database_management'
       ],
-      replaces: ['purchase_director', 'purchase_specialist'],
+      replaces: ['purchase_manager', 'purchase_manager'],
       estimatedUsers: 5,
       complexity: 1.3
     },
@@ -63,7 +63,7 @@ const REFINED_STRUCTURE = {
         'quality_control',
         'subcontractor_assignment'
       ],
-      replaces: ['technical_director'],
+      replaces: ['technical_lead'],
       estimatedUsers: 8,
       complexity: 1.4,
       keyFeatures: [
@@ -87,9 +87,9 @@ const REFINED_STRUCTURE = {
         'design_coordination',
         'client_communication'
       ],
-      replaces: ['project_manager', 'architect', 'technical_engineer', 'field_worker'],
+      replaces: ['project_manager', 'project_manager', 'project_manager', 'project_manager'],
       estimatedUsers: 35, // Consolidated from multiple roles
-      complexity: 1.6, // Much simpler than current field_worker (2.5)
+      complexity: 1.6, // Much simpler than current project_manager (2.5)
       keyFeatures: [
         'Unified project management',
         'Field work capabilities',
@@ -135,7 +135,7 @@ const REFINED_STRUCTURE = {
       method: 'scope_item_assignment',
       assignedBy: ['technical_lead', 'project_manager'],
       tracking: [
-        'Which subcontractor is doing what',
+        'Which project_manager is doing what',
         'Payment calculations',
         'Performance monitoring',
         'Availability tracking'
@@ -145,7 +145,7 @@ const REFINED_STRUCTURE = {
       'No user account overhead',
       'Simplified permission system',
       'Better cost tracking',
-      'Easier subcontractor management'
+      'Easier project_manager management'
     ]
   },
 
@@ -166,7 +166,7 @@ const PERFORMANCE_IMPACT = {
     totalRoles: 13,
     averageComplexity: 1.67,
     averageResponseTime: 262,
-    problematicRoles: ['field_worker: 542ms', 'subcontractor: 359ms'],
+    problematicRoles: ['project_manager: 542ms', 'project_manager: 359ms'],
     rlsPolicies: 45
   },
   
@@ -174,7 +174,7 @@ const PERFORMANCE_IMPACT = {
     totalRoles: 5, // Massive reduction!
     averageComplexity: 1.3,
     estimatedResponseTime: 180, // Significant improvement
-    eliminatedProblems: ['No more field_worker complexity', 'No subcontractor user accounts'],
+    eliminatedProblems: ['No more project_manager complexity', 'No project_manager user accounts'],
     estimatedRlsPolicies: 15
   },
   
@@ -213,12 +213,12 @@ function analyzeRefinedStructure() {
       
       technicalLead: {
         requirement: 'Upload scope lists, assign subcontractors',
-        solution: 'Technical lead with scope management and subcontractor assignment',
+        solution: 'Technical lead with scope management and project_manager assignment',
         benefit: 'Clear technical ownership, streamlined workflow'
       },
       
       projectManager: {
-        requirement: 'Combine architect, field worker, project management',
+        requirement: 'Combine project_manager, field worker, project management',
         solution: 'Unified project manager role with all capabilities',
         benefit: 'Single point of contact, reduced handoffs'
       },
@@ -229,7 +229,7 @@ function analyzeRefinedStructure() {
         benefit: 'Clean client experience, no unnecessary complexity'
       },
       
-      subcontractor: {
+      project_manager: {
         requirement: 'Track assignments and payments, not system users',
         solution: 'Database entities with assignment tracking',
         benefit: 'No user account overhead, better cost control'
@@ -257,7 +257,7 @@ function generateImplementationPlan() {
       priority: 'HIGH',
       tasks: [
         'Create new 5-role enum structure',
-        'Design subcontractor entities table',
+        'Design project_manager entities table',
         'Update RLS policies (45 → 15 policies)',
         'Create role migration scripts'
       ]
@@ -280,7 +280,7 @@ function generateImplementationPlan() {
       duration: '2-3 weeks',
       priority: 'MEDIUM',
       tasks: [
-        'Create subcontractor database entities',
+        'Create project_manager database entities',
         'Build assignment interface for technical leads',
         'Implement payment tracking',
         'Add performance monitoring'
@@ -292,7 +292,7 @@ function generateImplementationPlan() {
       duration: '3-4 weeks',
       priority: 'HIGH',
       tasks: [
-        'Merge architect + field worker + PM capabilities',
+        'Merge project_manager + field worker + PM capabilities',
         'Simplify mobile interface for field work',
         'Streamline project coordination tools',
         'Update client communication features'
@@ -317,7 +317,7 @@ function generateImplementationPlan() {
       priority: 'HIGH',
       tasks: [
         'Migrate existing users to new roles',
-        'Convert subcontractor users to entities',
+        'Convert project_manager users to entities',
         'Comprehensive testing',
         'Performance validation'
       ]
@@ -407,7 +407,7 @@ CREATE POLICY "Client project access" ON projects
     );
 
 -- Technical leads: Subcontractor management
-CREATE POLICY "Technical lead subcontractor access" ON subcontractors
+CREATE POLICY "Technical lead project_manager access" ON subcontractors
     FOR ALL USING (
         (auth.jwt() ->> 'user_role') IN ('management', 'technical_lead')
     );
@@ -440,7 +440,7 @@ function generateReport() {
       '31% better performance (262ms → 180ms)',
       '67% fewer RLS policies (45 → 15)',
       'Eliminated field worker complexity (542ms)',
-      'No subcontractor user account overhead',
+      'No project_manager user account overhead',
       'Unified management oversight',
       'Streamlined project management',
       'Simplified client experience'
@@ -493,7 +493,7 @@ Your refined approach is **significantly better** than the original analysis:
    - Technical oversight and cost tracking
 
 3. **Unified Project Management** ✅
-   - Combined architect + field worker + project manager
+   - Combined project_manager + field worker + project manager
    - Single point of contact for projects
    - Streamlined coordination and communication
 
@@ -529,7 +529,7 @@ Your refined approach is **significantly better** than the original analysis:
 
 ### 3. Technical Lead (1→1)
 - **Replaces:** Technical Director
-- **Features:** Scope uploads, subcontractor assignments, technical oversight
+- **Features:** Scope uploads, project_manager assignments, technical oversight
 
 ### 4. Project Manager (4→1)
 - **Replaces:** Project Manager, Architect, Technical Engineer, Field Worker
@@ -551,7 +551,7 @@ Your refined approach is **significantly better** than the original analysis:
 
 **Total Duration:** 11-17 weeks
 
-1. **Database Schema** (1-2 weeks) - New roles, subcontractor entities
+1. **Database Schema** (1-2 weeks) - New roles, project_manager entities
 2. **Management Dashboard** (2-3 weeks) - Company oversight features  
 3. **Subcontractor System** (2-3 weeks) - Assignment and tracking
 4. **Unified Project Manager** (3-4 weeks) - Merge capabilities

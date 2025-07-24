@@ -243,63 +243,29 @@ function hasPermission(profile: UserProfile, requiredPermission: string): boolea
 
 function getPermissionsForRole(role: string): string[] {
   const rolePermissions: Record<string, string[]> = {
-    company_owner: ['*'], // All permissions
-    general_manager: ['*'], // All permissions
-    deputy_general_manager: [
-      'read:projects', 'write:projects',
-      'read:users', 'write:users',
-      'read:scope', 'write:scope',
-      'read:tasks', 'write:tasks',
-      'read:suppliers', 'write:suppliers'
-    ],
-    technical_director: [
-      'read:projects', 'write:projects',
-      'read:scope', 'write:scope',
-      'read:tasks', 'write:tasks',
-      'read:suppliers', 'write:suppliers'
-    ],
+    management: ['*'], // All permissions
     admin: ['*'], // All permissions
+    technical_lead: [
+      'read:projects', 'write:projects',
+      'read:scope', 'write:scope',
+      'read:tasks', 'write:tasks',
+      'read:suppliers', 'write:suppliers'
+    ],
     project_manager: [
       'read:projects', 'write:projects',
       'read:tasks', 'write:tasks',
       'read:scope', 'write:scope',
       'read:suppliers', 'write:suppliers'
     ],
-    architect: [
-      'read:projects', 'write:projects',
-      'read:tasks', 'write:tasks',
-      'read:scope', 'write:scope'
-    ],
-    technical_engineer: [
-      'read:projects',
-      'read:tasks', 'write:tasks',
-      'read:scope', 'write:scope'
-    ],
-    purchase_director: [
+    purchase_manager: [
       'read:projects',
       'read:scope',
       'read:suppliers', 'write:suppliers',
       'read:tasks'
-    ],
-    purchase_specialist: [
-      'read:projects',
-      'read:scope',
-      'read:suppliers', 'write:suppliers',
-      'read:tasks'
-    ],
-    field_worker: [
-      'read:projects',
-      'read:tasks', 'write:tasks',
-      'read:scope'
     ],
     client: [
       'read:projects',
       'read:tasks',
-      'read:scope'
-    ],
-    subcontractor: [
-      'read:projects',
-      'read:tasks', 'write:tasks',
       'read:scope'
     ]
   }

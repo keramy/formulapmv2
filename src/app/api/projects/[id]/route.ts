@@ -1,4 +1,5 @@
 import { withAPI, getRequestData, createSuccessResponse, createErrorResponse } from '@/lib/enhanced-auth-middleware';
+import { NextRequest } from 'next/server';
 import { buildPaginatedQuery, parseQueryParams, getScopeItemsOptimized, getProjectsOptimized, getTasksOptimized, getDashboardStatsOptimized } from '@/lib/enhanced-query-builder';
 import { performanceMonitor } from '@/lib/performance-monitor';
 import { createClient } from '@supabase/supabase-js';
@@ -6,7 +7,9 @@ import { createClient } from '@supabase/supabase-js';
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || '',
   process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-);\n\nasync function GETOriginal(req: NextRequest) {
+);
+
+async function GETOriginal(req: NextRequest) {
   const { user, profile } = getRequestData(req);
   
   try {
@@ -25,7 +28,9 @@ const supabase = createClient(
     console.error('API fetch error:', error);
     throw error;
   }
-}\n\nasync function PUTOriginal(req: NextRequest) {
+}
+
+async function PUTOriginal(req: NextRequest) {
   const { user, profile } = getRequestData(req);
   
   try {
@@ -49,4 +54,7 @@ async function DELETEOriginal(req: NextRequest) {
   }
 }
 
-// Enhanced API exports with middleware\nexport const GET = withAPI(GETOriginal);\nexport const PUT = withAPI(PUTOriginal);\nexport const DELETE = withAPI(DELETEOriginal);
+// Enhanced API exports with middleware
+export const GET = withAPI(GETOriginal);
+export const PUT = withAPI(PUTOriginal);
+export const DELETE = withAPI(DELETEOriginal);

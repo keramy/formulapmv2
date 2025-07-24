@@ -60,7 +60,7 @@ export const useImpersonation = () => {
         return false
       }
 
-      // Security check: Don't allow impersonating other admins (unless you're company_owner)
+      // Security check: Don't allow impersonating other admins (unless you're management)
       if (adminRoles.includes(targetUser.role) && originalAdmin.role !== 'management') {
         console.error('🎭 [useImpersonation] Cannot impersonate admin user:', {
           adminRole: originalAdmin.role,
@@ -179,20 +179,9 @@ export function useImpersonationAdvanced() {
     error: validationError,
     refetch: validateAdmin
   } = useAdvancedApiQuery<{ canImpersonate: boolean; adminLevel: string }>({
-    queryKey: ['admin-validation', impersonationState?.originalAdmin?.id],
-    queryFn: async () => {
-      if (!impersonationState?.originalAdmin) return { canImpersonate: false, adminLevel: 'none' }
-
-      const response = await fetch('/api/admin/validate-impersonation', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ adminId: impersonationState.originalAdmin.id })
-      })
-
-      if (!response.ok) throw new Error('Failed to validate admin permissions')
-
-      return response.json()
-    },
+    endpoint: '/api/admin/validate-impersonation',
+    params: impersonationState?.originalAdmin ? { adminId: impersonationState.originalAdmin.id } : {},
+    cacheKey: `admin-validation-${impersonationState?.originalAdmin?.id}`,
     enabled: !!impersonationState?.originalAdmin,
     staleTime: 5 * 60 * 1000, // 5 minutes
     cacheTime: 10 * 60 * 1000, // 10 minutes
@@ -228,7 +217,7 @@ export function useImpersonationAdvanced() {
       const newState: ImpersonationState = {
         originalAdmin,
         impersonatedUser: targetUser,
-        startedAt: new Date().toISOString()
+        timestamp: Date.now()
       }
 
       sessionStorage.setItem(IMPERSONATION_KEY, JSON.stringify(newState))

@@ -11,10 +11,10 @@
 // ============================================================================
 
 export type UserRole = 
-  | 'management'        // Unified: company_owner, general_manager, deputy_general_manager
-  | 'purchase_manager'  // Unified: purchase_director, purchase_specialist  
-  | 'technical_lead'    // Renamed from: technical_director
-  | 'project_manager'   // Unified: project_manager, architect, technical_engineer, field_worker
+  | 'management'        // Unified: management, management, management
+  | 'purchase_manager'  // Unified: purchase_manager, purchase_manager  
+  | 'technical_lead'    // Renamed from: technical_lead
+  | 'project_manager'   // Unified: project_manager, project_manager, project_manager, project_manager
   | 'client'           // Unchanged
   | 'admin'            // Unchanged (system admin)
 ;
@@ -329,7 +329,7 @@ export interface DeliveryConfirmation {
 }
 
 // ============================================================================
-// CLIENT PORTAL INTERFACES
+// client PORTAL INTERFACES
 // ============================================================================
 
 export interface ClientCompany {
@@ -1512,7 +1512,7 @@ export interface Database {
 }
 
 // ============================================================================
-// SUBCONTRACTOR ACCESS SYSTEM DATABASE TYPES
+// project_manager ACCESS SYSTEM DATABASE TYPES
 // ============================================================================
 
 // Subcontractor access system enums matching database

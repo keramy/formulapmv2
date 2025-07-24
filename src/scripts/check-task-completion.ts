@@ -43,7 +43,7 @@ function checkTaskManagementCompletion(): CompletionStatus[] {
     
     if (hasRealData.length < 3) {
       tasksTabStatus.status = 'partial'
-      tasksTabStatus.details.push('Still using some mock data')
+      tasksTabStatus.details.push('Still using some real data')
     } else {
       tasksTabStatus.details.push('✓ Using real project members')
       tasksTabStatus.details.push('✓ Connected to real API')

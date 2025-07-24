@@ -94,7 +94,7 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
           created_at: user.created_at,
           updated_at: user.updated_at,
           display_name: `${user.first_name} ${user.last_name}`,
-          role_display: user.role.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+          role_display: user.role.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())
         })
       }
     })
@@ -118,16 +118,16 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
       created_at: user.created_at,
       updated_at: user.updated_at,
       display_name: `${user.first_name} ${user.last_name}`,
-      role_display: user.role.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+      role_display: user.role.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())
     })) || []
 
     // Security: Filter out the current admin from impersonation list
     // (can't impersonate yourself)
     const availableForImpersonation = flatUserList.filter(u => u.id !== user.id)
 
-    // For company_owner: can impersonate everyone except themselves
+    // For management: can impersonate everyone except themselves
     // For admin: can impersonate non-owner/admin roles
-    let secureList = []
+    let secureList: typeof availableForImpersonation = []
     
     if (profile.role === 'management') {
       // Company owners can impersonate anyone except themselves

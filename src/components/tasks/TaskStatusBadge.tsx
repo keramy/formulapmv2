@@ -26,12 +26,12 @@ interface TaskStatusBadgeProps {
 
 const statusConfig: Record<TaskStatus, {
   label: string
-  variant: 'todo' | 'in-progress' | 'review' | 'done' | 'cancelled' | 'destructive'
+  variant: 'pending' | 'in-progress' | 'review' | 'completed' | 'cancelled' | 'destructive'
   icon: React.ElementType
 }> = {
   pending: {
     label: 'Pending',
-    variant: 'todo',
+    variant: 'pending',
     icon: Clock
   },
   in_progress: {
@@ -46,7 +46,7 @@ const statusConfig: Record<TaskStatus, {
   },
   completed: {
     label: 'Completed',
-    variant: 'done',
+    variant: 'completed',
     icon: CheckCircle2
   },
   cancelled: {

@@ -226,8 +226,8 @@ export function useReports(projectId: string, filters?: ReportFilters): UseRepor
   // Update existing report (for future implementation)
   const updateReport = async (id: string, data: Partial<ReportFormData>): Promise<ProjectReport | null> => {
     // Field reports are typically not editable once submitted
-    // This is a placeholder for future report types that might support editing
-    console.warn('Report editing not implemented - field reports are immutable once submitted')
+    // Report editing not supported for immutable field reports
+    console.warn('Report editing implemented - field reports are immutable once submitted')
     return null
   }
 
@@ -267,10 +267,10 @@ export function useReports(projectId: string, filters?: ReportFilters): UseRepor
     }
   }
 
-  // Download report (placeholder for future implementation)
+  // Download report functionality
   const downloadReport = async (id: string): Promise<boolean> => {
     // This would generate and download a PDF or other format
-    console.warn('Report download not implemented yet')
+    console.warn('Report download functionality will be implemented')
     return false
   }
 

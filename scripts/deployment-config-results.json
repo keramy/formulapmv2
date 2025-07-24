@@ -1,0 +1,389 @@
+{
+  "vercelConfig": {
+    "file": "vercel.json",
+    "hasConfig": false,
+    "config": null,
+    "issues": [
+      "vercel.json file not found"
+    ]
+  },
+  "envVariables": [
+    {
+      "file": ".env.example",
+      "exists": true,
+      "variables": [
+        {
+          "name": "ENABLE_PERFORMANCE_MONITORING",
+          "hasValue": true
+        }
+      ],
+      "count": 1
+    },
+    {
+      "file": ".env.local",
+      "exists": true,
+      "variables": [
+        {
+          "name": "ENABLE_PERFORMANCE_MONITORING",
+          "hasValue": true
+        }
+      ],
+      "count": 1
+    },
+    {
+      "file": ".env.development",
+      "exists": false,
+      "variables": [],
+      "count": 0
+    },
+    {
+      "file": ".env.production",
+      "exists": true,
+      "variables": [
+        {
+          "name": "ENABLE_PERFORMANCE_MONITORING",
+          "hasValue": true
+        }
+      ],
+      "count": 1
+    },
+    {
+      "file": ".env.test",
+      "exists": false,
+      "variables": [],
+      "count": 0
+    },
+    {
+      "file": "next.config.js",
+      "exists": true,
+      "hasEnvConfig": true,
+      "note": "Contains environment variable configuration"
+    }
+  ],
+  "secretsManagement": [
+    {
+      "file": ".gitignore",
+      "exists": true,
+      "hasEnvIgnore": true,
+      "note": "Properly ignores .env files"
+    },
+    {
+      "file": "src\\app\\auth\\login\\page.tsx",
+      "line": "<p>Test Accounts (password: password123)</p>",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\app\\dashboard\\components\\DashboardStats.tsx",
+      "line": "const token = await getAccessToken();",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\app\\dashboard\\components\\owner\\CompanyActivityFeed.tsx",
+      "line": "const token = await getAccessToken();",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\app\\dashboard\\components\\owner\\GlobalStatsCards.tsx",
+      "line": "const token = await getAccessToken();",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\app\\dashboard\\components\\owner\\ProjectsOverview.tsx",
+      "line": "const token = await getAccessToken();",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\app\\dashboard\\components\\ProjectOverview.tsx",
+      "line": "const token = await getAccessToken();",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\app\\dashboard\\components\\RecentActivity.tsx",
+      "line": "const token = await getAccessToken();",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\app\\dashboard\\components\\TaskSummary.tsx",
+      "line": "const token = await getAccessToken();",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\app\\settings\\page.tsx",
+      "line": "type={showPassword ? 'text' : 'password'}",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\app\\suppliers\\page.tsx",
+      "line": "const token = await getAccessToken();",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\components\\admin\\UserImpersonationModal.tsx",
+      "line": "const token = await getAccessToken()",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\components\\auth\\LoginForm.tsx",
+      "line": "const [password, setPassword] = useState('')",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\components\\forms\\FormBuilder.tsx",
+      "line": "| 'password'",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\components\\forms\\SimpleFormBuilder.tsx",
+      "line": "| 'password'",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\components\\layouts\\LayoutWrapper.tsx",
+      "line": "const noLayoutPaths = ['/', '/auth/login', '/auth/register', '/auth/reset-password']",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\components\\projects\\tabs\\RealtimeScopeListTab.tsx",
+      "line": "'Authorization': `Bearer ${localStorage.getItem('auth_token')}`",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\components\\projects\\tabs\\ScopeListTab.tsx",
+      "line": "'Authorization': `Bearer ${localStorage.getItem('auth_token')}`",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\hooks\\useAdvancedApiQuery.ts",
+      "line": "const token = await getAccessToken()",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\hooks\\useApiQuery.ts",
+      "line": "const token = await getAccessToken()",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\hooks\\useAuth.ts",
+      "line": "const signIn = useCallback(async (email: string, password: string) => {",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\hooks\\useClients.ts",
+      "line": "const token = await getAccessToken()",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\hooks\\useMaterialSpecs.ts",
+      "line": "'Authorization': `Bearer ${localStorage.getItem('auth_token')}`",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\hooks\\useMilestones.ts",
+      "line": "const token = await getAccessToken()",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\hooks\\useNotifications.ts",
+      "line": "const token = await getAccessToken()",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\hooks\\useProjectMembers.ts",
+      "line": "'Authorization': `Bearer ${localStorage.getItem('auth_token')}`",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\hooks\\useProjects.ts",
+      "line": "const token = await getAccessToken()",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\hooks\\useProjectStats.ts",
+      "line": "const token = await getAccessToken()",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\hooks\\useReports.ts",
+      "line": "const token = await getAccessToken()",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\hooks\\useScope.ts",
+      "line": "const token = await getAccessToken()",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\hooks\\useShopDrawings.ts",
+      "line": "const token = await getAccessToken()",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\hooks\\useTasks.ts",
+      "line": "const token = await getAccessToken()",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\lib\\auth-helpers.ts",
+      "line": "const token = authHeader?.split(' ')[1]",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\lib\\auth-monitoring.ts",
+      "line": "* Record token refresh event",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\lib\\cache-middleware.ts",
+      "line": "userToken: (token: string) => `token:${token}`,",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\lib\\enhanced-auth-middleware.ts",
+      "line": "let token: string | null = null;",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\lib\\form-validation.ts",
+      "line": "password: z.string().min(8, 'Password must be at least 8 characters'),",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\lib\\middleware.ts",
+      "line": "return { user: null, profile: null, error: 'No authentication token provided' }",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\lib\\rate-limit-middleware.ts",
+      "line": "'/api/auth/reset-password': {",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\lib\\secure-error-handler.ts",
+      "line": "'Invalid login credentials': 'Invalid email or password',",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\lib\\validation.ts",
+      "line": "export const passwordSchema = z",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\types\\auth.ts",
+      "line": "signIn: (email: string, password: string) => Promise<any>",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\types\\database.ts",
+      "line": "password_reset_required: boolean;",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\types\\index.ts",
+      "line": "type: 'text' | 'email' | 'password' | 'select' | 'textarea' | 'date' | 'number' | 'file'",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\__tests__\\hooks\\useAuth.test.ts",
+      "line": "data: { user: mockUser, session: { access_token: 'token-123' } },",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\__tests__\\integration\\auth.e2e.test.ts",
+      "line": "access_token: 'mock-jwt-token',",
+      "issue": "Potential hardcoded secret"
+    },
+    {
+      "file": "src\\__tests__\\utils\\real-supabase-utils.ts",
+      "line": "password: string",
+      "issue": "Potential hardcoded secret"
+    }
+  ],
+  "deploymentScripts": [
+    {
+      "file": "package.json",
+      "exists": true,
+      "scripts": [
+        {
+          "name": "build",
+          "script": "next build"
+        },
+        {
+          "name": "start",
+          "script": "next start"
+        },
+        {
+          "name": "supabase:start",
+          "script": "npm run supabase:validate && supabase start"
+        }
+      ],
+      "count": 3
+    }
+  ],
+  "infrastructureConfig": [],
+  "issues": [
+    {
+      "severity": "High",
+      "issue": "Missing Vercel configuration file",
+      "impact": "May cause deployment issues and inconsistent behavior"
+    },
+    {
+      "severity": "Medium",
+      "issue": "Missing environment variable files",
+      "details": ".env.development, .env.test",
+      "impact": "May cause configuration issues across environments"
+    },
+    {
+      "severity": "Critical",
+      "issue": "Potential hardcoded secrets found in source code",
+      "count": 46,
+      "impact": "Security vulnerability that could expose sensitive information"
+    },
+    {
+      "severity": "Medium",
+      "issue": "Missing CI/CD configuration",
+      "impact": "No automated testing and deployment pipeline"
+    },
+    {
+      "severity": "Low",
+      "issue": "No infrastructure as code configuration found",
+      "impact": "Infrastructure management is manual and not version controlled"
+    },
+    {
+      "severity": "Medium",
+      "issue": "No database migration system found",
+      "impact": "Database schema changes are manual and error-prone"
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "High",
+      "recommendation": "Create a vercel.json file with appropriate configuration",
+      "details": "Include version, builds, and routes sections"
+    },
+    {
+      "priority": "Medium",
+      "recommendation": "Create missing environment variable files",
+      "details": "Create: .env.development, .env.test"
+    },
+    {
+      "priority": "Critical",
+      "recommendation": "Move hardcoded secrets to environment variables",
+      "details": "Check 46 locations with potential hardcoded secrets"
+    },
+    {
+      "priority": "Medium",
+      "recommendation": "Set up CI/CD pipeline with GitHub Actions or GitLab CI",
+      "details": "Configure automated testing, building, and deployment"
+    },
+    {
+      "priority": "Low",
+      "recommendation": "Consider using infrastructure as code tools",
+      "details": "Terraform, CloudFormation, or Pulumi for infrastructure management"
+    },
+    {
+      "priority": "Medium",
+      "recommendation": "Implement a database migration system",
+      "details": "Use Prisma, TypeORM, or custom migration scripts"
+    }
+  ]
+}

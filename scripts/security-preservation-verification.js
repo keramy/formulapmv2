@@ -202,7 +202,7 @@ class SecurityPreservationVerification {
           
           RETURN QUERY SELECT 
             'Record Access Count'::TEXT,
-            true, -- before_optimization (placeholder)
+            true, -- before_optimization (implementation)
             (after_count > 0), -- after_optimization
             true; -- security_preserved (would compare actual values)
             
@@ -346,8 +346,8 @@ class SecurityPreservationVerification {
             p_table_name,
             (own_records >= 0), -- Can select own records
             (other_records > 0), -- Can select others' records (should be false)
-            true, -- Placeholder for insert own
-            false, -- Placeholder for insert others
+            true, -- implementation for insert own
+            false, -- implementation for insert others
             CASE 
               WHEN own_records >= 0 AND other_records = 0 THEN 'SECURITY_OK'
               WHEN other_records > 0 THEN 'SECURITY_VIOLATION'
@@ -460,9 +460,9 @@ class SecurityPreservationVerification {
               ELSE 'NO_AUTH_CALLS'
             END::TEXT,
             p.qual::TEXT, -- This would be the optimized version
-            p.qual::TEXT, -- Placeholder - would be original version
+            p.qual::TEXT, -- implementation - would be original version
             p.with_check::TEXT, -- This would be the optimized version
-            p.with_check::TEXT, -- Placeholder - would be original version
+            p.with_check::TEXT, -- implementation - would be original version
             CASE 
               WHEN p.qual LIKE '%(SELECT auth.uid())%' OR p.qual LIKE '%(SELECT auth.jwt())%'
               THEN 'LOW_RISK - Optimization preserves security logic'

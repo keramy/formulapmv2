@@ -11,10 +11,10 @@ export type UserRole =
 
 // Legacy role type for migration compatibility (deprecated - migration complete)
 export type LegacyUserRole = 
-  | 'management'        // Migrated from: company_owner, general_manager, deputy_general_manager
-  | 'technical_lead'    // Migrated from: technical_director
-  | 'project_manager'   // Migrated from: architect, technical_engineer, field_worker
-  | 'purchase_manager'  // Migrated from: purchase_director, purchase_specialist
+  | 'management'        // Migrated from: management, management, management
+  | 'technical_lead'    // Migrated from: technical_lead
+  | 'project_manager'   // Migrated from: project_manager, project_manager, project_manager
+  | 'purchase_manager'  // Migrated from: purchase_manager, purchase_manager
   | 'client'           // Unchanged
   | 'admin'            // Unchanged
 

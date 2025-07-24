@@ -12,18 +12,18 @@ console.log('='.repeat(60))
 // Role mapping for fixes
 const ROLE_MAPPINGS = {
   // Management consolidation
-  'company_owner': 'management',
-  'general_manager': 'management', 
-  'deputy_general_manager': 'management',
+  'management': 'management',
+  'management': 'management', 
+  'management': 'management',
   // Technical lead
-  'technical_director': 'technical_lead',
+  'technical_lead': 'technical_lead',
   // Project manager consolidation
-  'architect': 'project_manager',
-  'technical_engineer': 'project_manager',
-  'field_worker': 'project_manager',
+  'project_manager': 'project_manager',
+  'project_manager': 'project_manager',
+  'project_manager': 'project_manager',
   // Purchase manager consolidation
-  'purchase_director': 'purchase_manager',
-  'purchase_specialist': 'purchase_manager',
+  'purchase_manager': 'purchase_manager',
+  'purchase_manager': 'purchase_manager',
   // Client remains the same
   'client': 'client',
   // Admin remains the same
@@ -33,13 +33,13 @@ const ROLE_MAPPINGS = {
 // Common role arrays to replace
 const COMMON_ARRAYS = {
   // Management roles
-  "['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin']": "['management', 'admin']",
-  "['company_owner', 'general_manager', 'deputy_general_manager', 'admin']": "['management', 'admin']",
-  "['company_owner', 'admin']": "['management', 'admin']",
+  "['management', 'management', 'management', 'technical_lead', 'admin']": "['management', 'admin']",
+  "['management', 'management', 'management', 'admin']": "['management', 'admin']",
+  "['management', 'admin']": "['management', 'admin']",
   // Project roles
-  "['project_manager', 'architect', 'technical_engineer', 'field_worker']": "['project_manager']",
+  "['project_manager', 'project_manager', 'project_manager', 'project_manager']": "['project_manager']",
   // Purchase roles
-  "['purchase_director', 'purchase_specialist']": "['purchase_manager']"
+  "['purchase_manager', 'purchase_manager']": "['purchase_manager']"
 }
 
 // Update a single file with role mappings

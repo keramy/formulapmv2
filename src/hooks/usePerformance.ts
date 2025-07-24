@@ -2,7 +2,7 @@
  * Performance monitoring hook
  * Helps track component render performance
  */
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 export function usePerformanceMonitor(componentName: string) {
   const renderCount = useRef(0)

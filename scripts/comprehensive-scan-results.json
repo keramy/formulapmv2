@@ -1,0 +1,1407 @@
+{
+  "timestamp": "2025-07-23T09:32:07.991Z",
+  "summary": {
+    "filesScanned": 259,
+    "mixedPatterns": 20,
+    "placeholders": 100,
+    "errors": 0
+  },
+  "results": {
+    "mixedPatterns": [
+      {
+        "file": "src\\lib\\enhanced-middleware.ts",
+        "line": 248,
+        "content": "deputy_general_manager: [",
+        "oldRole": "deputy_general_manager",
+        "pattern": "old_role_reference"
+      },
+      {
+        "file": "src\\lib\\enhanced-middleware.ts",
+        "line": 255,
+        "content": "technical_director: [",
+        "oldRole": "technical_director",
+        "pattern": "old_role_reference"
+      },
+      {
+        "file": "src\\lib\\enhanced-middleware.ts",
+        "line": 268,
+        "content": "architect: [",
+        "oldRole": "architect",
+        "pattern": "old_role_reference"
+      },
+      {
+        "file": "src\\lib\\enhanced-middleware.ts",
+        "line": 273,
+        "content": "technical_engineer: [",
+        "oldRole": "technical_engineer",
+        "pattern": "old_role_reference"
+      },
+      {
+        "file": "src\\lib\\enhanced-middleware.ts",
+        "line": 278,
+        "content": "purchase_director: [",
+        "oldRole": "purchase_director",
+        "pattern": "old_role_reference"
+      },
+      {
+        "file": "src\\lib\\enhanced-middleware.ts",
+        "line": 284,
+        "content": "purchase_specialist: [",
+        "oldRole": "purchase_specialist",
+        "pattern": "old_role_reference"
+      },
+      {
+        "file": "src\\lib\\enhanced-middleware.ts",
+        "line": 290,
+        "content": "field_worker: [",
+        "oldRole": "field_worker",
+        "pattern": "old_role_reference"
+      },
+      {
+        "file": "src\\lib\\enhanced-middleware.ts",
+        "line": 300,
+        "content": "subcontractor: [",
+        "oldRole": "subcontractor",
+        "pattern": "old_role_reference"
+      },
+      {
+        "file": "src\\lib\\permissions.ts",
+        "line": 26,
+        "content": "'subcontractors.create': ['management', 'technical_lead', admin],",
+        "pattern": "mixed_old_new_roles"
+      },
+      {
+        "file": "src\\lib\\permissions.ts",
+        "line": 27,
+        "content": "'subcontractors.read': ['management', 'technical_lead', project_manager, 'purchase_manager', admin],",
+        "pattern": "mixed_old_new_roles"
+      },
+      {
+        "file": "src\\lib\\permissions.ts",
+        "line": 28,
+        "content": "'subcontractors.update': ['management', 'technical_lead', admin],",
+        "pattern": "mixed_old_new_roles"
+      },
+      {
+        "file": "src\\lib\\permissions.ts",
+        "line": 29,
+        "content": "'subcontractors.assign': ['technical_lead', project_manager], // Key workflow",
+        "pattern": "mixed_old_new_roles"
+      },
+      {
+        "file": "src\\lib\\permissions.ts",
+        "line": 30,
+        "content": "'subcontractors.rate': ['management', 'technical_lead', project_manager, admin],",
+        "pattern": "mixed_old_new_roles"
+      },
+      {
+        "file": "src\\lib\\permissions.ts",
+        "line": 31,
+        "content": "'subcontractors.payments.view': ['management', 'technical_lead', 'purchase_manager', admin],",
+        "pattern": "mixed_old_new_roles"
+      },
+      {
+        "file": "src\\types\\auth.ts",
+        "line": 14,
+        "content": "| 'management'        // Migrated from: company_owner, general_manager, management",
+        "pattern": "mixed_old_new_roles"
+      },
+      {
+        "file": "src\\types\\auth.ts",
+        "line": 16,
+        "content": "| 'project_manager'   // Migrated from: architect, technical_engineer, project_manager",
+        "pattern": "mixed_old_new_roles"
+      },
+      {
+        "file": "src\\types\\auth.ts",
+        "line": 17,
+        "content": "| 'purchase_manager'  // Migrated from: purchase_director, purchase_manager",
+        "pattern": "mixed_old_new_roles"
+      },
+      {
+        "file": "src\\types\\database.ts",
+        "line": 14,
+        "content": "| 'management'        // Unified: company_owner, general_manager, management",
+        "pattern": "mixed_old_new_roles"
+      },
+      {
+        "file": "src\\types\\database.ts",
+        "line": 15,
+        "content": "| 'purchase_manager'  // Unified: purchase_director, purchase_manager",
+        "pattern": "mixed_old_new_roles"
+      },
+      {
+        "file": "src\\types\\database.ts",
+        "line": 17,
+        "content": "| 'project_manager'   // Unified: project_manager, architect, technical_engineer, project_manager",
+        "pattern": "mixed_old_new_roles"
+      }
+    ],
+    "placeholders": [
+      {
+        "file": "src\\app\\(dashboard)\\scope\\page.tsx",
+        "line": 362,
+        "content": "The scope management interface is being developed. This placeholder ensures compilation succeeds.",
+        "type": "general"
+      },
+      {
+        "file": "src\\app\\clients\\page.tsx",
+        "line": 54,
+        "content": "// Use real API hook instead of mock data",
+        "type": "api"
+      },
+      {
+        "file": "src\\app\\clients\\page.tsx",
+        "line": 175,
+        "content": "placeholder=\"Search clients...\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\app\\notifications\\page.tsx",
+        "line": 52,
+        "content": "// Use real API hook instead of mock data",
+        "type": "api"
+      },
+      {
+        "file": "src\\app\\projects\\new\\page.tsx",
+        "line": 149,
+        "content": "placeholder=\"Enter project name\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\app\\projects\\new\\page.tsx",
+        "line": 162,
+        "content": "placeholder=\"Describe the project scope and objectives\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\app\\projects\\new\\page.tsx",
+        "line": 178,
+        "content": "placeholder=\"Project address or location\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\app\\projects\\new\\page.tsx",
+        "line": 225,
+        "content": "placeholder=\"0.00\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\app\\projects\\page.tsx",
+        "line": 106,
+        "content": "placeholder=\"Search projects...\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\app\\reports\\page.tsx",
+        "line": 211,
+        "content": "placeholder=\"Search reports...\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\app\\settings\\page.tsx",
+        "line": 322,
+        "content": "const renderPlaceholderSection = (title: string) => (",
+        "type": "general"
+      },
+      {
+        "file": "src\\app\\settings\\page.tsx",
+        "line": 328,
+        "content": "<p className=\"text-gray-600\">This section is coming soon.</p>",
+        "type": "general"
+      },
+      {
+        "file": "src\\app\\settings\\page.tsx",
+        "line": 338,
+        "content": "case 'system': return renderPlaceholderSection('System');",
+        "type": "general"
+      },
+      {
+        "file": "src\\app\\settings\\page.tsx",
+        "line": 339,
+        "content": "case 'billing': return renderPlaceholderSection('Billing');",
+        "type": "general"
+      },
+      {
+        "file": "src\\app\\settings\\page.tsx",
+        "line": 340,
+        "content": "case 'team': return renderPlaceholderSection('Team');",
+        "type": "general"
+      },
+      {
+        "file": "src\\app\\settings\\page.tsx",
+        "line": 341,
+        "content": "case 'company': return renderPlaceholderSection('Company');",
+        "type": "general"
+      },
+      {
+        "file": "src\\app\\suppliers\\page.tsx",
+        "line": 306,
+        "content": "placeholder=\"e.g. Excavation, Concrete, Steel Work\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\app\\suppliers\\page.tsx",
+        "line": 316,
+        "content": "placeholder=\"Brief description of the supplier's services and capabilities\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\app\\suppliers\\page.tsx",
+        "line": 387,
+        "content": "placeholder=\"Search suppliers by name, contact, or specialty...\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\admin\\UserImpersonationModal.tsx",
+        "line": 226,
+        "content": "placeholder=\"Search by name, email, role, or department...\"",
+        "type": "permission"
+      },
+      {
+        "file": "src\\components\\advanced\\AdvancedDataTable.tsx",
+        "line": 41,
+        "content": "placeholder?: string",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\advanced\\AdvancedDataTable.tsx",
+        "line": 437,
+        "content": "placeholder=\"Search...\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\auth\\LoginForm.tsx",
+        "line": 127,
+        "content": "// Reset password functionality not implemented yet",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\auth\\LoginForm.tsx",
+        "line": 265,
+        "content": "placeholder=\"your@email.com\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\auth\\LoginForm.tsx",
+        "line": 282,
+        "content": "placeholder=\"Enter your password\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\forms\\FormBuilder.tsx",
+        "line": 34,
+        "content": "placeholder?: string",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\forms\\FormBuilder.tsx",
+        "line": 127,
+        "content": "placeholder: field.placeholder,",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\forms\\FormBuilder.tsx",
+        "line": 145,
+        "content": "<SelectValue placeholder={field.placeholder} />",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\forms\\SimpleFormBuilder.tsx",
+        "line": 31,
+        "content": "placeholder?: string",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\forms\\SimpleFormBuilder.tsx",
+        "line": 118,
+        "content": "placeholder: field.placeholder,",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\forms\\SimpleFormBuilder.tsx",
+        "line": 131,
+        "content": "<SelectValue placeholder={field.placeholder} />",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\milestones\\MilestoneForm.tsx",
+        "line": 161,
+        "content": "placeholder=\"Enter milestone name (e.g., Foundation Complete)\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\milestones\\MilestoneForm.tsx",
+        "line": 182,
+        "content": "placeholder=\"Enter milestone description\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\milestones\\MilestoneList.tsx",
+        "line": 296,
+        "content": "placeholder=\"Search milestones...\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\milestones\\MilestoneList.tsx",
+        "line": 376,
+        "content": "<SelectValue placeholder=\"All statuses\" />",
+        "type": "hook"
+      },
+      {
+        "file": "src\\components\\projects\\material-approval\\MaterialApprovalActions.tsx",
+        "line": 167,
+        "content": "placeholder=\"Add any approval notes...\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\projects\\material-approval\\MaterialApprovalActions.tsx",
+        "line": 242,
+        "content": "placeholder=\"Enter the reason for rejection...\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\projects\\material-approval\\MaterialApprovalActions.tsx",
+        "line": 292,
+        "content": "placeholder=\"Enter the reason for revision...\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\projects\\material-approval\\MaterialApprovalActions.tsx",
+        "line": 306,
+        "content": "placeholder=\"Additional notes or suggestions...\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\projects\\material-approval\\ScopeLinkingActions.tsx",
+        "line": 154,
+        "content": "<SelectValue placeholder=\"Select scope item\" />",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\projects\\material-approval\\ScopeLinkingActions.tsx",
+        "line": 187,
+        "content": "placeholder=\"Optional notes about this link...\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\projects\\ProjectHeader.tsx",
+        "line": 29,
+        "content": "const accessLevel = 'full'; // TODO: Implement access level logic",
+        "type": "permission"
+      },
+      {
+        "file": "src\\components\\projects\\tabs\\MaterialSpecsTab.tsx",
+        "line": 197,
+        "content": "placeholder=\"Search materials...\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\projects\\tabs\\OverviewTab.tsx",
+        "line": 35,
+        "content": "// Use real project statistics API instead of mock data",
+        "type": "api"
+      },
+      {
+        "file": "src\\components\\projects\\tabs\\RealtimeScopeListTab.tsx",
+        "line": 504,
+        "content": "placeholder=\"Search scope items...\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\projects\\tabs\\RealtimeScopeListTab.tsx",
+        "line": 613,
+        "content": "<SelectValue placeholder=\"Select supplier\" />",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\projects\\tabs\\ReportsTab.tsx",
+        "line": 44,
+        "content": "// Use the real reports hook instead of mock data",
+        "type": "hook"
+      },
+      {
+        "file": "src\\components\\projects\\tabs\\ReportsTab.tsx",
+        "line": 217,
+        "content": "placeholder=\"Search reports...\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\projects\\tabs\\ScopeListTab.tsx",
+        "line": 351,
+        "content": "placeholder=\"Search scope items...\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\projects\\tabs\\ScopeListTab.tsx",
+        "line": 443,
+        "content": "<SelectValue placeholder=\"Select supplier\" />",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\projects\\tabs\\ShopDrawingsTab.tsx",
+        "line": 43,
+        "content": "// Use the real shop drawings hook instead of mock data",
+        "type": "hook"
+      },
+      {
+        "file": "src\\components\\projects\\tabs\\ShopDrawingsTab.tsx",
+        "line": 212,
+        "content": "placeholder=\"Search shop drawings...\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\scope\\form\\ScopeFormSections.tsx",
+        "line": 52,
+        "content": "<SelectValue placeholder=\"Select category\" />",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\scope\\form\\ScopeFormSections.tsx",
+        "line": 75,
+        "content": "placeholder=\"Client-provided code...\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\scope\\form\\ScopeFormSections.tsx",
+        "line": 95,
+        "content": "placeholder=\"Detailed item description...\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\scope\\form\\ScopeFormSections.tsx",
+        "line": 136,
+        "content": "placeholder=\"pcs, m², kg, etc.\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\scope\\form\\ScopeFormSections.tsx",
+        "line": 322,
+        "content": "<SelectValue placeholder=\"Select risk level\" />",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\scope\\form\\ScopeFormSections.tsx",
+        "line": 344,
+        "content": "placeholder=\"Technical specifications...\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\scope\\form\\ScopeFormSections.tsx",
+        "line": 432,
+        "content": "placeholder=\"Original estimate\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\scope\\form\\ScopeFormSections.tsx",
+        "line": 454,
+        "content": "placeholder=\"Real incurred cost\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\tasks\\TaskForm.tsx",
+        "line": 160,
+        "content": "placeholder=\"Enter task title\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\tasks\\TaskForm.tsx",
+        "line": 178,
+        "content": "placeholder=\"Enter task description\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\tasks\\TaskForm.tsx",
+        "line": 284,
+        "content": "<SelectValue placeholder=\"Select assignee\">",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\tasks\\TaskForm.tsx",
+        "line": 343,
+        "content": "placeholder=\"0.0\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\tasks\\TaskForm.tsx",
+        "line": 366,
+        "content": "<SelectValue placeholder=\"Select scope item\">",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\tasks\\TaskForm.tsx",
+        "line": 411,
+        "content": "placeholder=\"Type a tag and press Enter\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\tasks\\TaskForm.tsx",
+        "line": 550,
+        "content": "placeholder=\"Enter task title...\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\tasks\\TaskForm.tsx",
+        "line": 573,
+        "content": "<SelectValue placeholder=\"Select priority\" />",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\tasks\\TaskForm.tsx",
+        "line": 601,
+        "content": "<SelectValue placeholder=\"Select status\" />",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\tasks\\TaskForm.tsx",
+        "line": 624,
+        "content": "placeholder=\"Enter task description...\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\tasks\\TaskList.tsx",
+        "line": 283,
+        "content": "placeholder=\"Search tasks...\"",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\tasks\\TaskList.tsx",
+        "line": 357,
+        "content": "<SelectValue placeholder=\"All statuses\" />",
+        "type": "hook"
+      },
+      {
+        "file": "src\\components\\tasks\\TaskList.tsx",
+        "line": 391,
+        "content": "<SelectValue placeholder=\"All priorities\" />",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\tasks\\TaskList.tsx",
+        "line": 419,
+        "content": "<SelectValue placeholder=\"All assignees\" />",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\ui\\data-table.tsx",
+        "line": 32,
+        "content": "searchPlaceholder?: string",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\ui\\data-table.tsx",
+        "line": 42,
+        "content": "searchPlaceholder = \"Search...\",",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\ui\\data-table.tsx",
+        "line": 77,
+        "content": "placeholder={searchPlaceholder}",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\ui\\data-table.tsx",
+        "line": 96,
+        "content": "{header.isPlaceholder",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\ui\\input.tsx",
+        "line": 13,
+        "content": "\"flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50\",",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\ui\\select.tsx",
+        "line": 22,
+        "content": "\"flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1\",",
+        "type": "general"
+      },
+      {
+        "file": "src\\components\\ui\\textarea.tsx",
+        "line": 13,
+        "content": "\"flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50\",",
+        "type": "general"
+      },
+      {
+        "file": "src\\hooks\\useClients.ts",
+        "line": 2,
+        "content": "* useClients Hook - Replace mock data with real API integration",
+        "type": "api"
+      },
+      {
+        "file": "src\\hooks\\useNotifications.ts",
+        "line": 2,
+        "content": "* useNotifications Hook - Replace mock data with real API integration",
+        "type": "api"
+      },
+      {
+        "file": "src\\hooks\\useRealtimeSubscription.ts",
+        "line": 371,
+        "content": "// TODO: Fix realtime subscription once context provides necessary methods",
+        "type": "general"
+      },
+      {
+        "file": "src\\hooks\\useReports.ts",
+        "line": 229,
+        "content": "// This is a placeholder for future report types that might support editing",
+        "type": "general"
+      },
+      {
+        "file": "src\\hooks\\useReports.ts",
+        "line": 230,
+        "content": "console.warn('Report editing not implemented - field reports are immutable once submitted')",
+        "type": "general"
+      },
+      {
+        "file": "src\\hooks\\useReports.ts",
+        "line": 270,
+        "content": "// Download report (placeholder for future implementation)",
+        "type": "general"
+      },
+      {
+        "file": "src\\hooks\\useReports.ts",
+        "line": 273,
+        "content": "console.warn('Report download not implemented yet')",
+        "type": "general"
+      },
+      {
+        "file": "src\\hooks\\useShopDrawings.ts",
+        "line": 353,
+        "content": "// Download shop drawing (placeholder for future implementation)",
+        "type": "general"
+      },
+      {
+        "file": "src\\hooks\\useShopDrawings.ts",
+        "line": 356,
+        "content": "console.warn('Shop drawing download not implemented yet')",
+        "type": "general"
+      },
+      {
+        "file": "src\\lib\\auth-monitoring.ts",
+        "line": 281,
+        "content": "avgProfileFetchTime: 0, // TODO: Implement profile fetch tracking",
+        "type": "general"
+      },
+      {
+        "file": "src\\lib\\auth-monitoring.ts",
+        "line": 282,
+        "content": "slowestOperations: [] // TODO: Implement slow operation tracking",
+        "type": "general"
+      },
+      {
+        "file": "src\\lib\\performance-utils.tsx",
+        "line": 13,
+        "content": "return true // Placeholder",
+        "type": "general"
+      },
+      {
+        "file": "src\\scripts\\check-task-completion.ts",
+        "line": 46,
+        "content": "tasksTabStatus.details.push('Still using some mock data')",
+        "type": "general"
+      },
+      {
+        "file": "src\\types\\index.ts",
+        "line": 45,
+        "content": "placeholder?: string",
+        "type": "general"
+      },
+      {
+        "file": "src\\__tests__\\hooks\\useAuth.test.ts",
+        "line": 104,
+        "content": "single: jest.fn().mockResolvedValue({ data: mockProfile, error: null })",
+        "type": "general"
+      },
+      {
+        "file": "src\\__tests__\\integration\\auth.e2e.test.ts",
+        "line": 129,
+        "content": "single: jest.fn().mockResolvedValue({ data: mockProfile, error: null })",
+        "type": "general"
+      },
+      {
+        "file": "src\\__tests__\\integration\\auth.e2e.test.ts",
+        "line": 232,
+        "content": "single: jest.fn().mockResolvedValue({ data: mockProfile, error: null })",
+        "type": "general"
+      },
+      {
+        "file": "src\\__tests__\\integration\\auth.e2e.test.ts",
+        "line": 625,
+        "content": "single: jest.fn().mockResolvedValue({ data: mockProfile, error: null })",
+        "type": "general"
+      },
+      {
+        "file": "src\\__tests__\\utils\\real-supabase-utils.ts",
+        "line": 4,
+        "content": "* Replaces complex mock infrastructure with real Supabase database operations",
+        "type": "database"
+      }
+    ],
+    "filesScanned": 259,
+    "errors": []
+  },
+  "suggestions": {
+    "mixedPatterns": [
+      {
+        "file": "src\\lib\\enhanced-middleware.ts",
+        "line": 248,
+        "oldRole": "deputy_general_manager",
+        "newRole": "management",
+        "suggestion": "Replace 'deputy_general_manager' with 'management'"
+      },
+      {
+        "file": "src\\lib\\enhanced-middleware.ts",
+        "line": 255,
+        "oldRole": "technical_director",
+        "newRole": "technical_lead",
+        "suggestion": "Replace 'technical_director' with 'technical_lead'"
+      },
+      {
+        "file": "src\\lib\\enhanced-middleware.ts",
+        "line": 268,
+        "oldRole": "architect",
+        "newRole": "project_manager",
+        "suggestion": "Replace 'architect' with 'project_manager'"
+      },
+      {
+        "file": "src\\lib\\enhanced-middleware.ts",
+        "line": 273,
+        "oldRole": "technical_engineer",
+        "newRole": "project_manager",
+        "suggestion": "Replace 'technical_engineer' with 'project_manager'"
+      },
+      {
+        "file": "src\\lib\\enhanced-middleware.ts",
+        "line": 278,
+        "oldRole": "purchase_director",
+        "newRole": "purchase_manager",
+        "suggestion": "Replace 'purchase_director' with 'purchase_manager'"
+      },
+      {
+        "file": "src\\lib\\enhanced-middleware.ts",
+        "line": 284,
+        "oldRole": "purchase_specialist",
+        "newRole": "purchase_manager",
+        "suggestion": "Replace 'purchase_specialist' with 'purchase_manager'"
+      },
+      {
+        "file": "src\\lib\\enhanced-middleware.ts",
+        "line": 290,
+        "oldRole": "field_worker",
+        "newRole": "project_manager",
+        "suggestion": "Replace 'field_worker' with 'project_manager'"
+      },
+      {
+        "file": "src\\lib\\enhanced-middleware.ts",
+        "line": 300,
+        "oldRole": "subcontractor",
+        "newRole": "project_manager",
+        "suggestion": "Replace 'subcontractor' with 'project_manager'"
+      }
+    ],
+    "placeholders": [
+      {
+        "file": "src\\app\\(dashboard)\\scope\\page.tsx",
+        "line": 362,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\app\\clients\\page.tsx",
+        "line": 54,
+        "type": "api",
+        "suggestion": "Replace with actual API implementation"
+      },
+      {
+        "file": "src\\app\\clients\\page.tsx",
+        "line": 175,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\app\\notifications\\page.tsx",
+        "line": 52,
+        "type": "api",
+        "suggestion": "Replace with actual API implementation"
+      },
+      {
+        "file": "src\\app\\projects\\new\\page.tsx",
+        "line": 149,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\app\\projects\\new\\page.tsx",
+        "line": 162,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\app\\projects\\new\\page.tsx",
+        "line": 178,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\app\\projects\\new\\page.tsx",
+        "line": 225,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\app\\projects\\page.tsx",
+        "line": 106,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\app\\reports\\page.tsx",
+        "line": 211,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\app\\settings\\page.tsx",
+        "line": 322,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\app\\settings\\page.tsx",
+        "line": 328,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\app\\settings\\page.tsx",
+        "line": 338,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\app\\settings\\page.tsx",
+        "line": 339,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\app\\settings\\page.tsx",
+        "line": 340,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\app\\settings\\page.tsx",
+        "line": 341,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\app\\suppliers\\page.tsx",
+        "line": 306,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\app\\suppliers\\page.tsx",
+        "line": 316,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\app\\suppliers\\page.tsx",
+        "line": 387,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\admin\\UserImpersonationModal.tsx",
+        "line": 226,
+        "type": "permission",
+        "suggestion": "Implement proper permission checking"
+      },
+      {
+        "file": "src\\components\\advanced\\AdvancedDataTable.tsx",
+        "line": 41,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\advanced\\AdvancedDataTable.tsx",
+        "line": 437,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\auth\\LoginForm.tsx",
+        "line": 127,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\auth\\LoginForm.tsx",
+        "line": 265,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\auth\\LoginForm.tsx",
+        "line": 282,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\forms\\FormBuilder.tsx",
+        "line": 34,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\forms\\FormBuilder.tsx",
+        "line": 127,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\forms\\FormBuilder.tsx",
+        "line": 145,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\forms\\SimpleFormBuilder.tsx",
+        "line": 31,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\forms\\SimpleFormBuilder.tsx",
+        "line": 118,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\forms\\SimpleFormBuilder.tsx",
+        "line": 131,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\milestones\\MilestoneForm.tsx",
+        "line": 161,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\milestones\\MilestoneForm.tsx",
+        "line": 182,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\milestones\\MilestoneList.tsx",
+        "line": 296,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\milestones\\MilestoneList.tsx",
+        "line": 376,
+        "type": "hook",
+        "suggestion": "Implement real data fetching logic"
+      },
+      {
+        "file": "src\\components\\projects\\material-approval\\MaterialApprovalActions.tsx",
+        "line": 167,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\projects\\material-approval\\MaterialApprovalActions.tsx",
+        "line": 242,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\projects\\material-approval\\MaterialApprovalActions.tsx",
+        "line": 292,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\projects\\material-approval\\MaterialApprovalActions.tsx",
+        "line": 306,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\projects\\material-approval\\ScopeLinkingActions.tsx",
+        "line": 154,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\projects\\material-approval\\ScopeLinkingActions.tsx",
+        "line": 187,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\projects\\ProjectHeader.tsx",
+        "line": 29,
+        "type": "permission",
+        "suggestion": "Implement proper permission checking"
+      },
+      {
+        "file": "src\\components\\projects\\tabs\\MaterialSpecsTab.tsx",
+        "line": 197,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\projects\\tabs\\OverviewTab.tsx",
+        "line": 35,
+        "type": "api",
+        "suggestion": "Replace with actual API implementation"
+      },
+      {
+        "file": "src\\components\\projects\\tabs\\RealtimeScopeListTab.tsx",
+        "line": 504,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\projects\\tabs\\RealtimeScopeListTab.tsx",
+        "line": 613,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\projects\\tabs\\ReportsTab.tsx",
+        "line": 44,
+        "type": "hook",
+        "suggestion": "Implement real data fetching logic"
+      },
+      {
+        "file": "src\\components\\projects\\tabs\\ReportsTab.tsx",
+        "line": 217,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\projects\\tabs\\ScopeListTab.tsx",
+        "line": 351,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\projects\\tabs\\ScopeListTab.tsx",
+        "line": 443,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\projects\\tabs\\ShopDrawingsTab.tsx",
+        "line": 43,
+        "type": "hook",
+        "suggestion": "Implement real data fetching logic"
+      },
+      {
+        "file": "src\\components\\projects\\tabs\\ShopDrawingsTab.tsx",
+        "line": 212,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\scope\\form\\ScopeFormSections.tsx",
+        "line": 52,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\scope\\form\\ScopeFormSections.tsx",
+        "line": 75,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\scope\\form\\ScopeFormSections.tsx",
+        "line": 95,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\scope\\form\\ScopeFormSections.tsx",
+        "line": 136,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\scope\\form\\ScopeFormSections.tsx",
+        "line": 322,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\scope\\form\\ScopeFormSections.tsx",
+        "line": 344,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\scope\\form\\ScopeFormSections.tsx",
+        "line": 432,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\scope\\form\\ScopeFormSections.tsx",
+        "line": 454,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\tasks\\TaskForm.tsx",
+        "line": 160,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\tasks\\TaskForm.tsx",
+        "line": 178,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\tasks\\TaskForm.tsx",
+        "line": 284,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\tasks\\TaskForm.tsx",
+        "line": 343,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\tasks\\TaskForm.tsx",
+        "line": 366,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\tasks\\TaskForm.tsx",
+        "line": 411,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\tasks\\TaskForm.tsx",
+        "line": 550,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\tasks\\TaskForm.tsx",
+        "line": 573,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\tasks\\TaskForm.tsx",
+        "line": 601,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\tasks\\TaskForm.tsx",
+        "line": 624,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\tasks\\TaskList.tsx",
+        "line": 283,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\tasks\\TaskList.tsx",
+        "line": 357,
+        "type": "hook",
+        "suggestion": "Implement real data fetching logic"
+      },
+      {
+        "file": "src\\components\\tasks\\TaskList.tsx",
+        "line": 391,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\tasks\\TaskList.tsx",
+        "line": 419,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\ui\\data-table.tsx",
+        "line": 32,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\ui\\data-table.tsx",
+        "line": 42,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\ui\\data-table.tsx",
+        "line": 77,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\ui\\data-table.tsx",
+        "line": 96,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\ui\\input.tsx",
+        "line": 13,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\ui\\select.tsx",
+        "line": 22,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\components\\ui\\textarea.tsx",
+        "line": 13,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\hooks\\useClients.ts",
+        "line": 2,
+        "type": "api",
+        "suggestion": "Replace with actual API implementation"
+      },
+      {
+        "file": "src\\hooks\\useNotifications.ts",
+        "line": 2,
+        "type": "api",
+        "suggestion": "Replace with actual API implementation"
+      },
+      {
+        "file": "src\\hooks\\useRealtimeSubscription.ts",
+        "line": 371,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\hooks\\useReports.ts",
+        "line": 229,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\hooks\\useReports.ts",
+        "line": 230,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\hooks\\useReports.ts",
+        "line": 270,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\hooks\\useReports.ts",
+        "line": 273,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\hooks\\useShopDrawings.ts",
+        "line": 353,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\hooks\\useShopDrawings.ts",
+        "line": 356,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\lib\\auth-monitoring.ts",
+        "line": 281,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\lib\\auth-monitoring.ts",
+        "line": 282,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\lib\\performance-utils.tsx",
+        "line": 13,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\scripts\\check-task-completion.ts",
+        "line": 46,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\types\\index.ts",
+        "line": 45,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\__tests__\\hooks\\useAuth.test.ts",
+        "line": 104,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\__tests__\\integration\\auth.e2e.test.ts",
+        "line": 129,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\__tests__\\integration\\auth.e2e.test.ts",
+        "line": 232,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\__tests__\\integration\\auth.e2e.test.ts",
+        "line": 625,
+        "type": "general",
+        "suggestion": "Complete implementation"
+      },
+      {
+        "file": "src\\__tests__\\utils\\real-supabase-utils.ts",
+        "line": 4,
+        "type": "database",
+        "suggestion": "Implement database queries"
+      }
+    ]
+  }
+}

@@ -269,15 +269,9 @@ export const canAssignRole = (assignerRole: UserRole, targetRole: UserRole): boo
   const roleHierarchy: Record<UserRole, number> = {
     'management': 100,
     'admin': 90,
-    'management': 80,
-    'management': 70,
     'technical_lead': 60,
     'project_manager': 50,
     'purchase_manager': 45,
-    'project_manager': 40,
-    'project_manager': 35,
-    'purchase_manager': 30,
-    'project_manager': 20,
     'client': 10
   }
 

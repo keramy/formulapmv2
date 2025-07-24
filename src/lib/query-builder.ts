@@ -51,7 +51,14 @@ export async function buildPaginatedQuery<T>(
   additionalFilters?: (query: any) => any,
   userId?: string
 ): Promise<PaginationResult<T>> {
-  const { page, limit, search, sort_field, sort_direction, filters } = params
+  const { 
+    page = 1, 
+    limit = 10, 
+    search, 
+    sort_field = 'created_at', 
+    sort_direction = 'desc' as 'desc', 
+    filters 
+  } = params
   
   // Generate cache key
   const cacheKey = generateCacheKey(
@@ -65,7 +72,7 @@ export async function buildPaginatedQuery<T>(
     cacheKey,
     `/api/${tableName}`,
     async () => {
-      const supabase = createClient()
+      const supabase = await createClient()
       
       // Calculate offset
       const offset = (page - 1) * limit
@@ -81,7 +88,7 @@ export async function buildPaginatedQuery<T>(
       }
       
       // Apply filters
-      Object.entries(filters).forEach(([key, value]) => {
+      Object.entries(filters || {}).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
           query = query.eq(key, value)
         }
@@ -130,7 +137,7 @@ export async function batchOperation<T>(
   data: T[],
   batchSize: number = 100
 ): Promise<void> {
-  const supabase = createClient()
+  const supabase = await createClient()
   const batches = []
   
   for (let i = 0; i < data.length; i += batchSize) {

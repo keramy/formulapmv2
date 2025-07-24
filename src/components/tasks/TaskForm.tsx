@@ -495,7 +495,6 @@ export function TaskFormOptimized({
       priority: task?.priority || 'medium',
       assigned_to: task?.assigned_to || '',
       due_date: task?.due_date || '',
-      project_id: projectId,
       scope_item_id: task?.scope_item_id || ''
     }
   })
@@ -518,7 +517,7 @@ export function TaskFormOptimized({
         return
       }
 
-      await onSave(validationResult.data!)
+      await onSave(data)
 
       toast({
         title: mode === 'create' ? 'Task created' : 'Task updated',

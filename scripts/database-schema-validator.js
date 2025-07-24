@@ -228,16 +228,16 @@ function validateCommonIssues() {
     const srcDir = path.join(__dirname, '..', 'src');
     if (fs.existsSync(srcDir)) {
       const oldRoles = [
-        'company_owner',
-        'general_manager', 
-        'deputy_general_manager',
-        'technical_director',
-        'architect',
-        'technical_engineer',
-        'field_worker',
-        'purchase_director',
-        'purchase_specialist',
-        'subcontractor'
+        'management',
+        'management', 
+        'management',
+        'technical_lead',
+        'project_manager',
+        'project_manager',
+        'project_manager',
+        'purchase_manager',
+        'purchase_manager',
+        'project_manager'
       ];
       
       // This is a simplified check - in a real scenario, you'd want to recursively search files

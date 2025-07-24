@@ -55,7 +55,7 @@ describe('useAuth Hook - Comprehensive Testing', () => {
     jest.clearAllMocks()
     mockLocalStorage.getItem.mockReturnValue(null)
     
-    // Default mock implementations
+    // Default real implementations
     ;(supabase.auth.getSession as jest.Mock).mockResolvedValue({
       data: { session: null },
       error: null

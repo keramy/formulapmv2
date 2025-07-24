@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { withAuth } from '@/lib/api-middleware';
-import { createSuccessResponse, createErrorResponse } from '@/lib/api-response';
+import { createSuccessResponse, createErrorResponse } from '@/lib/api-middleware';
 import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 
@@ -17,7 +17,7 @@ const updateMilestoneSchema = z.object({
 export const GET = withAuth(async (request: NextRequest, { user, profile }, { params }) => {
   try {
     const milestoneId = params.id;
-    const supabase = createClient();
+    const supabase = await createClient();
     
     const { data, error } = await supabase
       .from('project_milestones')
@@ -54,19 +54,19 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }, { pa
     // Transform data to match frontend types
     const transformedData = {
       id: data.id,
-      project_id: data.project?.id,
+      project_id: (data.project as any)?.id,
       name: data.title,
       description: data.description,
       target_date: data.milestone_date,
       actual_date: data.actual_completion_date,
       status: mapDbToFrontendStatus(data.status),
-      created_by: data.creator?.id,
+      created_by: (data.creator as any)?.id,
       created_at: data.created_at,
       updated_at: data.updated_at,
       creator: data.creator ? {
-        id: data.creator.id,
-        full_name: `${data.creator.first_name} ${data.creator.last_name}`,
-        email: data.creator.email
+        id: (data.creator as any)?.id,
+        full_name: `${(data.creator as any)?.first_name} ${(data.creator as any)?.last_name}`,
+        email: (data.creator as any)?.email
       } : undefined,
       project: data.project
     };
@@ -76,13 +76,13 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }, { pa
     console.error('Error in GET /api/milestones/[id]:', error);
     return createErrorResponse('Internal server error', 500);
   }
-}, { permission: 'projects.read' });
+}, { permission: 'projects.read.all' });
 
 // PUT /api/milestones/[id] - Update milestone
 export const PUT = withAuth(async (request: NextRequest, { user, profile }, { params }) => {
   try {
     const milestoneId = params.id;
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Parse and validate request body
     const body = await request.json();
@@ -164,19 +164,19 @@ export const PUT = withAuth(async (request: NextRequest, { user, profile }, { pa
     // Transform data to match frontend types
     const transformedData = {
       id: data.id,
-      project_id: data.project?.id,
+      project_id: (data.project as any)?.id,
       name: data.title,
       description: data.description,
       target_date: data.milestone_date,
       actual_date: data.actual_completion_date,
       status: mapDbToFrontendStatus(data.status),
-      created_by: data.creator?.id,
+      created_by: (data.creator as any)?.id,
       created_at: data.created_at,
       updated_at: data.updated_at,
       creator: data.creator ? {
-        id: data.creator.id,
-        full_name: `${data.creator.first_name} ${data.creator.last_name}`,
-        email: data.creator.email
+        id: (data.creator as any)?.id,
+        full_name: `${(data.creator as any)?.first_name} ${(data.creator as any)?.last_name}`,
+        email: (data.creator as any)?.email
       } : undefined,
       project: data.project
     };
@@ -203,7 +203,7 @@ export const PUT = withAuth(async (request: NextRequest, { user, profile }, { pa
 export const DELETE = withAuth(async (request: NextRequest, { user, profile }, { params }) => {
   try {
     const milestoneId = params.id;
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Check if milestone exists
     const { data: existingMilestone } = await supabase

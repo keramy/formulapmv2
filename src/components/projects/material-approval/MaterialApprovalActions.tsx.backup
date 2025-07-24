@@ -1,0 +1,375 @@
+/**
+ * Formula PM 2.0 Material Approval Actions Component
+ * V3 Phase 1 Implementation
+ * 
+ * Handles material specification approval workflow actions
+ */
+
+'use client';
+
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { 
+  CheckCircle, 
+  XCircle, 
+  AlertTriangle, 
+  MoreHorizontal,
+  Loader2
+} from 'lucide-react';
+import { MaterialSpec } from '@/types/material-specs';
+import { useMaterialSpecs } from '@/hooks/useMaterialSpecs';
+
+interface MaterialApprovalActionsProps {
+  materialSpec: MaterialSpec;
+  projectId: string;
+  onAction?: (action: string, materialSpec: MaterialSpec) => void;
+}
+
+export function MaterialApprovalActions({ 
+  materialSpec, 
+  projectId, 
+  onAction 
+}: MaterialApprovalActionsProps) {
+  const { 
+    permissions, 
+    approveMaterialSpec, 
+    rejectMaterialSpec, 
+    requestRevisionMaterialSpec 
+  } = useMaterialSpecs(projectId);
+  
+  const [isApprovalDialogOpen, setIsApprovalDialogOpen] = useState(false);
+  const [isRejectionDialogOpen, setIsRejectionDialogOpen] = useState(false);
+  const [isRevisionDialogOpen, setIsRevisionDialogOpen] = useState(false);
+  const [approvalNotes, setApprovalNotes] = useState('');
+  const [rejectionReason, setRejectionReason] = useState('');
+  const [revisionReason, setRevisionReason] = useState('');
+  const [revisionNotes, setRevisionNotes] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleApprove = async () => {
+    if (!permissions.canApprove) return;
+    
+    setIsSubmitting(true);
+    try {
+      const success = await approveMaterialSpec(materialSpec.id, {
+        approval_notes: approvalNotes || undefined
+      });
+      
+      if (success) {
+        setIsApprovalDialogOpen(false);
+        setApprovalNotes('');
+        onAction?.('approved', materialSpec);
+      }
+    } catch (error) {
+      console.error('Error approving material specification:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleReject = async () => {
+    if (!permissions.canReject || !rejectionReason.trim()) return;
+    
+    setIsSubmitting(true);
+    try {
+      const success = await rejectMaterialSpec(materialSpec.id, {
+        rejection_reason: rejectionReason.trim()
+      });
+      
+      if (success) {
+        setIsRejectionDialogOpen(false);
+        setRejectionReason('');
+        onAction?.('rejected', materialSpec);
+      }
+    } catch (error) {
+      console.error('Error rejecting material specification:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleRequestRevision = async () => {
+    if (!permissions.canRequestRevision || !revisionReason.trim()) return;
+    
+    setIsSubmitting(true);
+    try {
+      const success = await requestRevisionMaterialSpec(materialSpec.id, {
+        revision_reason: revisionReason.trim(),
+        revision_notes: revisionNotes || undefined
+      });
+      
+      if (success) {
+        setIsRevisionDialogOpen(false);
+        setRevisionReason('');
+        setRevisionNotes('');
+        onAction?.('revision_requested', materialSpec);
+      }
+    } catch (error) {
+      console.error('Error requesting revision for material specification:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const canApprove = permissions.canApprove && materialSpec.status === 'pending_approval';
+  const canReject = permissions.canReject && ['pending_approval', 'revision_required'].includes(materialSpec.status);
+  const canRequestRevision = permissions.canRequestRevision && materialSpec.status === 'pending_approval';
+
+  // If no actions are available, don't render the component
+  if (!canApprove && !canReject && !canRequestRevision) {
+    return null;
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      {/* Quick approve button for pending approval */}
+      {canApprove && (
+        <Dialog open={isApprovalDialogOpen} onOpenChange={setIsApprovalDialogOpen}>
+          <DialogTrigger asChild>
+            <Button size="sm" className="bg-green-600 hover:bg-green-700">
+              <CheckCircle className="w-4 h-4 mr-2" />
+              Approve
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Approve Material Specification</DialogTitle>
+              <DialogDescription>
+                You are about to approve "{materialSpec.name}". This action cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="approval-notes" className="text-right">
+                  Notes (Optional)
+                </Label>
+                <Textarea
+                  id="approval-notes"
+                  placeholder="Add any approval notes..."
+                  value={approvalNotes}
+                  onChange={(e) => setApprovalNotes(e.target.value)}
+                  className="col-span-3"
+                  rows={3}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsApprovalDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleApprove} 
+                disabled={isSubmitting}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Approving...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    Approve
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* More actions dropdown */}
+      {(canReject || canRequestRevision) && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm">
+              <MoreHorizontal className="w-4 h-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {canReject && (
+              <DropdownMenuItem onClick={() => setIsRejectionDialogOpen(true)}>
+                <XCircle className="w-4 h-4 mr-2" />
+                Reject
+              </DropdownMenuItem>
+            )}
+            {canRequestRevision && (
+              <DropdownMenuItem onClick={() => setIsRevisionDialogOpen(true)}>
+                <AlertTriangle className="w-4 h-4 mr-2" />
+                Request Revision
+              </DropdownMenuItem>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
+
+      {/* Rejection Dialog */}
+      <Dialog open={isRejectionDialogOpen} onOpenChange={setIsRejectionDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Reject Material Specification</DialogTitle>
+            <DialogDescription>
+              You are about to reject "{materialSpec.name}". Please provide a reason for rejection.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="rejection-reason" className="text-right">
+                Reason *
+              </Label>
+              <Textarea
+                id="rejection-reason"
+                placeholder="Enter the reason for rejection..."
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                className="col-span-3"
+                rows={3}
+                required
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsRejectionDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleReject} 
+              disabled={isSubmitting || !rejectionReason.trim()}
+              variant="destructive"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Rejecting...
+                </>
+              ) : (
+                <>
+                  <XCircle className="w-4 h-4 mr-2" />
+                  Reject
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Revision Dialog */}
+      <Dialog open={isRevisionDialogOpen} onOpenChange={setIsRevisionDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Request Revision</DialogTitle>
+            <DialogDescription>
+              Request revisions for "{materialSpec.name}". Please provide details about what needs to be changed.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="revision-reason" className="text-right">
+                Reason *
+              </Label>
+              <Textarea
+                id="revision-reason"
+                placeholder="Enter the reason for revision..."
+                value={revisionReason}
+                onChange={(e) => setRevisionReason(e.target.value)}
+                className="col-span-3"
+                rows={3}
+                required
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="revision-notes" className="text-right">
+                Notes (Optional)
+              </Label>
+              <Textarea
+                id="revision-notes"
+                placeholder="Additional notes or suggestions..."
+                value={revisionNotes}
+                onChange={(e) => setRevisionNotes(e.target.value)}
+                className="col-span-3"
+                rows={2}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsRevisionDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleRequestRevision} 
+              disabled={isSubmitting || !revisionReason.trim()}
+              className="bg-orange-600 hover:bg-orange-700"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Requesting...
+                </>
+              ) : (
+                <>
+                  <AlertTriangle className="w-4 h-4 mr-2" />
+                  Request Revision
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+// Status badge component for material specifications
+export function MaterialStatusBadge({ status }: { status: string }) {
+  // Map material status to semantic Badge variants
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status) {
+      case 'approved': return 'default' as const;
+      case 'pending_approval': return 'secondary' as const;
+      case 'rejected': return 'destructive' as const;
+      case 'revision_required': return 'outline' as const;
+      case 'discontinued': return 'destructive' as const;
+      case 'substitution_required': return 'secondary' as const;
+      default: return 'secondary' as const;
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'approved': return <CheckCircle className="w-3 h-3" />;
+      case 'pending_approval': return <AlertTriangle className="w-3 h-3" />;
+      case 'rejected': return <XCircle className="w-3 h-3" />;
+      case 'revision_required': return <AlertTriangle className="w-3 h-3" />;
+      case 'discontinued': return <XCircle className="w-3 h-3" />;
+      case 'substitution_required': return <AlertTriangle className="w-3 h-3" />;
+      default: return null;
+    }
+  };
+
+  return (
+    <Badge variant={getStatusBadgeVariant(status)} className="flex items-center gap-1">
+      {getStatusIcon(status)}
+      {status.replace('_', ' ')}
+    </Badge>
+  );
+}

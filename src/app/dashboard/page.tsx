@@ -11,18 +11,15 @@
 
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
-import { cookies } from 'next/headers';
-import { createServerClient } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/server';
 import ServerDashboard from './dashboard-server';
 import { DashboardSkeleton } from './components/DashboardSkeleton';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
-// Server-side authentication check
+// Server-side authentication check following Context7 pattern
 async function checkAuth() {
   try {
-    const cookieStore = cookies();
-    const supabase = createServerClient();
-
+    const supabase = await createClient();
     const { data: { user }, error } = await supabase.auth.getUser();
     
     if (error || !user) {

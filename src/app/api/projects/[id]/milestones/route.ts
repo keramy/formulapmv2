@@ -1,7 +1,6 @@
 import { NextRequest } from 'next/server';
 import { withAuth } from '@/lib/api-middleware';
-import { createSuccessResponse, createErrorResponse } from '@/lib/api-response';
-import { parseQueryParams } from '@/lib/api-utils';
+import { createSuccessResponse, createErrorResponse, parseQueryParams } from '@/lib/api-middleware';
 import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 
@@ -17,7 +16,7 @@ const createMilestoneSchema = z.object({
 export const GET = withAuth(async (request: NextRequest, { user, profile }, { params }) => {
   try {
     const projectId = params.id;
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Parse query parameters for filtering and pagination
     const { page, limit, search, sort_field = 'milestone_date', sort_direction = 'asc', filters } = parseQueryParams(request);
@@ -106,13 +105,13 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }, { pa
       target_date: milestone.milestone_date,
       actual_date: milestone.actual_completion_date,
       status: mapDbToFrontendStatus(milestone.status),
-      created_by: milestone.creator?.id,
+      created_by: (milestone.creator as any)?.id,
       created_at: milestone.created_at,
       updated_at: milestone.updated_at,
       creator: milestone.creator ? {
-        id: milestone.creator.id,
-        full_name: `${milestone.creator.first_name} ${milestone.creator.last_name}`,
-        email: milestone.creator.email
+        id: (milestone.creator as any)?.id,
+        full_name: `${(milestone.creator as any)?.first_name} ${(milestone.creator as any)?.last_name}`,
+        email: (milestone.creator as any)?.email
       } : undefined,
       project: milestone.project
     }));
@@ -125,30 +124,34 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }, { pa
     
     const statistics = calculateMilestoneStatistics(statsQuery.data || []);
     
-    return createSuccessResponse(transformedData, {
-      page,
-      limit,
-      total: count || 0,
-      statistics,
+    return createSuccessResponse({
+      data: transformedData,
+      pagination: {
+        page,
+        limit,
+        total: count || 0,
+        has_more: (page * limit) < (count || 0)
+      },
+      statistics
     });
   } catch (error) {
     console.error('Error in GET /api/projects/[id]/milestones:', error);
     return createErrorResponse('Internal server error', 500);
   }
-}, { permission: 'projects.read' });
+}, { permission: 'projects.read.all' });
 
 // POST /api/projects/[id]/milestones - Create new milestone
 export const POST = withAuth(async (request: NextRequest, { user, profile }, { params }) => {
   try {
     const projectId = params.id;
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Parse and validate request body
     const body = await request.json();
     const validationResult = createMilestoneSchema.safeParse(body);
     
     if (!validationResult.success) {
-      return createErrorResponse('Invalid milestone data', 400, validationResult.error.errors);
+      return createErrorResponse('Invalid milestone data', 400);
     }
     
     const milestoneData = {
@@ -198,13 +201,13 @@ export const POST = withAuth(async (request: NextRequest, { user, profile }, { p
       target_date: data.milestone_date,
       actual_date: data.actual_completion_date,
       status: mapDbToFrontendStatus(data.status),
-      created_by: data.creator?.id,
+      created_by: (data.creator as any)?.id,
       created_at: data.created_at,
       updated_at: data.updated_at,
       creator: data.creator ? {
-        id: data.creator.id,
-        full_name: `${data.creator.first_name} ${data.creator.last_name}`,
-        email: data.creator.email
+        id: (data.creator as any)?.id,
+        full_name: `${(data.creator as any)?.first_name} ${(data.creator as any)?.last_name}`,
+        email: (data.creator as any)?.email
       } : undefined
     };
     
@@ -220,7 +223,7 @@ export const POST = withAuth(async (request: NextRequest, { user, profile }, { p
       },
     });
     
-    return createSuccessResponse(transformedData, null, 201);
+    return createSuccessResponse(transformedData);
   } catch (error) {
     console.error('Error in POST /api/projects/[id]/milestones:', error);
     return createErrorResponse('Internal server error', 500);

@@ -40,7 +40,7 @@ export const PERMISSIONS = {
   'documents.approve': ['management', 'project_manager', 'technical_lead', 'client', 'admin'],
   'documents.approve.client': ['client'],
 
-  // Shop Drawing Permissions - Under project_manager (was architect)
+  // Shop Drawing Permissions - Under project_manager (was project_manager)
   'shop_drawings.create': ['project_manager', 'technical_lead'],
   'shop_drawings.edit': ['project_manager', 'technical_lead'],
   'shop_drawings.delete': ['management', 'project_manager', 'technical_lead', 'admin'],
@@ -260,7 +260,7 @@ export const ROLE_HIERARCHY: Record<UserRole, number> = {
   'technical_lead': 80, // Technical oversight and scope management
   'purchase_manager': 70, // Purchase operations
   'project_manager': 60, // Project coordination (with seniority levels)
-  'client': 10          // External read-only access
+  client: 10          // External read-only access
 }
 
 export const hasHigherRole = (userRole: UserRole, comparedRole: UserRole): boolean => {

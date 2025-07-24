@@ -1,7 +1,6 @@
 import { NextRequest } from 'next/server';
 import { withAuth } from '@/lib/api-middleware';
-import { createSuccessResponse, createErrorResponse } from '@/lib/api-response';
-import { parseQueryParams } from '@/lib/api-utils';
+import { createSuccessResponse, createErrorResponse, parseQueryParams } from '@/lib/api-middleware';
 import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 
@@ -24,7 +23,7 @@ const createShopDrawingSchema = z.object({
 export const GET = withAuth(async (request: NextRequest, { user, profile }, { params }) => {
   try {
     const projectId = params.id;
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Parse query parameters for filtering and pagination
     const { page, limit, search, sort_field = 'created_at', sort_direction = 'desc', filters } = parseQueryParams(request);
@@ -130,13 +129,13 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }, { pa
       status: mapDbToFrontendStatus(drawing.status),
       priority: determinePriority(drawing),
       submittedBy: drawing.creator 
-        ? `${drawing.creator.first_name} ${drawing.creator.last_name}`
+        ? `${(drawing.creator as any)?.first_name} ${(drawing.creator as any)?.last_name}`
         : 'Unknown',
       submittedDate: drawing.created_at.split('T')[0],
       reviewedBy: drawing.internal_approver 
-        ? `${drawing.internal_approver.first_name} ${drawing.internal_approver.last_name}`
+        ? `${(drawing.internal_approver as any)?.first_name} ${(drawing.internal_approver as any)?.last_name}`
         : drawing.client_approver 
-          ? `${drawing.client_approver.first_name} ${drawing.client_approver.last_name}`
+          ? `${(drawing.client_approver as any)?.first_name} ${(drawing.client_approver as any)?.last_name}`
           : undefined,
       reviewedDate: drawing.internal_approved_at?.split('T')[0] || drawing.client_approved_at?.split('T')[0],
       version: parseInt(drawing.revision) || 1,
@@ -154,9 +153,9 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }, { pa
       file_path: drawing.current_file_path || drawing.original_file_path,
       thumbnail_path: drawing.thumbnail_path,
       assigned_architect: drawing.assigned_architect_user ? {
-        id: drawing.assigned_architect_user.id,
-        name: `${drawing.assigned_architect_user.first_name} ${drawing.assigned_architect_user.last_name}`,
-        email: drawing.assigned_architect_user.email
+        id: (drawing.assigned_architect_user as any)?.id,
+        name: `${(drawing.assigned_architect_user as any)?.first_name} ${(drawing.assigned_architect_user as any)?.last_name}`,
+        email: (drawing.assigned_architect_user as any)?.email
       } : undefined,
       scope_item: drawing.scope_item,
       internal_approved_at: drawing.internal_approved_at,
@@ -174,30 +173,34 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }, { pa
     
     const statistics = calculateShopDrawingStatistics(statsQuery.data || []);
     
-    return createSuccessResponse(transformedData, {
-      page,
-      limit,
-      total: count || 0,
-      statistics,
+    return createSuccessResponse({
+      data: transformedData,
+      pagination: {
+        page,
+        limit,
+        total: count || 0,
+        has_more: (page * limit) < (count || 0)
+      },
+      statistics
     });
   } catch (error) {
     console.error('Error in GET /api/projects/[id]/shop-drawings:', error);
     return createErrorResponse('Internal server error', 500);
   }
-}, { permission: 'projects.read' });
+}, { permission: 'projects.read.all' });
 
 // POST /api/projects/[id]/shop-drawings - Create new shop drawing
 export const POST = withAuth(async (request: NextRequest, { user, profile }, { params }) => {
   try {
     const projectId = params.id;
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Parse and validate request body
     const body = await request.json();
     const validationResult = createShopDrawingSchema.safeParse(body);
     
     if (!validationResult.success) {
-      return createErrorResponse('Invalid shop drawing data', 400, validationResult.error.errors);
+      return createErrorResponse('Invalid shop drawing data', 400);
     }
     
     const drawingData = {
@@ -258,7 +261,7 @@ export const POST = withAuth(async (request: NextRequest, { user, profile }, { p
       status: mapDbToFrontendStatus(data.status),
       priority: determinePriority(data),
       submittedBy: data.creator 
-        ? `${data.creator.first_name} ${data.creator.last_name}`
+        ? `${(data.creator as any)?.first_name} ${(data.creator as any)?.last_name}`
         : 'Unknown',
       submittedDate: data.created_at.split('T')[0],
       version: parseInt(data.revision) || 1,
@@ -275,9 +278,9 @@ export const POST = withAuth(async (request: NextRequest, { user, profile }, { p
       file_path: data.current_file_path || data.original_file_path,
       thumbnail_path: data.thumbnail_path,
       assigned_architect: data.assigned_architect_user ? {
-        id: data.assigned_architect_user.id,
-        name: `${data.assigned_architect_user.first_name} ${data.assigned_architect_user.last_name}`,
-        email: data.assigned_architect_user.email
+        id: (data.assigned_architect_user as any)?.id,
+        name: `${(data.assigned_architect_user as any)?.first_name} ${(data.assigned_architect_user as any)?.last_name}`,
+        email: (data.assigned_architect_user as any)?.email
       } : undefined,
       scope_item: data.scope_item,
       created_at: data.created_at,
@@ -298,7 +301,7 @@ export const POST = withAuth(async (request: NextRequest, { user, profile }, { p
       },
     });
     
-    return createSuccessResponse(transformedData, null, 201);
+    return createSuccessResponse(transformedData);
   } catch (error) {
     console.error('Error in POST /api/projects/[id]/shop-drawings:', error);
     return createErrorResponse('Internal server error', 500);

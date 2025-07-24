@@ -112,16 +112,9 @@ export function useProjectMembersAdvanced(projectId: string) {
     refetch,
     mutate
   } = useAdvancedApiQuery<ProjectMember[]>({
-    queryKey: ['project-members', projectId],
-    queryFn: async () => {
-      if (!projectId || !user) return []
-
-      const response = await fetch(`/api/projects/${projectId}/members`)
-      if (!response.ok) throw new Error('Failed to fetch project members')
-
-      const result = await response.json()
-      return result.success ? result.data : []
-    },
+    endpoint: `/api/projects/${projectId}/members`,
+    params: {},
+    cacheKey: `project-members-${projectId}`,
     enabled: !!projectId && !!user,
     staleTime: 5 * 60 * 1000, // 5 minutes
     cacheTime: 10 * 60 * 1000, // 10 minutes

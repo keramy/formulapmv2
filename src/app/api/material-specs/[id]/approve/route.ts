@@ -1,3 +1,4 @@
+import { NextRequest } from 'next/server';
 import { withAPI, getRequestData, createSuccessResponse, createErrorResponse } from '@/lib/enhanced-auth-middleware';
 import { buildPaginatedQuery, parseQueryParams, getScopeItemsOptimized, getProjectsOptimized, getTasksOptimized, getDashboardStatsOptimized } from '@/lib/enhanced-query-builder';
 import { performanceMonitor } from '@/lib/performance-monitor';
@@ -6,7 +7,9 @@ import { createClient } from '@supabase/supabase-js';
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || '',
   process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-);\n\nasync function POSTOriginal(req: NextRequest) {
+);
+
+async function POSTOriginal(req: NextRequest) {
   const { user, profile } = getRequestData(req);
   
   try {
@@ -34,4 +37,7 @@ const supabase = createClient(
     console.error('API create error:', error);
     throw error;
   }
-}\n\n// Enhanced API exports with middleware\nexport const POST = withAPI(POSTOriginal);
+}
+
+// Enhanced API exports with middleware
+export const POST = withAPI(POSTOriginal);

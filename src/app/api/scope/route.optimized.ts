@@ -50,7 +50,7 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }) => {
         // Apply role-based data filtering
         const filteredData = paginatedResult.data.map(item => {
           // Hide cost data for non-privileged users
-          if (!['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'].includes(profile.role)) {
+          if (!['management', 'technical_lead', 'admin'].includes(profile.role)) {
             return {
               ...item,
               unit_price: null,
@@ -101,7 +101,7 @@ export const POST = withAuth(async (request: NextRequest, { user, profile }) => 
       })
     }
 
-    const supabase = createClient()
+    const supabase = await createClient()
 
     // Verify project access efficiently
     const { data: projectAccess, error: accessError } = await supabase
@@ -145,11 +145,11 @@ export const POST = withAuth(async (request: NextRequest, { user, profile }) => 
       created_by: user.id
     }
 
-    // Only include cost fields for privileged users
-    if (['company_owner', 'general_manager', 'deputy_general_manager', 'technical_director', 'admin'].includes(profile.role)) {
-      if (body.initial_cost) scopeItemData.initial_cost = parseFloat(body.initial_cost)
-      if (body.actual_cost) scopeItemData.actual_cost = parseFloat(body.actual_cost)
-    }
+    // Cost fields are not in the current schema - commented out until added
+    // if (['management', 'management', 'management', 'technical_lead', 'admin'].includes(profile.role)) {
+    //   if (body.initial_cost) (scopeItemData as any).initial_cost = parseFloat(body.initial_cost)
+    //   if (body.actual_cost) (scopeItemData as any).actual_cost = parseFloat(body.actual_cost)
+    // }
 
     const { data: scopeItem, error: insertError } = await supabase
       .from('scope_items')
@@ -198,7 +198,7 @@ export const PATCH = withAuth(async (request: NextRequest, { user, profile }) =>
       })
     }
 
-    const supabase = createClient()
+    const supabase = await createClient()
 
     // Verify access to all scope items efficiently
     const { data: accessibleItems, error: accessError } = await supabase

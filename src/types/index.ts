@@ -42,7 +42,7 @@ export interface FormField {
   name: string
   label: string
   type: 'text' | 'email' | 'password' | 'select' | 'textarea' | 'date' | 'number' | 'file'
-  placeholder?: string
+  implementation?: string
   required?: boolean
   options?: { value: string; label: string }[]
   validation?: {

@@ -17,7 +17,7 @@ const nextConfig = {
   // Suppress hydration warnings caused by browser extensions and performance optimizations
   experimental: {
     optimizePackageImports: ['@radix-ui/react-icons', '@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', 'lucide-react'],
-    optimizeCss: true,
+    // optimizeCss: true, // Disabled due to critters module issue
   },
   // Additional options to reduce hydration warnings
   poweredByHeader: false,

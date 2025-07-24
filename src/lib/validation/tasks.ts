@@ -353,16 +353,10 @@ export const validateTaskStatisticsParams = (data: unknown) => {
 export const validateTaskPermissions = (userRole: string, action: string): boolean => {
   const rolePermissions: Record<string, string[]> = {
     'management': ['create', 'read', 'update', 'delete', 'assign', 'change_status', 'comment', 'view_all'],
-    'management': ['create', 'read', 'update', 'delete', 'assign', 'change_status', 'comment', 'view_all'],
-    'management': ['create', 'read', 'update', 'assign', 'change_status', 'comment', 'view_all'],
-    'technical_lead': ['read', 'update', 'assign', 'change_status', 'comment', 'view_all'],
     'admin': ['create', 'read', 'update', 'delete', 'assign', 'change_status', 'comment', 'view_all'],
+    'technical_lead': ['read', 'update', 'assign', 'change_status', 'comment', 'view_all'],
     'project_manager': ['create', 'read', 'update', 'assign', 'change_status', 'comment'],
-    'project_manager': ['create', 'read', 'update', 'comment'],
-    'project_manager': ['create', 'read', 'update', 'comment'],
     'purchase_manager': ['read', 'comment'],
-    'purchase_manager': ['read', 'comment'],
-    'project_manager': ['read', 'update', 'comment'],
     'client': ['read', 'comment'],
   }
   

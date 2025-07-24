@@ -1,0 +1,133 @@
+/**
+ * Project Statistics API - Replace mockStats with real database integration
+ * Uses withAuth pattern from Kiro's optimizations
+ */
+
+import { NextRequest } from 'next/server'
+import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/api-middleware'
+import { createClient } from '@/lib/supabase/server'
+
+interface ProjectStats {
+  totalTasks: number
+  completedTasks: number
+  teamMembers: number
+  documents: number
+  budgetSpent: number
+  budgetRemaining: number
+  riskLevel: 'low' | 'medium' | 'high'
+  scopeItemsTotal: number
+  scopeItemsCompleted: number
+  milestonesTotal: number
+  milestonesCompleted: number
+  materialSpecsTotal: number
+  materialSpecsApproved: number
+}
+
+// GET /api/projects/[id]/stats - Get comprehensive project statistics
+export const GET = withAuth(async (request: NextRequest, { user, profile }, { params }) => {
+  const projectId = params.id
+  
+  if (!projectId) {
+    return createErrorResponse('Project ID is required', 400)
+  }
+  
+  try {
+    const supabase = await createClient()
+    
+    // Verify project exists and user has access
+    const { data: project, error: projectError } = await supabase
+      .from('projects')
+      .select('budget, actual_cost')
+      .eq('id', projectId)
+      .single()
+    
+    if (projectError || !project) {
+      return createErrorResponse('Project not found', 404)
+    }
+    
+    // Get team members count
+    const { count: teamMembers } = await supabase
+      .from('project_assignments')
+      .select('*', { count: 'exact', head: true })
+      .eq('project_id', projectId)
+      .eq('is_active', true)
+    
+    // Get scope items statistics
+    const { data: scopeItems } = await supabase
+      .from('scope_items')
+      .select('status')
+      .eq('project_id', projectId)
+    
+    const scopeItemsTotal = scopeItems?.length || 0
+    const scopeItemsCompleted = scopeItems?.filter(item => item.status === 'completed').length || 0
+    
+    // Get milestones statistics
+    const { data: milestones } = await supabase
+      .from('project_milestones')
+      .select('status')
+      .eq('project_id', projectId)
+    
+    const milestonesTotal = milestones?.length || 0
+    const milestonesCompleted = milestones?.filter(milestone => milestone.status === 'completed').length || 0
+    
+    // Get material specs statistics
+    const { data: materialSpecs } = await supabase
+      .from('material_specs')
+      .select('status')
+      .eq('project_id', projectId)
+    
+    const materialSpecsTotal = materialSpecs?.length || 0
+    const materialSpecsApproved = materialSpecs?.filter(spec => spec.status === 'approved').length || 0
+    
+    // Calculate budget information
+    const budget = project.budget || 0
+    const actualCost = project.actual_cost || 0
+    const budgetSpent = actualCost
+    const budgetRemaining = Math.max(0, budget - actualCost)
+    
+    // Calculate risk level based on various factors
+    let riskLevel: 'low' | 'medium' | 'high' = 'low'
+    
+    if (budget > 0) {
+      const budgetUtilization = actualCost / budget
+      const scopeCompletion = scopeItemsTotal > 0 ? scopeItemsCompleted / scopeItemsTotal : 1
+      const milestoneCompletion = milestonesTotal > 0 ? milestonesCompleted / milestonesTotal : 1
+      
+      // Risk assessment logic
+      if (budgetUtilization > 0.9 || scopeCompletion < 0.3 || milestoneCompletion < 0.3) {
+        riskLevel = 'high'
+      } else if (budgetUtilization > 0.7 || scopeCompletion < 0.6 || milestoneCompletion < 0.6) {
+        riskLevel = 'medium'
+      }
+    }
+    
+    // For now, use scope items as tasks (can be refined later with actual tasks table)
+    const totalTasks = scopeItemsTotal
+    const completedTasks = scopeItemsCompleted
+    
+    // Estimate documents count based on material specs (temporary)
+    const documents = materialSpecsTotal
+    
+    const stats: ProjectStats = {
+      totalTasks,
+      completedTasks,
+      teamMembers: teamMembers || 0,
+      documents,
+      budgetSpent,
+      budgetRemaining,
+      riskLevel,
+      scopeItemsTotal,
+      scopeItemsCompleted,
+      milestonesTotal,
+      milestonesCompleted,
+      materialSpecsTotal,
+      materialSpecsApproved
+    }
+    
+    return createSuccessResponse(stats)
+    
+  } catch (error) {
+    console.error('Project stats API error:', error)
+    return createErrorResponse('Internal server error', 500)
+  }
+}, { permission: 'projects.read.all' })

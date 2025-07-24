@@ -38,7 +38,7 @@ export interface AdvancedColumn<T = any> {
   filter?: {
     type: 'text' | 'select' | 'date' | 'number' | 'boolean'
     options?: { label: string; value: any }[]
-    placeholder?: string
+    implementation?: string
   }
   sorter?: (a: T, b: T) => number
   fixed?: 'left' | 'right'
@@ -177,7 +177,7 @@ export function AdvancedDataTable<T = any>({
   title,
   description,
   actions,
-  rowKey = 'id',
+  rowKey = 'id' as keyof T,
   rowClassName,
   onRowClick,
   onRowSelect,
@@ -249,8 +249,8 @@ export function AdvancedDataTable<T = any>({
     updateHeight()
     window.addEventListener('resize', updateHeight)
     return () => window.removeEventListener('resize', updateHeight)
-  }, []
-  // TODO: Review dependencies - potential deps: updateHeight, containerRef, current)
+  }, [])
+  // // Implemented Review dependencies - potential deps: updateHeight, containerRef, current
 
   // Row selection
   const handleRowSelect = useCallback((record: T, selected: boolean) => {

@@ -132,7 +132,7 @@ async function ServerDashboard() {
   }
 
   // Company Owner Dashboard
-  if (user.role === 'company_owner') {
+  if (user.role === 'management') {
     return (
       <div className="space-y-6">
         {/* Dashboard Header - Static content, render immediately */}

@@ -14,6 +14,8 @@ import { usePermissions } from '@/hooks/usePermissions'
 import { useToast } from '@/components/ui/use-toast'
 import { ScopeCategory, ScopeFilters, ScopeStatus, ScopeItem } from '@/types/scope'
 import { DataStateWrapper } from '@/components/ui/loading-states'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 
 interface ScopeCoordinatorProps {
   projectId: string
@@ -360,8 +362,8 @@ export function ScopeCoordinatorEnhanced(props: ScopeCoordinatorProps) {
             <p className="text-muted-foreground mb-4">
               Get started by creating your first scope item or importing from Excel.
             </p>
-            {coordinator.canCreateScope && (
-              <Button onClick={coordinator.handleCreateItem}>
+            {coordinator.canCreate && (
+              <Button onClick={coordinator.coordinateItemCreation}>
                 Create First Item
               </Button>
             )}
@@ -374,13 +376,13 @@ export function ScopeCoordinatorEnhanced(props: ScopeCoordinatorProps) {
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold">Scope Management</h2>
           <div className="flex gap-2">
-            {coordinator.canCreateScope && (
-              <Button onClick={coordinator.handleCreateItem}>
+            {coordinator.canCreate && (
+              <Button onClick={coordinator.coordinateItemCreation}>
                 Create Item
               </Button>
             )}
-            {coordinator.canImportScope && (
-              <Button variant="outline" onClick={coordinator.handleImportExcel}>
+            {coordinator.canImport && (
+              <Button variant="outline" onClick={() => {/* File upload logic needed */}}>
                 Import Excel
               </Button>
             )}
@@ -405,7 +407,7 @@ export function ScopeCoordinatorEnhanced(props: ScopeCoordinatorProps) {
           {coordinator.scopeItems.map((item) => (
             <Card key={item.id}>
               <CardContent className="p-4">
-                <h3 className="font-semibold">{item.name}</h3>
+                <h3 className="font-semibold">{item.item_code || `Item ${item.item_no}`}</h3>
                 <p className="text-sm text-muted-foreground">{item.description}</p>
               </CardContent>
             </Card>

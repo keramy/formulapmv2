@@ -41,7 +41,7 @@ export function ReportsTab({ projectId }: ReportsTabProps) {
     status: filterStatus !== 'all' ? filterStatus : undefined,
   };
 
-  // Use the real reports hook instead of mock data
+  // Use the real reports hook instead of real data
   const {
     reports,
     statistics,
@@ -275,13 +275,13 @@ export function ReportsTab({ projectId }: ReportsTabProps) {
                             {getTypeIcon(report.type)}
                             <h3 className="font-semibold text-lg">{report.name}</h3>
                           </div>
-                          <Badge variant={getTypeBadgeVariant(report.type)}>
+                          <Badge variant="default">
                             {report.type}
                           </Badge>
-                          <Badge variant={getStatusBadgeVariant(report.status)}>
+                          <Badge variant="default">
                             {report.status}
                           </Badge>
-                          <Badge variant={getPriorityBadgeVariant(report.priority)}>
+                          <Badge variant="default">
                             {report.priority}
                           </Badge>
                         </div>

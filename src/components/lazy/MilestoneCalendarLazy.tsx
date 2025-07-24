@@ -6,7 +6,7 @@ import { lazy, Suspense } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 
 // Lazy load the component
-const MilestoneCalendarLazy = lazy(() => import('../milestones/MilestoneCalendar.tsx'))
+const MilestoneCalendarLazy = lazy(() => import('../milestones/MilestoneCalendar').then(module => ({ default: module.MilestoneCalendar })))
 
 // Loading fallback component
 function MilestoneCalendarLoading() {

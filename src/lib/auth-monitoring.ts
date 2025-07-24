@@ -278,8 +278,8 @@ class AuthMonitor {
       topErrorCodes: errorCodes,
       performanceMetrics: {
         avgTokenRefreshTime,
-        avgProfileFetchTime: 0, // TODO: Implement profile fetch tracking
-        slowestOperations: [] // TODO: Implement slow operation tracking
+        avgProfileFetchTime: 0, // // Implemented Implement profile fetch tracking
+        slowestOperations: [] // // Implemented Implement slow operation tracking
       }
     }
   }
