@@ -10,7 +10,17 @@ import {
   Briefcase,
   Settings,
   Building,
-  X
+  X,
+  FileText,
+  CheckSquare,
+  Target,
+  FileImage,
+  Package,
+  ClipboardList,
+  Users,
+  Bell,
+  Globe,
+  FileSearch
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -30,7 +40,7 @@ export const Sidebar = ({ className, onClose }: SidebarProps = {}) => {
   const { profile } = useAuth()
   const pathname = usePathname()
 
-  // Simplified navigation items as per the plan
+  // Navigation items based on V3 P1 features with existing APIs
   const navigationItems: NavigationItem[] = [
     {
       id: 'dashboard',
@@ -45,10 +55,58 @@ export const Sidebar = ({ className, onClose }: SidebarProps = {}) => {
       icon: Briefcase
     },
     {
+      id: 'tasks',
+      label: 'Tasks',
+      href: '/tasks',
+      icon: CheckSquare
+    },
+    {
+      id: 'milestones',
+      label: 'Milestones',
+      href: '/milestones',
+      icon: Target
+    },
+    {
+      id: 'scope',
+      label: 'Scope Management',
+      href: '/scope',
+      icon: FileText
+    },
+    {
+      id: 'shop-drawings',
+      label: 'Shop Drawings',
+      href: '/shop-drawings',
+      icon: FileImage
+    },
+    {
+      id: 'material-specs',
+      label: 'Material Approvals',
+      href: '/material-specs',
+      icon: Package
+    },
+    {
+      id: 'reports',
+      label: 'Reports',
+      href: '/reports',
+      icon: ClipboardList
+    },
+    {
       id: 'suppliers',
       label: 'Suppliers',
       href: '/suppliers',
       icon: Building
+    },
+    {
+      id: 'users',
+      label: 'User Management',
+      href: '/users',
+      icon: Users
+    },
+    {
+      id: 'client-portal',
+      label: 'Client Portal',
+      href: '/client-portal',
+      icon: Globe
     },
     {
       id: 'settings',
@@ -57,6 +115,35 @@ export const Sidebar = ({ className, onClose }: SidebarProps = {}) => {
       icon: Settings
     }
   ]
+
+  // Filter navigation items based on user role
+  const filteredNavigationItems = navigationItems.filter(item => {
+    // Everyone can see dashboard and settings
+    if (['dashboard', 'settings'].includes(item.id)) return true
+    
+    // Admin can see everything
+    if (profile?.role === 'admin') return true
+    
+    // Role-based access for V3 features
+    switch (item.id) {
+      case 'projects':
+      case 'tasks':
+      case 'milestones':
+      case 'scope':
+      case 'shop-drawings':
+      case 'material-specs':
+      case 'reports':
+        return ['management', 'project_manager', 'technical_lead'].includes(profile?.role || '')
+      case 'suppliers':
+        return ['management', 'purchase_manager', 'project_manager'].includes(profile?.role || '')
+      case 'users':
+        return ['management'].includes(profile?.role || '')
+      case 'client-portal':
+        return ['management', 'client'].includes(profile?.role || '')
+      default:
+        return false
+    }
+  })
 
   return (
     <aside className={cn("fixed left-0 top-0 h-full w-64 bg-gray-900 text-white", className)}>
@@ -84,7 +171,7 @@ export const Sidebar = ({ className, onClose }: SidebarProps = {}) => {
         {/* Navigation */}
         <ScrollArea className="flex-1 py-4">
           <nav className="space-y-1 px-3">
-            {navigationItems.map((item) => {
+            {filteredNavigationItems.map((item) => {
               const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
               
               return (

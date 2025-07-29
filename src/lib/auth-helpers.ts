@@ -12,7 +12,7 @@ import {
   getCachedToken,
   setCachedToken,
   invalidateUserCache 
-} from './cache-middleware'
+} from './cache-middleware-robust'
 
 export interface AuthenticatedUser {
   user: User

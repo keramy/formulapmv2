@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, AlertCircle, WifiOff, RefreshCw } from 'lucide-react'
 import { RealtimeProvider } from '@/contexts/RealtimeContext'
+import { DevErrorSuppressor } from '@/components/DevErrorSuppressor'
 
 export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -34,13 +35,23 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
   const noLayoutPaths = ['/', '/auth/login', '/auth/register', '/auth/reset-password']
   const isNoLayoutPath = noLayoutPaths.includes(pathname)
 
-  // Handle authentication redirection for protected routes
+  // Client-side redirect logic
   useEffect(() => {
-    // Only redirect if we're on a protected route, not authenticated, and auth is stable (not loading)
-    const shouldRedirect = !isNoLayoutPath && !isAuthenticated && authState === 'idle' && !user
-    
-    if (shouldRedirect) {
+    // Redirect unauthenticated users away from protected pages
+    const shouldRedirectToLogin = !isNoLayoutPath && !isAuthenticated && authState === 'idle' && !user
+    if (shouldRedirectToLogin) {
+      console.log('🔐 [LayoutWrapper] Redirecting to login - user not authenticated')
       router.push('/auth/login')
+      return
+    }
+    
+    // Redirect authenticated users away from auth pages, but not during logout
+    const isAuthPage = pathname.startsWith('/auth/')
+    const shouldRedirectToDashboard = isAuthPage && isAuthenticated && user && 
+      authState !== 'loading' && authState !== 'signing_out'
+    if (shouldRedirectToDashboard) {
+      console.log('🔐 [LayoutWrapper] Redirecting to dashboard - user already authenticated')
+      router.push('/dashboard')
     }
   }, [isNoLayoutPath, isAuthenticated, authState, pathname, router, user])
 
@@ -154,13 +165,25 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
     )
   }
 
-  // If not authenticated and on a protected path, render children (might be login redirect)
+  // If not authenticated, show redirecting message
+  // We only render the layout when user is authenticated and has a profile
   if (!user || !isAuthenticated) {
-    return <>{children}</>
+    // Show redirecting state for unauthenticated users
+    const message = authState === 'idle' ? 'Redirecting to login...' : 'Checking authentication...'
+    
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
+          <p className="text-muted-foreground">{message}</p>
+        </div>
+      </div>
+    )
   }
 
   return (
     <RealtimeProvider>
+      <DevErrorSuppressor />
       <div className="flex h-screen overflow-hidden">
         {/* Mobile sidebar backdrop */}
         {sidebarOpen && (

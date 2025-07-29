@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
-import { UserRole, SeniorityLevel, ApprovalLimits } from '@/types/auth'
+import { UserRole, SeniorityLevel, ApprovalLimits, UserProfile } from '@/types/auth'
+import { getSeniorityFromProfile } from '@/lib/seniority-utils'
 
 // OPTIMIZED PERMISSIONS FOR 5-ROLE STRUCTURE (down from 13 roles)
 export const PERMISSIONS = {
@@ -40,12 +41,12 @@ export const PERMISSIONS = {
   'documents.approve': ['management', 'project_manager', 'technical_lead', 'client', 'admin'],
   'documents.approve.client': ['client'],
 
-  // Shop Drawing Permissions - Under project_manager (was project_manager)
+  // Shop Drawing Permissions - Simple PM Seniority Workflow
   'shop_drawings.create': ['project_manager', 'technical_lead'],
   'shop_drawings.edit': ['project_manager', 'technical_lead'],
   'shop_drawings.delete': ['management', 'project_manager', 'technical_lead', 'admin'],
   'shop_drawings.view': ['management', 'project_manager', 'technical_lead', 'client', 'admin'],
-  'shop_drawings.approve': ['management', 'project_manager', 'technical_lead', 'client', 'admin'],
+  'shop_drawings.approve': ['management', 'project_manager', 'technical_lead', 'admin'], // Senior PMs can approve
   'shop_drawings.approve.client': ['client'],
 
   // Purchase & Supplier Permissions - Unified under purchase_manager
@@ -122,8 +123,6 @@ export const PERMISSIONS = {
   'management.resources.allocate': ['management', 'admin'],
   
   'approvals.create': ['project_manager', 'technical_lead', 'purchase_manager'],
-  'approvals.process.senior': ['project_manager'], // Senior PMs only
-  'approvals.process.management': ['management', 'admin'],
   'approvals.view.own': ['project_manager', 'technical_lead', 'purchase_manager'],
   'approvals.view.all': ['management', 'admin'],
 
@@ -176,9 +175,9 @@ export const hasPermission = (userRole: UserRole, permission: Permission, senior
     return false
   }
   
-  // Special cases for PM hierarchy
-  if (permission === 'approvals.process.senior' && userRole === 'project_manager') {
-    return seniorityLevel === 'senior'
+  // Special cases for PM hierarchy (shop drawings only)
+  if (permission === 'shop_drawings.approve' && userRole === 'project_manager') {
+    return seniorityLevel === 'senior' || seniorityLevel === 'executive' // Senior or Executive PMs can approve
   }
   
   if (permission === 'costs.view.full' && userRole === 'project_manager') {
@@ -188,29 +187,28 @@ export const hasPermission = (userRole: UserRole, permission: Permission, senior
   return true
 }
 
-// Enhanced permission checking with approval limits
-export const hasPermissionWithLimits = (
+// Shop drawing approval checking with PM seniority
+export const canApproveShopDrawing = (
   userRole: UserRole, 
-  permission: Permission, 
-  seniorityLevel?: SeniorityLevel,
-  approvalLimits?: ApprovalLimits,
-  requestAmount?: number
+  seniorityLevel?: SeniorityLevel
 ): boolean => {
-  if (!hasPermission(userRole, permission, seniorityLevel)) {
-    return false
+  // Management and technical leads can approve
+  if (['management', 'admin', 'technical_lead'].includes(userRole)) {
+    return true
   }
   
-  // Check approval limits for budget-related permissions
-  if (permission.includes('approve') && requestAmount && approvalLimits?.budget) {
-    if (approvalLimits.budget === 'unlimited') {
-      return true
-    }
-    if (typeof approvalLimits.budget === 'number') {
-      return requestAmount <= approvalLimits.budget
-    }
+  // Only senior or executive PMs can approve shop drawings
+  if (userRole === 'project_manager') {
+    return seniorityLevel === 'senior' || seniorityLevel === 'executive'
   }
   
-  return true
+  return false
+}
+
+// Profile-based shop drawing approval checking
+export const canApproveShopDrawingFromProfile = (profile: UserProfile): boolean => {
+  const seniority = getSeniorityFromProfile(profile)
+  return canApproveShopDrawing(profile.role, seniority)
 }
 
 export const getUserPermissions = (userRole: UserRole, seniorityLevel?: SeniorityLevel): Permission[] => {
@@ -308,78 +306,31 @@ export const canApproveRequest = (
   return false
 }
 
-export const getDefaultApprovalLimits = (role: UserRole, seniorityLevel?: SeniorityLevel): ApprovalLimits => {
+export const getShopDrawingApprovalAccess = (role: UserRole, seniorityLevel?: SeniorityLevel): boolean => {
   switch (role) {
     case 'management':
-      return {
-        budget: 'unlimited',
-        scope_changes: 'all',
-        timeline_extensions: 'unlimited',
-        resource_allocation: 'unlimited'
-      }
-    
+    case 'admin':
     case 'technical_lead':
-      return {
-        budget: 75000,
-        scope_changes: 'all',
-        timeline_extensions: 'unlimited',
-        subcontractor_assignment: 'all'
-      }
-    
-    case 'purchase_manager':
-      return {
-        budget: seniorityLevel === 'senior' ? 100000 : 25000,
-        vendor_management: 'all',
-        purchase_orders: 'unlimited'
-      }
+      return true // Can approve all shop drawings
     
     case 'project_manager':
-      return {
-        budget: seniorityLevel === 'senior' ? 50000 : 15000,
-        scope_changes: seniorityLevel === 'senior' ? 'major' : 'minor',
-        timeline_extensions: seniorityLevel === 'senior' ? 30 : 7
-      }
+      return seniorityLevel === 'senior' || seniorityLevel === 'executive' // Senior or Executive PMs can approve
     
     case 'client':
-      return {
-        document_approval: 'assigned_projects',
-        report_access: 'assigned_projects'
-      }
+      return true // Clients can approve for their projects
     
     default:
-      return {}
+      return false
   }
 }
 
-// APPROVAL CHAIN FUNCTIONS
-export const getApprovalChain = (
-  requestType: 'budget' | 'scope_change' | 'timeline_extension' | 'resource_request',
-  requestAmount?: number,
-  requesterRole?: UserRole,
-  requesterSeniority?: SeniorityLevel
-): UserRole[] => {
-  switch (requestType) {
-    case 'budget':
-      if (!requestAmount) return ['management']
-      
-      if (requestAmount <= 15000) {
-        return requesterSeniority === 'senior' ? [] : ['project_manager'] // Senior PM can approve
-      } else if (requestAmount <= 50000) {
-        return ['project_manager'] // Senior PM approval needed
-      } else {
-        return ['project_manager', 'management'] // Senior PM → Management
-      }
-    
-    case 'scope_change':
-      return ['project_manager', 'management']
-    
-    case 'timeline_extension':
-      return ['project_manager', 'management']
-    
-    case 'resource_request':
-      return ['project_manager', 'management']
-    
-    default:
-      return ['management']
-  }
+// SHOP DRAWING APPROVAL WORKFLOW
+export const getShopDrawingApprovalWorkflow = (): string[] => {
+  // Simple workflow: Submit → Review → Approve
+  return [
+    'submitted',    // Created and submitted for review
+    'under_review', // Being reviewed by PM/Technical Lead
+    'approved',     // Approved by senior PM/management/technical lead
+    'rejected'      // Rejected and needs revision
+  ]
 }

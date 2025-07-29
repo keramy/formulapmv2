@@ -74,7 +74,7 @@ export function RealtimeProvider({ children }: RealtimeProviderProps) {
     console.log('🔴 [Realtime] Initializing connection for user:', profile.id);
     setConnectionStatus('connecting');
 
-    // Monitor connection status
+    // Monitor connection status (reduced frequency)
     const checkConnection = () => {
       const channels = supabase.getChannels();
       const hasConnectedChannels = channels.some(channel => channel.state === 'joined');
@@ -84,16 +84,16 @@ export function RealtimeProvider({ children }: RealtimeProviderProps) {
         setConnectionStatus('connected');
         console.log('🟢 [Realtime] Connected successfully');
       } else {
-        setIsConnected(false);
+        setIsConnected(false);  
         setConnectionStatus('disconnected');
       }
     };
     
-    // Check connection status periodically
-    const connectionInterval = setInterval(checkConnection, 1000);
+    // Check connection status less frequently (every 30 seconds instead of every second)
+    const connectionInterval = setInterval(checkConnection, 30000);
     
-    // Initial check
-    checkConnection();
+    // Initial check with delay to allow connection to establish
+    setTimeout(checkConnection, 2000);
 
     return () => {
       console.log('🔴 [Realtime] Cleaning up connection');

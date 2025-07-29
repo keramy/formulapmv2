@@ -626,9 +626,14 @@ export const useProjectTeam = (projectId: string) => {
     setError(null)
 
     try {
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
       const response = await fetch(`/api/projects/${projectId}/assignments`, {
         headers: {
-          'Authorization': `Bearer ${profile.id}`,
+          'Authorization': `Bearer ${token}`,
         }
       })
 
@@ -664,11 +669,16 @@ export const useProjectTeam = (projectId: string) => {
     setError(null)
 
     try {
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
       const response = await fetch(`/api/projects/${projectId}/assignments`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${profile.id}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           assignments: newAssignments,
@@ -710,13 +720,18 @@ export const useProjectTeam = (projectId: string) => {
     setError(null)
 
     try {
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
       const queryParams = new URLSearchParams({ user_id: userId })
       if (role) queryParams.set('role', role)
 
       const response = await fetch(`/api/projects/${projectId}/assignments?${queryParams.toString()}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${profile.id}`,
+          'Authorization': `Bearer ${token}`,
         }
       })
 
@@ -763,7 +778,7 @@ export const useProjectTeam = (projectId: string) => {
 // ============================================================================
 
 export const useProjectMetrics = () => {
-  const { profile } = useAuth()
+  const { profile, getAccessToken } = useAuth()
   const { canViewFinancials } = usePermissions()
   
   const [metrics, setMetrics] = useState<ProjectMetrics | null>(null)
@@ -778,6 +793,11 @@ export const useProjectMetrics = () => {
     setError(null)
 
     try {
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
       const queryParams = new URLSearchParams()
       if (includeFinancials && canViewFinancials()) {
         queryParams.set('include_financials', 'true')
@@ -785,7 +805,7 @@ export const useProjectMetrics = () => {
 
       const response = await fetch(`/api/projects/metrics?${queryParams.toString()}`, {
         headers: {
-          'Authorization': `Bearer ${profile.id}`,
+          'Authorization': `Bearer ${token}`,
         }
       })
 
@@ -828,7 +848,7 @@ export const useProjectMetrics = () => {
 
 // Hook for project status updates
 export const useProjectStatus = (projectId: string) => {
-  const { profile } = useAuth()
+  const { profile, getAccessToken } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -841,11 +861,16 @@ export const useProjectStatus = (projectId: string) => {
     setError(null)
 
     try {
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
       const response = await fetch(`/api/projects/${projectId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${profile.id}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(statusUpdate)
       })
@@ -881,7 +906,7 @@ export const useProjectStatus = (projectId: string) => {
 
 // Hook for project budget updates
 export const useProjectBudget = (projectId: string) => {
-  const { profile } = useAuth()
+  const { profile, getAccessToken } = useAuth()
   const { canViewPricing } = usePermissions()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -895,11 +920,16 @@ export const useProjectBudget = (projectId: string) => {
     setError(null)
 
     try {
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('No access token available')
+      }
+
       const response = await fetch(`/api/projects/${projectId}/budget`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${profile.id}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(budgetUpdate)
       })

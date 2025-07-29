@@ -1,0 +1,143 @@
+
+> formula-pm-v2@2.0.0 dev
+> next dev -p 3003
+
+   ▲ Next.js 15.3.5
+   - Local:        http://localhost:3003
+   - Network:      http://10.10.86.40:3003
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 2.5s
+ ○ Compiling /dashboard ...
+ ✓ Compiled /dashboard in 2.9s (1574 modules)
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.365Z #_acquireLock begin -1
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.365Z #_acquireLock lock acquired for storage key sb-auth-token
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.366Z #_handleVisibilityChange()
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.366Z #_removeVisibilityChangedCallback()
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.369Z #_stopAutoRefresh()
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.370Z #onAuthStateChange() registered callback with id b7530d8a-5b31-447d-a731-5a03d3f82ee2
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.377Z #_startAutoRefresh()
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.378Z #_initialize() end
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.378Z #_acquireLock lock released for storage key sb-auth-token
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.378Z #_acquireLock end
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.378Z #_acquireLock begin -1
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.379Z #_acquireLock lock acquired for storage key sb-auth-token
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.379Z #_useSession begin
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.379Z #__loadSession() begin
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.379Z #getSession() session from storage null
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.379Z #__loadSession() end
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.379Z INITIAL_SESSION callback id b7530d8a-5b31-447d-a731-5a03d3f82ee2 session null
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.379Z #_acquireLock lock released for storage key sb-auth-token
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.379Z #_useSession end
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.379Z #_acquireLock end
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.488Z #_acquireLock begin -1
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.488Z #_acquireLock lock acquired for storage key sb-auth-token
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.488Z #_handleVisibilityChange()
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.489Z #_removeVisibilityChangedCallback()
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.489Z #_stopAutoRefresh()
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.489Z #onAuthStateChange() registered callback with id ebe3637d-faeb-4481-bb9f-675d8d042886
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.551Z #_startAutoRefresh()
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.551Z #_initialize() end
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.554Z #_acquireLock lock released for storage key sb-auth-token
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.554Z #_acquireLock end
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.554Z #_acquireLock begin -1
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.554Z #_acquireLock lock acquired for storage key sb-auth-token
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.554Z #_useSession begin
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.555Z #__loadSession() begin
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.555Z #getSession() session from storage null
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.555Z #__loadSession() end
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.555Z INITIAL_SESSION callback id ebe3637d-faeb-4481-bb9f-675d8d042886 session null
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.555Z #_acquireLock lock released for storage key sb-auth-token
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.555Z #_useSession end
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.555Z #_acquireLock end
+ HEAD /dashboard 200 in 3433ms
+❌ [Dashboard] Authentication failed, redirecting to login
+❌ [Dashboard] Auth check error: Error: NEXT_REDIRECT
+    at getRedirectError (..\..\..\src\client\components\redirect.ts:21:16)
+    at redirect (..\..\..\src\client\components\redirect.ts:47:8)
+    at checkAuth (src\app\dashboard\page.tsx:27:15)
+    at async DashboardPage (src\app\dashboard\page.tsx:39:2)
+  19 |   statusCode: RedirectStatusCode = RedirectStatusCode.TemporaryRedirect
+  20 | ): RedirectError {
+> 21 |   const error = new Error(REDIRECT_ERROR_CODE) as RedirectError
+     |                ^
+  22 |   error.digest = `${REDIRECT_ERROR_CODE};${type};${url};${statusCode};`
+  23 |   return error
+  24 | } {
+  digest: 'NEXT_REDIRECT;replace;/auth/login;307;'
+}
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.571Z #_autoRefreshTokenTick() begin
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.571Z #_acquireLock begin 0
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.571Z #_acquireLock lock acquired for storage key sb-auth-token
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.571Z #_useSession begin
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.571Z #__loadSession() begin
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.571Z #getSession() session from storage null
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.571Z #__loadSession() end
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.571Z #_autoRefreshTokenTick() no session
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.571Z #_useSession end
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.571Z #_autoRefreshTokenTick() end
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.571Z #_acquireLock lock released for storage key sb-auth-token
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.571Z #_acquireLock end
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.571Z #_autoRefreshTokenTick() begin
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.571Z #_acquireLock begin 0
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.571Z #_acquireLock lock acquired for storage key sb-auth-token
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.571Z #_useSession begin
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.571Z #__loadSession() begin
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.571Z #getSession() session from storage null
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.572Z #__loadSession() end
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.572Z #_autoRefreshTokenTick() no session
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.572Z #_useSession end
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.572Z #_autoRefreshTokenTick() end
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.572Z #_acquireLock lock released for storage key sb-auth-token
+GoTrueClient@0 (2.70.0) 2025-07-24T17:26:52.572Z #_acquireLock end
+ ✓ Compiled in 745ms (635 modules)
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:22.387Z #_autoRefreshTokenTick() begin
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:22.387Z #_acquireLock begin 0
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:22.387Z #_acquireLock lock acquired for storage key sb-auth-token
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:22.387Z #_useSession begin
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:22.387Z #__loadSession() begin
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:22.387Z #getSession() session from storage null
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:22.387Z #__loadSession() end
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:22.387Z #_autoRefreshTokenTick() no session
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:22.387Z #_useSession end
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:22.387Z #_autoRefreshTokenTick() end
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:22.387Z #_acquireLock lock released for storage key sb-auth-token
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:22.387Z #_acquireLock end
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:22.558Z #_autoRefreshTokenTick() begin
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:22.559Z #_acquireLock begin 0
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:22.559Z #_acquireLock lock acquired for storage key sb-auth-token
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:22.559Z #_useSession begin
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:22.559Z #__loadSession() begin
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:22.559Z #getSession() session from storage null
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:22.559Z #__loadSession() end
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:22.559Z #_autoRefreshTokenTick() no session
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:22.559Z #_useSession end
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:22.559Z #_autoRefreshTokenTick() end
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:22.559Z #_acquireLock lock released for storage key sb-auth-token
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:22.559Z #_acquireLock end
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:52.400Z #_autoRefreshTokenTick() begin
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:52.400Z #_acquireLock begin 0
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:52.400Z #_acquireLock lock acquired for storage key sb-auth-token
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:52.400Z #_useSession begin
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:52.400Z #__loadSession() begin
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:52.400Z #getSession() session from storage null
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:52.400Z #__loadSession() end
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:52.400Z #_autoRefreshTokenTick() no session
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:52.400Z #_useSession end
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:52.400Z #_autoRefreshTokenTick() end
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:52.400Z #_acquireLock lock released for storage key sb-auth-token
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:52.400Z #_acquireLock end
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:52.570Z #_autoRefreshTokenTick() begin
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:52.570Z #_acquireLock begin 0
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:52.570Z #_acquireLock lock acquired for storage key sb-auth-token
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:52.570Z #_useSession begin
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:52.570Z #__loadSession() begin
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:52.570Z #getSession() session from storage null
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:52.570Z #__loadSession() end
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:52.570Z #_autoRefreshTokenTick() no session
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:52.570Z #_useSession end
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:52.570Z #_autoRefreshTokenTick() end
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:52.570Z #_acquireLock lock released for storage key sb-auth-token
+GoTrueClient@0 (2.70.0) 2025-07-24T17:27:52.570Z #_acquireLock end
+[?25h

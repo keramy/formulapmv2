@@ -73,10 +73,28 @@ export const Header = ({ onMenuClick }: HeaderProps = {}) => {
   const handleSignOut = async () => {
     try {
       setIsLoggingOut(true)
+      
+      // Clear auth state first to prevent race conditions with LayoutWrapper
       await signOut()
-      router.push('/login')
+      
+      // Add a small delay to ensure auth state is cleared
+      await new Promise(resolve => setTimeout(resolve, 100))
+      
+      // Use Next.js router for better handling, but fallback to window.location
+      try {
+        router.push('/auth/login')
+      } catch (routerError) {
+        // Fallback to hard redirect if router fails
+        window.location.href = '/auth/login'
+      }
     } catch (error) {
       console.error('Logout error:', error)
+      // Even on error, try router first, then force redirect
+      try {
+        router.push('/auth/login')
+      } catch (routerError) {
+        window.location.href = '/auth/login'
+      }
     } finally {
       setIsLoggingOut(false)
     }

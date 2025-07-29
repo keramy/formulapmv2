@@ -19,11 +19,43 @@ async function GETOriginal(req: NextRequest) {
   try {
     const params = parseQueryParams(req);
     
-    // Add your specific query logic here
-    const { data, error } = await supabase
-      .from('your_table')
-      .select('*')
-      .eq('user_id', user.id);
+    // Build query for scope items based on user role and filters
+    const query = supabase.from('scope_items').select(`
+      *,
+      project:projects(id, name, client_id),
+      assigned_user:user_profiles!scope_items_assigned_to_fkey(id, first_name, last_name, email)
+    `);
+    
+    // Apply role-based filtering
+    // RLS policies will handle access control, but we can optimize queries
+    if (params.project_id) {
+      query.eq('project_id', params.project_id);
+    }
+    
+    // Apply search filter if provided
+    if (params.search) {
+      query.or(`item_name.ilike.%${params.search}%,description.ilike.%${params.search}%`);
+    }
+    
+    // Apply status filter if provided
+    if (params.status) {
+      query.eq('status', params.status);
+    }
+    
+    // Apply sorting
+    if (params.sort_field) {
+      query.order(params.sort_field, { ascending: params.sort_direction === 'asc' });
+    } else {
+      query.order('created_at', { ascending: false });
+    }
+    
+    // Apply pagination
+    if (params.limit) {
+      const offset = (params.page - 1) * params.limit;
+      query.range(offset, offset + params.limit - 1);
+    }
+    
+    const { data, error } = await query;
     
     if (error) throw error;
     
@@ -45,10 +77,28 @@ async function POSTOriginal(req: NextRequest) {
       return createErrorResponse('Request body is required', 400);
     }
     
+    // Validate required fields for scope item
+    if (!body.item_name || !body.project_id) {
+      return createErrorResponse('Item name and project ID are required', 400);
+    }
+    
     const { data, error } = await supabase
-      .from('your_table')
+      .from('scope_items')
       .insert({
-        ...body,
+        item_name: body.item_name,
+        description: body.description || '',
+        category: body.category || 'general',
+        status: body.status || 'pending',
+        project_id: body.project_id,
+        assigned_to: body.assigned_to,
+        priority: body.priority || 'medium',
+        estimated_hours: body.estimated_hours || 0,
+        actual_hours: body.actual_hours || 0,
+        budget_amount: body.budget_amount || 0,
+        actual_cost: body.actual_cost || 0,
+        start_date: body.start_date,
+        end_date: body.end_date,
+        notes: body.notes || '',
         created_by: user.id,
         created_at: new Date().toISOString()
       })

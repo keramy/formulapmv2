@@ -6,9 +6,13 @@
 -- COMPREHENSIVE CONSTRUCTION TEAM MEMBERS (15+ REALISTIC ROLES)
 -- ============================================================================
 
--- Clear existing sample data first
+-- Clear existing sample data first (PRESERVE USER DATA)
+-- Only clear sample/test data, NOT custom user profiles
 TRUNCATE TABLE document_approvals, documents, scope_dependencies, scope_items, 
-              project_assignments, projects, clients, suppliers, user_profiles CASCADE;
+              project_assignments, projects, clients, suppliers CASCADE;
+
+-- Remove only sample user profiles (keep custom users safe)
+DELETE FROM user_profiles WHERE email LIKE '%@premiumbuild.com' OR email LIKE '%@%group.com' OR email LIKE '%@%pro.com';
 
 -- Insert 18 realistic construction team members
 INSERT INTO user_profiles (id, role, first_name, last_name, email, phone, company, department, is_active, created_at) VALUES

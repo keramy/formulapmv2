@@ -3,9 +3,10 @@
 import { useEffect, useState, useCallback } from 'react'
 import { User } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
-import { UserProfile, UserRole } from '@/types/auth'
+import { UserProfile, UserRole, SeniorityLevel } from '@/types/auth'
 import { useImpersonation } from './useImpersonation'
 import { useAdvancedApiQuery } from './useAdvancedApiQuery'
+import { getSeniorityFromProfile } from '@/lib/seniority-utils'
 
 export const useAuth = () => {
   // Simplified state management - only essential states
@@ -15,12 +16,13 @@ export const useAuth = () => {
   const [loading, setLoading] = useState(true)
   const [authError, setAuthError] = useState<string | null>(null)
   const [isSigningIn, setIsSigningIn] = useState(false)
+  const [isSigningOut, setIsSigningOut] = useState(false)
 
   // Integrate impersonation system
   const { isImpersonating, impersonatedUser, originalAdmin, stopImpersonation, canImpersonate } = useImpersonation()
 
   // Optimized profile fetching - async, non-blocking
-  const fetchUserProfile = useCallback(async (userId: string): Promise<void> => {
+  const fetchUserProfile = async (userId: string): Promise<void> => {
     try {
       const { data, error } = await supabase
         .from('user_profiles')
@@ -30,55 +32,13 @@ export const useAuth = () => {
 
       if (error || !data) {
         if (error) {
-          console.error('🔐 [useAuth] Profile fetch error:', error)
+          console.error('🔐 [useAuth] Profile fetch error:', error.message || error)
         } else {
           console.log('🔐 [useAuth] No profile found for user:', userId)
         }
         
-        // Handle profile creation for any authenticated user
-        const { data: { user } } = await supabase.auth.getUser()
-        if (user) {
-          console.log('🔐 [useAuth] Creating missing profile for:', user.email)
-            
-          const { supabaseAdmin } = await import('@/lib/supabase')
-          const { data: newProfile, error: createError } = await supabaseAdmin
-            .from('user_profiles')
-            .insert({
-              id: userId,
-              role: 'management',
-              first_name: 'Admin',
-              last_name: 'User',
-              email: user.email,
-              phone: null,
-              company: 'Formula PM',
-              department: 'Administration',
-              permissions: {},
-              is_active: true,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            })
-            .select('*')
-            .single()
-            
-          if (!createError && newProfile) {
-            const profile: UserProfile = {
-              id: newProfile.id,
-              role: newProfile.role as UserRole,
-              first_name: newProfile.first_name,
-              last_name: newProfile.last_name,
-              email: newProfile.email,
-              phone: newProfile.phone,
-              company: newProfile.company,
-              department: newProfile.department,
-              permissions: newProfile.permissions || {},
-              is_active: newProfile.is_active,
-              created_at: newProfile.created_at,
-              updated_at: newProfile.updated_at
-            }
-            setProfile(profile)
-            return;
-          }
-        }
+        // For now, just set error for missing profile - don't try to create one automatically
+        console.log('🔐 [useAuth] Profile not found - user needs to contact admin')
         
         setAuthError('Failed to load user profile');
         return;
@@ -103,9 +63,12 @@ export const useAuth = () => {
       
     } catch (error) {
       console.error('🔐 [useAuth] Profile fetch exception:', error);
-      setAuthError('Profile loading failed');
+      // Don't set error if it's a refresh token issue - the auth state listener will handle it
+      if (error instanceof Error && !error.message.includes('Refresh Token')) {
+        setAuthError('Profile loading failed');
+      }
     }
-  }, [])
+  }
 
   // Effect to handle impersonation changes
   useEffect(() => {
@@ -141,7 +104,25 @@ export const useAuth = () => {
         
         if (error) {
           console.error('🔐 [useAuth] Session error:', error)
-          setAuthError(error.message)
+          
+          // Handle invalid refresh token errors by clearing local state only
+          if (error.message.includes('Invalid Refresh Token') || error.message.includes('Refresh Token Not Found')) {
+            console.log('🔐 [useAuth] Invalid refresh token detected - clearing local storage and state')
+            
+            // Clear storage directly without triggering signOut to avoid loops
+            if (typeof window !== 'undefined') {
+              Object.keys(window.localStorage).forEach(key => {
+                if (key.startsWith('sb-') || key.startsWith('supabase')) {
+                  window.localStorage.removeItem(key)
+                }
+              })
+            }
+            
+            setAuthError(null) // Don't show error for invalid tokens
+          } else {
+            setAuthError(error.message)
+          }
+          
           setLoading(false)
           return
         }
@@ -168,13 +149,37 @@ export const useAuth = () => {
 
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('🔐 [useAuth] Auth state change:', event, session?.user?.id)
+      async (event, session, error) => {
+        console.log('🔐 [useAuth] Auth state change:', event, session?.user?.id, error?.message)
+        
+        // Handle auth errors during state changes WITHOUT recursive signOut
+        if (error && (error.message.includes('Invalid Refresh Token') || error.message.includes('Refresh Token Not Found'))) {
+          console.log('🔐 [useAuth] Invalid refresh token detected - clearing state only (no recursive signOut)')
+          
+          // Clear state directly without triggering another signOut
+          setUser(null)
+          setProfile(null)
+          setOriginalProfile(null)
+          setAuthError(null)
+          setIsSigningIn(false)
+          
+          // Clear storage but don't call supabase.auth.signOut() to avoid recursion
+          if (typeof window !== 'undefined') {
+            Object.keys(window.localStorage).forEach(key => {
+              if (key.startsWith('sb-') || key.startsWith('supabase')) {
+                window.localStorage.removeItem(key)
+              }
+            })
+          }
+          
+          return
+        }
         
         try {
           switch (event) {
             case 'SIGNED_IN':
               if (session?.user) {
+                console.log('🔐 [useAuth] User signed in:', session.user.id)
                 setUser(session.user)
                 setAuthError(null)
                 setIsSigningIn(false)
@@ -184,6 +189,7 @@ export const useAuth = () => {
               break
               
             case 'SIGNED_OUT':
+              console.log('🔐 [useAuth] User signed out')
               setUser(null)
               setProfile(null)
               setOriginalProfile(null)
@@ -193,12 +199,15 @@ export const useAuth = () => {
               
             case 'TOKEN_REFRESHED':
               if (session?.user) {
+                console.log('🔐 [useAuth] Token refreshed for user:', session.user.id)
                 setUser(session.user)
+                // Don't refetch profile on token refresh to avoid unnecessary calls
               }
               break
               
             case 'USER_UPDATED':
               if (session?.user) {
+                console.log('🔐 [useAuth] User updated:', session.user.id)
                 setUser(session.user)
                 fetchUserProfile(session.user.id)
               }
@@ -206,13 +215,16 @@ export const useAuth = () => {
           }
         } catch (error) {
           console.error('🔐 [useAuth] Error handling auth state change:', error)
-          setAuthError(error instanceof Error ? error.message : 'Authentication error')
+          // Don't set auth error for token refresh issues to avoid UI confusion
+          if (!error instanceof Error || !error.message.includes('Refresh Token')) {
+            setAuthError(error instanceof Error ? error.message : 'Authentication error')
+          }
         }
       }
     )
 
     return () => subscription.unsubscribe()
-  }, []) // ✅ Removed fetchUserProfile dependency to prevent circular re-renders
+  }, []) // Empty dependency array to prevent infinite loops
 
   const signIn = useCallback(async (email: string, password: string) => {
     console.log('🔐 [useAuth] Starting sign in')
@@ -248,12 +260,44 @@ export const useAuth = () => {
   const signOut = useCallback(async () => {
     console.log('🔐 [useAuth] Signing out')
     try {
+      setIsSigningOut(true)
+      
+      // Clear all state first
+      setUser(null)
+      setProfile(null)
+      setOriginalProfile(null)
+      setAuthError(null)
+      
+      // Sign out from Supabase
       const { error } = await supabase.auth.signOut()
       if (error) {
         console.error('🔐 [useAuth] Sign out error:', error)
       }
+      
+      // Clear localStorage to prevent auto-login and resolve token conflicts
+      if (typeof window !== 'undefined') {
+        try {
+          // Clear all Supabase authentication keys
+          Object.keys(window.localStorage).forEach(key => {
+            if (key.startsWith('sb-') || key.startsWith('supabase')) {
+              window.localStorage.removeItem(key)
+              console.log(`🧹 [useAuth] Cleared storage key: ${key}`)
+            }
+          })
+          
+          // Also clear any legacy auth tokens
+          window.localStorage.removeItem('auth_token')
+          window.localStorage.removeItem('access_token')
+          
+          console.log('🧹 [useAuth] Complete localStorage cleanup completed')
+        } catch (error) {
+          console.error('🧹 [useAuth] Error during localStorage cleanup:', error)
+        }
+      }
     } catch (error) {
       console.error('🔐 [useAuth] Sign out exception:', error)
+    } finally {
+      setIsSigningOut(false)
     }
   }, [])
 
@@ -320,7 +364,8 @@ export const useAuth = () => {
     
     // Simplified auth state - compatible with existing components
     isAuthenticated: !!user && !!profile && profile.is_active,
-    authState: isSigningIn ? 'loading' : 
+    authState: isSigningOut ? 'signing_out' :
+               isSigningIn ? 'loading' : 
                loading ? 'recovering' :
                (user && profile) ? 'authenticated' : 'idle',
     isError: !!authError,
@@ -337,9 +382,23 @@ export const useAuth = () => {
     isFieldRole: profile ? ['project_manager'].includes(profile.role) : false,
     isExternalRole: profile ? ['client'].includes(profile.role) : false,
     
+    // PM Seniority helpers
+    getSeniority: () => profile ? getSeniorityFromProfile(profile) : undefined,
+    isPMWithSeniority: (requiredLevel?: SeniorityLevel) => {
+      if (!profile || profile.role !== 'project_manager') return false
+      const currentSeniority = getSeniorityFromProfile(profile)
+      if (!requiredLevel) return !!currentSeniority
+      
+      // Executive > Senior > Regular
+      const levels = { executive: 3, senior: 2, regular: 1 }
+      const currentLevel = levels[currentSeniority || 'regular']
+      const requiredLevelValue = levels[requiredLevel]
+      return currentLevel >= requiredLevelValue
+    },
+    
     // Simplified debug info
     debugInfo: {
-      authState: isSigningIn ? 'signing_in' : loading ? 'checking' : (user && profile) ? 'authenticated' : 'idle',
+      authState: isSigningOut ? 'signing_out' : isSigningIn ? 'signing_in' : loading ? 'checking' : (user && profile) ? 'authenticated' : 'idle',
       recoveryAttempts: 0,
       hasError: !!authError,
       errorCode: authError ? 'AUTH_ERROR' : undefined,
@@ -348,7 +407,8 @@ export const useAuth = () => {
       sessionState: isSigningIn ? 'signing_in' : loading ? 'checking' : (user && profile) ? 'authenticated' : 'idle',
       isImpersonating,
       impersonatedUserEmail: impersonatedUser?.email,
-      originalAdminEmail: originalAdmin?.email
+      originalAdminEmail: originalAdmin?.email,
+      pmSeniority: profile ? getSeniorityFromProfile(profile) : undefined
     }
   }
 }

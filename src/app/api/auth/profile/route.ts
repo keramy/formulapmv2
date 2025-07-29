@@ -17,19 +17,18 @@ async function GETOriginal(req: NextRequest) {
   const { user, profile } = getRequestData(req);
   
   try {
-    const params = parseQueryParams(req);
-    
-    // Add your specific query logic here
+    // Return the user profile data
     const { data, error } = await supabase
-      .from('your_table')
+      .from('user_profiles')
       .select('*')
-      .eq('user_id', user.id);
+      .eq('id', user.id)
+      .single();
     
     if (error) throw error;
     
     return createSuccessResponse(data);
   } catch (error) {
-    console.error('API fetch error:', error);
+    console.error('Profile fetch error:', error);
     throw error;
   }
 }

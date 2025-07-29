@@ -20,14 +20,14 @@ ALTER FUNCTION generate_scope_item_no() SET search_path = '';
 -- 4. Secure has_project_access function
 ALTER FUNCTION has_project_access(UUID) SET search_path = '';
 
--- 5. Secure update_jwt_claims function
-ALTER FUNCTION update_jwt_claims() SET search_path = '';
+-- 5. Secure update_jwt_claims function (SKIP - function does not exist)
+-- ALTER FUNCTION update_jwt_claims() SET search_path = '';
 
--- 6. Secure test_workflow_scenarios function
-ALTER FUNCTION test_workflow_scenarios() SET search_path = '';
+-- 6. Secure test_workflow_scenarios function (SKIP - function does not exist)
+-- ALTER FUNCTION test_workflow_scenarios() SET search_path = '';
 
--- 7. Secure verify_role_permissions function
-ALTER FUNCTION verify_role_permissions() SET search_path = '';
+-- 7. Secure verify_role_permissions function (SKIP - function does not exist)
+-- ALTER FUNCTION verify_role_permissions() SET search_path = '';
 
 -- ============================================================================
 -- VERIFICATION - CHECK ALL FUNCTIONS HAVE SECURE SEARCH_PATH
@@ -56,8 +56,8 @@ BEGIN
     JOIN pg_namespace n ON n.oid = p.pronamespace
     WHERE n.nspname = 'public'
     AND p.proname IN (
-      'is_management_role', 'update_updated_at_column', 'test_workflow_scenarios',
-      'generate_scope_item_no', 'verify_role_permissions', 'has_project_access',
+      'is_management_role', 'update_updated_at_column',
+      'generate_scope_item_no', 'has_project_access',
       'update_jwt_claims'
     )
     ORDER BY p.proname

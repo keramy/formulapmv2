@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
@@ -54,6 +55,7 @@ interface Supplier {
 }
 
 export function ScopeListTab({ projectId }: ScopeListTabProps) {
+  const { getAccessToken } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [loading, setLoading] = useState(false);
@@ -122,7 +124,7 @@ export function ScopeListTab({ projectId }: ScopeListTabProps) {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          'Authorization': `Bearer ${await getAccessToken()}`
         },
         body: JSON.stringify({
           supplier_id: supplierId || null
@@ -164,7 +166,7 @@ export function ScopeListTab({ projectId }: ScopeListTabProps) {
     try {
       const response = await fetch(`/api/suppliers/totals?project_id=${projectId}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          'Authorization': `Bearer ${await getAccessToken()}`
         }
       })
       if (response.ok) {

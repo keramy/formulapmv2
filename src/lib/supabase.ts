@@ -14,9 +14,12 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: false,  // Disabled to prevent URL conflicts
-    flowType: 'implicit',       // Using implicit flow for better compatibility
-    debug: process.env.NODE_ENV === 'development'
+    detectSessionInUrl: true,   // Enable to handle auth callbacks
+    flowType: 'pkce',           // Use PKCE flow for better security
+    debug: process.env.NODE_ENV === 'development',
+    storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+    // Use default Supabase storage key for consistency
+    // storageKey: defaults to 'sb-' + url hash for uniqueness
   },
   db: {
     schema: 'public'

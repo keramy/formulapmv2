@@ -16,15 +16,23 @@ export async function login(formData: FormData) {
     redirect('/auth/login?error=missing-credentials')
   }
   
-  const { error } = await supabase.auth.signInWithPassword(data)
+  console.log('🔐 [Server Action] Attempting login for:', data.email)
+  
+  const { data: authData, error } = await supabase.auth.signInWithPassword(data)
   
   if (error) {
-    console.error('Login error:', error.message)
+    console.error('🔐 [Server Action] Login error:', error.message)
     redirect(`/auth/login?error=${encodeURIComponent(error.message)}`)
   }
   
-  revalidatePath('/', 'layout')
-  redirect('/dashboard')
+  if (authData?.user) {
+    console.log('🔐 [Server Action] Login successful, user ID:', authData.user.id)
+    revalidatePath('/', 'layout')
+    redirect('/dashboard')
+  } else {
+    console.error('🔐 [Server Action] No user data returned')
+    redirect('/auth/login?error=authentication-failed')
+  }
 }
 
 export async function logout() {

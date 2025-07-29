@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear Authentication Data</title>
+</head>
+<body>
+    <h2>Clearing Authentication Data...</h2>
+    <div id="status">Working...</div>
+    
+    <script>
+        // Clear all cookies
+        document.cookie.split(";").forEach(function(c) { 
+            document.cookie = c.replace(/^ +/, "")
+                .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+        });
+        
+        // Clear localStorage
+        localStorage.clear();
+        
+        // Clear sessionStorage
+        sessionStorage.clear();
+        
+        // Clear indexedDB (Supabase auth storage)
+        if (window.indexedDB) {
+            indexedDB.databases().then(databases => {
+                databases.forEach(db => {
+                    if (db.name.includes('supabase')) {
+                        indexedDB.deleteDatabase(db.name);
+                    }
+                });
+            });
+        }
+        
+        document.getElementById('status').innerHTML = `
+            <p style="color: green;">✅ Authentication data cleared successfully!</p>
+            <p>The following has been cleared:</p>
+            <ul>
+                <li>All cookies</li>
+                <li>localStorage</li>
+                <li>sessionStorage</li>
+                <li>Supabase IndexedDB</li>
+            </ul>
+            <p><strong>Now refresh your application and try logging in again.</strong></p>
+        `;
+        
+        console.log('Auth data cleared successfully');
+    </script>
+</body>
+</html>

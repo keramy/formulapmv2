@@ -1,43 +1,22 @@
 /**
- * Optimized Dashboard Page - Server Component
+ * Dashboard Page - Client Component Approach
  * 
- * PERFORMANCE OPTIMIZATION PHASE 1:
- * - Converted from 100% client-side to server-side rendering
- * - Expected 40-60% faster initial page loads
- * - Reduced client-side JavaScript bundle size
- * - Better SEO and Core Web Vitals scores
- * - Maintains same UX with progressive enhancement
+ * SIMPLIFIED AUTHENTICATION:
+ * - Uses client-side only authentication via LayoutWrapper
+ * - LayoutWrapper handles all auth redirects consistently
+ * - Eliminates client-server auth state mismatches
+ * - Faster development and debugging experience
  */
 
 import { Suspense } from 'react';
-import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
 import ServerDashboard from './dashboard-server';
 import { DashboardSkeleton } from './components/DashboardSkeleton';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
-// Server-side authentication check following Context7 pattern
-async function checkAuth() {
-  try {
-    const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
-    
-    if (error || !user) {
-      console.log('❌ [Dashboard] Authentication failed, redirecting to login');
-      redirect('/auth/login');
-    }
-
-    return user;
-  } catch (error) {
-    console.error('❌ [Dashboard] Auth check error:', error);
-    redirect('/auth/login');
-  }
-}
-
-export default async function DashboardPage() {
-  // Server-side auth check - no loading states needed
-  await checkAuth();
-
+export default function DashboardPage() {
+  // No server-side auth - LayoutWrapper handles all authentication
+  // User will only see this page if LayoutWrapper confirms they're authenticated
+  
   return (
     <div className="container mx-auto py-6">
       <ErrorBoundary>

@@ -31,7 +31,7 @@ interface UseProjectMembersReturn {
 }
 
 export function useProjectMembers(projectId: string | null): UseProjectMembersReturn {
-  const { user } = useAuth()
+  const { user, getAccessToken } = useAuth()
   const [members, setMembers] = useState<ProjectMember[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -48,7 +48,7 @@ export function useProjectMembers(projectId: string | null): UseProjectMembersRe
     try {
       const response = await fetch(`/api/projects/${projectId}/assignments`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          'Authorization': `Bearer ${await getAccessToken()}`
         }
       })
 

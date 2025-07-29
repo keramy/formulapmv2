@@ -30,13 +30,11 @@ interface Supplier {
   email: string;
   phone: string;
   address: string;
-  specialties: string[];
-  rating: number;
-  total_projects: number;
-  total_payments: number;
-  status: 'active' | 'inactive';
-  description: string;
+  specializations: string[];
+  is_approved: boolean;
+  created_by: string;
   created_at: string;
+  updated_at: string;
 }
 
 export default function SuppliersPage() {
@@ -98,8 +96,15 @@ export default function SuppliersPage() {
         throw new Error(errorMessage);
       }
       
-      const data = await response.json();
-      setSuppliers(data);
+      const result = await response.json();
+      console.log('🏢 [SuppliersPage] API Response:', result);
+      
+      // Handle the response structure from createSuccessResponse
+      if (result.success && result.data) {
+        setSuppliers(Array.isArray(result.data) ? result.data : []);
+      } else {
+        setSuppliers([]);
+      }
     } catch (err) {
       console.error('Error fetching suppliers:', err);
       setError(err instanceof Error ? err.message : 'Failed to load suppliers');
@@ -111,7 +116,7 @@ export default function SuppliersPage() {
   const filteredSuppliers = suppliers.filter(supplier =>
     supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     supplier.contact_person.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    supplier.specialties.some(spec => spec.toLowerCase().includes(searchTerm.toLowerCase()))
+    supplier.specializations.some(spec => spec.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   // Check access permissions
@@ -143,14 +148,16 @@ export default function SuppliersPage() {
     try {
       const supplierData = {
         ...formData,
-        specialties: formData.specialties.split(',').map(s => s.trim())
+        specializations: formData.specialties.split(',').map(s => s.trim())
       };
 
       if (editingSupplier) {
         // Update existing supplier
+        const token = await getAccessToken();
         const response = await fetch(`/api/suppliers/${editingSupplier.id}`, {
           method: 'PUT',
           headers: {
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(supplierData),
@@ -160,16 +167,20 @@ export default function SuppliersPage() {
           throw new Error('Failed to update supplier');
         }
         
-        const updatedSupplier = await response.json();
-        setSuppliers(prev => prev.map(supplier => 
-          supplier.id === editingSupplier.id ? updatedSupplier : supplier
-        ));
+        const result = await response.json();
+        if (result.success && result.data) {
+          setSuppliers(prev => prev.map(supplier => 
+            supplier.id === editingSupplier.id ? result.data : supplier
+          ));
+        }
         setEditingSupplier(null);
       } else {
         // Add new supplier
+        const token = await getAccessToken();
         const response = await fetch('/api/suppliers', {
           method: 'POST',
           headers: {
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(supplierData),
@@ -179,8 +190,10 @@ export default function SuppliersPage() {
           throw new Error('Failed to create supplier');
         }
         
-        const newSupplier = await response.json();
-        setSuppliers(prev => [...prev, newSupplier]);
+        const result = await response.json();
+        if (result.success && result.data) {
+          setSuppliers(prev => [...prev, result.data]);
+        }
       }
       
       setFormData({
@@ -207,25 +220,12 @@ export default function SuppliersPage() {
       email: supplier.email,
       phone: supplier.phone,
       address: supplier.address,
-      specialties: supplier.specialties.join(', '),
-      description: supplier.description
+      specialties: supplier.specializations.join(', '),
+      description: ''
     });
     setIsAddDialogOpen(true);
   };
 
-  const renderStars = (rating: number) => {
-    return (
-      <div className="flex items-center gap-1">
-        {[...Array(5)].map((_, i) => (
-          <Star 
-            key={i} 
-            className={`w-4 h-4 ${i < Math.floor(rating) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
-          />
-        ))}
-        <span className="text-sm text-gray-600 ml-1">{rating.toFixed(1)}</span>
-      </div>
-    );
-  };
 
   return (
     <div className="space-y-6">
@@ -343,33 +343,33 @@ export default function SuppliersPage() {
         </Card>
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Total Projects</CardTitle>
+            <CardTitle className="text-sm font-medium">Approved Suppliers</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{suppliers.reduce((sum, s) => sum + s.total_projects, 0)}</div>
-            <div className="text-sm text-gray-600">Combined projects</div>
+            <div className="text-2xl font-bold">{suppliers.filter(s => s.is_approved).length}</div>
+            <div className="text-sm text-gray-600">Verified suppliers</div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Total Payments</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              ${suppliers.reduce((sum, s) => sum + s.total_payments, 0).toLocaleString()}
-            </div>
-            <div className="text-sm text-gray-600">Total paid out</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Average Rating</CardTitle>
+            <CardTitle className="text-sm font-medium">Pending Approval</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-yellow-600">
-              {suppliers.length > 0 ? (suppliers.reduce((sum, s) => sum + s.rating, 0) / suppliers.length).toFixed(1) : '0.0'}
+              {suppliers.filter(s => !s.is_approved).length}
             </div>
-            <div className="text-sm text-gray-600">Overall rating</div>
+            <div className="text-sm text-gray-600">Awaiting verification</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium">Total Specializations</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-blue-600">
+              {[...new Set(suppliers.flatMap(s => s.specializations))].length}
+            </div>
+            <div className="text-sm text-gray-600">Unique services</div>
           </CardContent>
         </Card>
       </div>
@@ -430,8 +430,8 @@ export default function SuppliersPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Badge variant={supplier.status === 'active' ? 'default' : 'secondary'}>
-                        {supplier.status}
+                      <Badge variant={supplier.is_approved ? 'default' : 'secondary'}>
+                        {supplier.is_approved ? 'Approved' : 'Pending'}
                       </Badge>
                       <Button 
                         variant="ghost" 
@@ -460,7 +460,7 @@ export default function SuppliersPage() {
 
                   <div className="mb-3">
                     <div className="flex flex-wrap gap-1">
-                      {supplier.specialties.map((specialty, index) => (
+                      {supplier.specializations.map((specialty, index) => (
                         <Badge key={index} variant="secondary" className="text-xs">
                           {specialty}
                         </Badge>
@@ -469,24 +469,10 @@ export default function SuppliersPage() {
                   </div>
 
                   <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-1">
-                        <Users className="w-4 h-4 text-gray-400" />
-                        <span>{supplier.total_projects} projects</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <DollarSign className="w-4 h-4 text-gray-400" />
-                        <span>${supplier.total_payments.toLocaleString()}</span>
-                      </div>
+                    <div className="text-gray-500">
+                      Added {new Date(supplier.created_at).toLocaleDateString()}
                     </div>
-                    {renderStars(supplier.rating)}
                   </div>
-
-                  {supplier.description && (
-                    <p className="text-sm text-gray-600 mt-3 border-t pt-3">
-                      {supplier.description}
-                    </p>
-                  )}
                 </CardContent>
               </Card>
             ))}

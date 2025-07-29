@@ -1,8 +1,12 @@
 import { NextRequest } from 'next/server';
-import { withAuth } from '@/lib/api-middleware';
-import { createSuccessResponse, createErrorResponse } from '@/lib/api-middleware';
-import { createClient } from '@/lib/supabase/server';
+import { withAPI, getRequestData, createSuccessResponse, createErrorResponse } from '@/lib/enhanced-auth-middleware';
+import { createClient } from '@supabase/supabase-js';
 import { z } from 'zod';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+);
 
 // Validation schema for updating shop drawings
 const updateShopDrawingSchema = z.object({
@@ -18,10 +22,16 @@ const updateShopDrawingSchema = z.object({
 });
 
 // GET /api/shop-drawings/[id] - Get single shop drawing
-export const GET = withAuth(async (request: NextRequest, { user, profile }, { params }) => {
+async function GETOriginal(req: NextRequest) {
+  const { user, profile } = getRequestData(req);
+  const url = new URL(req.url);
+  const drawingId = url.pathname.split('/').pop();
+  
+  if (!drawingId) {
+    return createErrorResponse('Drawing ID is required', 400);
+  }
+  
   try {
-    const drawingId = params.id;
-    const supabase = await createClient();
     
     const { data, error } = await supabase
       .from('shop_drawings')
@@ -127,18 +137,26 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }, { pa
     return createSuccessResponse(transformedData);
   } catch (error) {
     console.error('Error in GET /api/shop-drawings/[id]:', error);
-    return createErrorResponse('Internal server error', 500);
+    throw error;
   }
-}, { permission: 'projects.read.all' });
+}
+
+export const GET = withAPI(GETOriginal);
 
 // PUT /api/shop-drawings/[id] - Update shop drawing
-export const PUT = withAuth(async (request: NextRequest, { user, profile }, { params }) => {
+async function PUTOriginal(req: NextRequest) {
+  const { user, profile } = getRequestData(req);
+  const url = new URL(req.url);
+  const drawingId = url.pathname.split('/').pop();
+  
+  if (!drawingId) {
+    return createErrorResponse('Drawing ID is required', 400);
+  }
+  
   try {
-    const drawingId = params.id;
-    const supabase = await createClient();
     
     // Parse and validate request body
-    const body = await request.json();
+    const body = await req.json();
     const validationResult = updateShopDrawingSchema.safeParse(body);
     
     if (!validationResult.success) {
@@ -325,15 +343,23 @@ export const PUT = withAuth(async (request: NextRequest, { user, profile }, { pa
     return createSuccessResponse(transformedData);
   } catch (error) {
     console.error('Error in PUT /api/shop-drawings/[id]:', error);
-    return createErrorResponse('Internal server error', 500);
+    throw error;
   }
-}, { permission: 'projects.update' });
+}
+
+export const PUT = withAPI(PUTOriginal);
 
 // DELETE /api/shop-drawings/[id] - Delete shop drawing
-export const DELETE = withAuth(async (request: NextRequest, { user, profile }, { params }) => {
+async function DELETEOriginal(req: NextRequest) {
+  const { user, profile } = getRequestData(req);
+  const url = new URL(req.url);
+  const drawingId = url.pathname.split('/').pop();
+  
+  if (!drawingId) {
+    return createErrorResponse('Drawing ID is required', 400);
+  }
+  
   try {
-    const drawingId = params.id;
-    const supabase = await createClient();
     
     // Check if shop drawing exists
     const { data: existingDrawing } = await supabase
@@ -373,9 +399,11 @@ export const DELETE = withAuth(async (request: NextRequest, { user, profile }, {
     return createSuccessResponse({ message: 'Shop drawing deleted successfully' });
   } catch (error) {
     console.error('Error in DELETE /api/shop-drawings/[id]:', error);
-    return createErrorResponse('Internal server error', 500);
+    throw error;
   }
-}, { permission: 'projects.delete' });
+}
+
+export const DELETE = withAPI(DELETEOriginal);
 
 // Helper functions
 function capitalizeFirstLetter(string: string): string {

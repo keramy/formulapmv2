@@ -7,7 +7,8 @@
 import { NextRequest } from 'next/server'
 import { withAuth, createSuccessResponse, createErrorResponse } from '@/lib/enhanced-middleware'
 import { getScopeItemsOptimized, parseQueryParams } from '@/lib/query-builder'
-import { getCachedResponse, generateCacheKey, invalidateCache } from '@/lib/cache-middleware'
+import { getCachedResponse, invalidateCache } from '@/lib/cache-middleware-robust'
+import { generateCacheKey } from '@/lib/query-builder'
 import { createClient } from '@/lib/supabase/server'
 
 // ============================================================================

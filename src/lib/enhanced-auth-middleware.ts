@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { getCachedUserProfile, setCachedUserProfile, getCachedToken, setCachedToken } from './cache-middleware';
+import { getCachedUserProfile, setCachedUserProfile, getCachedToken, setCachedToken } from './cache-middleware-robust';
 
 // Initialize Supabase client
 const supabase = createClient(

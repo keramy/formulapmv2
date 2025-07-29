@@ -3,7 +3,13 @@
  * Optimized database queries with pagination and caching
  */
 import { createClient } from '@/lib/supabase/server'
-import { getCachedResponse, generateCacheKey } from './cache-middleware'
+import { getCachedResponse } from './cache-middleware-robust'
+
+// Cache key generator function
+export function generateCacheKey(endpoint: string, userId: string, params?: Record<string, any>): string {
+  const paramString = params ? JSON.stringify(params) : '';
+  return `${endpoint}:${userId}:${Buffer.from(paramString).toString('base64')}`;
+}
 
 export interface QueryParams {
   page?: number
@@ -273,4 +279,3 @@ export async function getTasksOptimized(
   )
 }
 
-export { generateCacheKey }

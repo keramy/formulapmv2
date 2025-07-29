@@ -3,7 +3,13 @@
  * Optimized database queries with pagination, caching, and advanced filtering
  */
 import { createClient } from '@supabase/supabase-js';
-import { getCachedResponse, generateCacheKey } from './cache-middleware';
+import { getCachedResponse } from './cache-middleware-robust';
+
+// Cache key generator function
+export function generateCacheKey(endpoint: string, userId: string, params?: Record<string, any>): string {
+  const paramString = params ? JSON.stringify(params) : '';
+  return `${endpoint}:${userId}:${Buffer.from(paramString).toString('base64')}`;
+}
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -431,4 +437,3 @@ export function createQueryBuilder<T>(table: string): QueryBuilder<T> {
   return new QueryBuilder<T>(table);
 }
 
-export { generateCacheKey };

@@ -9,8 +9,7 @@
  */
 
 import { Suspense } from 'react';
-import { cookies } from 'next/headers';
-import { createServerClient } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/server';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DashboardSkeleton } from './components/DashboardSkeleton';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -36,14 +35,19 @@ interface DashboardUser {
 
 async function getAuthenticatedUser(): Promise<DashboardUser | null> {
   try {
-    const cookieStore = cookies();
-    const supabase = createServerClient();
+    const supabase = await createClient();
 
     // Get the session from cookies
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     
-    if (userError || !user) {
-      console.log('❌ [ServerDashboard] No authenticated user:', userError?.message);
+    if (userError) {
+      // Handle specific auth errors gracefully - return null instead of throwing
+      console.log('🔐 [ServerDashboard] Auth error (expected in some cases):', userError.message);
+      return null;
+    }
+    
+    if (!user) {
+      console.log('🔐 [ServerDashboard] No user found in server session');
       return null;
     }
 
@@ -64,6 +68,7 @@ async function getAuthenticatedUser(): Promise<DashboardUser | null> {
       return null;
     }
 
+    console.log('✅ [ServerDashboard] User authenticated on server:', profile.email);
     return {
       id: user.id,
       email: user.email!,
@@ -74,7 +79,7 @@ async function getAuthenticatedUser(): Promise<DashboardUser | null> {
       permissions: profile.permissions || {}
     };
   } catch (error) {
-    console.error('❌ [ServerDashboard] Authentication error:', error);
+    console.log('🔐 [ServerDashboard] Server auth failed (client auth still valid):', error);
     return null;
   }
 }
@@ -96,20 +101,11 @@ function hasPermission(permissions: Record<string, any>, permission: string): bo
 async function ServerDashboard() {
   const user = await getAuthenticatedUser();
 
-  // Handle unauthenticated users
+  // Handle server authentication failure - fallback to client-side dashboard
   if (!user) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>Access Required</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">Please log in to view the dashboard.</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
+    // Import client dashboard dynamically to avoid SSR issues
+    const { ClientDashboard } = await import('./components/client/ClientDashboard');
+    return <ClientDashboard />;
   }
 
   // Check permissions server-side

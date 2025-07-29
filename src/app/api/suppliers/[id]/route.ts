@@ -9,19 +9,21 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 );
 
-async function GETOriginal(req: NextRequest) {
+async function GETOriginal(req: NextRequest, { params }: { params: { id: string } }) {
   const { user, profile } = getRequestData(req);
   
   try {
-    const params = parseQueryParams(req);
-    
-    // Add your specific query logic here
     const { data, error } = await supabase
-      .from('your_table')
+      .from('suppliers')
       .select('*')
-      .eq('user_id', user.id);
+      .eq('id', params.id)
+      .single();
     
     if (error) throw error;
+    
+    if (!data) {
+      return createErrorResponse('Supplier not found', 404);
+    }
     
     return createSuccessResponse(data);
   } catch (error) {
@@ -30,24 +32,54 @@ async function GETOriginal(req: NextRequest) {
   }
 }
 
-async function PUTOriginal(req: NextRequest) {
+async function PUTOriginal(req: NextRequest, { params }: { params: { id: string } }) {
   const { user, profile } = getRequestData(req);
   
   try {
-    // Add your PUT logic here
-    return createSuccessResponse({ message: 'PUT operation completed' });
+    const body = await req.json();
+    
+    // Validate request body
+    if (!body || Object.keys(body).length === 0) {
+      return createErrorResponse('Request body is required', 400);
+    }
+    
+    // Update supplier
+    const { data, error } = await supabase
+      .from('suppliers')
+      .update({
+        ...body,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', params.id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    
+    if (!data) {
+      return createErrorResponse('Supplier not found', 404);
+    }
+    
+    return createSuccessResponse(data);
   } catch (error) {
     console.error('PUT error:', error);
     throw error;
   }
 }
 
-async function DELETEOriginal(req: NextRequest) {
+async function DELETEOriginal(req: NextRequest, { params }: { params: { id: string } }) {
   const { user, profile } = getRequestData(req);
   
   try {
-    // Add your DELETE logic here
-    return createSuccessResponse({ message: 'DELETE operation completed' });
+    // Delete supplier
+    const { error } = await supabase
+      .from('suppliers')
+      .delete()
+      .eq('id', params.id);
+    
+    if (error) throw error;
+    
+    return createSuccessResponse({ message: 'Supplier deleted successfully' });
   } catch (error) {
     console.error('DELETE error:', error);
     throw error;

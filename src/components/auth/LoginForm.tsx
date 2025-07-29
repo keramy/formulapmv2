@@ -1,13 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import Input from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, Eye, EyeOff, AlertCircle } from 'lucide-react'
-import { login } from '@/app/auth/actions'
+import { useAuth } from '@/hooks/useAuth'
 import Link from 'next/link'
 
 interface LoginFormProps {
@@ -21,47 +21,43 @@ const LoginForm = ({
 }: LoginFormProps) => {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const searchParams = useSearchParams()
-  
-  const error = searchParams.get('error')
-  const message = searchParams.get('message')
+  const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
+  const { signIn } = useAuth()
 
-  const handleSubmit = async (formData: FormData) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
     setIsLoading(true)
+    setError(null)
+    
+    const formData = new FormData(e.currentTarget)
+    const email = formData.get('email') as string
+    const password = formData.get('password') as string
+
+    if (!email || !password) {
+      setError('Email and password are required')
+      setIsLoading(false)
+      return
+    }
+
     try {
-      await login(formData)
-    } catch (error) {
-      console.error('Login error:', error)
+      console.log('🔐 [LoginForm] Attempting login for:', email)
+      await signIn(email, password)
+      
+      console.log('🔐 [LoginForm] Login successful, redirecting to dashboard')
+      router.push('/dashboard')
+    } catch (error: any) {
+      console.error('🔐 [LoginForm] Login failed:', error.message)
+      setError(error.message || 'Login failed')
     } finally {
       setIsLoading(false)
     }
   }
 
-  const getErrorMessage = (error: string) => {
-    switch (error) {
-      case 'missing-credentials':
-        return 'Email and password are required'
-      case 'Invalid login credentials':
-        return 'Invalid email or password. Please try again.'
-      case 'logout-failed':
-        return 'Failed to logout. Please try again.'
-      default:
-        return decodeURIComponent(error)
-    }
-  }
-
-  const getSuccessMessage = (message: string) => {
-    switch (message) {
-      case 'check-email':
-        return 'Please check your email and click the confirmation link.'
-      default:
-        return decodeURIComponent(message)
-    }
-  }
 
   return (
     <div className="w-full max-w-md mx-auto">
-      <form action={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="email">Email Address</Label>
           <Input
@@ -107,17 +103,7 @@ const LoginForm = ({
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              {getErrorMessage(error)}
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {/* Success message display */}
-        {message && (
-          <Alert>
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              {getSuccessMessage(message)}
+              {error}
             </AlertDescription>
           </Alert>
         )}
@@ -160,14 +146,14 @@ const LoginForm = ({
       {process.env.NODE_ENV === 'development' && (
         <div className="mt-4 p-4 border border-dashed rounded-lg bg-gray-50">
           <div className="text-sm font-medium text-gray-700 mb-2">
-            Test Accounts (password: testpass123):
+            Test Accounts (working credentials):
           </div>
           <div className="text-xs text-gray-600 space-y-1">
-            <div>Admin: admin.test@formulapm.com</div>
-            <div>PM: pm.test@formulapm.com</div>
-            <div>GM: gm.test@formulapm.com</div>
-            <div>Architect: architect.test@formulapm.com</div>
-            <div>Client: client.test@formulapm.com</div>
+            <div>✅ admin@formulapm.com / admin123 (Admin)</div>
+            <div>✅ owner.test@formulapm.com / testpass123 (Management)</div>
+            <div>✅ pm.working@formulapm.com / testpass123 (Project Manager)</div>
+            <div>✅ admin.working@formulapm.com / testpass123 (Admin)</div>
+            <div>✅ client.working@formulapm.com / testpass123 (Client)</div>
           </div>
         </div>
       )}

@@ -18,13 +18,11 @@ export type LegacyUserRole =
   | 'client'           // Unchanged
   | 'admin'            // Unchanged
 
-// PM hierarchy levels
+// PM hierarchy levels (only for project_manager role)
 export type SeniorityLevel = 
-  | 'executive'    // Management level
-  | 'senior'       // Senior PM, Technical Lead, Senior Purchase Manager
-  | 'regular'      // Regular PM, Regular Purchase Manager
-  | 'standard'     // Client standard level
-  | 'system'       // Admin system level
+  | 'executive'    // Executive Project Manager - highest PM level, can approve all shop drawings
+  | 'senior'       // Senior Project Manager - can approve shop drawings
+  | 'regular'      // Regular Project Manager - cannot approve shop drawings
 
 // Approval limits structure
 export interface ApprovalLimits {
@@ -60,9 +58,8 @@ export interface UserProfile {
   created_at: string
   updated_at: string
   
-  // New PM hierarchy and role optimization fields
-  seniority_level?: SeniorityLevel
-  approval_limits?: ApprovalLimits
+  // PM hierarchy (only for project_manager role)
+  seniority_level?: SeniorityLevel // Only used when role === 'project_manager'
   dashboard_preferences?: DashboardPreferences
   previous_role?: LegacyUserRole
   role_migrated_at?: string
