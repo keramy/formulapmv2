@@ -565,7 +565,7 @@ export const useScopeExcel = (projectId: string) => {
     try {
       const formData = new FormData()
       formData.append('file', file)
-      formData.append('project_id', projectId)
+      formData.append('projectId', projectId)
 
       const token = await getAccessToken()
       if (!token) {
@@ -588,7 +588,23 @@ export const useScopeExcel = (projectId: string) => {
       const data = await response.json()
       
       if (data.success) {
-        return data.data as ExcelImportBatch
+        // Transform our new API response format to match the ExcelImportBatch type
+        const importBatch: ExcelImportBatch = {
+          id: `import-${Date.now()}`, // Generate a temporary ID
+          project_id: projectId,
+          filename: file.name,
+          imported_by: profile.id,
+          import_date: new Date().toISOString(),
+          total_rows: data.data.imported + data.data.errors.length,
+          successful_imports: data.data.imported,
+          failed_imports: data.data.errors.length,
+          validation_errors: data.data.errors.map((error: any) => ({
+            row_number: error.row,
+            column: error.field,
+            error_message: error.message
+          }))
+        }
+        return importBatch
       } else {
         throw new Error(data.error || 'Failed to import Excel file')
       }

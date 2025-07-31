@@ -42,10 +42,14 @@ export interface ScopeItem {
   // Core Required Fields (Business Requirements)
   item_no: number // Auto-generated sequential number per project
   item_code?: string // Client-provided code (Excel importable, nullable)
+  item_name: string // Display name separate from description (NEW FIELD)
   description: string // Detailed item description (required)
+  specification: string // Technical specifications (NEW FIELD)
+  location: string // Physical location in project (NEW FIELD)
   quantity: number // Numeric quantity with unit validation
   unit_price: number // Base unit pricing
   total_price: number // Auto-calculated (quantity × unit_price)
+  update_notes?: string // Update comments/notes (NEW FIELD)
   
   // Material Spec Integration Fields
   scope_item?: string // Reference to scope item name/title
@@ -160,9 +164,12 @@ export interface ExcelValidationError {
 export interface ScopeItemFormData {
   category: ScopeCategory
   item_code?: string
+  item_name: string // Display name (NEW FIELD - required)
   description: string
+  specification: string // Technical specifications (NEW FIELD - required)
+  location: string // Physical location (NEW FIELD - required)
   title?: string
-  specifications?: string
+  specifications?: string // Keep for backward compatibility
   quantity: number
   unit_of_measure: string
   unit_price: number
@@ -181,6 +188,7 @@ export interface ScopeItemFormData {
   assigned_to?: string[]
   supplier_id?: string
   dependencies?: string[]
+  update_notes?: string // Update comments (NEW FIELD)
 }
 
 export interface ScopeItemUpdateData extends Partial<ScopeItemFormData> {
@@ -221,6 +229,11 @@ export interface ScopeFilters {
     end?: string
   }
   search_term?: string
+  // New filtering fields
+  location?: string // Filter by location (NEW FIELD)
+  item_name?: string // Filter by item name (NEW FIELD)
+  specification?: string // Filter by specification (NEW FIELD)
+  item_no?: number // Filter by item number (NEW FIELD)
 }
 
 export interface ScopeListParams {
@@ -305,6 +318,7 @@ export interface ExcelImportMapping {
     max_value?: number
     allowed_values?: string[]
     regex_pattern?: string
+    max_length?: number // For new text fields
   }
 }
 
@@ -326,6 +340,10 @@ export interface ExcelExportConfig {
   include_formulas: boolean
   group_by_category: boolean
   include_summary_sheet: boolean
+  // New export options for new fields
+  include_specifications: boolean
+  include_locations: boolean
+  include_update_notes: boolean
 }
 
 // ============================================================================
@@ -423,7 +441,7 @@ export interface ExcelImportResponse {
 // ============================================================================
 
 export type ScopeItemSummary = Pick<ScopeItem, 
-  'id' | 'item_no' | 'category' | 'title' | 'status' | 'progress_percentage' | 'assigned_to'
+  'id' | 'item_no' | 'item_name' | 'category' | 'title' | 'status' | 'progress_percentage' | 'assigned_to' | 'location'
 >
 
 export type ScopeItemWithAssignments = ScopeItem & {
