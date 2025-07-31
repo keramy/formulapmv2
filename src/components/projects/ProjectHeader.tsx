@@ -1,6 +1,6 @@
 'use client';
 
-import { useProject } from '@/hooks/useProjects';
+import { useProjectDirect } from '@/hooks/useProjects';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -25,8 +25,17 @@ interface ProjectHeaderProps {
 
 export function ProjectHeader({ projectId }: ProjectHeaderProps) {
   const { user } = useAuth();
-  const { data: project, loading, error } = useProject(projectId);
+  const { data: project, loading, error, refetch } = useProjectDirect(projectId);
   const accessLevel = 'full'; // // Implemented Implement access level logic
+  
+  console.log('🏗️ [ProjectHeader] Component state:', {
+    projectId,
+    hasUser: !!user,
+    hasProject: !!project,
+    loading,
+    error,
+    projectName: project?.name
+  });
 
   // Map project status to semantic Badge variants
   const getStatusBadgeVariant = (status: string) => {
@@ -71,31 +80,38 @@ export function ProjectHeader({ projectId }: ProjectHeaderProps) {
       loading={loading}
       error={error}
       data={project}
+      onRetry={refetch}
       emptyComponent={
         <Card>
           <CardContent className="text-center py-8">
             <h1 className="text-2xl font-bold text-gray-900">Project Not Found</h1>
-            <p className="text-gray-600">The requested project could not be found.</p>
-            <Button asChild className="mt-4">
-              <Link href="/projects">Back to Projects</Link>
-            </Button>
+            <p className="text-gray-600">The requested project could not be found or you don't have access to it.</p>
+            <div className="mt-4 space-x-2">
+              <Button onClick={refetch} variant="outline">
+                Try Again
+              </Button>
+              <Button asChild>
+                <Link href="/projects">Back to Projects</Link>
+              </Button>
+            </div>
           </CardContent>
         </Card>
       }
     >
-      <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/projects">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Projects
-              </Link>
-            </Button>
-            <div>
-              <div className="flex items-center space-x-2 mb-1">
-                <h1 className="text-2xl font-bold text-gray-900">{project.name}</h1>
+      {project && (
+        <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/projects">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back to Projects
+                </Link>
+              </Button>
+              <div>
+                <div className="flex items-center space-x-2 mb-1">
+                  <h1 className="text-2xl font-bold text-gray-900">{project.name}</h1>
                 <Badge variant={getStatusBadgeVariant(project.status)}>
                   {project.status.replace('_', ' ')}
                 </Badge>
@@ -161,6 +177,7 @@ export function ProjectHeader({ projectId }: ProjectHeaderProps) {
         )}
       </CardContent>
       </Card>
+      )}
     </DataStateWrapper>
   );
 }

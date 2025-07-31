@@ -7,6 +7,7 @@ export const PERMISSIONS = {
   // Project Management - Simplified for 5 roles
   'projects.create': ['management', 'project_manager', 'admin'],
   'projects.read.all': ['management', 'admin'],
+  'projects.read': ['management', 'project_manager', 'technical_lead', 'purchase_manager', 'client', 'admin'],
   'projects.read.assigned': ['project_manager', 'technical_lead', 'purchase_manager'],
   'projects.read.own': ['client'],
   'projects.update': ['management', 'project_manager', 'admin'],

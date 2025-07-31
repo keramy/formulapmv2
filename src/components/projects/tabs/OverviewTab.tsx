@@ -1,6 +1,6 @@
 'use client';
 
-import { useProject } from '@/hooks/useProjects';
+import { useProjectDirect } from '@/hooks/useProjects';
 import { useMilestones } from '@/hooks/useMilestones';
 import { useProjectStats } from '@/hooks/useProjectStats';
 import { useAuth } from '@/hooks/useAuth';
@@ -8,7 +8,6 @@ import { usePermissions } from '@/hooks/usePermissions';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { DataStateWrapper } from '@/components/ui/loading-states';
 import { 
   Calendar, 
   MapPin, 
@@ -29,11 +28,11 @@ interface OverviewTabProps {
 export function OverviewTab({ projectId }: OverviewTabProps) {
   const { user } = useAuth();
   const { hasPermission } = usePermissions();
-  const { data: project, loading, error } = useProject(projectId);
+  const { data: project, loading, error } = useProjectDirect(projectId);
   const { milestones, statistics: milestoneStats, loading: milestonesLoading } = useMilestones(projectId);
   
-  // Use real project statistics API instead of real data
-  const { stats, loading: statsLoading, error: statsError, refresh: refreshStats } = useProjectStats(projectId);
+  // Use real project statistics API
+  const { stats, loading: statsLoading, error: statsError } = useProjectStats(projectId);
 
   // Get next milestone from real data
   const nextMilestone = milestones
@@ -58,23 +57,58 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
     }
   };
 
-  return (
-    <DataStateWrapper
-      loading={loading || statsLoading}
-      error={error || statsError}
-      data={project && stats}
-      emptyComponent={
+  // Show loading state while project or stats are loading
+  if (loading || statsLoading) {
+    return (
+      <div className="space-y-6">
         <Card>
-          <CardContent className="text-center py-8">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Target className="w-8 h-8 text-gray-400" />
+          <CardHeader>
+            <Skeleton className="h-6 w-1/3" />
+            <Skeleton className="h-4 w-2/3" />
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[...Array(6)].map((_, i) => (
+                <Skeleton key={i} className="h-4 w-full" />
+              ))}
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Project Not Found</h3>
-            <p className="text-gray-600">The requested project could not be found.</p>
           </CardContent>
         </Card>
-      }
-    >
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error || statsError) {
+    return (
+      <Card>
+        <CardContent className="text-center py-8">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <AlertTriangle className="w-8 h-8 text-red-400" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Error Loading Project</h3>
+          <p className="text-gray-600">{error || statsError}</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Show empty state if no project found
+  if (!project) {
+    return (
+      <Card>
+        <CardContent className="text-center py-8">
+          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Target className="w-8 h-8 text-gray-400" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Project Not Found</h3>
+          <p className="text-gray-600">The requested project could not be found.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
       <div className="space-y-6">
       {/* Key Project Information */}
       <Card>
@@ -319,6 +353,5 @@ export function OverviewTab({ projectId }: OverviewTabProps) {
         </Card>
       </div>
       </div>
-    </DataStateWrapper>
   );
 }

@@ -6,28 +6,29 @@
 1. **Check Database First**
    - Verify user exists in auth.users table
    - Verify profile exists in user_profiles table
-   - Check which database is being used (local vs cloud)
+   - ⚠️ **USING SUPABASE CLOUD ONLY** - No local database setup
    
 2. **Verify Environment Configuration**
    ```bash
    # Check current database connection
    echo $NEXT_PUBLIC_SUPABASE_URL
    
-   # For local development, should be:
-   # http://localhost:54321 (NOT cloud URL)
+   # Should point to cloud URL (not localhost)
+   # Example: https://your-project.supabase.co
    ```
 
 3. **Common 401 Error Root Causes**
-   - Database mismatch (local vs cloud)
-   - Missing user profiles in database
-   - Wrong environment variables
+   - Missing user profiles in cloud database
+   - Wrong environment variables pointing to wrong project
+   - JWT token expiry issues
    - **NOT usually code complexity**
 
 ### Development Best Practices:
-1. **Local-First Development**
-   - Use local Supabase for development
-   - Keep cloud for production only
-   - Ensure .env.local points to local URLs
+1. **⚠️ CLOUD-ONLY DEVELOPMENT** - IMPORTANT UPDATE (July 30, 2025)
+   - **NO LOCAL SUPABASE** - All development uses Supabase Cloud
+   - Development environment connects directly to cloud database
+   - All migrations run against cloud instance
+   - All database queries execute on cloud infrastructure
    
 2. **Simple Solutions First**
    - Avoid complex patterns (circuit breakers, mutex locks)
@@ -289,15 +290,13 @@ Common authentication setup problems and solutions:
 - Location: `src/lib/validation/client-portal.ts`
 - Status: Validation schemas properly refactored
 
-**Local Environment Setup**:
+**Cloud Environment Setup**:
 ```bash
-# Start Supabase
-npx supabase start
-
+# ⚠️ NO LOCAL SUPABASE - Using cloud only
 # Start Next.js (currently running on port 3003/3004)
 npm run dev
 
-# ✅ Working credentials (password: testpass123)
+# ✅ Working credentials on CLOUD database (password: testpass123)
 # - Admin/Owner: owner.test@formulapm.com (✅ TESTED & WORKING)
 # - Project Manager: pm.test@formulapm.com (✅ TESTED & WORKING)
 # - General Manager: gm.test@formulapm.com (✅ TESTED & WORKING)

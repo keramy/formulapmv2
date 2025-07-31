@@ -89,15 +89,129 @@ export const useProjectsList = () => {
 }
 
 /**
- * Single project hook with caching
+ * Direct single project hook - fetches project directly from API (RECOMMENDED)
+ * This bypasses the need to load all projects first
+ */
+export const useProjectDirect = (projectId: string) => {
+  const { profile, getAccessToken } = useAuth()
+  const { canAccessProject } = usePermissions()
+  
+  const [project, setProject] = useState<ProjectWithDetails | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchProject = useCallback(async () => {
+    if (!profile || !projectId) {
+      console.log('🔍 [useProjectDirect] Skipping fetch - no profile or projectId', {
+        hasProfile: !!profile,
+        projectId
+      })
+      return
+    }
+
+    console.log('🔍 [useProjectDirect] Starting fetch', {
+      projectId,
+      profileId: profile.id,
+      profileRole: profile.role
+    })
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const token = await getAccessToken()
+      if (!token) {
+        console.error('❌ [useProjectDirect] No access token available')
+        throw new Error('Authentication required')
+      }
+
+      console.log('📡 [useProjectDirect] Making API call', {
+        url: `/api/projects/${projectId}`,
+        tokenLength: token.length
+      })
+
+      const response = await fetch(`/api/projects/${projectId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        }
+      })
+
+      console.log('📡 [useProjectDirect] API response', {
+        status: response.status,
+        ok: response.ok,
+        statusText: response.statusText
+      })
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error('Project not found or access denied')
+        } else if (response.status === 403) {
+          throw new Error('Access denied - insufficient permissions')
+        } else {
+          const errorData = await response.json().catch(() => ({}))
+          throw new Error(errorData.error || `Failed to fetch project: ${response.status}`)
+        }
+      }
+
+      const data = await response.json()
+      
+      console.log('📡 [useProjectDirect] API data received', {
+        success: data.success,
+        hasProject: !!data.data?.project,
+        projectName: data.data?.project?.name
+      })
+      
+      if (data.success && data.data?.project) {
+        setProject(data.data.project)
+        setError(null)
+      } else {
+        throw new Error(data.error || 'Project data not found in response')
+      }
+    } catch (err) {
+      console.error('❌ [useProjectDirect] Error fetching project:', err)
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch project'
+      setError(errorMessage)
+      setProject(null)
+    } finally {
+      setLoading(false)
+    }
+  }, [profile, projectId, getAccessToken])
+
+  // Load project on mount and when dependencies change
+  useEffect(() => {
+    fetchProject()
+  }, [fetchProject])
+
+  return {
+    data: project,
+    loading,
+    error,
+    refetch: fetchProject
+  }
+}
+
+/**
+ * Single project hook - uses existing projects data (LEGACY - for backward compatibility)
  */
 export const useProject = (projectId: string) => {
-  return useApiQuery({
-    endpoint: `/api/projects/${projectId}`,
-    enabled: !!projectId,
-    cacheKey: `project-${projectId}`,
-    dependencies: [projectId]
+  const { projects, loading, error } = useProjects()
+  
+  const project = projects.find(p => p.id === projectId)
+  
+  // Debug logging
+  console.log('🔍 [useProject] Debug:', {
+    projectId,
+    projectsCount: projects.length,
+    projectFound: !!project,
+    projects: projects.map(p => ({ id: p.id, name: p.name }))
   })
+  
+  return {
+    data: project || null,
+    loading: loading,
+    error: !loading && !project ? 'Project not found' : error,
+    refetch: () => {} // Not needed since useProjects handles refresh
+  }
 }
 
 /**
@@ -291,13 +405,6 @@ export const useProjects = () => {
         }
       })
 
-      console.log('📡 [useProjects:fetchProjects] API response', {
-        status: response.status,
-        statusText: response.statusText,
-        ok: response.ok,
-        headers: Object.fromEntries(response.headers.entries())
-      })
-
       if (!response.ok) {
         const errorText = await response.text()
         console.error('❌ [useProjects:fetchProjects] API call failed', {
@@ -310,6 +417,14 @@ export const useProjects = () => {
       }
 
       const data = await response.json()
+      
+      console.log('📡 [useProjects:fetchProjects] API response', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+        data,
+        headers: Object.fromEntries(response.headers.entries())
+      })
       
       if (data.success) {
         setProjects(data.data.projects)
@@ -404,7 +519,7 @@ export const useProjects = () => {
 
   // Filter projects based on user access
   const accessibleProjects = useMemo(() => {
-    if (!profile) return []
+    if (!profile || !projects) return []
     
     return projects.filter(project => {
       // Management can see all projects
@@ -613,7 +728,7 @@ export const useProjectDetailed = (projectId: string) => {
 // ============================================================================
 
 export const useProjectTeam = (projectId: string) => {
-  const { profile } = useAuth()
+  const { profile, getAccessToken } = useAuth()
   const [assignments, setAssignments] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
