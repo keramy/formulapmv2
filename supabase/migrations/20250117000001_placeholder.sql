@@ -1,0 +1,3 @@
+-- Placeholder migration to sync with remote
+-- This migration already exists on remote database
+-- Created to maintain migration history consistency

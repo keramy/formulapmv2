@@ -1,12 +1,12 @@
 /**
- * Realtime Dashboard - OPTIMIZATION PHASE 1.3
+ * Project Dashboard - CONSTRUCTION MANAGEMENT
  * 
  * Features:
- * - Live project updates
- * - Real-time activity feed
- * - User presence indicators
- * - Instant task status changes
- * - Collaborative editing indicators
+ * - Current project overview
+ * - Project activity updates
+ * - Work order management
+ * - Project status tracking
+ * - Team collaboration tools
  */
 
 'use client';
@@ -102,23 +102,8 @@ export function RealtimeDashboard() {
 
     // Simulate presence updates without real subscriptions
     const simulatePresence = () => {
-      // Mock online users for demo
-      setOnlineUsers([
-        {
-          userId: 'demo-1',
-          userName: 'Demo User 1',
-          status: 'viewing',
-          lastSeen: new Date(),
-          projectId: 'dashboard'
-        },
-        {
-          userId: 'demo-2', 
-          userName: 'Demo User 2',
-          status: 'editing',
-          lastSeen: new Date(),
-          projectId: 'dashboard'
-        }
-      ]);
+      // No mock users - show empty state
+      setOnlineUsers([]);
     };
 
     // Initial presence simulation
@@ -153,54 +138,18 @@ export function RealtimeDashboard() {
       const projectsResponse = await fetch('/api/projects', { headers });
       if (projectsResponse.ok) {
         const projectsData = await projectsResponse.json();
-        setProjects(projectsData.data || []);
+        // Handle both old and new API response formats
+        const projectsArray = projectsData.data?.projects || projectsData.data || [];
+        setProjects(Array.isArray(projectsArray) ? projectsArray : []);
       } else {
         console.error('Failed to load projects:', projectsResponse.status);
       }
 
-      // Load mock task data since /api/dashboard/tasks doesn't exist
-      setTasks([
-        {
-          id: '1',
-          title: 'Review project specifications',
-          status: 'in_progress',
-          priority: 'high',
-          project_id: '1',
-          project_name: 'Sample Project',
-          updated_at: new Date().toISOString()
-        },
-        {
-          id: '2', 
-          title: 'Update budget calculations',
-          status: 'completed',
-          priority: 'medium',
-          project_id: '1',
-          project_name: 'Sample Project',
-          updated_at: new Date(Date.now() - 3600000).toISOString()
-        }
-      ]);
+      // No mock task data - show empty state
+      setTasks([]);
 
-      // Load mock activity data since /api/dashboard/activity doesn't exist
-      setActivities([
-        {
-          id: '1',
-          action: 'created',
-          entity_type: 'project',
-          entity_id: '1',
-          user_name: profile?.first_name + ' ' + profile?.last_name || 'User',
-          created_at: new Date().toISOString(),
-          details: {}
-        },
-        {
-          id: '2',
-          action: 'updated',
-          entity_type: 'task',
-          entity_id: '1',
-          user_name: profile?.first_name + ' ' + profile?.last_name || 'User',
-          created_at: new Date(Date.now() - 1800000).toISOString(),
-          details: {}
-        }
-      ]);
+      // No mock activity data - show empty state
+      setActivities([]);
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     } finally {
@@ -278,16 +227,15 @@ export function RealtimeDashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Connection Status Header */}
+      {/* Project Control Center Header */}
       <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <div className={`w-3 h-3 rounded-full ${getConnectionStatusColor(connectionStatus)}`} />
             <span className="text-sm font-medium">
-              Realtime: {connectionStatus === 'connected' ? 'Connected' : connectionStatus}
+              System Status: {connectionStatus === 'connected' ? 'Online' : connectionStatus}
             </span>
           </div>
-          <Zap className="w-4 h-4 text-status-info" />
         </div>
         
         {/* Online Users */}
@@ -310,18 +258,18 @@ export function RealtimeDashboard() {
 
       {/* Real-time Dashboard Content */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Live Projects */}
+        {/* Current Projects */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="w-5 h-5" />
-              Live Projects
-              <Badge variant="secondary">{projects.length}</Badge>
+              Current Projects
+              <Badge variant="secondary">{Array.isArray(projects) ? projects.length : 0}</Badge>
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {projects.slice(0, 5).map((project) => (
+              {(Array.isArray(projects) ? projects : []).slice(0, 5).map((project) => (
                 <div key={project.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex-1">
                     <div className="font-medium">{project.name}</div>
@@ -332,7 +280,7 @@ export function RealtimeDashboard() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="text-sm font-medium">{project.progress}%</div>
+                    <div className="text-sm font-medium">{project.progress || 0}%</div>
                     <Button 
                       variant="ghost" 
                       size="sm"
@@ -343,16 +291,22 @@ export function RealtimeDashboard() {
                   </div>
                 </div>
               ))}
+              {(!Array.isArray(projects) || projects.length === 0) && (
+                <div className="text-center py-8 text-gray-500">
+                  <p>No projects yet</p>
+                  <p className="text-sm">Create your first project to see it here</p>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
 
-        {/* Live Tasks */}
+        {/* Recent Work Orders */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CheckCircle className="w-5 h-5" />
-              Recent Tasks
+              Recent Work Orders
               <Badge variant="secondary">{tasks.length}</Badge>
             </CardTitle>
           </CardHeader>
@@ -381,12 +335,12 @@ export function RealtimeDashboard() {
         </Card>
       </div>
 
-      {/* Live Activity Feed */}
+      {/* Recent Project Updates */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Activity className="w-5 h-5" />
-            Live Activity Feed
+            Recent Project Updates
             <Badge variant="secondary">{activities.length}</Badge>
           </CardTitle>
         </CardHeader>
@@ -394,7 +348,7 @@ export function RealtimeDashboard() {
           <div className="space-y-3">
             {activities.slice(0, 10).map((activity) => (
               <div key={activity.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                {getActivityIcon(activity.entity_type, activity.action)}
+                {getUpdateIcon(activity.entity_type, activity.action)}
                 <div className="flex-1">
                   <div className="text-sm">
                     <span className="font-medium">{activity.user_name}</span>
@@ -405,9 +359,8 @@ export function RealtimeDashboard() {
                     {formatTimeAgo(activity.created_at)}
                   </div>
                 </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 bg-status-success rounded-full animate-pulse" />
-                  <span className="text-xs text-status-success">Live</span>
+                <div className="text-xs text-gray-500">
+                  Updated {formatTimeAgo(activity.created_at)}
                 </div>
               </div>
             ))}

@@ -296,12 +296,8 @@ Common authentication setup problems and solutions:
 # Start Next.js (currently running on port 3003/3004)
 npm run dev
 
-# ✅ Working credentials on CLOUD database (password: testpass123)
-# - Admin/Owner: owner.test@formulapm.com (✅ TESTED & WORKING)
-# - Project Manager: pm.test@formulapm.com (✅ TESTED & WORKING)
-# - General Manager: gm.test@formulapm.com (✅ TESTED & WORKING)
-# - Architect: architect.test@formulapm.com (✅ TESTED & WORKING)
-# - Client: client.test@formulapm.com (✅ TESTED & WORKING)
+# ✅ Working credentials on CLOUD database (password: admin123)
+# - Admin: admin@formulapm.com (✅ TESTED & WORKING)
 ```
 
 ## Current Session Status (July 8, 2025)

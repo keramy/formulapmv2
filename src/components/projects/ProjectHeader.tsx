@@ -15,7 +15,8 @@ import {
   DollarSign,
   Users,
   Clock,
-  AlertTriangle
+  AlertTriangle,
+  BarChart3
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -110,16 +111,22 @@ export function ProjectHeader({ projectId }: ProjectHeaderProps) {
                 </Link>
               </Button>
               <div>
-                <div className="flex items-center space-x-2 mb-1">
-                  <h1 className="text-2xl font-bold text-gray-900">{project.name}</h1>
-                <Badge variant={getStatusBadgeVariant(project.status)}>
-                  {project.status.replace('_', ' ')}
-                </Badge>
-                <Badge variant={getPriorityBadgeVariant(String(project.priority))}>
-                  {project.priority}
-                </Badge>
-              </div>
-              <CardDescription>{project.description}</CardDescription>
+                <div className="flex items-center space-x-3 mb-2">
+                  <h1 className="text-3xl font-bold text-gray-900">{project.name}</h1>
+                  <div className="flex items-center space-x-2">
+                    <Badge variant={getStatusBadgeVariant(project.status)} className="px-3 py-1 text-sm font-medium">
+                      {project.status.replace('_', ' ')}
+                    </Badge>
+                    <Badge variant={getPriorityBadgeVariant(String(project.priority))} className="px-3 py-1 text-sm font-medium">
+                      {project.priority} priority
+                    </Badge>
+                  </div>
+                </div>
+                {project.description && (
+                  <CardDescription className="text-base text-gray-600 max-w-3xl">
+                    {project.description}
+                  </CardDescription>
+                )}
             </div>
           </div>
           {(accessLevel === 'full' || accessLevel === 'limited') && (
@@ -135,44 +142,71 @@ export function ProjectHeader({ projectId }: ProjectHeaderProps) {
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {project.location && (
-            <div className="flex items-center space-x-2">
-              <MapPin className="w-4 h-4 text-gray-500" />
-              <span className="text-sm">{project.location}</span>
+            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg border">
+              <MapPin className="w-5 h-5 text-blue-600" />
+              <div>
+                <div className="text-xs text-gray-500 uppercase tracking-wide">Location</div>
+                <div className="text-sm font-medium text-gray-900">{project.location}</div>
+              </div>
             </div>
           )}
           {project.start_date && (
-            <div className="flex items-center space-x-2">
-              <Calendar className="w-4 h-4 text-gray-500" />
-              <span className="text-sm">Started {new Date(project.start_date).toLocaleDateString()}</span>
+            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg border">
+              <Calendar className="w-5 h-5 text-green-600" />
+              <div>
+                <div className="text-xs text-gray-500 uppercase tracking-wide">Started</div>
+                <div className="text-sm font-medium text-gray-900">{new Date(project.start_date).toLocaleDateString()}</div>
+              </div>
             </div>
           )}
           {project.end_date && (
-            <div className="flex items-center space-x-2">
-              <Clock className="w-4 h-4 text-gray-500" />
-              <span className="text-sm">Due {new Date(project.end_date).toLocaleDateString()}</span>
+            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg border">
+              <Clock className="w-5 h-5 text-orange-600" />
+              <div>
+                <div className="text-xs text-gray-500 uppercase tracking-wide">Due Date</div>
+                <div className="text-sm font-medium text-gray-900">{new Date(project.end_date).toLocaleDateString()}</div>
+              </div>
             </div>
           )}
           {project.budget && (
-            <div className="flex items-center space-x-2">
-              <DollarSign className="w-4 h-4 text-gray-500" />
-              <span className="text-sm">${project.budget.toLocaleString()}</span>
+            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg border">
+              <DollarSign className="w-5 h-5 text-purple-600" />
+              <div>
+                <div className="text-xs text-gray-500 uppercase tracking-wide">Budget</div>
+                <div className="text-sm font-medium text-gray-900">${project.budget.toLocaleString()}</div>
+              </div>
             </div>
           )}
         </div>
         
-        {/* Progress Bar */}
+        {/* Enhanced Progress Bar */}
         {project.progress_percentage !== undefined && (
-          <div className="mt-4">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium text-gray-700">Overall Progress</span>
-              <span className="text-sm text-gray-600">{project.progress_percentage}%</span>
+          <div className="mt-6 p-4 bg-gray-50 rounded-lg border">
+            <div className="flex justify-between items-center mb-3">
+              <div className="flex items-center space-x-2">
+                <BarChart3 className="w-4 h-4 text-gray-600" />
+                <span className="text-sm font-semibold text-gray-700">Project Progress</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className="text-lg font-bold text-gray-900">{project.progress_percentage}%</span>
+                <span className="text-sm text-gray-500">complete</span>
+              </div>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-3">
+            <div className="w-full bg-gray-200 rounded-full h-4 shadow-inner">
               <div 
-                className="bg-status-info h-3 rounded-full transition-all duration-300"
+                className={`h-4 rounded-full transition-all duration-500 ${
+                  project.progress_percentage < 25 ? 'bg-gradient-to-r from-red-400 to-red-500' :
+                  project.progress_percentage < 50 ? 'bg-gradient-to-r from-orange-400 to-orange-500' :
+                  project.progress_percentage < 75 ? 'bg-gradient-to-r from-yellow-400 to-yellow-500' :
+                  project.progress_percentage < 100 ? 'bg-gradient-to-r from-blue-400 to-blue-500' :
+                  'bg-gradient-to-r from-green-400 to-green-500'
+                }`}
                 style={{ width: `${project.progress_percentage}%` }}
               />
             </div>
+            {project.progress_percentage === 0 && (
+              <div className="text-xs text-gray-500 mt-2 text-center">Project ready to begin</div>
+            )}
           </div>
         )}
       </CardContent>

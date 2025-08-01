@@ -46,12 +46,12 @@ export const useAuth = () => {
         const profile: UserProfile = {
           id: data.id,
           role: data.role as UserRole,
-          first_name: data.first_name,
-          last_name: data.last_name,
+          first_name: data.full_name?.split(' ')[0] || '',
+          last_name: data.full_name?.split(' ').slice(1).join(' ') || '',
           email: data.email,
           phone: data.phone,
-          company: data.company,
-          department: data.department,
+          company: '', // Not in database schema
+          department: '', // Not in database schema
           permissions: data.permissions || {},
           is_active: data.is_active,
           created_at: data.created_at,
@@ -96,6 +96,15 @@ export const useAuth = () => {
 
   useEffect(() => {
     console.log('🔐 [useAuth] Initializing auth hook')
+    
+    // Set up automatic token refresh (every 30 minutes)
+    const refreshInterval = setInterval(async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        console.log('🔄 [useAuth] Auto-refreshing token...')
+        await supabase.auth.refreshSession()
+      }
+    }, 30 * 60 * 1000) // 30 minutes
     
     const initializeAuth = async () => {
       try {
@@ -223,7 +232,10 @@ export const useAuth = () => {
       }
     )
 
-    return () => subscription.unsubscribe()
+    return () => {
+      subscription.unsubscribe()
+      clearInterval(refreshInterval)
+    }
   }, []) // Empty dependency array to prevent infinite loops
 
   const signIn = useCallback(async (email: string, password: string) => {
@@ -301,6 +313,24 @@ export const useAuth = () => {
     }
   }, [])
 
+  const refreshToken = useCallback(async () => {
+    try {
+      console.log('🔄 [useAuth] Manually refreshing token...')
+      const { data, error } = await supabase.auth.refreshSession()
+      
+      if (error) {
+        console.error('🔐 [useAuth] Token refresh error:', error)
+        return false
+      }
+      
+      console.log('✅ [useAuth] Token refreshed successfully')
+      return true
+    } catch (error) {
+      console.error('🔐 [useAuth] Token refresh exception:', error)
+      return false
+    }
+  }, [])
+
   const getAccessToken = useCallback(async () => {
     try {
       const { data: { session }, error } = await supabase.auth.getSession()
@@ -351,6 +381,7 @@ export const useAuth = () => {
     signIn,
     signOut,
     getAccessToken,
+    refreshToken,
     clearAuthError,
     clearStaleSession,
     

@@ -17,7 +17,7 @@
 
 'use client';
 
-import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback, useRef } from 'react';
 import { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import { useAuth } from '@/hooks/useAuth';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
@@ -63,9 +63,15 @@ export function RealtimeProvider({ children }: RealtimeProviderProps) {
   const [isConnected, setIsConnected] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected' | 'error'>('disconnected');
   const [channels, setChannels] = useState<Map<string, RealtimeChannel>>(new Map());
+  const channelsRef = useRef<Map<string, RealtimeChannel>>(new Map());
   const [presence, setPresence] = useState<Map<string, UserPresence[]>>(new Map());
   
   const supabase = createClientComponentClient();
+
+  // Keep channelsRef in sync with channels state
+  useEffect(() => {
+    channelsRef.current = channels;
+  }, [channels]);
 
   // Initialize realtime connection
   useEffect(() => {
@@ -273,7 +279,7 @@ export function RealtimeProvider({ children }: RealtimeProviderProps) {
     if (!profile) return;
 
     const channelName = `presence:${projectId}`;
-    const existingChannel = channels.get(channelName);
+    const existingChannel = channelsRef.current.get(channelName);
     
     if (existingChannel) {
       existingChannel.track({
@@ -307,7 +313,12 @@ export function RealtimeProvider({ children }: RealtimeProviderProps) {
         })
         .subscribe(async (status) => {
           if (status === 'SUBSCRIBED') {
-            setChannels(prev => new Map(prev).set(channelName, channel));
+            setChannels(prev => {
+              const newMap = new Map(prev);
+              newMap.set(channelName, channel);
+              return newMap;
+            });
+            channelsRef.current.set(channelName, channel);
             await channel.track({
               userId: profile.id,
               userName: `${profile.first_name} ${profile.last_name}`,
@@ -318,7 +329,7 @@ export function RealtimeProvider({ children }: RealtimeProviderProps) {
           }
         });
     }
-  }, [profile, channels, supabase]);
+  }, [profile, supabase]);
 
   // Get presence for a project
   const getPresence = useCallback((projectId: string): UserPresence[] => {

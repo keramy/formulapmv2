@@ -103,8 +103,8 @@ export function useMilestones(projectId: string, filters?: MilestoneFilters): Us
       const data = await response.json()
       
       if (data.success) {
-        setMilestones(data.data || [])
-        setStatistics(data.pagination?.statistics || null)
+        setMilestones(data.data.data || [])
+        setStatistics(data.data.statistics || null)
       } else {
         throw new Error(data.error || 'Failed to fetch milestones')
       }

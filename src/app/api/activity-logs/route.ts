@@ -70,12 +70,12 @@ async function GETOriginal(req: NextRequest) {
     // Admin and management see all activities
     
     // Apply filters
-    if (params.entity_type) {
-      query = query.eq('entity_type', params.entity_type);
+    if ((params as any).entity_type) {
+      query = query.eq('entity_type', (params as any).entity_type);
     }
     
-    if (params.entity_id) {
-      query = query.eq('entity_id', params.entity_id);
+    if ((params as any).entity_id) {
+      query = query.eq('entity_id', (params as any).entity_id);
     }
     
     if (params.user_id) {

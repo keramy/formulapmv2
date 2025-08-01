@@ -26,7 +26,7 @@ import Link from 'next/link';
 export default function ProjectsPage() {
   const { user, profile, authState, isAuthenticated } = useAuth();
   const { hasPermission } = usePermissions();
-  const { projects, loading, error, fetchProjects } = useProjects();
+  const { projects, loading, error, fetchProjects, refreshProjects } = useProjects();
 
   // Debug authentication state
   useEffect(() => {
@@ -40,6 +40,13 @@ export default function ProjectsPage() {
       timestamp: new Date().toISOString()
     });
   }, [user, profile, authState, isAuthenticated]);
+
+  // Load projects on mount and when profile changes
+  useEffect(() => {
+    if (profile) {
+      fetchProjects();
+    }
+  }, [profile, fetchProjects]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
 
@@ -154,7 +161,7 @@ export default function ProjectsPage() {
               <h3 className="text-lg font-semibold">Error Loading Projects</h3>
               <p className="text-sm">{error}</p>
             </div>
-            <Button onClick={() => fetchProjects()} variant="outline">
+            <Button onClick={() => refreshProjects()} variant="outline">
               Try Again
             </Button>
           </CardContent>
@@ -185,87 +192,100 @@ export default function ProjectsPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProjects.map((project) => (
-            <Card key={project.id} className="hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="text-lg line-clamp-1">{project.name}</CardTitle>
-                    <CardDescription className="mt-1 line-clamp-2">
-                      {project.description || 'No description available'}
-                    </CardDescription>
-                  </div>
-                  <div className="flex gap-1">
-                    <Badge variant={getStatusBadgeVariant(project.status)}>
-                      {project.status.replace('_', ' ')}
-                    </Badge>
-                    <Badge variant={getPriorityBadgeVariant(String(project.priority))}>
-                      {project.priority}
-                    </Badge>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {/* Project Details */}
-                <div className="space-y-2 text-sm text-gray-600">
-                  {project.location && (
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4" />
-                      <span className="truncate">{project.location}</span>
-                    </div>
-                  )}
-                  {project.start_date && (
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4" />
-                      <span>Started {new Date(project.start_date).toLocaleDateString()}</span>
-                    </div>
-                  )}
-                  {project.budget && hasPermission('financials.view') && (
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="w-4 h-4" />
-                      <span>${project.budget.toLocaleString()}</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Progress Bar */}
-                {project.progress_percentage !== undefined && (
-                  <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-sm font-medium text-gray-700">Progress</span>
-                      <span className="text-sm text-gray-600">{project.progress_percentage}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${project.progress_percentage}%` }}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* Actions */}
-                <div className="flex gap-2 pt-2">
-                  <Button variant="outline" size="sm" className="flex-1" asChild>
-                    <Link href={`/projects/${project.id}`}>
-                      <Eye className="w-4 h-4 mr-1" />
-                      View
-                    </Link>
-                  </Button>
-                  {hasPermission('projects.update') && (
-                    <Button variant="outline" size="sm" className="flex-1" asChild>
-                      <Link href={`/projects/${project.id}/edit`}>
-                        <Edit className="w-4 h-4 mr-1" />
-                        Edit
-                      </Link>
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <Card>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Project Name</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Budget</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Start Date</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deadline</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {filteredProjects.map((project) => (
+                    <tr key={project.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => {
+                      console.log('🖱️ [ProjectRow] Clicked project:', { id: project.id, name: project.name });
+                      window.location.href = `/projects/${project.id}`;
+                    }}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div>
+                            <div className="text-sm font-medium text-gray-900">{project.name}</div>
+                            <div className="text-sm text-gray-500">{project.code || 'N/A'}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Badge variant={getStatusBadgeVariant(project.status)}>
+                          {project.status.replace('_', ' ')}
+                        </Badge>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {project.project_type || 'Construction'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {project.budget_amount && hasPermission('financials.view') 
+                          ? `$${project.budget_amount.toLocaleString()}`
+                          : 'N/A'
+                        }
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {project.start_date ? new Date(project.start_date).toLocaleDateString() : 'N/A'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {project.end_date ? new Date(project.end_date).toLocaleDateString() : 'N/A'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {project.end_date ? (
+                          new Date(project.end_date) < new Date() ? (
+                            <span className="text-red-600 font-medium">Overdue</span>
+                          ) : (
+                            Math.ceil((new Date(project.end_date).getTime() - new Date().getTime()) / (1000 * 3600 * 24)) + " days"
+                          )
+                        ) : 'N/A'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="w-full bg-gray-200 rounded-full h-2 mr-2">
+                            <div 
+                              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                              style={{ width: `${project.progress_percentage || 0}%` }}
+                            />
+                          </div>
+                          <span className="text-sm text-gray-600 min-w-[3rem]">{project.progress_percentage || 0}%</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm" asChild onClick={(e) => e.stopPropagation()}>
+                            <Link href={`/projects/${project.id}`}>
+                              <Eye className="w-4 h-4" />
+                            </Link>
+                          </Button>
+                          {hasPermission('projects.update') && (
+                            <Button variant="outline" size="sm" asChild onClick={(e) => e.stopPropagation()}>
+                              <Link href={`/projects/${project.id}/edit`}>
+                                <Edit className="w-4 h-4" />
+                              </Link>
+                            </Button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

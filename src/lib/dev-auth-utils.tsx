@@ -3,6 +3,7 @@
  * Helper functions for resolving auth issues during development
  */
 
+import React from 'react'
 import { clearAllAuthData } from './auth-cleanup'
 
 /**
@@ -93,8 +94,8 @@ localStorage.clear(); location.reload();
 /**
  * Add this component to your development layout to show auth debug info
  */
-export function DevAuthDebugger() {
-  if (process.env.NODE_ENV !== 'production') {
+export function DevAuthDebugger(): React.ReactElement | null {
+  if (process.env.NODE_ENV === 'production') {
     return null
   }
   

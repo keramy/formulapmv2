@@ -76,3 +76,5 @@ temp/
 **/public/workbox-*.js
 **/public/worker-*.js
 **/public/fallback-*.js
+Claude-Code-Usage-Monitor/
+mcp-servers/

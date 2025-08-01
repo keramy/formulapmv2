@@ -21,7 +21,7 @@ import { ServerActivityFeed } from './components/server/ServerActivityFeed';
 
 // Client components for interactivity (keep existing when needed)
 import { ClientDashboardActions } from './components/client/ClientDashboardActions';
-import { RealtimeDashboard } from '@/components/dashboard/RealtimeDashboard';
+import { ConstructionDashboard } from '@/components/dashboard/ConstructionDashboard';
 
 interface DashboardUser {
   id: string;
@@ -138,7 +138,7 @@ async function ServerDashboard() {
               Welcome back, {user.first_name}
             </h1>
             <p className="text-gray-600 capitalize">
-              Company Owner Dashboard
+              Project Control Center
             </p>
           </div>
           {/* Client component for interactive actions */}
@@ -217,10 +217,10 @@ async function ServerDashboard() {
             </div>
           </div>
           
-          {/* Real-time Dashboard Section */}
+          {/* Construction Dashboard Section */}
           <div className="mt-6">
             <Suspense fallback={<DashboardSkeleton />}>
-              <RealtimeDashboard />
+              <ConstructionDashboard />
             </Suspense>
           </div>
         </div>
@@ -253,10 +253,10 @@ async function ServerDashboard() {
         </ErrorBoundary>
       </Suspense>
       
-      {/* Real-time Dashboard Section */}
+      {/* Construction Dashboard Section */}
       <div className="mt-6">
         <Suspense fallback={<DashboardSkeleton />}>
-          <RealtimeDashboard />
+          <ConstructionDashboard />
         </Suspense>
       </div>
     </div>

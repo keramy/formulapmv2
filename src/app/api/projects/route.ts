@@ -22,16 +22,44 @@ async function GETOriginal(req: NextRequest) {
     // Build query for projects with related data
     const query = supabase.from('projects').select(`
       *,
-      client:clients(id, company_name, contact_person),
-      project_manager:user_profiles!projects_project_manager_id_fkey(id, first_name, last_name, email),
+      client:clients(id, name, contact_person),
+      project_manager:user_profiles!projects_project_manager_id_fkey(id, full_name, email),
       assignments:project_assignments(
         id,
         user_id,
-        role,
+        role_in_project,
         is_active,
-        user:user_profiles(id, first_name, last_name, email)
+        user:user_profiles!project_assignments_user_id_fkey(id, full_name, email)
       )
     `);
+    
+    // ROLE-BASED ACCESS CONTROL: Apply filtering based on user role
+    // Admin and Management roles can see ALL projects
+    if (!['admin', 'management'].includes(profile.role)) {
+      // Other roles (PM, technical_lead, etc.) only see projects they're assigned to
+      const assignedProjectsQuery = supabase
+        .from('project_assignments')
+        .select('project_id')
+        .eq('user_id', user.id)
+        .eq('is_active', true);
+      
+      const { data: assignments } = await assignedProjectsQuery;
+      const projectIds = assignments?.map(a => a.project_id) || [];
+      
+      if (projectIds.length === 0) {
+        // User has no project assignments, return empty result
+        return createSuccessResponse({
+          projects: [],
+          total_count: 0,
+          page: params.page || 1,
+          limit: params.limit || 20,
+          has_more: false
+        });
+      }
+      
+      // Filter to only assigned projects
+      query.in('id', projectIds);
+    }
     
     // Apply search filter if provided
     if (params.search) {
@@ -61,11 +89,18 @@ async function GETOriginal(req: NextRequest) {
       query.range(offset, offset + params.limit - 1);
     }
     
-    const { data, error } = await query;
+    const { data, error, count } = await query;
     
     if (error) throw error;
     
-    return createSuccessResponse(data);
+    // Return in the expected format for frontend
+    return createSuccessResponse({
+      projects: data || [],
+      total_count: count || data?.length || 0,
+      page: params.page || 1,
+      limit: params.limit || 20,
+      has_more: params.limit ? (data?.length || 0) >= params.limit : false
+    });
   } catch (error) {
     console.error('API fetch error:', error);
     throw error;
@@ -84,36 +119,40 @@ async function POSTOriginal(req: NextRequest) {
     }
     
     // Validate required fields for project
-    if (!body.name || !body.client_id) {
-      return createErrorResponse('Project name and client ID are required', 400);
+    if (!body.name || !body.client_id || !body.start_date) {
+      return createErrorResponse('Project name, client ID, and start date are required', 400);
     }
+    
+    // Generate project code from name
+    const projectCode = body.name.toUpperCase().replace(/[^A-Z0-9]/g, '').substring(0, 8) + '-' + Date.now().toString().slice(-4);
     
     const { data, error } = await supabase
       .from('projects')
       .insert({
         name: body.name,
-        description: body.description || '',
+        code: projectCode,
+        description: body.description || null,
         status: body.status || 'planning',
-        client_id: body.client_id,
+        client_id: body.client_id || null,
         project_manager_id: body.project_manager_id || user.id,
         start_date: body.start_date,
-        end_date: body.end_date,
-        budget: body.budget || 0,
-        location: body.location || '',
-        notes: body.notes || '',
-        created_by: user.id,
-        created_at: new Date().toISOString()
+        end_date: body.end_date || null,
+        budget_amount: body.budget ? parseFloat(body.budget) : null,
+        location: body.location || null,
+        created_by: user.id
       })
       .select(`
         *,
-        client:clients(id, company_name, contact_person),
-        project_manager:user_profiles!projects_project_manager_id_fkey(id, first_name, last_name, email)
+        client:clients(id, name, contact_person),
+        project_manager:user_profiles!projects_project_manager_id_fkey(id, full_name, email)
       `)
       .single();
     
     if (error) throw error;
     
-    return createSuccessResponse(data);
+    return createSuccessResponse({
+      project: data
+    });
   } catch (error) {
     console.error('API create error:', error);
     throw error;

@@ -7,7 +7,6 @@
         "npx",
         "-y",
         "@supabase/mcp-server-supabase@latest",
-        "--read-only",
         "--project-ref=<xrrrtwrfadcilwkgwacs>"
       ],
       "env": {
@@ -17,9 +16,11 @@
     "postgres": {
       "command": "postgres-mcp",
       "args": [
-        "--access-mode=unrestricted",
-        "postgresql://postgres:postgres@127.0.0.1:54322/postgres"
-      ]
+        "--access-mode=restricted"
+      ],
+      "env": {
+        "DATABASE_URL": "postgresql://postgres.xrrrtwrfadcilwkgwacs:535425Keramy!@aws-0-eu-central-1.pooler.supabase.com:6543/postgres?sslmode=require"
+      }
     }
   }
 }

@@ -1,13 +1,14 @@
 /**
- * Server Dashboard Stats Component
+ * Construction Dashboard Stats Component
  * 
- * Fetches dashboard statistics on the server for immediate rendering
+ * Fetches construction project statistics on the server for immediate rendering
+ * Displays construction-industry focused metrics and terminology
  * This replaces the client-side data fetching for better performance
  */
 
 import { createServerClient } from '@/lib/supabase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Activity, DollarSign, FolderOpen, Users, AlertTriangle } from 'lucide-react';
+import { Building2, DollarSign, ClipboardList, TrendingUp, AlertTriangle, Hammer, Calendar } from 'lucide-react';
 
 interface DashboardStats {
   totalProjects: number;
@@ -128,63 +129,63 @@ export async function ServerDashboardStats({ userId, role }: ServerDashboardStat
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      {/* Active Projects */}
-      <Card>
+      {/* Current Projects */}
+      <Card className="border-l-4 border-l-blue-500">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
-          <FolderOpen className="h-4 w-4 text-muted-foreground" />
+          <CardTitle className="text-sm font-medium text-gray-700">Projects in Progress</CardTitle>
+          <Building2 className="h-5 w-5 text-blue-600" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{stats.activeProjects}</div>
-          <p className="text-xs text-muted-foreground">
+          <div className="text-2xl font-bold text-gray-900">{stats.activeProjects}</div>
+          <p className="text-xs text-gray-600">
             of {stats.totalProjects} total projects
           </p>
         </CardContent>
       </Card>
 
-      {/* Budget Overview */}
-      <Card>
+      {/* Project Spending */}
+      <Card className="border-l-4 border-l-green-500">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Budget Utilization</CardTitle>
-          <DollarSign className="h-4 w-4 text-muted-foreground" />
+          <CardTitle className="text-sm font-medium text-gray-700">Project Spending</CardTitle>
+          <DollarSign className="h-5 w-5 text-green-600" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{formatCurrency(stats.totalSpent)}</div>
-          <p className="text-xs text-muted-foreground">
-            of {formatCurrency(stats.totalBudget)} budgeted
+          <div className="text-2xl font-bold text-gray-900">{formatCurrency(stats.totalSpent)}</div>
+          <p className="text-xs text-gray-600">
+            of {formatCurrency(stats.totalBudget)} allocated
           </p>
         </CardContent>
       </Card>
 
-      {/* Active Tasks */}
-      <Card>
+      {/* Work Orders */}
+      <Card className="border-l-4 border-l-orange-500">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Active Tasks</CardTitle>
-          <Activity className="h-4 w-4 text-muted-foreground" />
+          <CardTitle className="text-sm font-medium text-gray-700">Active Work Orders</CardTitle>
+          <ClipboardList className="h-5 w-5 text-orange-600" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{stats.activeTasks}</div>
-          <p className="text-xs text-muted-foreground">
+          <div className="text-2xl font-bold text-gray-900">{stats.activeTasks}</div>
+          <p className="text-xs text-gray-600">
             {stats.overdueTasks > 0 && (
-              <span className="text-red-600">
-                {stats.overdueTasks} overdue
+              <span className="text-red-600 font-medium">
+                {stats.overdueTasks} behind schedule
               </span>
             )}
-            {stats.overdueTasks === 0 && "All tasks on track"}
+            {stats.overdueTasks === 0 && "All on schedule"}
           </p>
         </CardContent>
       </Card>
 
-      {/* Team Performance */}
-      <Card>
+      {/* Project Completion Rate */}
+      <Card className="border-l-4 border-l-purple-500">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Team Performance</CardTitle>
-          <Users className="h-4 w-4 text-muted-foreground" />
+          <CardTitle className="text-sm font-medium text-gray-700">Completion Rate</CardTitle>
+          <TrendingUp className="h-5 w-5 text-purple-600" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{formatPercentage(stats.completionRate)}</div>
-          <p className="text-xs text-muted-foreground">
-            completion rate • {stats.teamMembers} members
+          <div className="text-2xl font-bold text-gray-900">{formatPercentage(stats.completionRate)}</div>
+          <p className="text-xs text-gray-600">
+            project completion • {stats.teamMembers} team members
           </p>
         </CardContent>
       </Card>

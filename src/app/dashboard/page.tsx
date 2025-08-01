@@ -9,7 +9,7 @@
  */
 
 import { Suspense } from 'react';
-import ServerDashboard from './dashboard-server';
+import { ConstructionDashboard } from '@/components/dashboard/ConstructionDashboard';
 import { DashboardSkeleton } from './components/DashboardSkeleton';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
@@ -18,18 +18,20 @@ export default function DashboardPage() {
   // User will only see this page if LayoutWrapper confirms they're authenticated
   
   return (
-    <div className="container mx-auto py-6">
-      <ErrorBoundary>
-        <Suspense fallback={<DashboardSkeleton />}>
-          <ServerDashboard />
-        </Suspense>
-      </ErrorBoundary>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <ErrorBoundary>
+          <Suspense fallback={<DashboardSkeleton />}>
+            <ConstructionDashboard />
+          </Suspense>
+        </ErrorBoundary>
+      </div>
     </div>
   );
 }
 
 // Add metadata for better SEO
 export const metadata = {
-  title: 'Dashboard | Formula PM',
-  description: 'Project management dashboard with real-time insights and team collaboration tools',
+  title: 'Project Control Center | Formula PM',
+  description: 'Professional construction project management dashboard with portfolio overview, project tracking, and comprehensive project insights',
 };

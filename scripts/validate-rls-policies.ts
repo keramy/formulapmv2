@@ -373,4 +373,5 @@ if (require.main === module) {
   main();
 }
 
-export { RLSValidator, ValidationIssue, ValidationResult };
+export type { ValidationIssue, ValidationResult };
+export { RLSValidator };

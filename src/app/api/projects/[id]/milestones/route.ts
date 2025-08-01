@@ -19,35 +19,30 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }, { pa
     const supabase = await createClient();
     
     // Parse query parameters for filtering and pagination
-    const { page, limit, search, sort_field = 'milestone_date', sort_direction = 'asc', filters } = parseQueryParams(request);
+    const { page, limit, search, sort_field = 'due_date', sort_direction = 'asc', filters } = parseQueryParams(request);
     
-    // Build query
+    // Build query without foreign key references (constraints don't exist in cloud DB yet)
     let query = supabase
-      .from('project_milestones')
+      .from('milestones')
       .select(`
         id,
-        title,
+        name,
         description,
-        milestone_date,
+        due_date,
+        completed_date,
         status,
-        milestone_type,
-        completion_percentage,
-        actual_completion_date,
-        notes,
+        percentage_weight,
+        amount,
+        responsible_user_id,
+        created_by,
         created_at,
-        updated_at,
-        creator:user_profiles!project_milestones_created_by_fkey(
-          id, first_name, last_name, email
-        ),
-        project:projects(
-          id, name, status
-        )
+        updated_at
       `, { count: 'exact' })
       .eq('project_id', projectId);
     
     // Apply search filter
     if (search) {
-      query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`);
+      query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
     }
     
     // Apply status filter
@@ -59,28 +54,27 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }, { pa
     
     // Apply date range filters
     if (filters?.target_date_start) {
-      query = query.gte('milestone_date', filters.target_date_start);
+      query = query.gte('due_date', filters.target_date_start);
     }
     if (filters?.target_date_end) {
-      query = query.lte('milestone_date', filters.target_date_end);
+      query = query.lte('due_date', filters.target_date_end);
     }
     
     // Apply special filters
     if (filters?.overdue_only === 'true') {
-      query = query.lt('milestone_date', new Date().toISOString().split('T')[0])
+      query = query.lt('due_date', new Date().toISOString().split('T')[0])
                    .neq('status', 'completed');
     }
     if (filters?.completed_only === 'true') {
       query = query.eq('status', 'completed');
     }
     if (filters?.upcoming_only === 'true') {
-      query = query.eq('status', 'not_started')
-                   .gte('milestone_date', new Date().toISOString().split('T')[0]);
+      query = query.eq('status', 'pending')
+                   .gte('due_date', new Date().toISOString().split('T')[0]);
     }
     
     // Apply sorting
-    const dbSortField = sort_field === 'target_date' ? 'milestone_date' : 
-                       sort_field === 'name' ? 'title' : sort_field;
+    const dbSortField = sort_field === 'target_date' ? 'due_date' : sort_field;
     query = query.order(dbSortField, { ascending: sort_direction === 'asc' });
     
     // Apply pagination
@@ -96,30 +90,28 @@ export const GET = withAuth(async (request: NextRequest, { user, profile }, { pa
       return createErrorResponse('Failed to fetch milestones', 500);
     }
     
-    // Transform data to match frontend types
+    // Transform data to match frontend types (no related data until FK constraints are added)
     const transformedData = data.map(milestone => ({
       id: milestone.id,
       project_id: projectId,
-      name: milestone.title,
+      name: milestone.name,
       description: milestone.description,
-      target_date: milestone.milestone_date,
-      actual_date: milestone.actual_completion_date,
+      target_date: milestone.due_date,
+      actual_date: milestone.completed_date,
       status: mapDbToFrontendStatus(milestone.status),
-      created_by: (milestone.creator as any)?.id,
+      created_by: milestone.created_by,
       created_at: milestone.created_at,
       updated_at: milestone.updated_at,
-      creator: milestone.creator ? {
-        id: (milestone.creator as any)?.id,
-        full_name: `${(milestone.creator as any)?.first_name} ${(milestone.creator as any)?.last_name}`,
-        email: (milestone.creator as any)?.email
-      } : undefined,
-      project: milestone.project
+      // Related data will be available once FK constraints are added to cloud DB
+      creator: undefined,
+      responsible: undefined,
+      project: undefined
     }));
     
     // Calculate statistics
     const statsQuery = await supabase
-      .from('project_milestones')
-      .select('status, milestone_date')
+      .from('milestones')
+      .select('status, due_date')
       .eq('project_id', projectId);
     
     const statistics = calculateMilestoneStatistics(statsQuery.data || []);
@@ -156,9 +148,9 @@ export const POST = withAuth(async (request: NextRequest, { user, profile }, { p
     
     const milestoneData = {
       project_id: projectId,
-      title: validationResult.data.name,
+      name: validationResult.data.name,
       description: validationResult.data.description,
-      milestone_date: validationResult.data.target_date,
+      due_date: validationResult.data.target_date,
       status: mapFrontendToDbStatus(validationResult.data.status || 'upcoming'),
       created_by: profile.id,
       created_at: new Date().toISOString(),
@@ -167,23 +159,21 @@ export const POST = withAuth(async (request: NextRequest, { user, profile }, { p
     
     // Create the milestone
     const { data, error } = await supabase
-      .from('project_milestones')
+      .from('milestones')
       .insert(milestoneData)
       .select(`
         id,
-        title,
+        name,
         description,
-        milestone_date,
+        due_date,
+        completed_date,
         status,
-        milestone_type,
-        completion_percentage,
-        actual_completion_date,
-        notes,
+        percentage_weight,
+        amount,
+        responsible_user_id,
+        created_by,
         created_at,
-        updated_at,
-        creator:user_profiles!project_milestones_created_by_fkey(
-          id, first_name, last_name, email
-        )
+        updated_at
       `)
       .single();
     
@@ -192,23 +182,20 @@ export const POST = withAuth(async (request: NextRequest, { user, profile }, { p
       return createErrorResponse('Failed to create milestone', 500);
     }
     
-    // Transform data to match frontend types
+    // Transform data to match frontend types (no related data until FK constraints are added)
     const transformedData = {
       id: data.id,
       project_id: projectId,
-      name: data.title,
+      name: data.name,
       description: data.description,
-      target_date: data.milestone_date,
-      actual_date: data.actual_completion_date,
+      target_date: data.due_date,
+      actual_date: data.completed_date,
       status: mapDbToFrontendStatus(data.status),
-      created_by: (data.creator as any)?.id,
+      created_by: data.created_by,
       created_at: data.created_at,
       updated_at: data.updated_at,
-      creator: data.creator ? {
-        id: (data.creator as any)?.id,
-        full_name: `${(data.creator as any)?.first_name} ${(data.creator as any)?.last_name}`,
-        email: (data.creator as any)?.email
-      } : undefined
+      // Related data will be available once FK constraints are added to cloud DB
+      creator: undefined
     };
     
     // Log activity
@@ -219,7 +206,7 @@ export const POST = withAuth(async (request: NextRequest, { user, profile }, { p
       resource_id: data.id,
       details: {
         project_id: projectId,
-        title: data.title,
+        title: data.name,
       },
     });
     
@@ -233,10 +220,10 @@ export const POST = withAuth(async (request: NextRequest, { user, profile }, { p
 // Helper functions to map between frontend and database status values
 function mapFrontendToDbStatus(frontendStatus: string): string {
   const mapping: Record<string, string> = {
-    'upcoming': 'not_started',
+    'upcoming': 'pending',
     'in_progress': 'in_progress',
     'completed': 'completed',
-    'overdue': 'overdue',
+    'overdue': 'delayed',
     'cancelled': 'cancelled'
   };
   return mapping[frontendStatus] || frontendStatus;
@@ -244,10 +231,10 @@ function mapFrontendToDbStatus(frontendStatus: string): string {
 
 function mapDbToFrontendStatus(dbStatus: string): string {
   const mapping: Record<string, string> = {
-    'not_started': 'upcoming',
+    'pending': 'upcoming',
     'in_progress': 'in_progress',
     'completed': 'completed',
-    'overdue': 'overdue',
+    'delayed': 'overdue',
     'cancelled': 'cancelled'
   };
   return mapping[dbStatus] || dbStatus;
@@ -278,9 +265,9 @@ function calculateMilestoneStatistics(milestones: any[]) {
     
     if (milestone.status === 'completed') {
       stats.completed++;
-    } else if (milestone.milestone_date < today && milestone.status !== 'completed') {
+    } else if (milestone.due_date < today && milestone.status !== 'completed') {
       stats.overdue++;
-    } else if (milestone.status === 'not_started') {
+    } else if (milestone.status === 'pending') {
       stats.upcoming++;
     }
   });

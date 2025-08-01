@@ -150,10 +150,6 @@ const LoginForm = ({
           </div>
           <div className="text-xs text-gray-600 space-y-1">
             <div>✅ admin@formulapm.com / admin123 (Admin)</div>
-            <div>✅ owner.test@formulapm.com / testpass123 (Management)</div>
-            <div>✅ pm.working@formulapm.com / testpass123 (Project Manager)</div>
-            <div>✅ admin.working@formulapm.com / testpass123 (Admin)</div>
-            <div>✅ client.working@formulapm.com / testpass123 (Client)</div>
           </div>
         </div>
       )}

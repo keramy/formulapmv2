@@ -25,7 +25,7 @@ export default function UsersPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">5</div>
+            <div className="text-2xl font-bold">1</div>
             <p className="text-xs text-muted-foreground">
               Active users
             </p>
@@ -92,16 +92,8 @@ export default function UsersPage() {
             
             <div className="flex items-center justify-between p-4 border rounded-lg">
               <div>
-                <p className="font-medium">Test Owner</p>
-                <p className="text-sm text-gray-600">owner.test@formulapm.com • Management</p>
-              </div>
-              <Button variant="outline" size="sm">Edit</Button>
-            </div>
-            
-            <div className="flex items-center justify-between p-4 border rounded-lg">
-              <div>
-                <p className="font-medium">Test PM</p>
-                <p className="text-sm text-gray-600">pm.test@formulapm.com • Project Manager</p>
+                <p className="font-medium">Admin User</p>
+                <p className="text-sm text-gray-600">admin@formulapm.com • Admin</p>
               </div>
               <Button variant="outline" size="sm">Edit</Button>
             </div>
