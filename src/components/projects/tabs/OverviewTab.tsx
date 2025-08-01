@@ -9,18 +9,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DashboardWidget, ProjectStatusWidget, TeamWidget, ProgressRing } from '@/components/ui/dashboard-widgets';
-import { 
-  Calendar, 
-  MapPin, 
-  DollarSign,
-  Users,
-  Clock,
-  BarChart3,
-  AlertTriangle,
-  CheckCircle,
-  XCircle,
-  Target
-} from 'lucide-react';
+import Calendar from 'lucide-react/dist/esm/icons/calendar'
+import MapPin from 'lucide-react/dist/esm/icons/map-pin'
+import DollarSign from 'lucide-react/dist/esm/icons/dollar-sign'
+import Users from 'lucide-react/dist/esm/icons/users'
+import Clock from 'lucide-react/dist/esm/icons/clock'
+import BarChart3 from 'lucide-react/dist/esm/icons/bar-chart-3'
+import AlertTriangle from 'lucide-react/dist/esm/icons/alert-triangle'
+import CheckCircle from 'lucide-react/dist/esm/icons/check-circle'
+import XCircle from 'lucide-react/dist/esm/icons/x-circle'
+import Target from 'lucide-react/dist/esm/icons/target'
 
 interface OverviewTabProps {
   projectId: string;

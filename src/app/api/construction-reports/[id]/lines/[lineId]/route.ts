@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { withAPI, getRequestData, createSuccessResponse, createErrorResponse } from '@/lib/enhanced-auth-middleware';
-import { supabase } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 
 // GET /api/construction-reports/[id]/lines/[lineId] - Get specific line with photos
 async function GETOriginal(request: NextRequest, { user, profile, params }: any) {
@@ -11,6 +11,7 @@ async function GETOriginal(request: NextRequest, { user, profile, params }: any)
       return createErrorResponse('Report ID and Line ID are required', 400);
     }
 
+    const supabase = await createClient();
     const { data: line, error } = await supabase
       .from('construction_report_lines')
       .select(`
@@ -55,6 +56,7 @@ async function PUTOriginal(request: NextRequest, { user, profile, params }: any)
     }
 
     // Check if line exists and get report status
+    const supabase = await createClient();
     const { data: existingLine, error: fetchError } = await supabase
       .from('construction_report_lines')
       .select(`
@@ -84,6 +86,7 @@ async function PUTOriginal(request: NextRequest, { user, profile, params }: any)
     }
 
     // Update the line
+    const supabase = await createClient();
     const { data: line, error } = await supabase
       .from('construction_report_lines')
       .update(updateData)
@@ -122,6 +125,7 @@ async function DELETEOriginal(request: NextRequest, { user, profile, params }: a
     }
 
     // Check if line exists and get report status
+    const supabase = await createClient();
     const { data: existingLine, error: fetchError } = await supabase
       .from('construction_report_lines')
       .select(`
@@ -142,6 +146,7 @@ async function DELETEOriginal(request: NextRequest, { user, profile, params }: a
     }
 
     // Delete the line (cascade will handle photos)
+    const supabase = await createClient();
     const { error } = await supabase
       .from('construction_report_lines')
       .delete()

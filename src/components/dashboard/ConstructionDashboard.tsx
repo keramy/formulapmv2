@@ -13,21 +13,20 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/hooks/useAuth';
-import { 
-  Building, 
-  DollarSign, 
-  TrendingUp, 
-  CheckCircle,
-  BarChart3,
-  Calendar,
-  MapPin,
-  User,
-  ArrowUp,
-  ArrowDown,
-  Clock,
-  AlertTriangle,
-  ArrowUpDown
-} from 'lucide-react';
+// Optimized icon imports for better tree-shaking
+import Building from 'lucide-react/dist/esm/icons/building';
+import DollarSign from 'lucide-react/dist/esm/icons/dollar-sign';
+import TrendingUp from 'lucide-react/dist/esm/icons/trending-up';
+import CheckCircle from 'lucide-react/dist/esm/icons/check-circle';
+import BarChart3 from 'lucide-react/dist/esm/icons/bar-chart-3';
+import Calendar from 'lucide-react/dist/esm/icons/calendar';
+import MapPin from 'lucide-react/dist/esm/icons/map-pin';
+import User from 'lucide-react/dist/esm/icons/user';
+import ArrowUp from 'lucide-react/dist/esm/icons/arrow-up';
+import ArrowDown from 'lucide-react/dist/esm/icons/arrow-down';
+import Clock from 'lucide-react/dist/esm/icons/clock';
+import AlertTriangle from 'lucide-react/dist/esm/icons/alert-triangle';
+import ArrowUpDown from 'lucide-react/dist/esm/icons/arrow-up-down';
 
 interface DashboardStats {
   totalPortfolioValue: number;
@@ -68,28 +67,8 @@ export function ConstructionDashboard() {
   const [sortField, setSortField] = useState<string>('updated_at');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
-  // Load initial data once
-  useEffect(() => {
-    loadInitialData();
-  }, []);
-
-  // Sort projects client-side when sort changes
-  useEffect(() => {
-    if (allProjects.length > 0) {
-      sortProjectsClientSide();
-    }
-  }, [sortField, sortDirection, allProjects]);
-
-  // Load initial data once
-  const loadInitialData = async () => {
-    await Promise.all([
-      loadDashboardStats(),
-      loadAllProjects()
-    ]);
-  };
-
-  // Load dashboard stats (only once)
-  const loadDashboardStats = async () => {
+  // Load dashboard stats function
+  const loadDashboardStats = useCallback(async () => {
     try {
       setStatsLoading(true);
       const token = await getAccessToken();
@@ -131,10 +110,10 @@ export function ConstructionDashboard() {
     } finally {
       setStatsLoading(false);
     }
-  };
+  }, [getAccessToken]);
 
-  // Load all projects for client-side sorting
-  const loadAllProjects = async () => {
+  // Load all projects function
+  const loadAllProjects = useCallback(async () => {
     try {
       setProjectsLoading(true);
       const token = await getAccessToken();
@@ -194,7 +173,54 @@ export function ConstructionDashboard() {
     } finally {
       setProjectsLoading(false);
     }
-  };
+  }, [getAccessToken]);
+
+  // Load initial data function (now with proper dependencies)
+  const loadInitialData = useCallback(async () => {
+    console.log('🔄 [Dashboard] Loading initial data');
+    await Promise.all([
+      loadDashboardStats(),
+      loadAllProjects()
+    ]);
+  }, [loadDashboardStats, loadAllProjects]);
+
+  // Load initial data once
+  useEffect(() => {
+    loadInitialData();
+  }, [loadInitialData]);
+
+  // Auto-refresh data periodically and on page visibility change (better UX)
+  useEffect(() => {
+    // Refresh when page becomes visible (user navigates back)
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        console.log('🔄 [Dashboard] Page became visible - refreshing data');
+        loadInitialData();
+      }
+    };
+
+    // Set up periodic refresh every 30 seconds for real-time updates
+    const refreshInterval = setInterval(() => {
+      if (!document.hidden) {
+        console.log('🔄 [Dashboard] Periodic refresh');
+        loadInitialData();
+      }
+    }, 30000); // 30 seconds
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      clearInterval(refreshInterval);
+    };
+  }, [loadInitialData]);
+
+  // Sort projects client-side when sort changes
+  useEffect(() => {
+    if (allProjects.length > 0) {
+      sortProjectsClientSide();
+    }
+  }, [sortField, sortDirection, allProjects]);
 
   // Memoized client-side sorting function (INSTANT!)
   const sortProjectsClientSide = useCallback(() => {

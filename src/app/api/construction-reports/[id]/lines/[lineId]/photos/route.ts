@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { withAPI, getRequestData, createSuccessResponse, createErrorResponse } from '@/lib/enhanced-auth-middleware';
-import { supabase } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 
 // GET /api/construction-reports/[id]/lines/[lineId]/photos - Get all photos for a line
 async function GETOriginal(request: NextRequest, { user, profile, params }: any) {
@@ -12,6 +12,7 @@ async function GETOriginal(request: NextRequest, { user, profile, params }: any)
     }
 
     // Verify user has access to the line
+    const supabase = await createClient();
     const { data: lineAccess, error: accessError } = await supabase
       .from('construction_report_lines')
       .select('id')
@@ -23,6 +24,7 @@ async function GETOriginal(request: NextRequest, { user, profile, params }: any)
       return createErrorResponse('Construction report line not found or access denied', 404);
     }
 
+    const supabase = await createClient();
     const { data: photos, error } = await supabase
       .from('construction_report_photos')
       .select(`
@@ -63,6 +65,7 @@ async function POSTOriginal(request: NextRequest, { user, profile, params }: any
     }
 
     // Verify user has access to the line and report is in draft status
+    const supabase = await createClient();
     const { data: line, error: accessError } = await supabase
       .from('construction_report_lines')
       .select(`
@@ -95,6 +98,7 @@ async function POSTOriginal(request: NextRequest, { user, profile, params }: any
     }
 
     // Create the photo record
+    const supabase = await createClient();
     const { data: photo, error } = await supabase
       .from('construction_report_photos')
       .insert({

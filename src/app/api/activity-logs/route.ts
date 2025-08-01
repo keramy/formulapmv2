@@ -78,24 +78,24 @@ async function GETOriginal(req: NextRequest) {
       query = query.eq('entity_id', (params as any).entity_id);
     }
     
-    if (params.user_id) {
-      query = query.eq('user_id', params.user_id);
+    if ((params as any).user_id) {
+      query = query.eq('user_id', (params as any).user_id);
     }
     
-    if (params.action) {
-      query = query.eq('action', params.action);
+    if ((params as any).action) {
+      query = query.eq('action', (params as any).action);
     }
     
-    if (params.project_id) {
-      query = query.or(`entity_type.eq.project.and.entity_id.eq.${params.project_id},details->>project_id.eq.${params.project_id}`);
+    if ((params as any).project_id) {
+      query = query.or(`entity_type.eq.project.and.entity_id.eq.${(params as any).project_id},details->>project_id.eq.${(params as any).project_id}`);
     }
     
-    if (params.date_from) {
-      query = query.gte('created_at', params.date_from);
+    if ((params as any).date_from) {
+      query = query.gte('created_at', (params as any).date_from);
     }
     
-    if (params.date_to) {
-      query = query.lte('created_at', params.date_to);
+    if ((params as any).date_to) {
+      query = query.lte('created_at', (params as any).date_to);
     }
     
     if (params.search) {
@@ -111,7 +111,7 @@ async function GETOriginal(req: NextRequest) {
     
     // Apply pagination
     const limit = params.limit || 50; // Default to 50 activity logs
-    if (limit) {
+    if (limit && params.page) {
       const offset = (params.page - 1) * limit;
       query = query.range(offset, offset + limit - 1);
     }

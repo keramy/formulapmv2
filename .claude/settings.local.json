@@ -127,7 +127,11 @@
       "Bash(where psql)",
       "Bash(pip install:*)",
       "Bash(supabase migration:*)",
-      "Bash(supabase db push:*)"
+      "Bash(supabase db push:*)",
+      "Bash(ANALYZE=true npm run build)",
+      "Bash(for:*)",
+      "Bash(do sed -i 's/let query = supabase\\./const supabase = await createClient();\\n    let query = supabase./g' \"$file\")",
+      "Bash(done)"
     ],
     "deny": []
   },

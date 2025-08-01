@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { withAPI, getRequestData, createSuccessResponse, createErrorResponse } from '@/lib/enhanced-auth-middleware';
-import { supabase } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 
 // GET /api/construction-reports/[id]/lines - Get all lines for a construction report
 async function GETOriginal(request: NextRequest, { user, profile, params }: any) {
@@ -12,6 +12,7 @@ async function GETOriginal(request: NextRequest, { user, profile, params }: any)
     }
 
     // Verify user has access to the report
+    const supabase = await createClient();
     const { data: reportAccess, error: accessError } = await supabase
       .from('construction_reports')
       .select('id')
@@ -22,6 +23,7 @@ async function GETOriginal(request: NextRequest, { user, profile, params }: any)
       return createErrorResponse('Construction report not found or access denied', 404);
     }
 
+    const supabase = await createClient();
     const { data: lines, error } = await supabase
       .from('construction_report_lines')
       .select(`
@@ -66,6 +68,7 @@ async function POSTOriginal(request: NextRequest, { user, profile, params }: any
     }
 
     // Verify user has access to the report and it's in draft status
+    const supabase = await createClient();
     const { data: report, error: accessError } = await supabase
       .from('construction_reports')
       .select('id, status')
@@ -81,6 +84,7 @@ async function POSTOriginal(request: NextRequest, { user, profile, params }: any
     }
 
     // Get the next line number
+    const supabase = await createClient();
     const { data: lastLine } = await supabase
       .from('construction_report_lines')
       .select('line_number')
@@ -92,6 +96,7 @@ async function POSTOriginal(request: NextRequest, { user, profile, params }: any
     const nextLineNumber = (lastLine?.line_number || 0) + 1;
 
     // Create the line
+    const supabase = await createClient();
     const { data: line, error } = await supabase
       .from('construction_report_lines')
       .insert({

@@ -9,6 +9,7 @@ import { usePermissions } from '@/hooks/usePermissions';
 import { Project } from '@/types/database';
 import { Calendar, MapPin, User, Plus, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { HoverPrefetchLink } from '@/components/ui/HoverPrefetchLink';
 
 export function ProjectOverview() {
   const { getAccessToken, isAuthenticated } = useAuth();
@@ -212,9 +213,13 @@ export function ProjectOverview() {
                 {/* Project Actions */}
                 <div className="flex items-center space-x-2">
                   <Button variant="ghost" size="sm" asChild>
-                    <Link href={`/projects/${project.id}`}>
+                    <HoverPrefetchLink
+                      href={`/projects/${project.id}`}
+                      className="flex items-center justify-center"
+                      prefetchDelay={150}
+                    >
                       View
-                    </Link>
+                    </HoverPrefetchLink>
                   </Button>
                 </div>
               </div>

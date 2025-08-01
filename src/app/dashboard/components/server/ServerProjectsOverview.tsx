@@ -10,6 +10,7 @@ import { createServerClient } from '@/lib/supabase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { HoverPrefetchLink } from '@/components/ui/HoverPrefetchLink';
 import { Calendar, DollarSign, MapPin } from 'lucide-react';
 
 interface Project {
@@ -133,7 +134,12 @@ export async function ServerProjectsOverview({ userId, role }: ServerProjectsOve
       <CardContent>
         <div className="space-y-4">
           {projects.map((project) => (
-            <Link key={project.id} href={`/projects/${project.id}`}>
+            <HoverPrefetchLink
+              key={project.id}
+              href={`/projects/${project.id}`}
+              className="block"
+              prefetchDelay={200}
+            >
               <div className="p-4 border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex-1 min-w-0">
@@ -195,7 +201,7 @@ export async function ServerProjectsOverview({ userId, role }: ServerProjectsOve
                   </div>
                 )}
               </div>
-            </Link>
+            </HoverPrefetchLink>
           ))}
         </div>
       </CardContent>

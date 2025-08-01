@@ -35,8 +35,8 @@ async function GETOriginal(req: NextRequest) {
     }
     
     // Apply status filter if provided
-    if (params.status) {
-      const isActive = params.status === 'active';
+    if ((params as any).status) {
+      const isActive = (params as any).status === 'active';
       query.eq('is_active', isActive);
     }
     
@@ -48,7 +48,7 @@ async function GETOriginal(req: NextRequest) {
     }
     
     // Apply pagination
-    if (params.limit) {
+    if (params.limit && params.page) {
       const offset = (params.page - 1) * params.limit;
       query.range(offset, offset + params.limit - 1);
     }

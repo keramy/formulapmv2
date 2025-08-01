@@ -1,0 +1,519 @@
+'use client';
+
+import React, { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Loader2 } from 'lucide-react';
+
+/**
+ * Centralized Loading State Management System
+ * 
+ * This system provides:
+ * - Progressive loading orchestration
+ * - Coordinated loading states across components
+ * - Intelligent skeleton loading
+ * - Performance timing measurements
+ * - Optimistic updates support
+ */
+
+interface LoadingState {
+  id: string;
+  label: string;
+  isLoading: boolean;
+  progress?: number;
+  startTime: number;
+  priority: 'critical' | 'high' | 'medium' | 'low';
+  dependencies?: string[];
+}
+
+interface LoadingMetrics {
+  totalDuration: number;
+  criticalPathDuration: number;
+  componentLoadTimes: Record<string, number>;
+  coreWebVitals: {
+    fcp?: number; // First Contentful Paint
+    lcp?: number; // Largest Contentful Paint
+    cls?: number; // Cumulative Layout Shift
+  };
+}
+
+interface LoadingOrchestratorContextType {
+  loadingStates: Record<string, LoadingState>;
+  startLoading: (id: string, label: string, priority?: LoadingState['priority'], dependencies?: string[]) => void;
+  finishLoading: (id: string) => void;
+  updateProgress: (id: string, progress: number) => void;
+  isAnyLoading: () => boolean;
+  isCriticalPathLoading: () => boolean;
+  getLoadingProgress: () => number;
+  getMetrics: () => LoadingMetrics;
+  hasLoadingDependencies: (id: string) => boolean;
+}
+
+const LoadingOrchestratorContext = createContext<LoadingOrchestratorContextType | null>(null);
+
+export function useLoadingOrchestrator() {
+  const context = useContext(LoadingOrchestratorContext);
+  if (!context) {
+    throw new Error('useLoadingOrchestrator must be used within a LoadingOrchestratorProvider');
+  }
+  return context;
+}
+
+interface LoadingOrchestratorProviderProps {
+  children: ReactNode;
+  onMetricsUpdate?: (metrics: LoadingMetrics) => void;
+}
+
+export function LoadingOrchestratorProvider({ 
+  children, 
+  onMetricsUpdate 
+}: LoadingOrchestratorProviderProps) {
+  const [loadingStates, setLoadingStates] = useState<Record<string, LoadingState>>({});
+  const [metrics, setMetrics] = useState<LoadingMetrics>({
+    totalDuration: 0,
+    criticalPathDuration: 0,
+    componentLoadTimes: {},
+    coreWebVitals: {}
+  });
+
+  // Performance observers for Core Web Vitals
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    // First Contentful Paint (FCP)
+    new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        if (entry.name === 'first-contentful-paint') {
+          setMetrics(prev => ({
+            ...prev,
+            coreWebVitals: { ...prev.coreWebVitals, fcp: entry.startTime }
+          }));
+        }
+      }
+    }).observe({ entryTypes: ['paint'] });
+
+    // Largest Contentful Paint (LCP)
+    new PerformanceObserver((list) => {
+      const entries = list.getEntries();
+      const lastEntry = entries[entries.length - 1];
+      if (lastEntry) {
+        setMetrics(prev => ({
+          ...prev,
+          coreWebVitals: { ...prev.coreWebVitals, lcp: lastEntry.startTime }
+        }));
+      }
+    }).observe({ entryTypes: ['largest-contentful-paint'] });
+
+    // Cumulative Layout Shift (CLS)
+    let clsValue = 0;
+    new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        if (!(entry as any).hadRecentInput) {
+          clsValue += (entry as any).value;
+          setMetrics(prev => ({
+            ...prev,
+            coreWebVitals: { ...prev.coreWebVitals, cls: clsValue }
+          }));
+        }
+      }
+    }).observe({ entryTypes: ['layout-shift'] });
+  }, []);
+
+  const startLoading = useCallback((
+    id: string, 
+    label: string, 
+    priority: LoadingState['priority'] = 'medium',
+    dependencies: string[] = []
+  ) => {
+    const startTime = performance.now();
+    
+    setLoadingStates(prev => ({
+      ...prev,
+      [id]: {
+        id,
+        label,
+        isLoading: true,
+        startTime,
+        priority,
+        dependencies
+      }
+    }));
+
+    console.log(`🔄 [LoadingOrchestrator] Started loading: ${id} (${label}) - Priority: ${priority}`);
+  }, []);
+
+  const finishLoading = useCallback((id: string) => {
+    setLoadingStates(prev => {
+      const state = prev[id];
+      if (!state) return prev;
+
+      const duration = performance.now() - state.startTime;
+      
+      console.log(`✅ [LoadingOrchestrator] Finished loading: ${id} (${state.label}) - Duration: ${duration.toFixed(2)}ms`);
+
+      // Update metrics
+      setMetrics(prevMetrics => {
+        const newMetrics = {
+          ...prevMetrics,
+          componentLoadTimes: {
+            ...prevMetrics.componentLoadTimes,
+            [id]: duration
+          }
+        };
+
+        // Calculate total duration and critical path
+        const allDurations = Object.values(newMetrics.componentLoadTimes);
+        newMetrics.totalDuration = allDurations.reduce((sum, d) => sum + d, 0);
+        
+        // Critical path is the longest loading sequence
+        const criticalComponents = Object.values(prev).filter(s => s.priority === 'critical');
+        newMetrics.criticalPathDuration = criticalComponents.reduce((max, s) => {
+          const componentDuration = newMetrics.componentLoadTimes[s.id] || 0;
+          return Math.max(max, componentDuration);
+        }, 0);
+
+        onMetricsUpdate?.(newMetrics);
+        return newMetrics;
+      });
+
+      // Remove from loading states
+      const { [id]: removed, ...rest } = prev;
+      return rest;
+    });
+  }, [onMetricsUpdate]);
+
+  const updateProgress = useCallback((id: string, progress: number) => {
+    setLoadingStates(prev => ({
+      ...prev,
+      [id]: prev[id] ? { ...prev[id], progress } : prev[id]
+    }));
+  }, []);
+
+  const isAnyLoading = useCallback(() => {
+    return Object.values(loadingStates).some(state => state.isLoading);
+  }, [loadingStates]);
+
+  const isCriticalPathLoading = useCallback(() => {
+    return Object.values(loadingStates).some(state => 
+      state.isLoading && state.priority === 'critical'
+    );
+  }, [loadingStates]);
+
+  const getLoadingProgress = useCallback(() => {
+    const states = Object.values(loadingStates);
+    if (states.length === 0) return 100;
+    
+    const totalProgress = states.reduce((sum, state) => {
+      return sum + (state.progress || (state.isLoading ? 0 : 100));
+    }, 0);
+    
+    return totalProgress / states.length;
+  }, [loadingStates]);
+
+  const hasLoadingDependencies = useCallback((id: string) => {
+    const state = loadingStates[id];
+    if (!state || !state.dependencies) return false;
+    
+    return state.dependencies.some(depId => loadingStates[depId]?.isLoading);
+  }, [loadingStates]);
+
+  const getMetrics = useCallback(() => metrics, [metrics]);
+
+  const contextValue: LoadingOrchestratorContextType = {
+    loadingStates,
+    startLoading,
+    finishLoading,
+    updateProgress,
+    isAnyLoading,
+    isCriticalPathLoading,
+    getLoadingProgress,
+    getMetrics,
+    hasLoadingDependencies
+  };
+
+  return (
+    <LoadingOrchestratorContext.Provider value={contextValue}>
+      {children}
+    </LoadingOrchestratorContext.Provider>
+  );
+}
+
+/**
+ * Progressive Loading Container
+ * Orchestrates the loading of multiple components with priority-based rendering
+ */
+interface ProgressiveLoadingContainerProps {
+  children: ReactNode;
+  loadingStates: string[];
+  fallback?: ReactNode;
+  showProgress?: boolean;
+  className?: string;
+}
+
+export function ProgressiveLoadingContainer({
+  children,
+  loadingStates,
+  fallback,
+  showProgress = false,
+  className = ''
+}: ProgressiveLoadingContainerProps) {
+  const { loadingStates: allStates, getLoadingProgress, isCriticalPathLoading } = useLoadingOrchestrator();
+  
+  const relevantStates = loadingStates.map(id => allStates[id]).filter(Boolean);
+  const isLoading = relevantStates.some(state => state.isLoading);
+  const progress = getLoadingProgress();
+
+  if (isLoading && fallback) {
+    return (
+      <div className={className}>
+        {fallback}
+        {showProgress && (
+          <div className="mt-4">
+            <div className="flex justify-between text-sm text-muted-foreground mb-2">
+              <span>Loading...</span>
+              <span>{Math.round(progress)}%</span>
+            </div>
+            <div className="w-full bg-muted rounded-full h-2">
+              <div 
+                className="bg-primary rounded-full h-2 transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return <div className={className}>{children}</div>;
+}
+
+/**
+ * Smart Skeleton Components
+ * Provides intelligent skeleton loading that matches actual content
+ */
+export function DashboardSkeleton() {
+  return (
+    <div className="space-y-6">
+      {/* Header Skeleton */}
+      <div className="space-y-2">
+        <Skeleton className="h-8 w-64" />
+        <Skeleton className="h-4 w-96" />
+      </div>
+
+      {/* Stats Grid Skeleton */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Card key={i}>
+            <CardHeader className="pb-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-8 w-20" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-4 w-32" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Charts Skeleton */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-6 w-48" />
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="h-64 w-full" />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-6 w-48" />
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="h-64 w-full" />
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Table Skeleton */}
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-6 w-40" />
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="flex space-x-4">
+                <Skeleton className="h-4 w-48" />
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-4 w-20" />
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+export function ProjectWorkspaceSkeleton() {
+  return (
+    <div className="space-y-6">
+      {/* Project Header Skeleton */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-64" />
+            <Skeleton className="h-4 w-96" />
+          </div>
+          <Skeleton className="h-10 w-32" />
+        </div>
+        
+        {/* Status Bar */}
+        <div className="flex space-x-4">
+          <Skeleton className="h-6 w-24" />
+          <Skeleton className="h-6 w-32" />
+          <Skeleton className="h-6 w-28" />
+        </div>
+      </div>
+
+      {/* Tabs Skeleton */}
+      <div className="border-b">
+        <div className="flex space-x-8">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} className="h-6 w-20" />
+          ))}
+        </div>
+      </div>
+
+      {/* Tab Content Skeleton */}
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-32" />
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="flex justify-between">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-4 w-16" />
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-40" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-48 w-full" />
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Performance-aware Loading Indicator
+ * Shows different states based on loading performance
+ */
+interface SmartLoadingIndicatorProps {
+  loadingId: string;
+  size?: 'sm' | 'md' | 'lg';
+  showLabel?: boolean;
+  showProgress?: boolean;
+}
+
+export function SmartLoadingIndicator({ 
+  loadingId, 
+  size = 'md', 
+  showLabel = true,
+  showProgress = false 
+}: SmartLoadingIndicatorProps) {
+  const { loadingStates, getMetrics } = useLoadingOrchestrator();
+  const state = loadingStates[loadingId];
+  const metrics = getMetrics();
+  
+  if (!state || !state.isLoading) return null;
+  
+  const duration = performance.now() - state.startTime;
+  const isSlowLoading = duration > 3000; // Slow if taking more than 3 seconds
+  
+  const sizeClasses = {
+    sm: 'h-4 w-4',
+    md: 'h-6 w-6',
+    lg: 'h-8 w-8'
+  };
+  
+  return (
+    <div className="flex items-center space-x-2">
+      <Loader2 
+        className={`animate-spin ${sizeClasses[size]} ${
+          isSlowLoading ? 'text-orange-500' : 'text-primary'
+        }`} 
+      />
+      {showLabel && (
+        <span className={`text-sm ${
+          isSlowLoading ? 'text-orange-600' : 'text-muted-foreground'
+        }`}>
+          {state.label}{isSlowLoading ? ' (taking longer than usual)' : ''}
+        </span>
+      )}
+      {showProgress && state.progress !== undefined && (
+        <div className="flex items-center space-x-2">
+          <div className="w-20 bg-muted rounded-full h-2">
+            <div 
+              className="bg-primary rounded-full h-2 transition-all duration-300"
+              style={{ width: `${state.progress}%` }}
+            />
+          </div>
+          <span className="text-xs text-muted-foreground">
+            {Math.round(state.progress)}%
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Hook for component-level loading orchestration
+ */
+export function useComponentLoading(
+  componentId: string,
+  label: string,
+  priority: LoadingState['priority'] = 'medium',
+  dependencies: string[] = []
+) {
+  const { startLoading, finishLoading, updateProgress, hasLoadingDependencies } = useLoadingOrchestrator();
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const start = useCallback(() => {
+    if (hasLoadingDependencies(componentId)) {
+      console.log(`⏳ [${componentId}] Waiting for dependencies:`, dependencies);
+      return;
+    }
+    
+    setIsLoading(true);
+    startLoading(componentId, label, priority, dependencies);
+  }, [componentId, label, priority, dependencies, startLoading, hasLoadingDependencies]);
+  
+  const finish = useCallback(() => {
+    setIsLoading(false);
+    finishLoading(componentId);
+  }, [componentId, finishLoading]);
+  
+  const progress = useCallback((value: number) => {
+    updateProgress(componentId, value);
+  }, [componentId, updateProgress]);
+  
+  return { isLoading, start, finish, progress };
+}

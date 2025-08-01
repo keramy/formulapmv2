@@ -19,16 +19,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { 
-  Plus, 
-  Target, 
-  Calendar, 
-  AlertTriangle,
-  CheckCircle,
-  Clock,
-  TrendingUp,
-  Users
-} from 'lucide-react'
+import Plus from 'lucide-react/dist/esm/icons/plus'
+import Target from 'lucide-react/dist/esm/icons/target'
+import Calendar from 'lucide-react/dist/esm/icons/calendar'
+import AlertTriangle from 'lucide-react/dist/esm/icons/alert-triangle'
+import CheckCircle from 'lucide-react/dist/esm/icons/check-circle'
+import Clock from 'lucide-react/dist/esm/icons/clock'
+import TrendingUp from 'lucide-react/dist/esm/icons/trending-up'
+import Users from 'lucide-react/dist/esm/icons/users'
 import { Milestone, MilestoneFormData, MilestoneFilters } from '@/types/milestones'
 
 interface MilestonesTabProps {

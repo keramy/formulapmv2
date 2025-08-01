@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { withAPI, getRequestData, createSuccessResponse, createErrorResponse } from '@/lib/enhanced-auth-middleware';
-import { supabase } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 
 // GET /api/construction-reports - Get all construction reports for projects user has access to
 async function GETOriginal(request: NextRequest, { user, profile }: any) {
@@ -13,6 +13,7 @@ async function GETOriginal(request: NextRequest, { user, profile }: any) {
     const limit = Math.min(parseInt(searchParams.get('limit') || '10'), 50);
     const offset = (page - 1) * limit;
 
+    const supabase = await createClient();
     let query = supabase.from('construction_reports').select(`
       id, name, description, status, visibility, pdf_path, published_at,
       created_at, updated_at,
@@ -102,6 +103,7 @@ async function POSTOriginal(request: NextRequest, { user, profile }: any) {
     }
 
     // Verify user has access to the project
+    const supabase = await createClient();
     const { data: projectAccess, error: accessError } = await supabase
       .from('projects')
       .select('id')
@@ -113,6 +115,7 @@ async function POSTOriginal(request: NextRequest, { user, profile }: any) {
     }
 
     // Create the construction report
+    const supabase = await createClient();
     const { data: report, error } = await supabase
       .from('construction_reports')
       .insert({

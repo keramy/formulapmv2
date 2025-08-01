@@ -139,10 +139,15 @@ export const useAuth = () => {
         if (session?.user) {
           console.log('🔐 [useAuth] Session found, setting user immediately')
           setUser(session.user)
-          setLoading(false) // ✅ Critical: Set loading false immediately for responsive UI
           
-          // Load profile asynchronously in background
-          fetchUserProfile(session.user.id)
+          // Load profile before setting loading to false to prevent flickering
+          try {
+            await fetchUserProfile(session.user.id)
+          } catch (error) {
+            console.error('🔐 [useAuth] Profile fetch failed during init:', error)
+          } finally {
+            setLoading(false)
+          }
         } else {
           console.log('🔐 [useAuth] No session found')
           setLoading(false)
@@ -192,8 +197,10 @@ export const useAuth = () => {
                 setUser(session.user)
                 setAuthError(null)
                 setIsSigningIn(false)
-                // Load profile asynchronously
-                fetchUserProfile(session.user.id)
+                // Load profile asynchronously (don't await here to avoid blocking auth flow)
+                fetchUserProfile(session.user.id).catch(error => {
+                  console.error('🔐 [useAuth] Profile fetch failed after sign in:', error)
+                })
               }
               break
               

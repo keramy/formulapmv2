@@ -6,21 +6,19 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { 
-  Search,
-  Filter,
-  Package,
-  CheckCircle,
-  Clock,
-  AlertTriangle,
-  XCircle,
-  Building,
-  DollarSign,
-  Calendar,
-  Truck,
-  FileText,
-  Plus
-} from 'lucide-react';
+import Search from 'lucide-react/dist/esm/icons/search'
+import Filter from 'lucide-react/dist/esm/icons/filter'
+import Package from 'lucide-react/dist/esm/icons/package'
+import CheckCircle from 'lucide-react/dist/esm/icons/check-circle'
+import Clock from 'lucide-react/dist/esm/icons/clock'
+import AlertTriangle from 'lucide-react/dist/esm/icons/alert-triangle'
+import XCircle from 'lucide-react/dist/esm/icons/x-circle'
+import Building from 'lucide-react/dist/esm/icons/building'
+import DollarSign from 'lucide-react/dist/esm/icons/dollar-sign'
+import Calendar from 'lucide-react/dist/esm/icons/calendar'
+import Truck from 'lucide-react/dist/esm/icons/truck'
+import FileText from 'lucide-react/dist/esm/icons/file-text'
+import Plus from 'lucide-react/dist/esm/icons/plus'
 import { useMaterialSpecs } from '@/hooks/useMaterialSpecs';
 import { MaterialSpec, MaterialSpecFilters } from '@/types/material-specs';
 import { MaterialApprovalActions } from '@/components/projects/material-approval/MaterialApprovalActions';

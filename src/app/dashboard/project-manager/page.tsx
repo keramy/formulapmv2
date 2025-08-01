@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
+import { HoverPrefetchLink } from '@/components/ui/HoverPrefetchLink';
 
 interface ProjectCard {
   id: string;
@@ -378,9 +379,13 @@ export default function ProjectManagerDashboard() {
                   {/* Quick Actions */}
                   <div className="mt-4 flex space-x-2">
                     <Button className="flex-1" asChild>
-                      <Link href={`/projects/${project.id}`}>
+                      <HoverPrefetchLink
+                        href={`/projects/${project.id}`}
+                        className="flex items-center justify-center"
+                        prefetchDelay={150}
+                      >
                         View Details
-                      </Link>
+                      </HoverPrefetchLink>
                     </Button>
                     <Button variant="outline" className="flex-1" asChild>
                       <Link href={`/scope?project=${project.id}`}>

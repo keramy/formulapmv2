@@ -9,21 +9,19 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { DataStateWrapper } from '@/components/ui/loading-states';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useReports, ProjectReport, ReportFilters } from '@/hooks/useReports';
-import { 
-  Search,
-  Filter,
-  FileText,
-  Download,
-  Eye,
-  Calendar,
-  User,
-  Clock,
-  BarChart3,
-  FileCheck,
-  AlertTriangle,
-  TrendingUp,
-  DollarSign
-} from 'lucide-react';
+import Search from 'lucide-react/dist/esm/icons/search'
+import Filter from 'lucide-react/dist/esm/icons/filter'
+import FileText from 'lucide-react/dist/esm/icons/file-text'
+import Download from 'lucide-react/dist/esm/icons/download'
+import Eye from 'lucide-react/dist/esm/icons/eye'
+import Calendar from 'lucide-react/dist/esm/icons/calendar'
+import User from 'lucide-react/dist/esm/icons/user'
+import Clock from 'lucide-react/dist/esm/icons/clock'
+import BarChart3 from 'lucide-react/dist/esm/icons/bar-chart-3'
+import FileCheck from 'lucide-react/dist/esm/icons/file-check'
+import AlertTriangle from 'lucide-react/dist/esm/icons/alert-triangle'
+import TrendingUp from 'lucide-react/dist/esm/icons/trending-up'
+import DollarSign from 'lucide-react/dist/esm/icons/dollar-sign'
 
 interface ReportsTabProps {
   projectId: string;

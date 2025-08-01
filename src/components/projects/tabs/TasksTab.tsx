@@ -15,16 +15,14 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { 
-  Plus, 
-  CheckSquare, 
-  Clock, 
-  AlertTriangle,
-  Users,
-  Target,
-  Activity,
-  TrendingUp
-} from 'lucide-react'
+import Plus from 'lucide-react/dist/esm/icons/plus'
+import CheckSquare from 'lucide-react/dist/esm/icons/check-square'
+import Clock from 'lucide-react/dist/esm/icons/clock'
+import AlertTriangle from 'lucide-react/dist/esm/icons/alert-triangle'
+import Users from 'lucide-react/dist/esm/icons/users'
+import Target from 'lucide-react/dist/esm/icons/target'
+import Activity from 'lucide-react/dist/esm/icons/activity'
+import TrendingUp from 'lucide-react/dist/esm/icons/trending-up'
 import { Task, TaskFormData, TaskFilters, TaskPermissions } from '@/types/tasks'
 import { useTasks, useTasksOptimized } from '@/hooks/useTasks'
 import { useProjectMembers } from '@/hooks/useProjectMembers'

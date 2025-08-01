@@ -42,10 +42,11 @@ async function GETOriginal(req: NextRequest) {
 
 async function getDashboardStats(userId: string, userRole: string) {
   try {
-    // Get projects count based on role
+    // Get projects count based on role - ONLY ACTIVE PROJECTS
     let projectsQuery = supabase
       .from('projects')
-      .select('id, status, budget_amount');
+      .select('id, status, budget_amount')
+      .eq('is_active', true); // Only count active (non-deleted) projects
 
     // Apply role-based filtering
     if (userRole === 'client') {

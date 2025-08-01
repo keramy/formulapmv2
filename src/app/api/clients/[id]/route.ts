@@ -32,8 +32,15 @@ async function GETOriginal(req: NextRequest) {
         contact_person,
         company_name,
         address,
+        city,
+        state,
+        zip_code,
+        country,
+        tax_id,
+        is_active,
         created_at,
-        updated_at
+        updated_at,
+        projects:projects(id, name)
       `)
       .eq('id', clientId)
       .single();
@@ -140,8 +147,15 @@ async function PUTOriginal(req: NextRequest) {
         contact_person,
         company_name,
         address,
+        city,
+        state,
+        zip_code,
+        country,
+        tax_id,
+        is_active,
         created_at,
-        updated_at
+        updated_at,
+        projects:projects(id, name)
       `)
       .single();
     

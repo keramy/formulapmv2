@@ -1,0 +1,524 @@
+'use client';
+
+/**
+ * Core Web Vitals Tracking and Performance Monitoring System
+ * 
+ * This module provides comprehensive performance monitoring including:
+ * - Core Web Vitals (FCP, LCP, CLS, FID, TTFB)
+ * - Custom performance metrics
+ * - User experience tracking
+ * - Performance reporting and analytics
+ * - Real-time performance optimization recommendations
+ */
+
+interface WebVitalMetric {
+  name: string;
+  value: number;
+  delta: number;
+  entries: PerformanceEntry[];
+  id: string;
+  rating: 'good' | 'needs-improvement' | 'poor';
+}
+
+interface CustomMetric {
+  name: string;
+  value: number;
+  timestamp: number;
+  metadata?: Record<string, any>;
+}
+
+interface PerformanceReport {
+  url: string;
+  timestamp: number;
+  sessionId: string;
+  userId?: string;
+  webVitals: Record<string, WebVitalMetric>;
+  customMetrics: CustomMetric[];
+  deviceInfo: {
+    userAgent: string;
+    connection?: any;
+    memory?: any;
+    hardware?: any;
+  };
+  recommendations: string[];
+}
+
+class WebVitalsTracker {
+  private metrics: Map<string, WebVitalMetric> = new Map();
+  private customMetrics: CustomMetric[] = [];
+  private sessionId: string;
+  private isTracking: boolean = false;
+  private reportingEndpoint: string = '/api/performance/report';
+  private onMetricUpdate?: (metric: WebVitalMetric) => void;
+  private onReportGenerated?: (report: PerformanceReport) => void;
+
+  constructor(options: {
+    reportingEndpoint?: string;
+    onMetricUpdate?: (metric: WebVitalMetric) => void;
+    onReportGenerated?: (report: PerformanceReport) => void;
+  } = {}) {
+    this.sessionId = this.generateSessionId();
+    this.reportingEndpoint = options.reportingEndpoint || this.reportingEndpoint;
+    this.onMetricUpdate = options.onMetricUpdate;
+    this.onReportGenerated = options.onReportGenerated;
+  }
+
+  private generateSessionId(): string {
+    return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  private getRating(name: string, value: number): 'good' | 'needs-improvement' | 'poor' {
+    // Core Web Vitals thresholds
+    const thresholds = {
+      FCP: { good: 1800, poor: 3000 },     // First Contentful Paint
+      LCP: { good: 2500, poor: 4000 },     // Largest Contentful Paint
+      CLS: { good: 0.1, poor: 0.25 },      // Cumulative Layout Shift
+      FID: { good: 100, poor: 300 },       // First Input Delay
+      TTFB: { good: 800, poor: 1800 },     // Time to First Byte
+      INP: { good: 200, poor: 500 }        // Interaction to Next Paint
+    };
+
+    const threshold = thresholds[name as keyof typeof thresholds];
+    if (!threshold) return 'good';
+
+    if (value <= threshold.good) return 'good';
+    if (value <= threshold.poor) return 'needs-improvement';
+    return 'poor';
+  }
+
+  private generateRecommendations(metrics: Map<string, WebVitalMetric>): string[] {
+    const recommendations: string[] = [];
+
+    metrics.forEach((metric) => {
+      if (metric.rating === 'poor') {
+        switch (metric.name) {
+          case 'FCP':
+            recommendations.push('Optimize critical rendering path and reduce server response time');
+            recommendations.push('Consider implementing resource preloading for critical assets');
+            break;
+          case 'LCP':
+            recommendations.push('Optimize largest content element (images, text blocks)');
+            recommendations.push('Consider image optimization and lazy loading');
+            break;
+          case 'CLS':
+            recommendations.push('Add size attributes to images and video elements');
+            recommendations.push('Avoid inserting content above existing content');
+            break;
+          case 'FID':
+            recommendations.push('Reduce JavaScript execution time');
+            recommendations.push('Consider code splitting and lazy loading');
+            break;
+          case 'TTFB':
+            recommendations.push('Optimize server response time');
+            recommendations.push('Consider using a CDN or caching strategy');
+            break;
+        }
+      } else if (metric.rating === 'needs-improvement') {
+        recommendations.push(`Consider optimizing ${metric.name} (current: ${metric.value.toFixed(2)})`);
+      }
+    });
+
+    return [...new Set(recommendations)];
+  }
+
+  private reportMetric(metric: WebVitalMetric) {
+    this.metrics.set(metric.name, metric);
+    this.onMetricUpdate?.(metric);
+
+    console.log(`📊 [WebVitals] ${metric.name}: ${metric.value.toFixed(2)}ms (${metric.rating})`);
+
+    // Auto-generate recommendations for poor metrics
+    if (metric.rating === 'poor') {
+      const recommendations = this.generateRecommendations(new Map([[metric.name, metric]]));
+      if (recommendations.length > 0) {
+        console.warn(`🚨 Performance Issue - ${metric.name}:`, recommendations);
+      }
+    }
+  }
+
+  public startTracking(): void {
+    if (typeof window === 'undefined' || this.isTracking) return;
+
+    this.isTracking = true;
+    console.log('🚀 [WebVitalsTracker] Starting performance tracking');
+
+    // Track Navigation Timing
+    this.trackNavigationTiming();
+
+    // Track Core Web Vitals
+    this.trackCoreWebVitals();
+
+    // Track custom metrics
+    this.trackCustomMetrics();
+
+    // Generate initial report
+    setTimeout(() => this.generateReport(), 5000);
+  }
+
+  private trackNavigationTiming(): void {
+    if (!('performance' in window) || !performance.getEntriesByType) return;
+
+    const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+    if (!navigation) return;
+
+    // Time to First Byte (TTFB)
+    const ttfb = navigation.responseStart - navigation.requestStart;
+    this.reportMetric({
+      name: 'TTFB',
+      value: ttfb,
+      delta: ttfb,
+      entries: [navigation],
+      id: this.generateMetricId(),
+      rating: this.getRating('TTFB', ttfb)
+    });
+
+    // DOM Content Loaded
+    const dcl = navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart;
+    this.addCustomMetric('DCL', dcl, { type: 'navigation' });
+
+    // Page Load Time
+    const plt = navigation.loadEventEnd - navigation.navigationStart;
+    this.addCustomMetric('PLT', plt, { type: 'navigation' });
+  }
+
+  private trackCoreWebVitals(): void {
+    if (!('PerformanceObserver' in window)) return;
+
+    // First Contentful Paint (FCP)
+    new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        if (entry.name === 'first-contentful-paint') {
+          this.reportMetric({
+            name: 'FCP',
+            value: entry.startTime,
+            delta: entry.startTime,
+            entries: [entry],
+            id: this.generateMetricId(),
+            rating: this.getRating('FCP', entry.startTime)
+          });
+        }
+      }
+    }).observe({ entryTypes: ['paint'] });
+
+    // Largest Contentful Paint (LCP)
+    new PerformanceObserver((list) => {
+      const entries = list.getEntries();
+      const lastEntry = entries[entries.length - 1];
+      if (lastEntry) {
+        this.reportMetric({
+          name: 'LCP',
+          value: lastEntry.startTime,
+          delta: lastEntry.startTime,
+          entries: [lastEntry],
+          id: this.generateMetricId(),
+          rating: this.getRating('LCP', lastEntry.startTime)
+        });
+      }
+    }).observe({ entryTypes: ['largest-contentful-paint'] });
+
+    // Cumulative Layout Shift (CLS)
+    let clsValue = 0;
+    new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        if (!(entry as any).hadRecentInput) {
+          clsValue += (entry as any).value;
+        }
+      }
+      this.reportMetric({
+        name: 'CLS',
+        value: clsValue,
+        delta: clsValue,
+        entries: list.getEntries(),
+        id: this.generateMetricId(),
+        rating: this.getRating('CLS', clsValue)
+      });
+    }).observe({ entryTypes: ['layout-shift'] });
+
+    // First Input Delay (FID)
+    new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        const fid = (entry as any).processingStart - entry.startTime;
+        this.reportMetric({
+          name: 'FID',
+          value: fid,
+          delta: fid,
+          entries: [entry],
+          id: this.generateMetricId(),
+          rating: this.getRating('FID', fid)
+        });
+      }
+    }).observe({ entryTypes: ['first-input'] });
+
+    // Interaction to Next Paint (INP) - if supported
+    if ('interactionCount' in performance) {
+      new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          const inp = (entry as any).duration;
+          this.reportMetric({
+            name: 'INP',
+            value: inp,
+            delta: inp,
+            entries: [entry],
+            id: this.generateMetricId(),
+            rating: this.getRating('INP', inp)
+          });
+        }
+      }).observe({ entryTypes: ['event'] });
+    }
+  }
+
+  private trackCustomMetrics(): void {
+    // Track JavaScript heap size (if available)
+    if ('memory' in performance) {
+      const memory = (performance as any).memory;
+      this.addCustomMetric('JSHeapUsed', memory.usedJSHeapSize / 1024 / 1024, { 
+        unit: 'MB',
+        total: memory.totalJSHeapSize / 1024 / 1024,
+        limit: memory.jsHeapSizeLimit / 1024 / 1024
+      });
+    }
+
+    // Track connection information
+    if ('connection' in navigator) {
+      const connection = (navigator as any).connection;
+      this.addCustomMetric('ConnectionSpeed', 0, {
+        effectiveType: connection.effectiveType,
+        downlink: connection.downlink,
+        rtt: connection.rtt,
+        saveData: connection.saveData
+      });
+    }
+  }
+
+  public addCustomMetric(name: string, value: number, metadata?: Record<string, any>): void {
+    const metric: CustomMetric = {
+      name,
+      value,
+      timestamp: performance.now(),
+      metadata
+    };
+
+    this.customMetrics.push(metric);
+    console.log(`🔍 [CustomMetric] ${name}: ${value}`, metadata);
+  }
+
+  public markStart(name: string): void {
+    performance.mark(`${name}-start`);
+  }
+
+  public markEnd(name: string): number {
+    const endMark = `${name}-end`;
+    const measureName = `${name}-duration`;
+    
+    performance.mark(endMark);
+    performance.measure(measureName, `${name}-start`, endMark);
+    
+    const measure = performance.getEntriesByName(measureName)[0];
+    const duration = measure.duration;
+    
+    this.addCustomMetric(name, duration, { type: 'user-timing' });
+    
+    return duration;
+  }
+
+  private generateMetricId(): string {
+    return `metric_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  public generateReport(): PerformanceReport {
+    const report: PerformanceReport = {
+      url: typeof window !== 'undefined' ? window.location.href : 'unknown',
+      timestamp: Date.now(),
+      sessionId: this.sessionId,
+      webVitals: Object.fromEntries(this.metrics),
+      customMetrics: [...this.customMetrics],
+      deviceInfo: this.getDeviceInfo(),
+      recommendations: this.generateRecommendations(this.metrics)
+    };
+
+    console.log('📊 [PerformanceReport] Generated:', report);
+    this.onReportGenerated?.(report);
+
+    return report;
+  }
+
+  private getDeviceInfo() {
+    return {
+      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown',
+      connection: typeof navigator !== 'undefined' && 'connection' in navigator 
+        ? (navigator as any).connection 
+        : undefined,
+      memory: typeof performance !== 'undefined' && 'memory' in performance 
+        ? (performance as any).memory 
+        : undefined,
+      hardware: typeof navigator !== 'undefined' && 'hardwareConcurrency' in navigator 
+        ? { cores: navigator.hardwareConcurrency } 
+        : undefined
+    };
+  }
+
+  public async sendReport(report?: PerformanceReport): Promise<void> {
+    const reportData = report || this.generateReport();
+    
+    try {
+      await fetch(this.reportingEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(reportData)
+      });
+      
+      console.log('✅ [PerformanceReport] Sent successfully');
+    } catch (error) {
+      console.error('❌ [PerformanceReport] Failed to send:', error);
+    }
+  }
+
+  public getMetrics(): Map<string, WebVitalMetric> {
+    return new Map(this.metrics);
+  }
+
+  public getCustomMetrics(): CustomMetric[] {
+    return [...this.customMetrics];
+  }
+
+  public stopTracking(): void {
+    this.isTracking = false;
+    console.log('🛑 [WebVitalsTracker] Stopped performance tracking');
+  }
+}
+
+// Global instance
+let globalTracker: WebVitalsTracker | null = null;
+
+export function getWebVitalsTracker(options?: {
+  reportingEndpoint?: string;
+  onMetricUpdate?: (metric: WebVitalMetric) => void;
+  onReportGenerated?: (report: PerformanceReport) => void;
+}): WebVitalsTracker {
+  if (!globalTracker) {
+    globalTracker = new WebVitalsTracker(options);
+  }
+  return globalTracker;
+}
+
+/**
+ * React Hook for Web Vitals Tracking
+ */
+import { useEffect, useState } from 'react';
+
+export function useWebVitals(autoStart: boolean = true) {
+  const [tracker] = useState(() => getWebVitalsTracker());
+  const [metrics, setMetrics] = useState<Map<string, WebVitalMetric>>(new Map());
+  const [report, setReport] = useState<PerformanceReport | null>(null);
+
+  useEffect(() => {
+    if (!autoStart) return;
+
+    const trackerWithCallbacks = getWebVitalsTracker({
+      onMetricUpdate: (metric) => {
+        setMetrics(prev => new Map(prev).set(metric.name, metric));
+      },
+      onReportGenerated: (newReport) => {
+        setReport(newReport);
+      }
+    });
+
+    trackerWithCallbacks.startTracking();
+
+    // Generate final report on page unload
+    const handleUnload = () => {
+      trackerWithCallbacks.sendReport();
+    };
+
+    window.addEventListener('beforeunload', handleUnload);
+    window.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        trackerWithCallbacks.sendReport();
+      }
+    });
+
+    return () => {
+      window.removeEventListener('beforeunload', handleUnload);
+      trackerWithCallbacks.stopTracking();
+    };
+  }, [autoStart]);
+
+  return {
+    tracker,
+    metrics,
+    report,
+    startTracking: () => tracker.startTracking(),
+    stopTracking: () => tracker.stopTracking(),
+    addCustomMetric: (name: string, value: number, metadata?: Record<string, any>) => 
+      tracker.addCustomMetric(name, value, metadata),
+    markStart: (name: string) => tracker.markStart(name),
+    markEnd: (name: string) => tracker.markEnd(name),
+    generateReport: () => tracker.generateReport(),
+    sendReport: (customReport?: PerformanceReport) => tracker.sendReport(customReport)
+  };
+}
+
+/**
+ * Performance Monitoring Component
+ */
+import React from 'react';
+
+interface PerformanceMonitorProps {
+  children: React.ReactNode;
+  componentName: string;
+  trackRender?: boolean;
+  trackInteractions?: boolean;
+}
+
+export function PerformanceMonitor({ 
+  children, 
+  componentName, 
+  trackRender = true, 
+  trackInteractions = false 
+}: PerformanceMonitorProps) {
+  const { markStart, markEnd, addCustomMetric } = useWebVitals(false);
+
+  useEffect(() => {
+    if (trackRender) {
+      markStart(`${componentName}-render`);
+      
+      return () => {
+        const duration = markEnd(`${componentName}-render`);
+        addCustomMetric(`${componentName}-render-time`, duration, {
+          component: componentName,
+          type: 'render'
+        });
+      };
+    }
+  }, [componentName, trackRender, markStart, markEnd, addCustomMetric]);
+
+  const handleInteraction = (interactionType: string) => {
+    if (trackInteractions) {
+      markStart(`${componentName}-${interactionType}`);
+      
+      setTimeout(() => {
+        const duration = markEnd(`${componentName}-${interactionType}`);
+        addCustomMetric(`${componentName}-interaction`, duration, {
+          component: componentName,
+          interaction: interactionType,
+          type: 'interaction'
+        });
+      }, 0);
+    }
+  };
+
+  return (
+    <div 
+      onClick={() => handleInteraction('click')}
+      onFocus={() => handleInteraction('focus')}
+      onBlur={() => handleInteraction('blur')}
+    >
+      {children}
+    </div>
+  );
+}
+
+export type { WebVitalMetric, CustomMetric, PerformanceReport };
+export { WebVitalsTracker };

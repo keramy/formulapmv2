@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { withAPI, getRequestData, createSuccessResponse, createErrorResponse } from '@/lib/enhanced-auth-middleware';
-import { supabase } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 
 // GET /api/construction-reports/[id] - Get specific construction report with all details
 async function GETOriginal(request: NextRequest, { user, profile, params }: any) {
@@ -11,6 +11,7 @@ async function GETOriginal(request: NextRequest, { user, profile, params }: any)
       return createErrorResponse('Report ID is required', 400);
     }
 
+    const supabase = await createClient();
     const { data: report, error } = await supabase
       .from('construction_reports')
       .select(`
@@ -70,6 +71,7 @@ async function PUTOriginal(request: NextRequest, { user, profile, params }: any)
     }
 
     // Check if report exists and user has access
+    const supabase = await createClient();
     const { data: existingReport, error: fetchError } = await supabase
       .from('construction_reports')
       .select('id, status, created_by')
@@ -98,6 +100,7 @@ async function PUTOriginal(request: NextRequest, { user, profile, params }: any)
     }
 
     // Update the report
+    const supabase = await createClient();
     const { data: report, error } = await supabase
       .from('construction_reports')
       .update(updateData)
@@ -133,6 +136,7 @@ async function DELETEOriginal(request: NextRequest, { user, profile, params }: a
     }
 
     // Check if report exists and user has access
+    const supabase = await createClient();
     const { data: existingReport, error: fetchError } = await supabase
       .from('construction_reports')
       .select('id, status')
@@ -149,6 +153,7 @@ async function DELETEOriginal(request: NextRequest, { user, profile, params }: a
     }
 
     // Delete the report (cascade will handle related data)
+    const supabase = await createClient();
     const { error } = await supabase
       .from('construction_reports')
       .delete()

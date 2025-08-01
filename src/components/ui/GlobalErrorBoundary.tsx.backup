@@ -1,0 +1,412 @@
+'use client';
+
+import React, { Component, ReactNode } from 'react';
+import { AlertTriangle, RefreshCw, Home, Bug } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+interface Props {
+  children: ReactNode;
+  fallback?: ReactNode;
+  onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
+}
+
+interface State {
+  hasError: boolean;
+  error?: Error;
+  errorInfo?: React.ErrorInfo;
+  errorId: string;
+}
+
+/**
+ * Global Error Boundary for Root Level Error Handling
+ * 
+ * This component catches all unhandled React errors and provides:
+ * - User-friendly error messages
+ * - Error reporting capabilities
+ * - Recovery options (retry, navigate home)
+ * - Development error details
+ * - Performance tracking for error rates
+ */
+export class GlobalErrorBoundary extends Component<Props, State> {
+  private errorCount = 0;
+  
+  constructor(props: Props) {
+    super(props);
+    this.state = { 
+      hasError: false, 
+      errorId: this.generateErrorId() 
+    };
+  }
+
+  private generateErrorId(): string {
+    return `err_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  private reportError(error: Error, errorInfo: React.ErrorInfo) {
+    this.errorCount++;
+    
+    // Log error details
+    console.error('🚨 [GlobalErrorBoundary] Catastrophic error caught:', {
+      errorId: this.state.errorId,
+      error: error.message,
+      stack: error.stack,
+      componentStack: errorInfo.componentStack,
+      errorCount: this.errorCount,
+      timestamp: new Date().toISOString(),
+      url: typeof window !== 'undefined' ? window.location.href : 'unknown',
+      userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : 'unknown'
+    });
+
+    // Report to external service in production
+    if (process.env.NODE_ENV === 'production') {
+      this.reportToExternalService(error, errorInfo);
+    }
+
+    // Call custom error handler if provided
+    this.props.onError?.(error, errorInfo);
+  }
+
+  private async reportToExternalService(error: Error, errorInfo: React.ErrorInfo) {
+    try {
+      // This would typically send to a service like Sentry, LogRocket, etc.
+      // For now, we'll use a simple API endpoint
+      await fetch('/api/errors/report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          errorId: this.state.errorId,
+          message: error.message,
+          stack: error.stack,
+          componentStack: errorInfo.componentStack,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: window.navigator.userAgent
+        })
+      }).catch(reportError => {
+        console.error('Failed to report error to external service:', reportError);
+      });
+    } catch (reportError) {
+      console.error('Error reporting failed:', reportError);
+    }
+  }
+
+  static getDerivedStateFromError(error: Error): Partial<State> {
+    return { 
+      hasError: true, 
+      error,
+      errorId: `err_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    this.setState({ errorInfo });
+    this.reportError(error, errorInfo);
+  }
+
+  private handleRetry = () => {
+    // Reset error state and force re-render
+    this.setState({ 
+      hasError: false, 
+      error: undefined, 
+      errorInfo: undefined,
+      errorId: this.generateErrorId()
+    });
+  };
+
+  private handleNavigateHome = () => {
+    window.location.href = '/dashboard';
+  };
+
+  private handleReloadPage = () => {
+    window.location.reload();
+  };
+
+  private handleReportBug = () => {
+    // Open bug report dialog or navigate to support
+    const bugReportUrl = `mailto:support@formulapm.com?subject=Application Error ${this.state.errorId}&body=Error ID: ${this.state.errorId}%0A%0APlease describe what you were doing when this error occurred:`;
+    window.open(bugReportUrl, '_blank');
+  };
+
+  render() {
+    if (this.state.hasError) {
+      // Use custom fallback if provided
+      if (this.props.fallback) {
+        return this.props.fallback;
+      }
+
+      const isDevelopment = process.env.NODE_ENV === 'development';
+      const isFrequentError = this.errorCount > 3;
+
+      return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+          <Card className="max-w-2xl w-full border-destructive/20 bg-destructive/5">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-3 text-destructive">
+                <AlertTriangle className="h-6 w-6" />
+                {isFrequentError ? 'Recurring Application Error' : 'Application Error'}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div>
+                <p className="text-sm text-muted-foreground mb-2">
+                  {isFrequentError 
+                    ? 'The application has encountered multiple errors. This may indicate a persistent issue.'
+                    : 'Something went wrong and the application encountered an unexpected error.'}
+                </p>
+                <p className="text-xs text-muted-foreground font-mono bg-muted/50 p-2 rounded">
+                  Error ID: {this.state.errorId}
+                </p>
+              </div>
+
+              {/* Error Details for Development */}
+              {isDevelopment && this.state.error && (
+                <details className="border rounded p-3 bg-muted/30">
+                  <summary className="cursor-pointer text-sm font-medium text-destructive mb-2">
+                    Error Details (Development Only)
+                  </summary>
+                  <div className="space-y-2 text-xs">
+                    <div>
+                      <strong>Message:</strong>
+                      <pre className="mt-1 p-2 bg-destructive/10 rounded overflow-auto">
+                        {this.state.error.message}
+                      </pre>
+                    </div>
+                    <div>
+                      <strong>Stack Trace:</strong>
+                      <pre className="mt-1 p-2 bg-destructive/10 rounded overflow-auto max-h-40">
+                        {this.state.error.stack}
+                      </pre>
+                    </div>
+                    {this.state.errorInfo?.componentStack && (
+                      <div>
+                        <strong>Component Stack:</strong>
+                        <pre className="mt-1 p-2 bg-destructive/10 rounded overflow-auto max-h-40">
+                          {this.state.errorInfo.componentStack}
+                        </pre>
+                      </div>
+                    )}
+                  </div>
+                </details>
+              )}
+
+              {/* Recovery Actions */}
+              <div className="flex flex-wrap gap-3">
+                <Button 
+                  onClick={this.handleRetry}
+                  variant="destructive"
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  Try Again
+                </Button>
+                
+                <Button 
+                  onClick={this.handleNavigateHome}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <Home className="h-4 w-4" />
+                  Go to Dashboard
+                </Button>
+                
+                <Button 
+                  onClick={this.handleReloadPage}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  Reload Page
+                </Button>
+                
+                <Button 
+                  onClick={this.handleReportBug}
+                  variant="ghost"
+                  size="sm"
+                  className="flex items-center gap-2 text-muted-foreground"
+                >
+                  <Bug className="h-4 w-4" />
+                  Report Issue
+                </Button>
+              </div>
+
+              {/* User Guidance */}
+              <div className="text-sm text-muted-foreground space-y-2 border-t pt-4">
+                <p><strong>What you can do:</strong></p>
+                <ul className="list-disc pl-4 space-y-1">
+                  <li>Try refreshing the page or clicking "Try Again"</li>
+                  <li>Navigate back to the dashboard to continue working</li>
+                  <li>Contact support if the problem persists</li>
+                  {isFrequentError && (
+                    <li className="text-destructive">Consider clearing your browser cache if errors continue</li>
+                  )}
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+/**
+ * Hook for imperatively triggering error boundary
+ * Useful for async errors that don't naturally bubble up to React
+ */
+export function useErrorHandler() {
+  const [error, setError] = React.useState<Error | null>(null);
+
+  const reportError = React.useCallback((error: Error | string) => {
+    const errorObj = typeof error === 'string' ? new Error(error) : error;
+    setError(errorObj);
+  }, []);
+
+  // Throw the error to trigger the boundary
+  if (error) {
+    throw error;
+  }
+
+  return reportError;
+}
+
+/**
+ * Performance Error Tracking
+ * Tracks error rates and patterns for monitoring
+ */
+interface ErrorMetrics {
+  totalErrors: number;
+  errorRate: number;
+  lastErrorTime: number;
+  frequentErrors: string[];
+}
+
+class ErrorTracker {
+  private metrics: ErrorMetrics = {
+    totalErrors: 0,
+    errorRate: 0,
+    lastErrorTime: 0,
+    frequentErrors: []
+  };
+
+  private errorHistory: Array<{ time: number; message: string }> = [];
+
+  trackError(error: Error) {
+    const now = Date.now();
+    this.metrics.totalErrors++;
+    this.metrics.lastErrorTime = now;
+    
+    // Track error history for rate calculation
+    this.errorHistory.push({ time: now, message: error.message });
+    
+    // Keep only last hour of errors
+    const oneHourAgo = now - (60 * 60 * 1000);
+    this.errorHistory = this.errorHistory.filter(e => e.time > oneHourAgo);
+    
+    // Calculate error rate (errors per hour)
+    this.metrics.errorRate = this.errorHistory.length;
+    
+    // Track frequent error messages
+    const errorCounts = this.errorHistory.reduce((acc, e) => {
+      acc[e.message] = (acc[e.message] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    this.metrics.frequentErrors = Object.entries(errorCounts)
+      .filter(([_, count]) => count >= 3)
+      .map(([message]) => message);
+    
+    console.log('🔍 [ErrorTracker] Error metrics:', this.metrics);
+  }
+
+  getMetrics(): ErrorMetrics {
+    return { ...this.metrics };
+  }
+
+  isHighErrorRate(): boolean {
+    return this.metrics.errorRate > 10; // More than 10 errors per hour
+  }
+}
+
+export const errorTracker = new ErrorTracker();
+
+/**
+ * Error Recovery Strategies
+ * Provides common patterns for recovering from errors
+ */
+export const ErrorRecoveryStrategies = {
+  // Retry with exponential backoff
+  retryWithBackoff: async <T>(
+    operation: () => Promise<T>,
+    maxRetries: number = 3,
+    baseDelay: number = 1000
+  ): Promise<T> => {
+    let lastError: Error;
+    
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        return await operation();
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error(String(error));
+        
+        if (attempt === maxRetries) {
+          break;
+        }
+        
+        // Exponential backoff: 1s, 2s, 4s, 8s...
+        const delay = baseDelay * Math.pow(2, attempt);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+    
+    throw lastError!;
+  },
+  
+  // Circuit breaker pattern
+  circuitBreaker: <T>(
+    operation: () => Promise<T>,
+    failureThreshold: number = 5,
+    timeout: number = 60000
+  ) => {
+    let failures = 0;
+    let lastFailureTime = 0;
+    let isOpen = false;
+    
+    return async (): Promise<T> => {
+      const now = Date.now();
+      
+      // Reset circuit if timeout has passed
+      if (isOpen && (now - lastFailureTime) > timeout) {
+        isOpen = false;
+        failures = 0;
+      }
+      
+      // Reject if circuit is open
+      if (isOpen) {
+        throw new Error('Circuit breaker is open');
+      }
+      
+      try {
+        const result = await operation();
+        // Reset on success
+        failures = 0;
+        return result;
+      } catch (error) {
+        failures++;
+        lastFailureTime = now;
+        
+        // Open circuit if threshold reached
+        if (failures >= failureThreshold) {
+          isOpen = true;
+        }
+        
+        throw error;
+      }
+    };
+  }
+};

@@ -9,20 +9,18 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { DataStateWrapper } from '@/components/ui/loading-states';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useShopDrawings, ShopDrawingFilters } from '@/hooks/useShopDrawings';
-import { 
-  Search,
-  Filter,
-  FileText,
-  Download,
-  Upload,
-  Eye,
-  CheckCircle,
-  XCircle,
-  Clock,
-  AlertTriangle,
-  Calendar,
-  User
-} from 'lucide-react';
+import Search from 'lucide-react/dist/esm/icons/search'
+import Filter from 'lucide-react/dist/esm/icons/filter'
+import FileText from 'lucide-react/dist/esm/icons/file-text'
+import Download from 'lucide-react/dist/esm/icons/download'
+import Upload from 'lucide-react/dist/esm/icons/upload'
+import Eye from 'lucide-react/dist/esm/icons/eye'
+import CheckCircle from 'lucide-react/dist/esm/icons/check-circle'
+import XCircle from 'lucide-react/dist/esm/icons/x-circle'
+import Clock from 'lucide-react/dist/esm/icons/clock'
+import AlertTriangle from 'lucide-react/dist/esm/icons/alert-triangle'
+import Calendar from 'lucide-react/dist/esm/icons/calendar'
+import User from 'lucide-react/dist/esm/icons/user'
 
 interface ShopDrawingsTabProps {
   projectId: string;

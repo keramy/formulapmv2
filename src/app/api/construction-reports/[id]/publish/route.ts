@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { withAPI, getRequestData, createSuccessResponse, createErrorResponse } from '@/lib/enhanced-auth-middleware';
-import { supabase } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 
 // POST /api/construction-reports/[id]/publish - Publish construction report
 async function POSTOriginal(request: NextRequest, { user, profile, params }: any) {
@@ -19,6 +19,7 @@ async function POSTOriginal(request: NextRequest, { user, profile, params }: any
     }
 
     // Get report details and verify it exists and is in draft status
+    const supabase = await createClient();
     const { data: report, error: fetchError } = await supabase
       .from('construction_reports')
       .select(`
@@ -70,6 +71,7 @@ async function POSTOriginal(request: NextRequest, { user, profile, params }: any
     }
 
     // Update the report to published status
+    const supabase = await createClient();
     const { data: publishedReport, error: updateError } = await supabase
       .from('construction_reports')
       .update(updateData)
@@ -88,7 +90,8 @@ async function POSTOriginal(request: NextRequest, { user, profile, params }: any
     }
 
     // Log the activity
-    await supabase
+    const supabase = await createClient();
+    const { data, error } = await supabase
       .from('activity_logs')
       .insert({
         user_id: user.id,

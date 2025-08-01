@@ -13,33 +13,31 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { DataStateWrapper } from '@/components/ui/loading-states';
 import { useRealtime } from '@/contexts/RealtimeContext';
 import { useAuth } from '@/hooks/useAuth';
-import { 
-  Search,
-  Filter,
-  DollarSign,
-  Calendar,
-  CheckCircle,
-  Clock,
-  AlertTriangle,
-  User,
-  Building,
-  Edit,
-  Save,
-  X,
-  Zap,
-  Eye,
-  Edit3,
-  Users
-} from 'lucide-react';
+import { RealtimeStatusHeader } from './components/RealtimeStatusHeader';
+import { SupplierBreakdown } from './components/SupplierBreakdown';
+import { ScopeItemCard } from './components/ScopeItemCard';
+import Search from 'lucide-react/dist/esm/icons/search'
+import Filter from 'lucide-react/dist/esm/icons/filter'
+import DollarSign from 'lucide-react/dist/esm/icons/dollar-sign'
+import Calendar from 'lucide-react/dist/esm/icons/calendar'
+import CheckCircle from 'lucide-react/dist/esm/icons/check-circle'
+import Clock from 'lucide-react/dist/esm/icons/clock'
+import AlertTriangle from 'lucide-react/dist/esm/icons/alert-triangle'
+import User from 'lucide-react/dist/esm/icons/user'
+import Building from 'lucide-react/dist/esm/icons/building'
+import Edit from 'lucide-react/dist/esm/icons/edit'
+import Save from 'lucide-react/dist/esm/icons/save'
+import X from 'lucide-react/dist/esm/icons/x'
+import Zap from 'lucide-react/dist/esm/icons/zap'
+import Eye from 'lucide-react/dist/esm/icons/eye'
+import Edit3 from 'lucide-react/dist/esm/icons/edit-3'
+import Users from 'lucide-react/dist/esm/icons/users'
 
 interface RealtimeScopeListTabProps {
   projectId: string;
@@ -274,15 +272,6 @@ export function RealtimeScopeListTab({ projectId }: RealtimeScopeListTabProps) {
     ));
   };
 
-  const getSuppliersBySpecialty = (category: string) => {
-    return suppliers.filter(supplier => 
-      supplier.specialties.some(specialty => 
-        specialty.toLowerCase().includes(category.toLowerCase()) ||
-        category.toLowerCase().includes(specialty.toLowerCase())
-      )
-    );
-  };
-
   const getSupplierTotals = () => {
     return supplierTotals.map(supplier => ({
       id: supplier.id,
@@ -300,49 +289,6 @@ export function RealtimeScopeListTab({ projectId }: RealtimeScopeListTabProps) {
     const matchesStatus = filterStatus === 'all' || item.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
-
-  // Map scope status to semantic Badge variants
-  const getStatusBadgeVariant = (status: string) => {
-    switch (status) {
-      case 'completed': return 'completed' as const;
-      case 'in_progress': return 'in-progress' as const;
-      case 'on_hold': return 'on-hold' as const;
-      case 'not_started': return 'pending' as const;
-      default: return 'pending' as const;
-    }
-  };
-
-  // Map priority to semantic Badge variants
-  const getPriorityBadgeVariant = (priority: string) => {
-    switch (priority) {
-      case 'high': return 'priority-high' as const;
-      case 'medium': return 'priority-medium' as const;
-      case 'low': return 'priority-low' as const;
-      default: return 'priority-medium' as const;
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'completed': return <CheckCircle className="w-4 h-4 text-status-success" />;
-      case 'in_progress': return <Clock className="w-4 h-4 text-status-info" />;
-      case 'on_hold': return <AlertTriangle className="w-4 h-4 text-status-warning" />;
-      case 'not_started': return <Clock className="w-4 h-4 text-muted-foreground" />;
-      default: return <Clock className="w-4 h-4 text-muted-foreground" />;
-    }
-  };
-
-  const formatTimeAgo = (timestamp: string) => {
-    const now = new Date();
-    const time = new Date(timestamp);
-    const diffMs = now.getTime() - time.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffMins < 1440) return `${Math.floor(diffMins / 60)}h ago`;
-    return `${Math.floor(diffMins / 1440)}d ago`;
-  };
 
   const totalEstimated = scopeItems.reduce((sum, item) => sum + item.estimatedCost, 0);
   const totalActual = scopeItems.reduce((sum, item) => sum + (item.actualCost || 0), 0);
@@ -383,39 +329,11 @@ export function RealtimeScopeListTab({ projectId }: RealtimeScopeListTabProps) {
   return (
     <div className="space-y-6">
       {/* Real-time Status Header */}
-      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} />
-            <span className="text-sm font-medium">
-              {isConnected ? 'Live Updates Active' : 'Offline'}
-            </span>
-            <Zap className="w-4 h-4 text-blue-500" />
-          </div>
-          {recentUpdates.length > 0 && (
-            <Badge variant="secondary" className="text-xs">
-              {recentUpdates.length} recent updates
-            </Badge>
-          )}
-        </div>
-        
-        {/* Online Users */}
-        {onlineUsers.length > 0 && (
-          <div className="flex items-center gap-2">
-            <Users className="w-4 h-4 text-gray-500" />
-            <span className="text-sm text-gray-600">{onlineUsers.length} online</span>
-            <div className="flex -space-x-2">
-              {onlineUsers.slice(0, 3).map((user) => (
-                <Avatar key={user.userId} className="w-6 h-6 border-2 border-white">
-                  <AvatarFallback className="text-xs">
-                    {user.userName.split(' ').map((n: string) => n[0]).join('')}
-                  </AvatarFallback>
-                </Avatar>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
+      <RealtimeStatusHeader
+        isConnected={isConnected}
+        recentUpdates={recentUpdates}
+        onlineUsers={onlineUsers}
+      />
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -457,38 +375,8 @@ export function RealtimeScopeListTab({ projectId }: RealtimeScopeListTabProps) {
         </Card>
       </div>
 
-      {/* Supplier Totals */}
-      {currentSupplierTotals.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Supplier Breakdown</CardTitle>
-            <CardDescription>Payment distribution across assigned suppliers</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {currentSupplierTotals.map((supplier) => (
-                <div key={supplier.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <Building className="w-4 h-4 text-blue-600" />
-                    </div>
-                    <div>
-                      <div className="font-medium">{supplier.name}</div>
-                      <div className="text-sm text-gray-600">{supplier.itemCount} scope items</div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-semibold text-green-600">${supplier.totalEstimated.toLocaleString()}</div>
-                    {supplier.totalActual > 0 && (
-                      <div className="text-sm text-gray-600">${supplier.totalActual.toLocaleString()} actual</div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {/* Supplier Breakdown */}
+      <SupplierBreakdown supplierTotals={currentSupplierTotals} />
 
       {/* Search and Filters */}
       <Card>
@@ -543,140 +431,16 @@ export function RealtimeScopeListTab({ projectId }: RealtimeScopeListTabProps) {
               </div>
             ) : (
               filteredItems.map((item) => (
-                <Card 
-                  key={item.id} 
-                  className={`hover:shadow-md transition-shadow ${
-                    recentUpdates.includes(item.id) ? 'ring-2 ring-blue-200 bg-blue-50' : ''
-                  }`}
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          {getStatusIcon(item.status)}
-                          <h3 className="font-semibold text-lg">{item.name}</h3>
-                          <Badge variant={getStatusBadgeVariant(item.status)}>
-                            {item.status.replace('_', ' ')}
-                          </Badge>
-                          <Badge variant={getPriorityBadgeVariant(item.priority)}>
-                            {item.priority}
-                          </Badge>
-                          {item.isBeingEdited && (
-                            <Badge variant="secondary" className="text-xs">
-                              <Edit3 className="w-3 h-3 mr-1" />
-                              Editing by {item.editedBy}
-                            </Badge>
-                          )}
-                          {recentUpdates.includes(item.id) && (
-                            <Badge variant="secondary" className="text-xs">
-                              <Zap className="w-3 h-3 mr-1" />
-                              Live Update
-                            </Badge>
-                          )}
-                        </div>
-                        
-                        <p className="text-gray-600 mb-3">{item.description}</p>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
-                          <div className="flex items-center gap-2">
-                            <DollarSign className="w-4 h-4 text-gray-400" />
-                            <span className="font-medium">Estimated:</span>
-                            <span>${item.estimatedCost.toLocaleString()}</span>
-                          </div>
-                          
-                          {item.actualCost && (
-                            <div className="flex items-center gap-2">
-                              <DollarSign className="w-4 h-4 text-green-500" />
-                              <span className="font-medium">Actual:</span>
-                              <span className="text-green-600">${item.actualCost.toLocaleString()}</span>
-                            </div>
-                          )}
-                          
-                          {item.assignedTo && (
-                            <div className="flex items-center gap-2">
-                              <User className="w-4 h-4 text-gray-400" />
-                              <span className="font-medium">Assigned:</span>
-                              <span>{item.assignedTo}</span>
-                            </div>
-                          )}
-                          
-                          <div className="flex items-center gap-2">
-                            <Building className="w-4 h-4 text-gray-400" />
-                            <span className="font-medium">Supplier:</span>
-                            {editingSupplier === item.id ? (
-                              <div className="flex items-center gap-2">
-                                <Select
-                                  value={item.supplierId || ''}
-                                  onValueChange={(value) => handleSupplierChange(item.id, value)}
-                                >
-                                  <SelectTrigger className="w-48">
-                                    <SelectValue placeholder="Select supplier" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="">No supplier</SelectItem>
-                                    {getSuppliersBySpecialty(item.category).map((supplier) => (
-                                      <SelectItem key={supplier.id} value={supplier.id}>
-                                        {supplier.name}
-                                      </SelectItem>
-                                    ))}
-                                    {suppliers.filter(s => !getSuppliersBySpecialty(item.category).find(gs => gs.id === s.id)).map((supplier) => (
-                                      <SelectItem key={supplier.id} value={supplier.id}>
-                                        {supplier.name} (Other)
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleEditingCancel(item.id)}
-                                >
-                                  <X className="w-4 h-4" />
-                                </Button>
-                              </div>
-                            ) : (
-                              <div className="flex items-center gap-2">
-                                <span>{item.supplier || 'Not assigned'}</span>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleEditingStart(item.id)}
-                                  disabled={item.isBeingEdited}
-                                >
-                                  <Edit className="w-4 h-4" />
-                                </Button>
-                              </div>
-                            )}
-                          </div>
-                          
-                          {item.startDate && (
-                            <div className="flex items-center gap-2">
-                              <Calendar className="w-4 h-4 text-gray-400" />
-                              <span className="font-medium">Start:</span>
-                              <span>{new Date(item.startDate).toLocaleDateString()}</span>
-                            </div>
-                          )}
-                          
-                          {item.endDate && (
-                            <div className="flex items-center gap-2">
-                              <Calendar className="w-4 h-4 text-gray-400" />
-                              <span className="font-medium">End:</span>
-                              <span>{new Date(item.endDate).toLocaleDateString()}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      
-                      <div className="ml-4 text-right">
-                        <div className="text-sm text-gray-500 mb-1">Category</div>
-                        <Badge variant="secondary">{item.category}</Badge>
-                        <div className="text-xs text-gray-500 mt-2">
-                          Updated {formatTimeAgo(item.updated_at)}
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                <ScopeItemCard
+                  key={item.id}
+                  item={item}
+                  suppliers={suppliers}
+                  editingSupplier={editingSupplier}
+                  recentUpdates={recentUpdates}
+                  onSupplierChange={handleSupplierChange}
+                  onEditingStart={handleEditingStart}
+                  onEditingCancel={handleEditingCancel}
+                />
               ))
             )}
           </div>

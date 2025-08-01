@@ -31,7 +31,8 @@ async function GETOriginal(req: NextRequest) {
         is_active,
         user:user_profiles!project_assignments_user_id_fkey(id, full_name, email)
       )
-    `);
+    `)
+    .eq('is_active', true); // Only return active (non-deleted) projects
     
     // ROLE-BASED ACCESS CONTROL: Apply filtering based on user role
     // Admin and Management roles can see ALL projects
@@ -92,6 +93,12 @@ async function GETOriginal(req: NextRequest) {
     const { data, error, count } = await query;
     
     if (error) throw error;
+    
+    console.log('📊 [GET /api/projects] Query result:', {
+      projectCount: data?.length || 0,
+      userRole: profile.role,
+      activeOnly: true // Added is_active = true filter
+    });
     
     // Return in the expected format for frontend
     return createSuccessResponse({

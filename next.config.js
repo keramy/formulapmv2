@@ -1,4 +1,9 @@
 /** @type {import('next').NextConfig} */
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+  openAnalyzer: false,
+})
+
 const nextConfig = {
   images: {
     domains: ['localhost'],
@@ -16,7 +21,15 @@ const nextConfig = {
   },
   // Suppress hydration warnings caused by browser extensions and performance optimizations
   experimental: {
-    optimizePackageImports: ['@radix-ui/react-icons', '@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', 'lucide-react'],
+    optimizePackageImports: [
+      'lucide-react',
+      '@radix-ui/react-icons', 
+      '@radix-ui/react-dialog', 
+      '@radix-ui/react-dropdown-menu',
+      '@supabase/supabase-js',
+      'react',
+      'react-dom'
+    ],
     // optimizeCss: true, // Disabled due to critters module issue
   },
   // Additional options to reduce hydration warnings
@@ -24,17 +37,6 @@ const nextConfig = {
   compress: true,
   // Bundle analysis and performance optimizations
   webpack: (config, { dev, isServer }) => {
-    // Bundle analyzer for production analysis
-    if (process.env.ANALYZE === 'true') {
-      const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
-      config.plugins.push(
-        new BundleAnalyzerPlugin({
-          analyzerMode: 'static',
-          openAnalyzer: false,
-          reportFilename: '../bundle-analysis.html',
-        })
-      )
-    }
     
     // Performance optimizations for development
     if (dev && !isServer) {
@@ -93,4 +95,4 @@ const nextConfig = {
 }
 
 
-module.exports = nextConfig
+module.exports = withBundleAnalyzer(nextConfig)
