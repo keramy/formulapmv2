@@ -82,7 +82,7 @@ try {
   }
 
   console.log(`✅ Authentication successful!`)
-  console.log(`🎟️ JWT Token: ${loginData.session.access_token.substring(0, 20)}...`)
+  console.log(`🎟️ JWT Token: ${loginData.session.access_token ? 'Received (' + loginData.session.access_token.length + ' chars)' : 'Missing'}`)
 
   // Step 4: Test API access
   console.log('4️⃣ Testing API access...')

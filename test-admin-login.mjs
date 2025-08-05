@@ -19,7 +19,7 @@ try {
     console.log('✅ Login successful!')
     console.log(`📧 Email: ${data.user.email}`)
     console.log(`🆔 ID: ${data.user.id}`)
-    console.log(`🎟️ Token: ${data.session.access_token.substring(0, 30)}...`)
+    console.log(`🎟️ Token: ${data.session.access_token ? 'Received (' + data.session.access_token.length + ' chars)' : 'Missing'}`)
     
     // Test profile access
     const { data: profile } = await supabase

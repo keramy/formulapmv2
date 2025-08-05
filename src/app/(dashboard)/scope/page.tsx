@@ -118,7 +118,7 @@ export default function GlobalScopePage() {
       setLoading(true)
       // Use getAccessToken from useAuth hook instead of localStorage
       const token = await getAccessToken()
-      console.log('Token length:', token?.length, 'Token starts with:', token?.substring(0, 20))
+      console.log('Token:', token ? `Received (${token.length} chars)` : 'Missing')
       if (!token) {
         throw new Error('No authentication token available')
       }

@@ -92,7 +92,7 @@ async function createFreshAdmin() {
       console.log('   New admin credentials:');
       console.log('   Email: test.admin@formulapm.com');
       console.log('   Password: testpass123');
-      console.log(`   Access Token: ${loginResult.access_token.substring(0, 50)}...`);
+      console.log(`   Access Token: ${loginResult.access_token ? 'Received (' + loginResult.access_token.length + ' chars)' : 'Missing'}`);
     } else {
       const loginError = await loginResponse.json();
       console.log('❌ Login failed:', loginError);

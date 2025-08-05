@@ -4,6 +4,7 @@ import { NextRequest } from 'next/server';
 import { buildPaginatedQuery, parseQueryParams, getScopeItemsOptimized, getProjectsOptimized, getTasksOptimized, getDashboardStatsOptimized } from '@/lib/enhanced-query-builder';
 
 import { performanceMonitor } from '@/lib/performance-monitor';
+import { getCachedResponse } from '@/lib/cache-middleware';
 
 import { createClient } from '@supabase/supabase-js';
 
@@ -65,9 +66,14 @@ async function GETOriginal(req: NextRequest) {
       query.range(offset, offset + params.limit - 1);
     }
     
-    const { data, error } = await query;
+    // Create cache key based on user, role, and query parameters
+    const cacheKey = `scope:${user.id}:${profile.role}:${JSON.stringify(params)}`;
     
-    if (error) throw error;
+    const data = await getCachedResponse(cacheKey, '/api/scope', async () => {
+      const { data, error } = await query;
+      if (error) throw error;
+      return data;
+    });
     
     return createSuccessResponse(data);
   } catch (error) {

@@ -9,7 +9,18 @@ const redis = new Redis({
   host: process.env.REDIS_HOST || 'localhost',
   port: parseInt(process.env.REDIS_PORT || '6379'),
   keyPrefix: 'formulapm:',
-  maxRetriesPerRequest: 3
+  maxRetriesPerRequest: 1, // Reduce retries to fail fast
+  connectTimeout: 1000,    // Quick connection timeout
+  lazyConnect: true        // Don't connect until first use
+})
+
+// Handle Redis connection errors gracefully
+redis.on('error', (err) => {
+  console.log('Redis connection error (fallback to memory cache):', err.message)
+})
+
+redis.on('connect', () => {
+  console.log('Redis connected successfully')
 })
 
 const memoryCache = new Map<string, { data: any, expires: number }>()
@@ -24,7 +35,7 @@ interface CacheConfig {
 const CACHE_CONFIG: Record<string, CacheConfig> = {
   "/api/dashboard/stats": {
     "ttl": 300,
-    "strategy": "redis",
+    "strategy": "memory", // Use memory cache when Redis unavailable
     "invalidateOn": [
       "project_update",
       "task_update",
@@ -34,7 +45,7 @@ const CACHE_CONFIG: Record<string, CacheConfig> = {
   },
   "/api/projects": {
     "ttl": 180,
-    "strategy": "redis",
+    "strategy": "memory", // Use memory cache when Redis unavailable
     "invalidateOn": [
       "project_create",
       "project_update"
@@ -43,7 +54,7 @@ const CACHE_CONFIG: Record<string, CacheConfig> = {
   },
   "/api/scope": {
     "ttl": 120,
-    "strategy": "redis",
+    "strategy": "memory", // Use memory cache when Redis unavailable
     "invalidateOn": [
       "scope_create",
       "scope_update"
@@ -85,9 +96,17 @@ export async function getCachedResponse(
     let cachedData: any = null
     
     if (config.strategy === 'redis') {
-      const cached = await redis.get(key)
-      if (cached) {
-        cachedData = JSON.parse(cached)
+      try {
+        const cached = await redis.get(key)
+        if (cached) {
+          cachedData = JSON.parse(cached)
+        }
+      } catch (redisError) {
+        // Silently fallback to memory cache if Redis fails
+        const memoryCached = memoryCache.get(key)
+        if (memoryCached && memoryCached.expires > Date.now()) {
+          cachedData = memoryCached.data
+        }
       }
     } else if (config.strategy === 'memory') {
       const cached = memoryCache.get(key)
@@ -107,7 +126,15 @@ export async function getCachedResponse(
 
     // Store in cache
     if (config.strategy === 'redis') {
-      await redis.setex(key, config.ttl, JSON.stringify(freshData))
+      try {
+        await redis.setex(key, config.ttl, JSON.stringify(freshData))
+      } catch (redisError) {
+        // Fallback to memory cache if Redis fails
+        memoryCache.set(key, {
+          data: freshData,
+          expires: Date.now() + (config.ttl * 1000)
+        })
+      }
     } else if (config.strategy === 'memory') {
       memoryCache.set(key, {
         data: freshData,
