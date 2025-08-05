@@ -9,10 +9,19 @@ const supabase = createClient(
 );
 
 async function GETOriginal(req: NextRequest) {
-  const { user, profile } = getRequestData(req);
+  const user = (req as any).user;
+  const profile = (req as any).profile;
   
   try {
-    const params = parseQueryParams(req);
+    const { searchParams } = new URL(req.url);
+    const params = {
+      search: searchParams.get('search'),
+      status: searchParams.get('status'),
+      sort_field: searchParams.get('sort_field'),
+      sort_direction: searchParams.get('sort_direction') || 'desc',
+      page: parseInt(searchParams.get('page') || '1'),
+      limit: parseInt(searchParams.get('limit') || '20')
+    };
     
     // Build query for clients based on user role
     const query = supabase.from('clients').select(`
@@ -68,7 +77,8 @@ async function GETOriginal(req: NextRequest) {
 }
 
 async function POSTOriginal(req: NextRequest) {
-  const { user, profile } = getRequestData(req);
+  const user = (req as any).user;
+  const profile = (req as any).profile;
   
   try {
     const body = await req.json();

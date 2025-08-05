@@ -53,7 +53,7 @@ async function GETOriginal(request: NextRequest, { user, profile, params }: any)
 async function PUTOriginal(request: NextRequest, { user, profile, params }: any) {
   try {
     const reportId = params.id;
-    const requestData = await getRequestData(request);
+    const requestData = await request.json();
     const { name, description, visibility, status } = requestData;
 
     if (!reportId) {
@@ -71,8 +71,8 @@ async function PUTOriginal(request: NextRequest, { user, profile, params }: any)
     }
 
     // Check if report exists and user has access
-    const supabase = await createClient();
-    const { data: existingReport, error: fetchError } = await supabase
+    const supabase2 = await createClient();
+    const { data: existingReport, error: fetchError } = await supabase2
       .from('construction_reports')
       .select('id, status, created_by')
       .eq('id', reportId)
@@ -100,8 +100,8 @@ async function PUTOriginal(request: NextRequest, { user, profile, params }: any)
     }
 
     // Update the report
-    const supabase = await createClient();
-    const { data: report, error } = await supabase
+    const supabase3 = await createClient();
+    const { data: report, error } = await supabase3
       .from('construction_reports')
       .update(updateData)
       .eq('id', reportId)
@@ -136,8 +136,8 @@ async function DELETEOriginal(request: NextRequest, { user, profile, params }: a
     }
 
     // Check if report exists and user has access
-    const supabase = await createClient();
-    const { data: existingReport, error: fetchError } = await supabase
+    const supabase4 = await createClient();
+    const { data: existingReport, error: fetchError } = await supabase4
       .from('construction_reports')
       .select('id, status')
       .eq('id', reportId)
@@ -153,8 +153,8 @@ async function DELETEOriginal(request: NextRequest, { user, profile, params }: a
     }
 
     // Delete the report (cascade will handle related data)
-    const supabase = await createClient();
-    const { error } = await supabase
+    const supabase5 = await createClient();
+    const { error } = await supabase5
       .from('construction_reports')
       .delete()
       .eq('id', reportId);

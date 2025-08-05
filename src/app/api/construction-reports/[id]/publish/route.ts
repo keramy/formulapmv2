@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 async function POSTOriginal(request: NextRequest, { user, profile, params }: any) {
   try {
     const reportId = params.id;
-    const requestData = await getRequestData(request);
+    const requestData = await request.json();
     const { visibility = 'internal', generate_pdf = true } = requestData;
 
     if (!reportId) {
@@ -71,7 +71,7 @@ async function POSTOriginal(request: NextRequest, { user, profile, params }: any
     }
 
     // Update the report to published status
-    const supabase = await createClient();
+    const supabase2 = await createClient();
     const { data: publishedReport, error: updateError } = await supabase
       .from('construction_reports')
       .update(updateData)
@@ -90,7 +90,7 @@ async function POSTOriginal(request: NextRequest, { user, profile, params }: any
     }
 
     // Log the activity
-    const supabase = await createClient();
+    const supabase3 = await createClient();
     const { data, error } = await supabase
       .from('activity_logs')
       .insert({

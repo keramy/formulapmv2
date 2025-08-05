@@ -22,10 +22,9 @@ const EXCEL_COLUMNS = {
   quantity: 'F',
   specification: 'G',
   location: 'H',
-  supplier: 'I',
-  description: 'J',
-  status: 'K',
-  update: 'L'
+  description: 'I',
+  status: 'J',
+  update: 'K'
 };
 
 interface ExcelRowData {
@@ -37,7 +36,6 @@ interface ExcelRowData {
   quantity: number;
   specification?: string;
   location?: string;
-  supplier?: string;
   description: string;
   status: string;
   update?: string;
@@ -55,11 +53,11 @@ interface ImportResult {
   imported: number;
   errors: ValidationError[];
   warnings: string[];
-  suppliers: { [key: string]: string }; // supplier name -> id mapping
 }
 
 async function POSTOriginal(req: NextRequest) {
-  const { user, profile } = getRequestData(req);
+  const user = (req as any).user;
+  const profile = (req as any).profile;
   
   try {
     // Parse multipart form data
@@ -109,8 +107,7 @@ async function POSTOriginal(req: NextRequest) {
         message: `Successfully imported ${result.imported} scope items`,
         imported: result.imported,
         errors: result.errors,
-        warnings: result.warnings,
-        suppliers: result.suppliers
+        warnings: result.warnings
       });
     } else {
       return createErrorResponse('Import failed with validation errors', 400, {
@@ -137,8 +134,7 @@ async function processExcelData(
     success: false,
     imported: 0,
     errors: [],
-    warnings: [],
-    suppliers: {}
+    warnings: []
   };
   
   const validRows: ExcelRowData[] = [];
@@ -180,16 +176,12 @@ async function processExcelData(
     return result;
   }
   
-  // Get supplier mappings
-  const supplierMappings = await getSupplierMappings(validRows);
-  result.suppliers = supplierMappings;
-  
   // Get next item_no for the project
   const nextItemNo = await getNextItemNo(projectId);
   
   // Insert data using transaction
   try {
-    const insertedItems = await insertScopeItems(validRows, projectId, userId, supplierMappings, nextItemNo);
+    const insertedItems = await insertScopeItems(validRows, projectId, userId, nextItemNo);
     result.imported = insertedItems;
     result.success = true;
   } catch (error) {
@@ -222,7 +214,6 @@ function parseExcelRow(row: ExcelJS.Row, rowNumber: number): ExcelRowData {
     quantity: parseFloat(getValue(EXCEL_COLUMNS.quantity)) || 0,
     specification: getValue(EXCEL_COLUMNS.specification)?.toString()?.trim() || undefined,
     location: getValue(EXCEL_COLUMNS.location)?.toString()?.trim() || undefined,
-    supplier: getValue(EXCEL_COLUMNS.supplier)?.toString()?.trim() || undefined,
     description: getValue(EXCEL_COLUMNS.description)?.toString()?.trim() || '',
     status: getValue(EXCEL_COLUMNS.status)?.toString()?.trim()?.toLowerCase() || 'pending',
     update: getValue(EXCEL_COLUMNS.update)?.toString()?.trim() || undefined
@@ -307,36 +298,6 @@ function validateRowData(data: ExcelRowData, rowNumber: number): {
   return { errors, warnings };
 }
 
-async function getSupplierMappings(rows: ExcelRowData[]): Promise<{[key: string]: string}> {
-  const supplierNamesSet = new Set(
-    rows
-      .map(row => row.supplier)
-      .filter(name => name && name.trim() !== '')
-  );
-  const supplierNames = Array.from(supplierNamesSet);
-  
-  if (supplierNames.length === 0) {
-    return {};
-  }
-  
-  const { data: suppliers, error } = await supabase
-    .from('suppliers')
-    .select('id, name')
-    .in('name', supplierNames);
-    
-  if (error) {
-    console.error('Error fetching suppliers:', error);
-    return {};
-  }
-  
-  const mappings: {[key: string]: string} = {};
-  suppliers?.forEach(supplier => {
-    mappings[supplier.name] = supplier.id;
-  });
-  
-  return mappings;
-}
-
 async function getNextItemNo(projectId: string): Promise<number> {
   const { data, error } = await supabase
     .from('scope_items')
@@ -358,12 +319,9 @@ async function insertScopeItems(
   rows: ExcelRowData[],
   projectId: string,
   userId: string,
-  supplierMappings: {[key: string]: string},
   startingItemNo: number
 ): Promise<number> {
   const itemsToInsert = rows.map((row, index) => {
-    const supplierId = row.supplier ? supplierMappings[row.supplier] : undefined;
-    
     return {
       project_id: projectId,
       item_no: row.itemNo || (startingItemNo + index),
@@ -377,9 +335,7 @@ async function insertScopeItems(
       specification: row.specification,
       location: row.location,
       update_notes: row.update,
-      created_by: userId,
-      // Add supplier info to metadata if found
-      metadata: supplierId ? { supplier_id: supplierId, supplier_name: row.supplier } : {}
+      created_by: userId
     };
   });
   
@@ -398,5 +354,5 @@ async function insertScopeItems(
 
 // Enhanced API exports with middleware
 export const POST = withAPI(POSTOriginal, {
-  roles: ['management', 'project_manager', 'technical_lead', 'purchase_manager']
+  roles: ['management', 'project_manager', 'technical_lead', 'purchase_manager', 'subcontractor']
 });

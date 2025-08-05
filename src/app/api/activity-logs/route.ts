@@ -9,10 +9,21 @@ const supabase = createClient(
 );
 
 async function GETOriginal(req: NextRequest) {
-  const { user, profile } = getRequestData(req);
+  const user = (req as any).user;
+  const profile = (req as any).profile;
   
   try {
-    const params = parseQueryParams(req);
+    const { searchParams } = new URL(req.url);
+    const params = {
+      entity_type: searchParams.get('entity_type'),
+      user_id: searchParams.get('user_id'),
+      project_id: searchParams.get('project_id'),
+      search: searchParams.get('search'),
+      sort_field: searchParams.get('sort_field'),
+      sort_direction: searchParams.get('sort_direction') || 'desc',
+      limit: parseInt(searchParams.get('limit') || '20'),
+      page: parseInt(searchParams.get('page') || '1')
+    };
     
     // Build comprehensive activity logs query
     let query = supabase.from('activity_logs').select(`
@@ -143,7 +154,8 @@ async function GETOriginal(req: NextRequest) {
 }
 
 async function POSTOriginal(req: NextRequest) {
-  const { user, profile } = getRequestData(req);
+  const user = (req as any).user;
+  const profile = (req as any).profile;
   
   try {
     const body = await req.json();

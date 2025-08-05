@@ -14,7 +14,8 @@ const supabase = createClient(
 );
 
 async function GETOriginal(req: NextRequest) {
-  const { user, profile } = getRequestData(req);
+  const user = (req as any).user;
+  const profile = (req as any).profile;
   
   try {
     // Return the user profile data
@@ -34,7 +35,8 @@ async function GETOriginal(req: NextRequest) {
 }
 
 async function PUTOriginal(req: NextRequest) {
-  const { user, profile } = getRequestData(req);
+  const user = (req as any).user;
+  const profile = (req as any).profile;
   
   try {
     // Add your PUT logic here

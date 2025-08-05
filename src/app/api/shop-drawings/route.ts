@@ -9,10 +9,20 @@ const supabase = createClient(
 );
 
 async function GETOriginal(req: NextRequest) {
-  const { user, profile } = getRequestData(req);
+  const user = (req as any).user;
+  const profile = (req as any).profile;
   
   try {
-    const params = parseQueryParams(req);
+    const { searchParams } = new URL(req.url);
+    const params = {
+      page: parseInt(searchParams.get('page') || '1'),
+      limit: parseInt(searchParams.get('limit') || '20'),
+      search: searchParams.get('search'),
+      status: searchParams.get('status'),
+      project_id: searchParams.get('project_id'),
+      sort_field: searchParams.get('sort_field'),
+      sort_direction: searchParams.get('sort_direction') || 'desc'
+    };
     
     // Build comprehensive shop drawings query
     let query = supabase.from('shop_drawings').select(`
@@ -192,7 +202,8 @@ async function GETOriginal(req: NextRequest) {
 }
 
 async function POSTOriginal(req: NextRequest) {
-  const { user, profile } = getRequestData(req);
+  const user = (req as any).user;
+  const profile = (req as any).profile;
   
   try {
     const body = await req.json();

@@ -13,11 +13,9 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 );
 
-async function GETOriginal(req: NextRequest) {
-  const { user, profile } = getRequestData(req);
-  
+async function GETOriginal(req: NextRequest, { user, profile }: any) {
   try {
-    const params = parseQueryParams(req);
+    const { searchParams } = new URL(req.url);
     
     // Get dashboard statistics based on user role
     const stats = {

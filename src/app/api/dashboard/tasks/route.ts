@@ -14,10 +14,17 @@ const supabase = createClient(
 );
 
 async function GETOriginal(req: NextRequest) {
-  const { user, profile } = getRequestData(req);
+  const user = (req as any).user;
+  const profile = (req as any).profile;
   
   try {
-    const params = parseQueryParams(req);
+    const { searchParams } = new URL(req.url);
+    const params = {
+      limit: parseInt(searchParams.get('limit') || '10'),
+      page: parseInt(searchParams.get('page') || '1'),
+      status: searchParams.get('status'),
+      priority: searchParams.get('priority')
+    };
     
     // Get dashboard tasks for the user based on their role
     let query = supabase.from('tasks').select(`

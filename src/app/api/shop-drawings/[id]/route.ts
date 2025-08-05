@@ -23,7 +23,8 @@ const updateShopDrawingSchema = z.object({
 
 // GET /api/shop-drawings/[id] - Get single shop drawing
 async function GETOriginal(req: NextRequest) {
-  const { user, profile } = getRequestData(req);
+  const user = (req as any).user;
+  const profile = (req as any).profile;
   const url = new URL(req.url);
   const drawingId = url.pathname.split('/').pop();
   
@@ -145,7 +146,8 @@ export const GET = withAPI(GETOriginal);
 
 // PUT /api/shop-drawings/[id] - Update shop drawing
 async function PUTOriginal(req: NextRequest) {
-  const { user, profile } = getRequestData(req);
+  const user = (req as any).user;
+  const profile = (req as any).profile;
   const url = new URL(req.url);
   const drawingId = url.pathname.split('/').pop();
   
@@ -351,7 +353,8 @@ export const PUT = withAPI(PUTOriginal);
 
 // DELETE /api/shop-drawings/[id] - Delete shop drawing
 async function DELETEOriginal(req: NextRequest) {
-  const { user, profile } = getRequestData(req);
+  const user = (req as any).user;
+  const profile = (req as any).profile;
   const url = new URL(req.url);
   const drawingId = url.pathname.split('/').pop();
   

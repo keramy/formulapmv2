@@ -13,8 +13,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 );
 
-async function GETOriginal(req: NextRequest) {
-  const { user, profile } = getRequestData(req);
+async function GETOriginal(req: NextRequest, { user, profile }: any) {
   
   try {
     console.log('🔍 [Dashboard Stats] Loading stats for user:', user.id, 'role:', profile.role);

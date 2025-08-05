@@ -13,24 +13,29 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 );
 
-async function GETOriginal(req: NextRequest) {
-  const { user, profile } = getRequestData(req);
-  
+async function GETOriginal(req: NextRequest, { user, profile }: any) {
   try {
+    // Parse query parameters from the request
     const params = parseQueryParams(req);
+    const { searchParams } = new URL(req.url);
     
-    // Build query for projects with related data
+    // Build base query for projects - using simple select to avoid FK issues
     const query = supabase.from('projects').select(`
-      *,
-      client:clients(id, name, contact_person),
-      project_manager:user_profiles!projects_project_manager_id_fkey(id, full_name, email),
-      assignments:project_assignments(
-        id,
-        user_id,
-        role_in_project,
-        is_active,
-        user:user_profiles!project_assignments_user_id_fkey(id, full_name, email)
-      )
+      id,
+      name,
+      code,
+      description,
+      status,
+      client_id,
+      project_manager_id,
+      start_date,
+      end_date,
+      budget_amount,
+      location,
+      created_at,
+      updated_at,
+      created_by,
+      is_active
     `)
     .eq('is_active', true); // Only return active (non-deleted) projects
     

@@ -23,8 +23,8 @@ async function GETOriginal(request: NextRequest, { user, profile, params }: any)
       return createErrorResponse('Construction report not found or access denied', 404);
     }
 
-    const supabase = await createClient();
-    const { data: lines, error } = await supabase
+    const supabase2 = await createClient();
+    const { data: lines, error } = await supabase2
       .from('construction_report_lines')
       .select(`
         id, line_number, title, description, created_at, updated_at,
@@ -55,7 +55,7 @@ async function GETOriginal(request: NextRequest, { user, profile, params }: any)
 async function POSTOriginal(request: NextRequest, { user, profile, params }: any) {
   try {
     const reportId = params.id;
-    const requestData = await getRequestData(request);
+    const requestData = await request.json();
     const { title, description } = requestData;
 
     if (!reportId) {
@@ -68,8 +68,8 @@ async function POSTOriginal(request: NextRequest, { user, profile, params }: any
     }
 
     // Verify user has access to the report and it's in draft status
-    const supabase = await createClient();
-    const { data: report, error: accessError } = await supabase
+    const supabase3 = await createClient();
+    const { data: report, error: accessError } = await supabase3
       .from('construction_reports')
       .select('id, status')
       .eq('id', reportId)
@@ -84,8 +84,8 @@ async function POSTOriginal(request: NextRequest, { user, profile, params }: any
     }
 
     // Get the next line number
-    const supabase = await createClient();
-    const { data: lastLine } = await supabase
+    const supabase4 = await createClient();
+    const { data: lastLine } = await supabase4
       .from('construction_report_lines')
       .select('line_number')
       .eq('report_id', reportId)
@@ -96,8 +96,8 @@ async function POSTOriginal(request: NextRequest, { user, profile, params }: any
     const nextLineNumber = (lastLine?.line_number || 0) + 1;
 
     // Create the line
-    const supabase = await createClient();
-    const { data: line, error } = await supabase
+    const supabase5 = await createClient();
+    const { data: line, error } = await supabase5
       .from('construction_report_lines')
       .insert({
         report_id: reportId,

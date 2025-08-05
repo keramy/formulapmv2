@@ -14,10 +14,23 @@ const supabase = createClient(
 );
 
 async function GETOriginal(req: NextRequest) {
-  const { user, profile } = getRequestData(req);
+  const user = (req as any).user;
+  const profile = (req as any).profile;
   
   try {
-    const params = parseQueryParams(req);
+    const { searchParams } = new URL(req.url);
+    const params = {
+      project_id: searchParams.get('project_id'),
+      assigned_to: searchParams.get('assigned_to'),
+      status: searchParams.get('status'),
+      priority: searchParams.get('priority'),
+      overdue: searchParams.get('overdue'),
+      search: searchParams.get('search'),
+      sort_field: searchParams.get('sort_field'),
+      sort_direction: searchParams.get('sort_direction') || 'desc',
+      page: parseInt(searchParams.get('page') || '1'),
+      limit: parseInt(searchParams.get('limit') || '20')
+    };
     
     // Build comprehensive tasks query with relations
     let query = supabase.from('tasks').select(`
@@ -153,7 +166,8 @@ async function GETOriginal(req: NextRequest) {
 }
 
 async function POSTOriginal(req: NextRequest) {
-  const { user, profile } = getRequestData(req);
+  const user = (req as any).user;
+  const profile = (req as any).profile;
   
   try {
     const body = await req.json();

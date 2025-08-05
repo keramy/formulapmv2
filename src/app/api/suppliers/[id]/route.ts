@@ -10,7 +10,8 @@ const supabase = createClient(
 );
 
 async function GETOriginal(req: NextRequest, { params }: { params: { id: string } }) {
-  const { user, profile } = getRequestData(req);
+  const user = (req as any).user;
+  const profile = (req as any).profile;
   
   try {
     const { data, error } = await supabase
@@ -33,7 +34,8 @@ async function GETOriginal(req: NextRequest, { params }: { params: { id: string 
 }
 
 async function PUTOriginal(req: NextRequest, { params }: { params: { id: string } }) {
-  const { user, profile } = getRequestData(req);
+  const user = (req as any).user;
+  const profile = (req as any).profile;
   
   try {
     const body = await req.json();
@@ -68,7 +70,8 @@ async function PUTOriginal(req: NextRequest, { params }: { params: { id: string 
 }
 
 async function DELETEOriginal(req: NextRequest, { params }: { params: { id: string } }) {
-  const { user, profile } = getRequestData(req);
+  const user = (req as any).user;
+  const profile = (req as any).profile;
   
   try {
     // Delete supplier

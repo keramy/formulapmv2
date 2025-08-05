@@ -1,1 +1,0 @@
-SELECT COUNT(*) as policy_count FROM pg_policies WHERE schemaname = 'public';

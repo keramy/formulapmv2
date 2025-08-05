@@ -14,7 +14,8 @@ const supabase = createClient(
 
 // GET /api/clients/[id] - Get specific client
 async function GETOriginal(req: NextRequest) {
-  const { user, profile } = getRequestData(req);
+  const user = (req as any).user;
+  const profile = (req as any).profile;
   const url = new URL(req.url);
   const clientId = url.pathname.split('/').pop();
   
@@ -84,7 +85,8 @@ export const GET = withAPI(GETOriginal);
 
 // PUT /api/clients/[id] - Update specific client
 async function PUTOriginal(req: NextRequest) {
-  const { user, profile } = getRequestData(req);
+  const user = (req as any).user;
+  const profile = (req as any).profile;
   const url = new URL(req.url);
   const clientId = url.pathname.split('/').pop();
   
@@ -202,7 +204,8 @@ export const PUT = withAPI(PUTOriginal);
 
 // DELETE /api/clients/[id] - Delete specific client
 async function DELETEOriginal(req: NextRequest) {
-  const { user, profile } = getRequestData(req);
+  const user = (req as any).user;
+  const profile = (req as any).profile;
   const url = new URL(req.url);
   const clientId = url.pathname.split('/').pop();
   

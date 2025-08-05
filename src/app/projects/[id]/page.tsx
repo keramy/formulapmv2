@@ -1,15 +1,15 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { ProjectHeader } from '@/components/projects/ProjectHeader';
 import { TabbedWorkspaceOptimized } from '@/components/projects/TabbedWorkspaceOptimized';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { useAuth } from '@/hooks/useAuth';
 import { 
-  useLoadingOrchestrator, 
   ProgressiveLoadingContainer,
   ProjectWorkspaceSkeleton,
-  SmartLoadingIndicator,
+  SimpleLoadingIndicator,
   useComponentLoading
 } from '@/components/ui/SimpleLoadingOrchestrator';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,43 +17,28 @@ import { AlertTriangle, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 /**
- * Progressive Project Header
- * Loads project basic info first, then detailed metadata
+ * Simplified Project Header
+ * Loads project information with basic validation
  */
 function ProgressiveProjectHeader({ projectId }: { projectId: string }) {
-  const { start, finish, progress, isLoading } = useComponentLoading(
-    'project-header',
-    'Loading project information',
-    'critical'
-  );
+  const { start, finish } = useComponentLoading('project-header');
+  const { getAccessToken } = useAuth();
   const [projectExists, setProjectExists] = useState<boolean | null>(null);
   const router = useRouter();
+  const loadedRef = useRef<string | null>(null);
 
   useEffect(() => {
+    // Prevent duplicate loading for the same project
+    if (loadedRef.current === projectId) return;
+    
+    loadedRef.current = projectId;
     start();
     
     const loadProjectHeader = async () => {
       try {
-        // Phase 1: Check if project exists (20%)
-        progress(20);
-        await new Promise(resolve => setTimeout(resolve, 200));
-        
-        // Simulate project validation
-        const exists = await validateProject(projectId);
+        // Validate project with authentication
+        const exists = await validateProject(projectId, getAccessToken);
         setProjectExists(exists);
-        
-        if (!exists) {
-          finish();
-          return;
-        }
-        
-        // Phase 2: Load basic project info (60%)
-        progress(60);
-        await new Promise(resolve => setTimeout(resolve, 300));
-        
-        // Phase 3: Load project metadata (100%)
-        progress(100);
-        await new Promise(resolve => setTimeout(resolve, 200));
         
         finish();
       } catch (error) {
@@ -64,7 +49,7 @@ function ProgressiveProjectHeader({ projectId }: { projectId: string }) {
     };
     
     loadProjectHeader();
-  }, [projectId, start, finish, progress]);
+  }, [projectId]); // Only depend on projectId to prevent infinite loops
 
   // Project not found error state
   if (projectExists === false) {
@@ -98,13 +83,12 @@ function ProgressiveProjectHeader({ projectId }: { projectId: string }) {
 
   return (
     <ProgressiveLoadingContainer
-      loadingStates={['project-header']}
+      loadingId="project-header"
       fallback={
         <div className="space-y-4">
-          <SmartLoadingIndicator 
+          <SimpleLoadingIndicator 
             loadingId="project-header"
-            showLabel={true}
-            showProgress={true}
+            label="Loading project information..."
           />
           <div className="h-32 bg-muted/30 animate-pulse rounded-lg" />
         </div>
@@ -118,24 +102,23 @@ function ProgressiveProjectHeader({ projectId }: { projectId: string }) {
 }
 
 /**
- * Progressive Project Tabs
- * Loads tab structure first, then tab content on demand
+ * Simplified Project Tabs
+ * Loads project workspace without artificial delays
  */
 function ProgressiveProjectTabs({ projectId }: { projectId: string }) {
-  const { start, finish, isLoading } = useComponentLoading(
-    'project-tabs',
-    'Loading project workspace',
-    'high',
-    ['project-header']
-  );
+  const { start, finish } = useComponentLoading('project-tabs');
+  const loadedRef = useRef<string | null>(null);
 
   useEffect(() => {
+    // Prevent duplicate loading for the same project
+    if (loadedRef.current === projectId) return;
+    
+    loadedRef.current = projectId;
     start();
     
     const loadTabs = async () => {
       try {
-        // Load tab structure
-        await new Promise(resolve => setTimeout(resolve, 400));
+        // Immediate loading - no artificial delays
         finish();
       } catch (error) {
         console.error('Error loading project tabs:', error);
@@ -144,21 +127,20 @@ function ProgressiveProjectTabs({ projectId }: { projectId: string }) {
     };
     
     loadTabs();
-  }, [projectId, start, finish]);
+  }, [projectId]); // Only depend on projectId to prevent infinite loops
 
   return (
     <ProgressiveLoadingContainer
-      loadingStates={['project-tabs']}
+      loadingId="project-tabs"
       fallback={
         <Card>
           <CardHeader>
             <CardTitle>Loading Workspace...</CardTitle>
           </CardHeader>
           <CardContent>
-            <SmartLoadingIndicator 
+            <SimpleLoadingIndicator 
               loadingId="project-tabs"
-              showLabel={true}
-              showProgress={false}
+              label="Loading workspace..."
             />
             <div className="mt-4 space-y-3">
               <div className="h-6 bg-muted/50 animate-pulse rounded" />
@@ -192,54 +174,62 @@ function ProgressiveProjectTabs({ projectId }: { projectId: string }) {
 }
 
 /**
- * Simulates project validation (replace with actual API call)
+ * Validates project existence with proper authentication
  */
-async function validateProject(projectId: string): Promise<boolean> {
-  // This would be replaced with actual project validation logic
-  // For now, simulate a validation check
+async function validateProject(projectId: string, getAccessToken: () => Promise<string | null>): Promise<boolean> {
   try {
+    // Get authentication token
+    const token = await getAccessToken();
+    if (!token) {
+      console.warn('🔐 [validateProject] No auth token available');
+      return false;
+    }
+
     const response = await fetch(`/api/projects/${projectId}`, {
-      method: 'HEAD' // Just check if project exists
+      method: 'HEAD', // Just check if project exists
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
     });
+    
+    // Reduced console logging to prevent spam
+    if (!response.ok) {
+      console.warn(`🔍 [validateProject] Project ${projectId} validation failed:`, response.status);
+    }
+    
     return response.ok;
-  } catch {
-    return true; // Assume exists if can't validate
+  } catch (error) {
+    console.error('🔍 [validateProject] Validation error:', error);
+    return false; // Return false on error to show proper error state
   }
 }
 
 /**
- * Progressive Project Workspace
- * Orchestrates the loading of project components with proper error handling
+ * Simplified Project Workspace
+ * Clean loading of project components without complex tracking
  */
 function ProgressiveProjectWorkspace({ projectId }: { projectId: string }) {
-  const { getMetrics } = useLoadingOrchestrator();
   const [loadingStartTime] = useState(Date.now());
 
   useEffect(() => {
-    // Track page load performance
+    // Simple performance tracking
     const trackPerformance = () => {
       const loadTime = Date.now() - loadingStartTime;
       console.log(`🚀 Project workspace loaded in ${loadTime}ms`);
-      
-      const metrics = getMetrics();
-      console.log('📊 Loading metrics:', {
-        totalDuration: metrics.totalDuration,
-        criticalPathDuration: metrics.criticalPathDuration,
-        coreWebVitals: metrics.coreWebVitals
-      });
     };
     
-    // Track when all critical components finish loading
-    const timer = setTimeout(trackPerformance, 2000);
+    // Track when components finish loading
+    const timer = setTimeout(trackPerformance, 1000);
     return () => clearTimeout(timer);
-  }, [loadingStartTime, getMetrics]);
+  }, [loadingStartTime]);
 
   return (
     <div className="p-6 space-y-6">
-      {/* Progressive Header Loading */}
+      {/* Simplified Header Loading */}
       <ProgressiveProjectHeader projectId={projectId} />
       
-      {/* Progressive Tabs Loading */}
+      {/* Simplified Tabs Loading */}
       <ProgressiveProjectTabs projectId={projectId} />
     </div>
   );

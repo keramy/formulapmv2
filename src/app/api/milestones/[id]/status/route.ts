@@ -10,7 +10,8 @@ const supabase = createClient(
 );
 
 async function PUTOriginal(req: NextRequest) {
-  const { user, profile } = getRequestData(req);
+  const user = (req as any).user;
+  const profile = (req as any).profile;
   
   try {
     // Add your PUT logic here

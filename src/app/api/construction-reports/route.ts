@@ -89,7 +89,7 @@ async function GETOriginal(request: NextRequest, { user, profile }: any) {
 // POST /api/construction-reports - Create new construction report
 async function POSTOriginal(request: NextRequest, { user, profile }: any) {
   try {
-    const requestData = await getRequestData(request);
+    const requestData = await request.json();
     const { project_id, name, description, visibility = 'internal' } = requestData;
 
     // Validate required fields
@@ -103,8 +103,8 @@ async function POSTOriginal(request: NextRequest, { user, profile }: any) {
     }
 
     // Verify user has access to the project
-    const supabase = await createClient();
-    const { data: projectAccess, error: accessError } = await supabase
+    const supabase2 = await createClient();
+    const { data: projectAccess, error: accessError } = await supabase2
       .from('projects')
       .select('id')
       .eq('id', project_id)
@@ -115,8 +115,8 @@ async function POSTOriginal(request: NextRequest, { user, profile }: any) {
     }
 
     // Create the construction report
-    const supabase = await createClient();
-    const { data: report, error } = await supabase
+    const supabase3 = await createClient();
+    const { data: report, error } = await supabase3
       .from('construction_reports')
       .insert({
         project_id,

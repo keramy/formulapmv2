@@ -14,16 +14,30 @@ const supabase = createClient(
 );
 
 async function GETOriginal(req: NextRequest) {
-  const { user, profile } = getRequestData(req);
+  const user = (req as any).user;
+  const profile = (req as any).profile;
   
   try {
-    const params = parseQueryParams(req);
+    const { searchParams } = new URL(req.url);
+    const params = {
+      limit: parseInt(searchParams.get('limit') || '10'),
+      page: parseInt(searchParams.get('page') || '1')
+    };
     
-    // Add your specific query logic here
+    // Get recent activity logs
     const { data, error } = await supabase
-      .from('your_table')
-      .select('*')
-      .eq('user_id', user.id);
+      .from('activity_logs')
+      .select(`
+        id,
+        entity_type,
+        action,
+        entity_id,
+        details,
+        created_at,
+        user:user_profiles(first_name, last_name, email)
+      `)
+      .order('created_at', { ascending: false })
+      .limit(params.limit);
     
     if (error) throw error;
     

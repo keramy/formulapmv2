@@ -3,6 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { FileImage, Plus, Eye, Clock, CheckCircle, XCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { ShopDrawingUploadModal } from '@/components/shop-drawings/ShopDrawingUploadModal'
 
 export default function ShopDrawingsPage() {
   return (
@@ -12,10 +13,14 @@ export default function ShopDrawingsPage() {
           <h1 className="text-3xl font-bold mb-2">Shop Drawings</h1>
           <p className="text-gray-600">Manage shop drawing submissions and approvals</p>
         </div>
-        <Button className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          Upload Drawing
-        </Button>
+        <ShopDrawingUploadModal
+          trigger={
+            <Button className="flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              Upload Drawing
+            </Button>
+          }
+        />
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-6">

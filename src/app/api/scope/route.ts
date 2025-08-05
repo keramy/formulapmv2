@@ -14,10 +14,20 @@ const supabase = createClient(
 );
 
 async function GETOriginal(req: NextRequest) {
-  const { user, profile } = getRequestData(req);
+  const user = (req as any).user;
+  const profile = (req as any).profile;
   
   try {
-    const params = parseQueryParams(req);
+    const { searchParams } = new URL(req.url);
+    const params = {
+      project_id: searchParams.get('project_id'),
+      search: searchParams.get('search'),
+      status: searchParams.get('status'),
+      sort_field: searchParams.get('sort_field'),
+      sort_direction: searchParams.get('sort_direction') || 'desc',
+      page: parseInt(searchParams.get('page') || '1'),
+      limit: parseInt(searchParams.get('limit') || '20')
+    };
     
     // Build query for scope items based on user role and filters
     const query = supabase.from('scope_items').select(`
@@ -67,7 +77,8 @@ async function GETOriginal(req: NextRequest) {
 }
 
 async function POSTOriginal(req: NextRequest) {
-  const { user, profile } = getRequestData(req);
+  const user = (req as any).user;
+  const profile = (req as any).profile;
   
   try {
     const body = await req.json();
@@ -116,4 +127,6 @@ async function POSTOriginal(req: NextRequest) {
 
 // Enhanced API exports with middleware
 export const GET = withAPI(GETOriginal);
-export const POST = withAPI(POSTOriginal);
+export const POST = withAPI(POSTOriginal, {
+  roles: ['management', 'project_manager', 'technical_lead', 'purchase_manager', 'subcontractor']
+});

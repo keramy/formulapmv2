@@ -9,6 +9,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import dynamic from 'next/dynamic'
 import { useScope, useScopeExcel, useScopeProgress } from '@/hooks/useScope'
 import { usePermissions } from '@/hooks/usePermissions'
 import { useToast } from '@/components/ui/use-toast'
@@ -16,6 +17,16 @@ import { ScopeCategory, ScopeFilters, ScopeStatus, ScopeItem } from '@/types/sco
 import { DataStateWrapper } from '@/components/ui/loading-states'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { ScopeItemModal } from './ScopeItemModal'
+import { ExcelImportDialog } from './ExcelImportDialog'
+import { 
+  Plus, 
+  Upload, 
+  Bell, 
+  CheckSquare, 
+  RefreshCw
+} from 'lucide-react'
 
 interface ScopeCoordinatorProps {
   projectId: string
@@ -340,11 +351,64 @@ export const useScopeCoordinator = ({
 export type ScopeCoordinatorReturn = ReturnType<typeof useScopeCoordinator>
 
 /**
- * Enhanced ScopeCoordinator with DataStateWrapper integration
- * This provides consistent loading states and error handling for scope operations
+ * Enhanced ScopeCoordinator with integrated advanced features
+ * Provides comprehensive scope management with filtering, bulk actions, and notifications
  */
 export function ScopeCoordinatorEnhanced(props: ScopeCoordinatorProps) {
   const coordinator = useScopeCoordinator(props)
+  const [selectedItems, setSelectedItems] = useState<ScopeItem[]>([])
+  const [conflicts, setConflicts] = useState<any[]>([])
+  const [showNotifications, setShowNotifications] = useState(false)
+  const [showBulkActions, setShowBulkActions] = useState(false)
+  const [showExcelImport, setShowExcelImport] = useState(false)
+
+  // Import required components
+  const AdvancedScopeFilters = dynamic(() => import('./filters/AdvancedScopeFilters').then(mod => ({ default: mod.AdvancedScopeFilters })), {
+    loading: () => <div className="h-12 bg-muted animate-pulse rounded" />
+  })
+
+  const BulkScopeActions = dynamic(() => import('./bulk/BulkScopeActions').then(mod => ({ default: mod.BulkScopeActions })), {
+    loading: () => <div className="h-32 bg-muted animate-pulse rounded" />
+  })
+
+  const ConflictResolution = dynamic(() => import('./conflicts/ConflictResolution').then(mod => ({ default: mod.ConflictResolution })), {
+    loading: () => <div className="h-24 bg-muted animate-pulse rounded" />
+  })
+
+  const ScopeNotifications = dynamic(() => import('./notifications/ScopeNotifications').then(mod => ({ default: mod.ScopeNotifications })), {
+    loading: () => <div className="h-48 bg-muted animate-pulse rounded" />
+  })
+
+  // Mock data for development - replace with real API calls
+  const availableSuppliers = [
+    { id: '1', name: 'ABC Construction' },
+    { id: '2', name: 'XYZ Electrical' },
+    { id: '3', name: 'Quality Millwork' }
+  ]
+
+  const availableUsers = [
+    { id: '1', name: 'John Smith' },
+    { id: '2', name: 'Sarah Johnson' },
+    { id: '3', name: 'Mike Davis' }
+  ]
+
+  const availableProjects = [
+    { id: props.projectId || '1', name: 'Current Project' }
+  ]
+
+  const handleBulkUpdate = async (itemIds: string[], updates: any, updateType: string) => {
+    return coordinator.coordinateBulkUpdate(itemIds, updates, updateType)
+  }
+
+  const handleBulkDelete = async (itemIds: string[]) => {
+    for (const itemId of itemIds) {
+      await coordinator.coordinateItemDeletion(itemId)
+    }
+  }
+
+  const handleBulkExport = async (itemIds: string[]) => {
+    return coordinator.coordinateExcelExport()
+  }
 
   return (
     <DataStateWrapper
@@ -363,31 +427,81 @@ export function ScopeCoordinatorEnhanced(props: ScopeCoordinatorProps) {
               Get started by creating your first scope item or importing from Excel.
             </p>
             {coordinator.canCreate && (
-              <Button onClick={coordinator.coordinateItemCreation}>
-                Create First Item
-              </Button>
+              <ScopeItemModal onSubmit={coordinator.coordinateItemCreation}>
+                <Button>
+                  Create First Item
+                </Button>
+              </ScopeItemModal>
             )}
           </CardContent>
         </Card>
       }
     >
-      {/* Render scope coordinator content here */}
       <div className="space-y-6">
+        {/* Header with Actions */}
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold">Scope Management</h2>
           <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setShowNotifications(!showNotifications)}
+            >
+              <Bell className="h-4 w-4 mr-2" />
+              Notifications
+            </Button>
             {coordinator.canCreate && (
-              <Button onClick={coordinator.coordinateItemCreation}>
-                Create Item
-              </Button>
+              <ScopeItemModal onSubmit={coordinator.coordinateItemCreation}>
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Item
+                </Button>
+              </ScopeItemModal>
             )}
             {coordinator.canImport && (
-              <Button variant="outline" onClick={() => {/* File upload logic needed */}}>
+              <Button variant="outline" onClick={() => setShowExcelImport(true)}>
+                <Upload className="h-4 w-4 mr-2" />
                 Import Excel
               </Button>
             )}
           </div>
         </div>
+
+        {/* Notifications Panel */}
+        {showNotifications && (
+          <ScopeNotifications 
+            projectId={props.projectId}
+            maxNotifications={20}
+            showSettings={true}
+          />
+        )}
+
+        {/* Conflict Resolution */}
+        {conflicts.length > 0 && (
+          <ConflictResolution
+            conflicts={conflicts}
+            onResolveConflict={async () => {}}
+            onRefreshConflicts={async () => {}}
+            onDismissConflict={async () => {}}
+          />
+        )}
+
+        {/* Advanced Filters */}
+        <AdvancedScopeFilters
+          filters={coordinator.currentFilters}
+          onFiltersChange={(filters) => {
+            coordinator.updateState({ searchTerm: filters.search_term || '' })
+            coordinator.coordinateDataFetch()
+          }}
+          onReset={() => {
+            coordinator.resetFilters()
+            coordinator.coordinateDataFetch()
+          }}
+          availableSuppliers={availableSuppliers}
+          availableUsers={availableUsers}
+          availableProjects={availableProjects}
+          showProjectFilter={props.globalView}
+        />
 
         {/* Statistics Cards */}
         {coordinator.statistics && (
@@ -398,21 +512,134 @@ export function ScopeCoordinatorEnhanced(props: ScopeCoordinatorProps) {
                 <div className="text-sm text-muted-foreground">Total Items</div>
               </CardContent>
             </Card>
-            {/* Add more statistics cards as needed */}
+            <Card>
+              <CardContent className="p-4">
+                <div className="text-2xl font-bold text-blue-600">
+                  {coordinator.statistics.total_estimated_cost ? 
+                    `$${coordinator.statistics.total_estimated_cost.toLocaleString()}` : '$0'
+                  }
+                </div>
+                <div className="text-sm text-muted-foreground">Estimated Cost</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4">
+                <div className="text-2xl font-bold text-green-600">
+                  {coordinator.statistics.completion_percentage || 0}%
+                </div>
+                <div className="text-sm text-muted-foreground">Completed</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4">
+                <div className="text-2xl font-bold text-orange-600">
+                  {selectedItems.length}
+                </div>
+                <div className="text-sm text-muted-foreground">Selected</div>
+              </CardContent>
+            </Card>
           </div>
         )}
 
-        {/* Scope Items Display */}
-        <div className="space-y-4">
-          {coordinator.scopeItems.map((item) => (
-            <Card key={item.id}>
-              <CardContent className="p-4">
-                <h3 className="font-semibold">{item.item_code || `Item ${item.item_no}`}</h3>
-                <p className="text-sm text-muted-foreground">{item.description}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        {/* Bulk Actions */}
+        {selectedItems.length > 0 && (
+          <BulkScopeActions
+            selectedItems={selectedItems}
+            onSelectionChange={setSelectedItems}
+            onBulkUpdate={handleBulkUpdate}
+            onBulkDelete={handleBulkDelete}
+            onBulkExport={handleBulkExport}
+            allItems={coordinator.scopeItems}
+            availableSuppliers={availableSuppliers}
+            availableUsers={availableUsers}
+            canEdit={coordinator.effectivePermissions.canEdit}
+            canDelete={coordinator.effectivePermissions.canDelete}
+            canExport={coordinator.canExport}
+          />
+        )}
+
+        {/* Scope Items Table/List */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Scope Items ({coordinator.totalCount})</CardTitle>
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setShowBulkActions(!showBulkActions)}
+                >
+                  <CheckSquare className="h-4 w-4 mr-2" />
+                  Bulk Actions
+                </Button>
+                <Button variant="outline" size="sm" onClick={coordinator.coordinateDataFetch}>
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {coordinator.scopeItems.map((item) => {
+                const isSelected = selectedItems.some(selected => selected.id === item.id)
+                
+                return (
+                  <Card 
+                    key={item.id} 
+                    className={`cursor-pointer transition-colors hover:bg-muted/50 ${
+                      isSelected ? 'border-blue-500 bg-blue-50' : ''
+                    }`}
+                    onClick={() => {
+                      if (isSelected) {
+                        setSelectedItems(prev => prev.filter(selected => selected.id !== item.id))
+                      } else {
+                        setSelectedItems(prev => [...prev, item])
+                      }
+                    }}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <input 
+                            type="checkbox" 
+                            checked={isSelected}
+                            onChange={() => {}} // Handled by card click
+                            className="rounded"
+                          />
+                          <div>
+                            <h3 className="font-semibold">
+                              {item.item_code || `Item ${item.item_no}`}
+                            </h3>
+                            <p className="text-sm text-muted-foreground">{item.description}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline">{item.status}</Badge>
+                          <Badge variant="secondary">{item.category}</Badge>
+                          {item.estimated_cost && (
+                            <span className="text-sm text-muted-foreground">
+                              ${item.estimated_cost.toLocaleString()}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Excel Import Dialog */}
+        {showExcelImport && (
+          <ExcelImportDialog
+            projectId={props.projectId || ''}
+            onImport={coordinator.coordinateExcelImport}
+            onClose={() => setShowExcelImport(false)}
+            importing={coordinator.importing}
+          />
+        )}
       </div>
     </DataStateWrapper>
   )

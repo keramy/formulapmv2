@@ -2,6 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Skeleton Wave Animation */
+@keyframes wave {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.animate-wave {
+  animation: wave 2s linear infinite;
+  background-size: 200px 100%;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

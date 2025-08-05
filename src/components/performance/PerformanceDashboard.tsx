@@ -41,7 +41,7 @@ export function PerformanceDashboard({
   autoRefresh = true
 }: PerformanceDashboardProps) {
   const { metrics, report, generateReport, sendReport } = useWebVitals();
-  const { loadingStates, getMetrics, isAnyLoading } = useLoadingOrchestrator();
+  const { loadingStates } = useLoadingOrchestrator();
   const [isExpanded, setIsExpanded] = useState(false);
   const [lastRefresh, setLastRefresh] = useState(Date.now());
 
@@ -78,7 +78,8 @@ export function PerformanceDashboard({
   const webVitalsArray = Array.from(metrics.values());
   const poorMetrics = webVitalsArray.filter(m => m.rating === 'poor');
   const goodMetrics = webVitalsArray.filter(m => m.rating === 'good');
-  const loadingMetrics = getMetrics();
+  // Simple loading metrics
+  const activeLoadingCount = Object.values(loadingStates).filter(Boolean).length;
 
   return (
     <div className={`space-y-4 ${className}`}>
@@ -146,7 +147,7 @@ export function PerformanceDashboard({
                 <span className="text-sm font-medium">Loading</span>
               </div>
               <div className="text-2xl font-bold text-blue-600">
-                {isAnyLoading() ? 'Active' : 'Idle'}
+                {activeLoadingCount > 0 ? 'Active' : 'Idle'}
               </div>
             </div>
             
@@ -156,7 +157,7 @@ export function PerformanceDashboard({
                 <span className="text-sm font-medium">Total Load</span>
               </div>
               <div className="text-2xl font-bold text-purple-600">
-                {loadingMetrics.totalDuration.toFixed(0)}ms
+                {activeLoadingCount}
               </div>
             </div>
           </div>
@@ -260,25 +261,32 @@ export function PerformanceDashboard({
               <div>
                 <h4 className="font-medium mb-3">Core Web Vitals Breakdown</h4>
                 <div className="grid gap-4">
-                  {loadingMetrics.coreWebVitals && Object.entries(loadingMetrics.coreWebVitals).map(([key, value]) => (
-                    <div key={key} className="flex justify-between items-center py-2 border-b">
-                      <span className="font-medium">{key.toUpperCase()}</span>
-                      <span className="text-muted-foreground">{value?.toFixed(2) || 'N/A'}ms</span>
+                  {webVitalsArray.map((metric) => (
+                    <div key={metric.name} className="flex justify-between items-center py-2 border-b">
+                      <span className="font-medium">{metric.name.toUpperCase()}</span>
+                      <span className="text-muted-foreground">{metric.value?.toFixed(2) || 'N/A'}ms</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Component Load Times */}
+              {/* Loading States */}
               <div>
-                <h4 className="font-medium mb-3">Component Load Times</h4>
+                <h4 className="font-medium mb-3">Active Loading States</h4>
                 <div className="grid gap-2">
-                  {Object.entries(loadingMetrics.componentLoadTimes).map(([component, duration]) => (
-                    <div key={component} className="flex justify-between items-center py-2 px-3 bg-muted/30 rounded">
-                      <span className="text-sm font-medium">{component}</span>
-                      <span className="text-sm text-muted-foreground">{duration.toFixed(2)}ms</span>
-                    </div>
+                  {Object.entries(loadingStates).map(([component, isLoading]) => (
+                    isLoading && (
+                      <div key={component} className="flex justify-between items-center py-2 px-3 bg-muted/30 rounded">
+                        <span className="text-sm font-medium">{component}</span>
+                        <span className="text-sm text-green-600">Loading...</span>
+                      </div>
+                    )
                   ))}
+                  {activeLoadingCount === 0 && (
+                    <div className="text-center py-4 text-muted-foreground">
+                      <p>No active loading states</p>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -287,12 +295,12 @@ export function PerformanceDashboard({
                 <h4 className="font-medium mb-3">Performance Summary</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-3 bg-blue-50 rounded-lg">
-                    <p className="text-sm font-medium text-blue-800">Total Duration</p>
-                    <p className="text-lg font-bold text-blue-900">{loadingMetrics.totalDuration.toFixed(2)}ms</p>
+                    <p className="text-sm font-medium text-blue-800">Active Loading</p>
+                    <p className="text-lg font-bold text-blue-900">{activeLoadingCount}</p>
                   </div>
                   <div className="p-3 bg-purple-50 rounded-lg">
-                    <p className="text-sm font-medium text-purple-800">Critical Path</p>
-                    <p className="text-lg font-bold text-purple-900">{loadingMetrics.criticalPathDuration.toFixed(2)}ms</p>
+                    <p className="text-sm font-medium text-purple-800">Web Vitals</p>
+                    <p className="text-lg font-bold text-purple-900">{webVitalsArray.length}</p>
                   </div>
                 </div>
               </div>
@@ -372,7 +380,8 @@ function WebVitalCard({ metric }: { metric: WebVitalMetric }) {
  */
 export function PerformanceWidget({ className = '' }: { className?: string }) {
   const { metrics } = useWebVitals();
-  const { isAnyLoading } = useLoadingOrchestrator();
+  const { loadingStates: globalLoadingStates } = useLoadingOrchestrator();
+  const isAnyLoading = Object.values(globalLoadingStates).some(Boolean);
   
   const webVitalsArray = Array.from(metrics.values());
   const poorCount = webVitalsArray.filter(m => m.rating === 'poor').length;
@@ -397,7 +406,7 @@ export function PerformanceWidget({ className = '' }: { className?: string }) {
       <div className="text-xs text-muted-foreground">
         {webVitalsArray.length} metrics
       </div>
-      {isAnyLoading() && (
+      {isAnyLoading && (
         <div className="flex items-center gap-1 text-blue-600">
           <RefreshCw className="h-3 w-3 animate-spin" />
           <span className="text-xs">Loading</span>

@@ -10,7 +10,8 @@ const supabase = createClient(
 );
 
 async function GETOriginal(req: NextRequest) {
-  const { user, profile } = getRequestData(req);
+  const user = (req as any).user;
+  const profile = (req as any).profile;
   const url = new URL(req.url);
   const specId = url.pathname.split('/').pop();
   
@@ -94,7 +95,8 @@ async function GETOriginal(req: NextRequest) {
 }
 
 async function PUTOriginal(req: NextRequest) {
-  const { user, profile } = getRequestData(req);
+  const user = (req as any).user;
+  const profile = (req as any).profile;
   const url = new URL(req.url);
   const specId = url.pathname.split('/').pop();
   
@@ -189,7 +191,8 @@ async function PUTOriginal(req: NextRequest) {
 }
 
 async function DELETEOriginal(req: NextRequest) {
-  const { user, profile } = getRequestData(req);
+  const user = (req as any).user;
+  const profile = (req as any).profile;
   const url = new URL(req.url);
   const specId = url.pathname.split('/').pop();
   

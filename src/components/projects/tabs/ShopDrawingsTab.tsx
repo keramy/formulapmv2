@@ -9,6 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { DataStateWrapper } from '@/components/ui/loading-states';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useShopDrawings, ShopDrawingFilters } from '@/hooks/useShopDrawings';
+import { ShopDrawingUploadModal } from '@/components/shop-drawings/ShopDrawingUploadModal';
 import Search from 'lucide-react/dist/esm/icons/search'
 import Filter from 'lucide-react/dist/esm/icons/filter'
 import FileText from 'lucide-react/dist/esm/icons/file-text'
@@ -135,10 +136,16 @@ export function ShopDrawingsTab({ projectId }: ShopDrawingsTabProps) {
               Upload your first shop drawing to get started.
             </p>
             {permissions.canCreate && (
-              <Button onClick={() => console.log('Open shop drawing upload form')}>
-                <Upload className="h-4 w-4 mr-2" />
-                Upload Drawing
-              </Button>
+              <ShopDrawingUploadModal
+                projectId={projectId}
+                onUploadComplete={refetch}
+                trigger={
+                  <Button>
+                    <Upload className="h-4 w-4 mr-2" />
+                    Upload Drawing
+                  </Button>
+                }
+              />
             )}
           </CardContent>
         </Card>
@@ -194,10 +201,16 @@ export function ShopDrawingsTab({ projectId }: ShopDrawingsTabProps) {
               <CardDescription>Manage shop drawing submissions and approvals</CardDescription>
             </div>
             {permissions.canCreate && (
-              <Button onClick={() => console.log('Open shop drawing upload form')}>
-                <Upload className="w-4 h-4 mr-2" />
-                Upload Drawing
-              </Button>
+              <ShopDrawingUploadModal
+                projectId={projectId}
+                onUploadComplete={refetch}
+                trigger={
+                  <Button>
+                    <Upload className="w-4 h-4 mr-2" />
+                    Upload Drawing
+                  </Button>
+                }
+              />
             )}
           </div>
         </CardHeader>

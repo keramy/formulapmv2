@@ -9,6 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DataStateWrapper } from '@/components/ui/loading-states';
+import { ScopeItemModal } from '@/components/scope/ScopeItemModal';
+import { ExcelImportDialog } from '@/components/scope/ExcelImportDialog';
 import { 
   Search,
   Filter,
@@ -25,7 +27,9 @@ import {
   Grid,
   List,
   MapPin,
-  FileText
+  FileText,
+  Plus,
+  Upload
 } from 'lucide-react';
 
 interface ScopeListTabProps {
@@ -64,7 +68,7 @@ interface Supplier {
 }
 
 export function ScopeListTab({ projectId }: ScopeListTabProps) {
-  const { getAccessToken } = useAuth();
+  const { getAccessToken, profile } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterLocation, setFilterLocation] = useState('all');
@@ -76,6 +80,8 @@ export function ScopeListTab({ projectId }: ScopeListTabProps) {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [editingSupplier, setEditingSupplier] = useState<string | null>(null);
   const [scopeItems, setScopeItems] = useState<ScopeItem[]>([]);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showImportDialog, setShowImportDialog] = useState(false);
 
   // Load suppliers and scope items on component mount
   useEffect(() => {
@@ -416,8 +422,55 @@ export function ScopeListTab({ projectId }: ScopeListTabProps) {
       {/* Search and Filters */}
       <Card>
         <CardHeader>
-          <CardTitle>Scope Items</CardTitle>
-          <CardDescription>Detailed breakdown of all project scope items</CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Scope Items</CardTitle>
+              <CardDescription>Detailed breakdown of all project scope items</CardDescription>
+            </div>
+            {profile?.role !== 'client' && (
+              <div className="flex gap-2">
+                <ScopeItemModal
+                  onSubmit={async (data) => {
+                    try {
+                      const response = await fetch('/api/scope', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          'Authorization': `Bearer ${await getAccessToken()}`
+                        },
+                        body: JSON.stringify({
+                          ...data,
+                          project_id: projectId
+                        })
+                      });
+                      
+                      if (response.ok) {
+                        await loadScopeItems();
+                      }
+                    } catch (error) {
+                      console.error('Error creating scope item:', error);
+                    }
+                  }}
+                  trigger={
+                    <Button size="sm">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Scope Item
+                    </Button>
+                  }
+                />
+                <ExcelImportDialog
+                  projectId={projectId}
+                  onImportComplete={loadScopeItems}
+                  trigger={
+                    <Button size="sm" variant="outline">
+                      <Upload className="h-4 w-4 mr-2" />
+                      Import from Excel
+                    </Button>
+                  }
+                />
+              </div>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-4 mb-6">

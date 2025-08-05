@@ -7,11 +7,13 @@
 
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { usePermissions } from '@/hooks/usePermissions'
 import { useScope, useScopeStatistics } from '@/hooks/useScope'
-// import { ScopeCoordinator } from '@/components/scope/ScopeCoordinator'
+import { ScopeCoordinatorEnhanced } from '@/components/scope/ScopeCoordinator'
+import { ScopeItemModal } from '@/components/scope/ScopeItemModal'
+import { ExcelImportDialog } from '@/components/scope/ExcelImportDialog'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
@@ -31,7 +33,8 @@ import {
   CheckCircle,
   TrendingUp,
   Users,
-  Building
+  Building,
+  Upload
 } from 'lucide-react'
 import { ScopeCategory } from '@/types/scope'
 
@@ -91,7 +94,7 @@ const CATEGORY_CONFIG = {
 }
 
 export default function GlobalScopePage() {
-  const { profile } = useAuth()
+  const { profile, getAccessToken } = useAuth()
   const { 
     canViewScope, 
     canCreateScope, 
@@ -104,35 +107,74 @@ export default function GlobalScopePage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // Fetch overview data
-  useEffect(() => {
-    fetchScopeOverview()
-  }, [])
-
-  const fetchScopeOverview = async () => {
-    if (!profile) return
+  const fetchScopeOverview = useCallback(async () => {
+    console.log('fetchScopeOverview called, profile:', profile)
+    if (!profile) {
+      console.log('No profile available, skipping fetch')
+      return
+    }
 
     try {
       setLoading(true)
+      // Use getAccessToken from useAuth hook instead of localStorage
+      const token = await getAccessToken()
+      console.log('Token length:', token?.length, 'Token starts with:', token?.substring(0, 20))
+      if (!token) {
+        throw new Error('No authentication token available')
+      }
+      
+      console.log('Making request to /api/scope/overview with token:', token ? 'present' : 'missing')
+      
       const response = await fetch('/api/scope/overview', {
         headers: {
-          'Authorization': `Bearer ${profile.id}`,
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       })
 
+      console.log('Response status:', response.status, 'OK:', response.ok)
+
       if (response.ok) {
         const data = await response.json()
-        setOverview(data.overview)
+        console.log('Scope overview response:', data)
+        if (data.success && data.data) {
+          setOverview(data.data.overview)
+        } else {
+          console.error('API returned unsuccessful response:', data)
+          throw new Error(data.error || 'Failed to fetch scope overview')
+        }
       } else {
-        throw new Error('Failed to fetch scope overview')
+        console.error('HTTP error response:', response.status, response.statusText)
+        try {
+          const errorData = await response.json()
+          console.error('Error response data:', errorData)
+          throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`)
+        } catch (parseError) {
+          console.error('Failed to parse error response:', parseError)
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+        }
       }
     } catch (err) {
       console.error('Failed to fetch scope overview:', err)
-      setError(err instanceof Error ? err.message : 'Failed to load overview')
+      
+      // Check if it's a network error
+      if (err instanceof TypeError && err.message.includes('fetch')) {
+        setError('Network error: Unable to connect to server. Please check if the development server is running.')
+      } else {
+        setError(err instanceof Error ? err.message : 'Failed to load overview')
+      }
     } finally {
       setLoading(false)
     }
-  }
+  }, [profile, getAccessToken])
+
+  // Fetch overview data
+  useEffect(() => {
+    console.log('GlobalScopePage: useEffect triggered, profile:', profile)
+    if (profile) {
+      fetchScopeOverview()
+    }
+  }, [profile, fetchScopeOverview])
 
   if (loading) {
     return (
@@ -179,11 +221,37 @@ export default function GlobalScopePage() {
               <Filter className="h-4 w-4 mr-2" />
               Advanced Filters
             </Button>
-            {canCreateScope() && (
-              <Button size="sm">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Scope Item
-              </Button>
+            {profile?.role !== 'client' && (
+              <>
+                <ScopeItemModal 
+                  onSubmit={async (data) => {
+                    console.log('Create scope item:', data);
+                    try {
+                      // TODO: Actually create the scope item via API with project selection
+                      // For now, just refresh the overview
+                      await fetchScopeOverview();
+                    } catch (error) {
+                      console.error('Failed to create scope item:', error);
+                    }
+                  }}
+                  trigger={
+                    <Button size="sm">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Scope Item
+                    </Button>
+                  }
+                />
+                <ExcelImportDialog
+                  projectId="" // Empty for global view - will need project selection
+                  onImportComplete={fetchScopeOverview}
+                  trigger={
+                    <Button size="sm" variant="outline">
+                      <Upload className="h-4 w-4 mr-2" />
+                      Import from Excel
+                    </Button>
+                  }
+                />
+              </>
             )}
           </div>
         </div>
@@ -350,19 +418,17 @@ export default function GlobalScopePage() {
         )}
 
         {/* Main Scope Management Interface */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Scope Management Interface</CardTitle>
-            <CardDescription>
-              Scope management interface will be implemented here
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">
-              The scope management interface is being developed. This implementation ensures compilation succeeds.
-            </p>
-          </CardContent>
-        </Card>
+        <ScopeCoordinatorEnhanced
+          projectId="" // Empty for global view
+          globalView={true}
+          initialCategory="all"
+          userPermissions={{
+            canEdit: canCreateScope(),
+            canDelete: checkPermission('projects.delete'),
+            canViewPricing: checkPermission('financials.view'),
+            canAssignSupplier: canCreateScope()
+          }}
+        />
       </div>
     </AuthGuard>
   )

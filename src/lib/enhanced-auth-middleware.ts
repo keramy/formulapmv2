@@ -122,8 +122,8 @@ export function withEnhancedAuth(handler: Function, options: AuthOptions = {}) {
       (requestWithAuth as any).profile = profile;
       (requestWithAuth as any).permissions = permissions;
       
-      // Call the handler with the enhanced request
-      const response = await handler(requestWithAuth);
+      // Call the handler with the enhanced request and auth data
+      const response = await handler(requestWithAuth, { user, profile, permissions });
       
       // Add performance headers
       const processingTime = Date.now() - startTime;
@@ -165,9 +165,9 @@ export function withRole(handler: Function, allowedRoles: string[]) {
  * Expected to reduce the 2.4% failure rate
  */
 export function withErrorHandling(handler: Function) {
-  return async (req: NextRequest) => {
+  return async (req: NextRequest, context?: any) => {
     try {
-      return await handler(req);
+      return await handler(req, context);
     } catch (error: any) {
       console.error('[API ERROR]', error);
       

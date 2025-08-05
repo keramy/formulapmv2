@@ -44,7 +44,7 @@ const TasksTab = dynamic(() => import('./tabs/TasksTab').then(mod => ({ default:
   ssr: false
 });
 
-const ScopeListTab = dynamic(() => import('./tabs/RealtimeScopeListTab').then(mod => ({ default: mod.RealtimeScopeListTab })), {
+const ScopeListTab = dynamic(() => import('./tabs/ScopeListTab').then(mod => ({ default: mod.ScopeListTab })), {
   loading: () => <ScopeListTabSkeleton />,
   ssr: false
 });

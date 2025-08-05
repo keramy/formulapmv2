@@ -30,9 +30,11 @@ import { validateData } from '@/lib/form-validation' // For future form validati
 
 interface ExcelImportDialogProps {
   projectId: string
-  onImport: (file: File) => Promise<ExcelImportBatch>
-  onClose: () => void
-  importing: boolean
+  onImport?: (file: File) => Promise<ExcelImportBatch>
+  onImportComplete?: () => Promise<void>
+  onClose?: () => void
+  importing?: boolean
+  trigger?: React.ReactElement
 }
 
 export const ExcelImportDialog: React.FC<ExcelImportDialogProps> = ({

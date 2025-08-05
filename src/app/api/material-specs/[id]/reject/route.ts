@@ -10,7 +10,8 @@ const supabase = createClient(
 );
 
 async function POSTOriginal(req: NextRequest) {
-  const { user, profile } = getRequestData(req);
+  const user = (req as any).user;
+  const profile = (req as any).profile;
   const url = new URL(req.url);
   const specId = url.pathname.split('/')[3]; // /api/material-specs/[id]/reject
   

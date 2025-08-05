@@ -13,15 +13,13 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 );
 
-async function GETOriginal(req: NextRequest) {
-  const { user, profile } = getRequestData(req);
-  
+async function GETOriginal(req: NextRequest, { user, profile }: any) {
   try {
-    const params = parseQueryParams(req);
+    const { searchParams } = new URL(req.url);
+    const hours = parseInt(searchParams.get('hours') || '24');
     
     // Get recent activity for dashboard (last 24 hours by default)
-    const timeLimit = params.hours ? new Date(Date.now() - params.hours * 60 * 60 * 1000).toISOString() : 
-                      new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const timeLimit = new Date(Date.now() - hours * 60 * 60 * 1000).toISOString();
     
     let query = supabase.from('activity_logs').select(`
       id,
@@ -80,7 +78,7 @@ async function GETOriginal(req: NextRequest) {
     // Admin and management see all recent activities
     
     // Limit to dashboard-appropriate number of activities  
-    const limit = params.limit || 15;
+    const limit = parseInt(searchParams.get('limit') || '15');
     query = query.order('created_at', { ascending: false }).limit(limit);
     
     const { data, error } = await query;
