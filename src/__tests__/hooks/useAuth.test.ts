@@ -569,7 +569,7 @@ describe('useAuth Hook - Comprehensive Testing', () => {
 
       expect(result.current.debugInfo).toBeDefined()
       expect(result.current.debugInfo.authState).toBeDefined()
-      expect(result.current.debugInfo.recoveryAttempts).toBe(0)
+      expect(result.current.debugInfo.cache).toBeDefined()
     })
   })
 

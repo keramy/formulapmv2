@@ -11,6 +11,8 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useAuth } from './useAuth'
 import { usePermissions } from './usePermissions'
 import { useAdvancedApiQuery } from './useAdvancedApiQuery'
+import { authenticatedFetch, getUserFriendlyErrorMessage } from '@/lib/fetch-utils'
+import { debugApiIssue } from '@/lib/api-health-check'
 import { 
   ScopeItem,
   ScopeItemFormData,
@@ -50,10 +52,26 @@ export const useScope = (projectId?: string) => {
   const [totalCount, setTotalCount] = useState(0)
   const [currentPage, setCurrentPage] = useState(1)
   const [hasMore, setHasMore] = useState(false)
+  const [lastFetchTime, setLastFetchTime] = useState<number>(0)
+  const [initialLoad, setInitialLoad] = useState(true)
 
-  // Fetch scope items with filters
-  const fetchScopeItems = useCallback(async (params?: ScopeListParams) => {
-    if (!profile || !canViewScope()) return
+  // Fetch scope items with filters - optimized to prevent infinite loops
+  const fetchScopeItems = useCallback(async (params?: ScopeListParams, force = false) => {
+    // Stability guards to prevent infinite re-renders
+    if (!profile || !canViewScope()) {
+      setLoading(false)
+      return
+    }
+
+    // Prevent duplicate calls
+    if (loading) return
+
+    // Simple caching - don't refetch if data is fresh (within 2 minutes) unless forced
+    const now = Date.now()
+    const cacheExpiry = 2 * 60 * 1000 // 2 minutes
+    if (!force && !initialLoad && scopeItems.length > 0 && (now - lastFetchTime) < cacheExpiry) {
+      return
+    }
 
     setLoading(true)
     setError(null)
@@ -87,19 +105,13 @@ export const useScope = (projectId?: string) => {
         queryParams.set('sort_direction', params.sort.direction)
       }
 
-      const token = await getAccessToken()
-      if (!token) {
-        throw new Error('No access token available')
-      }
-
-      const response = await fetch(`/api/scope?${queryParams.toString()}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        }
+      const response = await authenticatedFetch(`/api/scope?${queryParams.toString()}`, getAccessToken, {
+        retries: 1,
+        timeout: 10000
       })
 
       if (!response.ok) {
-        throw new Error('Failed to fetch scope items')
+        throw new Error(`Failed to fetch scope items: ${response.status} ${response.statusText}`)
       }
 
       const data: ScopeApiResponse<ScopeListResponse> = await response.json()
@@ -110,16 +122,21 @@ export const useScope = (projectId?: string) => {
         setCurrentPage(data.pagination?.page || 1)
         setTotalCount(data.pagination?.total || 0)
         setHasMore(data.pagination?.has_more || false)
+        setLastFetchTime(Date.now())
+        setInitialLoad(false)
       } else {
         throw new Error(data.error || 'Failed to fetch scope items')
       }
     } catch (err) {
-      console.error('Error fetching scope items:', err)
-      setError(err instanceof Error ? err.message : 'Failed to fetch scope items')
+      const errorMessage = err instanceof Error 
+        ? getUserFriendlyErrorMessage(err)
+        : 'Failed to fetch scope items'
+      
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
-  }, [profile, projectId, canViewScope, getAccessToken])
+  }, [profile?.id, projectId]) // Simplified dependencies
 
   // Create new scope item
   const createScopeItem = useCallback(async (itemData: ScopeItemFormData) => {
@@ -394,7 +411,7 @@ export const useScope = (projectId?: string) => {
     filterByCategory,
     filterByStatus,
     getAssignedItems,
-    refreshScopeItems: () => fetchScopeItems(),
+    refreshScopeItems: () => fetchScopeItems(undefined, true), // Force refresh
     
     // Permissions
     canCreate: canCreateScope(),
@@ -735,12 +752,10 @@ export const useScopeDependencies = (itemId: string) => {
   return { dependencies, loading, fetchDependencies }
 }
 
-// Hook for scope progress tracking
-export const useScopeProgress = (projectId?: string) => {
-  const { scopeItems, statistics } = useScope(projectId)
-
+// Hook for scope progress tracking - fixed to prevent circular dependencies
+export const useScopeProgress = (scopeItems: ScopeItem[], statistics?: ScopeStatistics) => {
   const progressMetrics = useMemo(() => {
-    if (!scopeItems.length) return null
+    if (!scopeItems || !scopeItems.length) return null
 
     const totalItems = scopeItems.length
     const completedItems = scopeItems.filter(item => item.status === 'completed').length
@@ -760,7 +775,7 @@ export const useScopeProgress = (projectId?: string) => {
       inProgressItems,
       blockedItems,
       overallProgress,
-      weightedProgress: Math.round(weightedProgress),
+      weightedProgress: Math.round(weightedProgress || 0),
       statistics
     }
   }, [scopeItems, statistics])

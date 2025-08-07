@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Scope Test</title>
+</head>
+<body>
+    <h1>Testing Scope Management</h1>
+    <div id="output"></div>
+    
+    <script>
+    async function testScope() {
+        const output = document.getElementById('output');
+        
+        try {
+            // Test login first
+            output.innerHTML += '<p>Testing login...</p>';
+            
+            const loginResponse = await fetch('http://localhost:3003/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: 'admin@formulapm.com',
+                    password: 'admin123'
+                })
+            });
+            
+            if (loginResponse.ok) {
+                const loginData = await loginResponse.json();
+                const token = loginData.data?.session?.access_token;
+                output.innerHTML += '<p style="color: green;">✅ Login successful</p>';
+                
+                // Test auth status
+                const statusResponse = await fetch('http://localhost:3003/api/auth/status', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                output.innerHTML += `<p>Auth Status: ${statusResponse.status} ${statusResponse.statusText}</p>`;
+                
+                // Test scope overview
+                const overviewResponse = await fetch('http://localhost:3003/api/scope/overview', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (overviewResponse.ok) {
+                    const data = await overviewResponse.json();
+                    output.innerHTML += '<p style="color: green;">✅ Scope Overview API working</p>';
+                    output.innerHTML += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                } else {
+                    output.innerHTML += `<p style="color: red;">❌ Scope Overview failed: ${overviewResponse.status}</p>`;
+                }
+                
+                // Now try to load the actual scope page
+                output.innerHTML += '<p>Opening scope page...</p>';
+                setTimeout(() => {
+                    window.open('http://localhost:3003/scope', '_blank');
+                }, 1000);
+                
+            } else {
+                output.innerHTML += '<p style="color: red;">❌ Login failed</p>';
+            }
+            
+        } catch (error) {
+            output.innerHTML += `<p style="color: red;">❌ Error: ${error.message}</p>`;
+        }
+    }
+    
+    // Run test when page loads
+    testScope();
+    </script>
+</body>
+</html>

@@ -9,7 +9,7 @@
 
 import { useState, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -40,8 +40,10 @@ interface ExcelImportDialogProps {
 export const ExcelImportDialog: React.FC<ExcelImportDialogProps> = ({
   projectId,
   onImport,
+  onImportComplete,
   onClose,
-  importing
+  importing,
+  trigger
 }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [importResult, setImportResult] = useState<ExcelImportBatch | null>(null)
@@ -71,9 +73,14 @@ export const ExcelImportDialog: React.FC<ExcelImportDialogProps> = ({
     setStep('importing')
     
     try {
-      const result = await onImport(selectedFile)
-      setImportResult(result)
-      setStep('complete')
+      const result = await onImport?.(selectedFile)
+      if (result) {
+        setImportResult(result)
+        setStep('complete')
+        if (onImportComplete) {
+          await onImportComplete()
+        }
+      }
     } catch (error) {
       setStep('preview') // Go back to preview on error
     }
@@ -104,8 +111,18 @@ mechanical,H001,HVAC system,1,system,15000,8,2025-01-20,2025-02-10,7,medium,Comp
     setStep('select')
   }
 
+  const [isOpen, setIsOpen] = useState(false)
+
   return (
-    <Dialog open={true} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+      setIsOpen(open)
+      if (!open && onClose) onClose()
+    }}>
+      {trigger && (
+        <DialogTrigger asChild>
+          {trigger}
+        </DialogTrigger>
+      )}
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">

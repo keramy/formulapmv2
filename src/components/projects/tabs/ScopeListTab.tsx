@@ -432,23 +432,63 @@ export function ScopeListTab({ projectId }: ScopeListTabProps) {
                 <ScopeItemModal
                   onSubmit={async (data) => {
                     try {
+                      console.log('🔍 Creating scope item:', { ...data, project_id: projectId });
+                      
+                      const token = await getAccessToken();
+                      if (!token) {
+                        alert('Authentication required. Please log in again.');
+                        return;
+                      }
+
                       const response = await fetch('/api/scope', {
                         method: 'POST',
                         headers: {
                           'Content-Type': 'application/json',
-                          'Authorization': `Bearer ${await getAccessToken()}`
+                          'Authorization': `Bearer ${token}`
                         },
                         body: JSON.stringify({
-                          ...data,
+                          // Map modal field names to API field names
+                          item_name: data.item_code || data.description || 'New Scope Item',
+                          description: data.description,
+                          long_description: data.long_description,
+                          category: data.category,
+                          unit: data.unit,
+                          quantity: data.quantity,
+                          initial_cost: data.initial_cost,
+                          selling_price: data.selling_price,
+                          actual_cost: data.actual_cost,
+                          supplier_id: data.supplier_id,
+                          notes: data.notes,
                           project_id: projectId
                         })
                       });
                       
+                      console.log('🔍 API response:', response.status, response.statusText);
+                      
                       if (response.ok) {
+                        const result = await response.json();
+                        console.log('✅ Scope item created successfully:', result);
+                        alert('Scope item created successfully!');
                         await loadScopeItems();
+                      } else {
+                        // Handle API errors
+                        const errorText = await response.text();
+                        console.error('❌ API error response:', errorText);
+                        
+                        let errorMessage = `Failed to create scope item (${response.status})`;
+                        try {
+                          const errorData = JSON.parse(errorText);
+                          errorMessage = errorData.error || errorMessage;
+                        } catch (e) {
+                          // If error response isn't JSON, use the text
+                          errorMessage = errorText || errorMessage;
+                        }
+                        
+                        alert(`Error: ${errorMessage}`);
                       }
                     } catch (error) {
-                      console.error('Error creating scope item:', error);
+                      console.error('❌ Network error creating scope item:', error);
+                      alert('Network error: Failed to create scope item. Please check your connection and try again.');
                     }
                   }}
                   trigger={

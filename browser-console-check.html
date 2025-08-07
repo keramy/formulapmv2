@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scope Management Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .result { margin: 10px 0; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Scope Management Debug Tool</h1>
+    <p>This tool will help debug fetch errors on the scope management page.</p>
+    
+    <div>
+        <button onclick="testLogin()">Test Login</button>
+        <button onclick="testScopeAPIs()">Test Scope APIs</button>
+        <button onclick="checkConsoleErrors()">Check Console Errors</button>
+        <button onclick="openScopePage()">Open Scope Page</button>
+        <button onclick="clearResults()">Clear Results</button>
+    </div>
+
+    <div id="results"></div>
+
+    <script>
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        async function testLogin() {
+            addResult('🔄 Testing login...', 'info');
+            
+            try {
+                const response = await fetch('http://localhost:3003/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@formulapm.com',
+                        password: 'admin123'
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const token = data.data?.session?.access_token;
+                    if (token) {
+                        sessionStorage.setItem('debug_token', token);
+                        addResult('✅ Login successful - token saved to sessionStorage', 'success');
+                    } else {
+                        addResult('❌ Login returned no token', 'error');
+                    }
+                } else {
+                    addResult(`❌ Login failed: ${response.status} ${response.statusText}`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Login error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testScopeAPIs() {
+            addResult('🔄 Testing scope APIs...', 'info');
+            
+            const token = sessionStorage.getItem('debug_token');
+            if (!token) {
+                addResult('❌ No token found. Please test login first.', 'error');
+                return;
+            }
+
+            // Test overview API
+            try {
+                const overviewResponse = await fetch('http://localhost:3003/api/scope/overview', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (overviewResponse.ok) {
+                    const data = await overviewResponse.json();
+                    addResult(`✅ Overview API: ${JSON.stringify(data.data?.overview || data, null, 2)}`, 'success');
+                } else {
+                    const error = await overviewResponse.text();
+                    addResult(`❌ Overview API failed: ${overviewResponse.status}<br><pre>${error}</pre>`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Overview API error: ${error.message}`, 'error');
+            }
+
+            // Test list API
+            try {
+                const listResponse = await fetch('http://localhost:3003/api/scope', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (listResponse.ok) {
+                    const data = await listResponse.json();
+                    addResult(`✅ List API: Items: ${data.data?.items?.length || 0}, Stats: ${JSON.stringify(data.data?.statistics)}`, 'success');
+                } else {
+                    const error = await listResponse.text();
+                    addResult(`❌ List API failed: ${listResponse.status}<br><pre>${error}</pre>`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ List API error: ${error.message}`, 'error');
+            }
+        }
+
+        function checkConsoleErrors() {
+            addResult('🔄 Checking console errors...', 'info');
+            
+            // Override console methods to capture errors
+            const originalError = console.error;
+            const originalWarn = console.warn;
+            const errors = [];
+            
+            console.error = function(...args) {
+                errors.push({type: 'error', message: args.join(' ')});
+                originalError.apply(console, args);
+            };
+            
+            console.warn = function(...args) {
+                errors.push({type: 'warn', message: args.join(' ')});
+                originalWarn.apply(console, args);
+            };
+
+            // Check for existing errors
+            if (window.onerror) {
+                addResult('✅ Error handler is set up', 'success');
+            } else {
+                addResult('⚠️ No global error handler', 'info');
+            }
+
+            // Listen for future errors
+            window.addEventListener('error', (e) => {
+                addResult(`❌ JavaScript Error: ${e.message} at ${e.filename}:${e.lineno}`, 'error');
+            });
+
+            window.addEventListener('unhandledrejection', (e) => {
+                addResult(`❌ Unhandled Promise Rejection: ${e.reason}`, 'error');
+            });
+
+            if (errors.length > 0) {
+                errors.forEach(err => {
+                    addResult(`${err.type === 'error' ? '❌' : '⚠️'} Console ${err.type}: ${err.message}`, err.type);
+                });
+            } else {
+                addResult('✅ No console errors captured yet', 'success');
+            }
+        }
+
+        function openScopePage() {
+            addResult('🔄 Opening scope page in new tab...', 'info');
+            const newWindow = window.open('http://localhost:3003/scope', '_blank');
+            
+            if (newWindow) {
+                addResult('✅ Scope page opened in new tab. Check that tab for any errors and look at the browser console.', 'success');
+            } else {
+                addResult('❌ Failed to open scope page. Popup might be blocked.', 'error');
+            }
+        }
+
+        // Initialize error monitoring when page loads
+        window.onload = function() {
+            addResult('🚀 Debug tool loaded. Click buttons to test different aspects.', 'info');
+            checkConsoleErrors();
+        };
+    </script>
+</body>
+</html>

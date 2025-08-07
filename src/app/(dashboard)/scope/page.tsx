@@ -12,6 +12,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { usePermissions } from '@/hooks/usePermissions'
 import { useScope, useScopeStatistics } from '@/hooks/useScope'
 import { ScopeCoordinatorEnhanced } from '@/components/scope/ScopeCoordinator'
+import { ScopeErrorBoundary } from '@/components/scope/ScopeErrorBoundary'
 import { ScopeItemModal } from '@/components/scope/ScopeItemModal'
 import { ExcelImportDialog } from '@/components/scope/ExcelImportDialog'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -34,9 +35,11 @@ import {
   TrendingUp,
   Users,
   Building,
-  Upload
+  Upload,
+  RefreshCw
 } from 'lucide-react'
 import { ScopeCategory } from '@/types/scope'
+import '@/lib/api-health-check' // Import health check for console debugging
 
 interface ScopeOverview {
   total_items: number
@@ -108,80 +111,98 @@ export default function GlobalScopePage() {
   const [error, setError] = useState<string | null>(null)
 
   const fetchScopeOverview = useCallback(async () => {
-    console.log('fetchScopeOverview called, profile:', profile)
-    if (!profile) {
-      console.log('No profile available, skipping fetch')
-      return
-    }
+    if (!profile || loading) return
 
     try {
       setLoading(true)
-      // Use getAccessToken from useAuth hook instead of localStorage
-      const token = await getAccessToken()
-      console.log('Token:', token ? `Received (${token.length} chars)` : 'Missing')
-      if (!token) {
-        throw new Error('No authentication token available')
-      }
+      setError(null)
       
-      console.log('Making request to /api/scope/overview with token:', token ? 'present' : 'missing')
+      // Add timeout protection
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 10000)
+      
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('Authentication required')
+      }
       
       const response = await fetch('/api/scope/overview', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
-        }
+        },
+        signal: controller.signal
       })
 
-      console.log('Response status:', response.status, 'OK:', response.ok)
+      clearTimeout(timeoutId)
 
       if (response.ok) {
         const data = await response.json()
-        console.log('Scope overview response:', data)
         if (data.success && data.data) {
           setOverview(data.data.overview)
+          setError(null) // Clear any previous errors
         } else {
-          console.error('API returned unsuccessful response:', data)
           throw new Error(data.error || 'Failed to fetch scope overview')
         }
       } else {
-        console.error('HTTP error response:', response.status, response.statusText)
-        try {
-          const errorData = await response.json()
-          console.error('Error response data:', errorData)
-          throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`)
-        } catch (parseError) {
-          console.error('Failed to parse error response:', parseError)
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-        }
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error || `Request failed with status ${response.status}`)
       }
     } catch (err) {
-      console.error('Failed to fetch scope overview:', err)
-      
-      // Check if it's a network error
-      if (err instanceof TypeError && err.message.includes('fetch')) {
-        setError('Network error: Unable to connect to server. Please check if the development server is running.')
+      if (err instanceof Error && err.name === 'AbortError') {
+        setError('Request timed out - please try again')
       } else {
         setError(err instanceof Error ? err.message : 'Failed to load overview')
       }
     } finally {
       setLoading(false)
     }
-  }, [profile, getAccessToken])
+  }, [profile?.id]) // Only depend on profile.id, not the entire profile object
 
-  // Fetch overview data
+  // Fetch overview data once when profile is available
   useEffect(() => {
-    console.log('GlobalScopePage: useEffect triggered, profile:', profile)
-    if (profile) {
+    if (profile && !overview && !loading) {
       fetchScopeOverview()
     }
-  }, [profile, fetchScopeOverview])
+  }, [profile?.id]) // Only trigger when profile ID changes
+
+  // Add loading timeout protection
+  useEffect(() => {
+    if (loading) {
+      const timeout = setTimeout(() => {
+        if (loading) {
+          setLoading(false)
+          setError('Loading took too long - please refresh the page')
+        }
+      }, 15000) // 15 second timeout
+
+      return () => clearTimeout(timeout)
+    }
+  }, [loading])
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="space-y-4 text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="text-muted-foreground">Loading scope overview...</p>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Scope Management</h1>
+            <p className="text-muted-foreground">Loading your scope overview...</p>
+          </div>
+        </div>
+        
+        {/* Skeleton loading */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <Card key={i} className="animate-pulse">
+              <CardHeader className="pb-2">
+                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+              </CardHeader>
+              <CardContent>
+                <div className="h-8 bg-gray-200 rounded w-1/2 mb-2"></div>
+                <div className="h-3 bg-gray-200 rounded w-full"></div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
     )
@@ -189,13 +210,28 @@ export default function GlobalScopePage() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Card className="w-full max-w-md">
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Scope Management</h1>
+            <p className="text-muted-foreground">Manage scope items across all projects</p>
+          </div>
+        </div>
+        
+        <Card className="w-full max-w-2xl mx-auto">
           <CardContent className="p-6 text-center">
-            <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Unable to Load Scope Data</h3>
+            <AlertTriangle className="h-12 w-12 text-orange-500 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Unable to Load Data</h3>
             <p className="text-muted-foreground mb-4">{error}</p>
-            <Button onClick={fetchScopeOverview}>Try Again</Button>
+            <div className="flex items-center justify-center space-x-2">
+              <Button onClick={fetchScopeOverview} disabled={loading}>
+                <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                {loading ? 'Loading...' : 'Try Again'}
+              </Button>
+              <Button variant="outline" onClick={() => window.location.reload()}>
+                Refresh Page
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -217,6 +253,15 @@ export default function GlobalScopePage() {
             </p>
           </div>
           <div className="flex items-center space-x-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => fetchScopeOverview()}
+              disabled={loading}
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
             <Button variant="outline" size="sm">
               <Filter className="h-4 w-4 mr-2" />
               Advanced Filters
@@ -418,17 +463,19 @@ export default function GlobalScopePage() {
         )}
 
         {/* Main Scope Management Interface */}
-        <ScopeCoordinatorEnhanced
-          projectId="" // Empty for global view
-          globalView={true}
-          initialCategory="all"
-          userPermissions={{
-            canEdit: canCreateScope(),
-            canDelete: checkPermission('projects.delete'),
-            canViewPricing: checkPermission('financials.view'),
-            canAssignSupplier: canCreateScope()
-          }}
-        />
+        <ScopeErrorBoundary>
+          <ScopeCoordinatorEnhanced
+            projectId="" // Empty for global view
+            globalView={true}
+            initialCategory="all"
+            userPermissions={{
+              canEdit: canCreateScope(),
+              canDelete: checkPermission('projects.delete'),
+              canViewPricing: checkPermission('financials.view'),
+              canAssignSupplier: canCreateScope()
+            }}
+          />
+        </ScopeErrorBoundary>
       </div>
     </AuthGuard>
   )

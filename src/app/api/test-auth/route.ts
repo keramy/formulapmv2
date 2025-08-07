@@ -18,28 +18,23 @@ async function GETOriginal(req: NextRequest) {
   const profile = (req as any).profile;
   
   try {
-    const { searchParams } = new URL(req.url);
-    const params = {
-      page: parseInt(searchParams.get('page') || '1'),
-      limit: parseInt(searchParams.get('limit') || '20'),
-      search: searchParams.get('search'),
-      status: searchParams.get('status'),
-      project_id: searchParams.get('project_id'),
-      sort_field: searchParams.get('sort_field'),
-      sort_direction: searchParams.get('sort_direction') || 'desc'
-    };
-    
-    // Add your specific query logic here
-    const { data, error } = await supabase
-      .from('your_table')
-      .select('*')
-      .eq('user_id', user.id);
-    
-    if (error) throw error;
-    
-    return createSuccessResponse(data);
+    // Simple authentication test endpoint
+    return createSuccessResponse({
+      message: 'Authentication test successful',
+      user: {
+        id: user.id,
+        email: user.email
+      },
+      profile: {
+        id: profile.id,
+        role: profile.role,
+        email: profile.email,
+        is_active: profile.is_active
+      },
+      timestamp: new Date().toISOString()
+    });
   } catch (error) {
-    console.error('API fetch error:', error);
+    console.error('Auth test error:', error);
     throw error;
   }
 }

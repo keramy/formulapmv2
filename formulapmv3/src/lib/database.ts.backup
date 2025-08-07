@@ -1,0 +1,555 @@
+/**
+ * Formula PM 2.0 Database Utilities
+ * Database helper functions, validation, and Supabase client configuration
+ */
+
+import { createClient } from '@supabase/supabase-js';
+import { 
+  UserProfile, 
+  Project, 
+  ScopeItem, 
+  Document,
+  UserRole,
+  MANAGEMENT_ROLES,
+  COST_TRACKING_ROLES,
+  isManagementRole,
+  hasCostTrackingAccess
+} from '@/types/database';
+
+// ============================================================================
+// SUPABASE CLIENT CONFIGURATION
+// ============================================================================
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+// ============================================================================
+// DATABASE VALIDATION FUNCTIONS
+// ============================================================================
+
+/**
+ * Validates database schema compliance
+ * Checks if all required tables exist and have proper structure
+ */
+export async function validateDatabaseSchema(): Promise<{
+  isValid: boolean;
+  missingTables: string[];
+  errors: string[];
+}> {
+  const requiredTables = [
+    'user_profiles',
+    'clients', 
+    'suppliers',
+    'projects',
+    'project_assignments',
+    'scope_items',
+    'scope_dependencies',
+    'documents',
+    'document_approvals'
+  ];
+
+  const missingTables: string[] = [];
+  const errors: string[] = [];
+
+  try {
+    // Check if tables exist
+    for (const table of requiredTables) {
+      const { data, error } = await supabase
+        .from(table)
+        .select('*')
+        .limit(1);
+      
+      if (error) {
+        if (error.message.includes('does not exist')) {
+          missingTables.push(table);
+        } else {
+          errors.push(`Error checking table ${table}: ${error.message}`);
+        }
+      }
+    }
+
+    // Check if RLS is enabled (this requires admin privileges in real implementation)
+    // For now, we'll just validate basic functionality
+
+    return {
+      isValid: missingTables.length === 0 && errors.length === 0,
+      missingTables,
+      errors
+    };
+
+  } catch (error) {
+    return {
+      isValid: false,
+      missingTables,
+      errors: [`Database validation failed: ${error}`]
+    };
+  }
+}
+
+/**
+ * Validates user permissions for database operations
+ */
+export async function validateUserPermissions(userId: string): Promise<{
+  isValid: boolean;
+  userProfile?: UserProfile;
+  permissions: string[];
+  errors: string[];
+}> {
+  try {
+    const { data: userProfile, error } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+
+    if (error || !userProfile) {
+      return {
+        isValid: false,
+        permissions: [],
+        errors: ['User profile not found']
+      };
+    }
+
+    // Generate permissions based on role
+    const permissions = generateUserPermissions(userProfile.role);
+
+    return {
+      isValid: true,
+      userProfile: userProfile as UserProfile,
+      permissions,
+      errors: []
+    };
+
+  } catch (error) {
+    return {
+      isValid: false,
+      permissions: [],
+      errors: [`Permission validation failed: ${error}`]
+    };
+  }
+}
+
+/**
+ * Generates permission list based on user role
+ */
+export function generateUserPermissions(role: UserRole): string[] {
+  const permissions: string[] = [];
+
+  // Base permissions for all users
+  permissions.push('profile.read.own', 'profile.update.own');
+
+  // Management permissions
+  if (isManagementRole(role)) {
+    permissions.push(
+      'projects.read.all',
+      'projects.create',
+      'projects.update',
+      'projects.delete',
+      'scope.read.full',
+      'scope.create',
+      'scope.update',
+      'documents.read.all',
+      'documents.create',
+      'suppliers.read',
+      'users.read.all'
+    );
+  }
+
+  // Cost tracking permissions
+  if (hasCostTrackingAccess(role)) {
+    permissions.push(
+      'scope.cost.read',
+      'scope.cost.update',
+      'scope.pricing.set'
+    );
+  }
+
+  // Role-specific permissions
+  switch (role) {
+    case 'company_owner':
+      permissions.push(
+        'users.create',
+        'users.update',
+        'users.delete',
+        'system.admin',
+        'financial.all'
+      );
+      break;
+
+    case 'admin':
+      permissions.push(
+        'users.create',
+        'users.update',
+        'system.admin'
+      );
+      break;
+
+    case 'project_manager':
+      permissions.push(
+        'projects.read.assigned',
+        'projects.create',
+        'projects.update.assigned',
+        'scope.create',
+        'scope.update',
+        'documents.create',
+        'documents.approve.internal',
+        'team.assign'
+      );
+      break;
+
+    case 'architect':
+      permissions.push(
+        'projects.read.assigned',
+        'scope.read.assigned',
+        'documents.create.shop_drawing',
+        'documents.update.shop_drawing'
+      );
+      break;
+
+    case 'technical_engineer':
+      permissions.push(
+        'projects.read.assigned',
+        'scope.read.full',
+        'scope.create',
+        'scope.cost.update',
+        'documents.create.material_spec'
+      );
+      break;
+
+    case 'purchase_director':
+    case 'purchase_specialist':
+      permissions.push(
+        'suppliers.create',
+        'suppliers.update',
+        'scope.supplier.assign',
+        'scope.cost.read',
+        'scope.cost.update'
+      );
+      break;
+
+    case 'field_worker':
+      permissions.push(
+        'projects.read.assigned',
+        'scope.read.assigned',
+        'scope.update.status',
+        'documents.create.report',
+        'documents.create.photo'
+      );
+      break;
+
+    case 'client':
+      permissions.push(
+        'projects.read.own',
+        'scope.read.limited',
+        'documents.read.client_visible',
+        'documents.approve.client'
+      );
+      break;
+
+  }
+
+  return permissions;
+}
+
+// ============================================================================
+// DATA ACCESS FILTERS
+// ============================================================================
+
+/**
+ * Filters scope item data based on user role and cost access permissions
+ */
+export function filterScopeItemByRole(scopeItem: ScopeItem, userRole: UserRole): Partial<ScopeItem> {
+  const filtered: Partial<ScopeItem> = { ...scopeItem };
+
+  // Remove cost data for users without cost tracking access
+  if (!hasCostTrackingAccess(userRole)) {
+    delete filtered.initial_cost;
+    delete filtered.actual_cost;
+    delete filtered.cost_variance;
+    delete filtered.unit_price;
+    delete filtered.total_price;
+    delete filtered.markup_percentage;
+    delete filtered.final_price;
+  }
+
+  // Field workers and external users get even more limited data
+  if (userRole === 'field_worker' || userRole === 'client') {
+    // Keep only essential fields
+    return {
+      id: filtered.id,
+      project_id: filtered.project_id,
+      category: filtered.category,
+      item_no: filtered.item_no,
+      item_code: filtered.item_code,
+      description: filtered.description,
+      quantity: filtered.quantity,
+      unit_of_measure: filtered.unit_of_measure,
+      status: filtered.status,
+      progress_percentage: filtered.progress_percentage,
+      timeline_start: filtered.timeline_start,
+      timeline_end: filtered.timeline_end,
+      assigned_to: filtered.assigned_to,
+      created_at: filtered.created_at,
+      updated_at: filtered.updated_at
+    };
+  }
+
+  return filtered;
+}
+
+/**
+ * Gets user's accessible projects based on role and assignments
+ */
+export async function getUserAccessibleProjects(userId: string): Promise<{
+  data: Project[];
+  error?: string;
+}> {
+  try {
+    const { data: userProfile } = await supabase
+      .from('user_profiles')
+      .select('role')
+      .eq('id', userId)
+      .single();
+
+    if (!userProfile) {
+      return { data: [], error: 'User profile not found' };
+    }
+
+    let query = supabase.from('projects').select('*');
+
+    // Management sees all projects
+    if (isManagementRole(userProfile.role)) {
+      const { data, error } = await query;
+      return { data: data || [], error: error?.message };
+    }
+
+    // Clients see only their projects
+    if (userProfile.role === 'client') {
+      const { data, error } = await query
+        .eq('client_id', userId);
+      return { data: data || [], error: error?.message };
+    }
+
+    // Others see assigned projects
+    // First get project IDs user is assigned to
+    const { data: assignments } = await supabase
+      .from('project_assignments')
+      .select('project_id')
+      .eq('user_id', userId)
+      .eq('is_active', true);
+
+    const projectIds = assignments?.map(a => a.project_id) || [];
+    
+    if (projectIds.length === 0) {
+      return { data: [], error: undefined };
+    }
+
+    const { data, error } = await query.in('id', projectIds);
+
+    return { data: data || [], error: error?.message };
+
+  } catch (error) {
+    return { data: [], error: `Failed to get accessible projects: ${error}` };
+  }
+}
+
+// ============================================================================
+// DATABASE TESTING FUNCTIONS
+// ============================================================================
+
+/**
+ * Tests RLS policies for different user roles
+ */
+export async function testRLSPolicies(): Promise<{
+  passed: boolean;
+  results: Array<{
+    test: string;
+    passed: boolean;
+    error?: string;
+  }>;
+}> {
+  const results: Array<{ test: string; passed: boolean; error?: string }> = [];
+
+  // Test user profile access
+  try {
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .limit(1);
+    
+    results.push({
+      test: 'User profiles table access',
+      passed: !error,
+      error: error?.message
+    });
+  } catch (error) {
+    results.push({
+      test: 'User profiles table access',
+      passed: false,
+      error: String(error)
+    });
+  }
+
+  // Test projects access
+  try {
+    const { data, error } = await supabase
+      .from('projects')
+      .select('*')
+      .limit(1);
+    
+    results.push({
+      test: 'Projects table access',
+      passed: !error,
+      error: error?.message
+    });
+  } catch (error) {
+    results.push({
+      test: 'Projects table access',
+      passed: false,
+      error: String(error)
+    });
+  }
+
+  // Test scope items access
+  try {
+    const { data, error } = await supabase
+      .from('scope_items')
+      .select('*')
+      .limit(1);
+    
+    results.push({
+      test: 'Scope items table access',
+      passed: !error,
+      error: error?.message
+    });
+  } catch (error) {
+    results.push({
+      test: 'Scope items table access',
+      passed: false,
+      error: String(error)
+    });
+  }
+
+  const passed = results.every(result => result.passed);
+  return { passed, results };
+}
+
+/**
+ * Validates computed fields in scope items
+ */
+export async function validateComputedFields(): Promise<{
+  isValid: boolean;
+  errors: string[];
+}> {
+  try {
+    const { data: scopeItems, error } = await supabase
+      .from('scope_items')
+      .select('quantity, unit_price, total_price, markup_percentage, final_price, initial_cost, actual_cost, cost_variance')
+      .limit(10);
+
+    if (error) {
+      return { isValid: false, errors: [error.message] };
+    }
+
+    const errors: string[] = [];
+
+    scopeItems?.forEach((item, index) => {
+      // Validate total_price calculation
+      const expectedTotal = item.quantity * item.unit_price;
+      if (Math.abs(item.total_price - expectedTotal) > 0.01) {
+        errors.push(`Item ${index}: total_price calculation incorrect`);
+      }
+
+      // Validate final_price calculation
+      const expectedFinal = item.total_price * (1 + item.markup_percentage / 100);
+      if (Math.abs(item.final_price - expectedFinal) > 0.01) {
+        errors.push(`Item ${index}: final_price calculation incorrect`);
+      }
+
+      // Validate cost_variance calculation (if both costs exist)
+      if (item.initial_cost !== null && item.actual_cost !== null) {
+        const expectedVariance = item.actual_cost - item.initial_cost;
+        if (Math.abs(item.cost_variance - expectedVariance) > 0.01) {
+          errors.push(`Item ${index}: cost_variance calculation incorrect`);
+        }
+      }
+    });
+
+    return { isValid: errors.length === 0, errors };
+
+  } catch (error) {
+    return { isValid: false, errors: [`Validation failed: ${error}`] };
+  }
+}
+
+// ============================================================================
+// UTILITY FUNCTIONS
+// ============================================================================
+
+/**
+ * Checks if user has permission for specific action
+ */
+export function hasPermission(userPermissions: string[], requiredPermission: string): boolean {
+  return userPermissions.includes(requiredPermission);
+}
+
+/**
+ * Gets database connection info for debugging
+ */
+export function getDatabaseInfo() {
+  return {
+    url: supabaseUrl ? 'Connected' : 'Not configured',
+    hasAnonKey: !!supabaseAnonKey,
+    clientReady: !!supabase
+  };
+}
+
+/**
+ * Executes a database health check
+ */
+export async function healthCheck(): Promise<{
+  healthy: boolean;
+  checks: Record<string, boolean>;
+  errors: string[];
+}> {
+  const checks: Record<string, boolean> = {};
+  const errors: string[] = [];
+
+  try {
+    // Check basic connectivity
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .select('count')
+      .limit(1);
+    
+    checks.connectivity = !error;
+    if (error) errors.push(`Connectivity: ${error.message}`);
+
+    // Check schema validation
+    const schemaCheck = await validateDatabaseSchema();
+    checks.schema = schemaCheck.isValid;
+    if (!schemaCheck.isValid) {
+      errors.push(...schemaCheck.errors);
+    }
+
+    // Check computed fields
+    const fieldsCheck = await validateComputedFields();
+    checks.computedFields = fieldsCheck.isValid;
+    if (!fieldsCheck.isValid) {
+      errors.push(...fieldsCheck.errors);
+    }
+
+    const healthy = Object.values(checks).every(check => check);
+
+    return { healthy, checks, errors };
+
+  } catch (error) {
+    return {
+      healthy: false,
+      checks: { connectivity: false },
+      errors: [`Health check failed: ${error}`]
+    };
+  }
+}

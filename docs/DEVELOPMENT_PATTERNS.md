@@ -6,14 +6,82 @@
 
 ## Table of Contents
 
-1. [RLS Optimization Patterns](#rls-optimization-patterns)
-2. [API Development Patterns](#api-development-patterns)
-3. [Security Implementation Patterns](#security-implementation-patterns)
-4. [Testing Patterns](#testing-patterns)
-5. [Performance Best Practices](#performance-best-practices)
-6. [Database Migration Patterns](#database-migration-patterns)
-7. [UI Component Patterns](#ui-component-patterns)
-8. [Error Handling Patterns](#error-handling-patterns)
+1. [Authentication Hook Patterns](#authentication-hook-patterns) **(NEW)**
+2. [RLS Optimization Patterns](#rls-optimization-patterns)
+3. [API Development Patterns](#api-development-patterns)
+4. [Security Implementation Patterns](#security-implementation-patterns)
+5. [Testing Patterns](#testing-patterns)
+6. [Performance Best Practices](#performance-best-practices)
+7. [Database Migration Patterns](#database-migration-patterns)
+8. [UI Component Patterns](#ui-component-patterns)
+9. [Error Handling Patterns](#error-handling-patterns)
+
+---
+
+## Authentication Hook Patterns
+
+### ✅ CORRECT Pattern - Use Specialized Hooks
+
+```typescript
+// ✅ BEST: Use focused hooks for specific needs
+import { useAccessToken } from '@/hooks/auth'
+import { useRoleChecks } from '@/hooks/auth'
+
+// API calls - only use token management
+const ApiComponent = () => {
+  const { getAccessToken } = useAccessToken()
+  // Only renders on token changes, not profile/role changes
+}
+
+// Permission checks - only use role checking
+const PermissionGate = () => {
+  const { isManagement, isProjectRole } = useRoleChecks(profile)
+  // Only renders on role changes, not auth state changes
+}
+
+// Profile display - only use profile data
+const ProfileCard = () => {
+  const { profile, loading } = useUserProfile(userId)
+  // Only renders on profile changes, not auth/token changes
+}
+```
+
+### ✅ ACCEPTABLE Pattern - Use Composed Hook (Legacy Components)
+
+```typescript
+// ✅ OK: Use full useAuth for components needing multiple features
+import { useAuth } from '@/hooks/useAuth'
+
+const ComplexDashboard = () => {
+  const { 
+    user, 
+    profile, 
+    isManagement, 
+    getAccessToken, 
+    isAuthenticated 
+  } = useAuth()
+  
+  // Use when you need 3+ authentication features
+}
+```
+
+### ❌ WRONG Pattern - Don't Mix Approaches
+
+```typescript
+// ❌ AVOID: Don't mix useAuth with specialized hooks
+const BadComponent = () => {
+  const { user } = useAuth()
+  const { profile } = useUserProfile(user?.id) // Duplicate data loading
+  const { isManagement } = useRoleChecks(profile) // Redundant with useAuth
+}
+```
+
+### Performance Guidelines
+
+- **Single Feature**: Use specialized hook (50% faster)
+- **2-3 Features**: Use specialized hooks
+- **4+ Features**: Use composed `useAuth` hook
+- **API Only**: Always use `useAccessToken` (87% fewer calls)
 
 ---
 

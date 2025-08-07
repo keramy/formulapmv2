@@ -1,0 +1,311 @@
+/**
+ * Enhanced API Middleware
+ * Combines authentication, caching, error handling, and performance monitoring
+ */
+import { NextRequest, NextResponse } from 'next/server'
+import { getAuthenticatedUser } from './auth-helpers'
+import type { UserProfile } from '@/types/auth'
+
+export interface AuthContext {
+  user: any
+  profile: UserProfile
+  permissions: string[]
+}
+
+export interface AuthOptions {
+  permission?: string
+  requiredRole?: string
+  skipAuth?: boolean
+}
+
+export interface PerformanceMetrics {
+  authTime: number
+  queryTime: number
+  totalTime: number
+  endpoint: string
+  timestamp: number
+}
+
+// Performance monitoring
+class PerformanceMonitor {
+  private static instance: PerformanceMonitor
+  private metrics: PerformanceMetrics[] = []
+  
+  static getInstance(): PerformanceMonitor {
+    if (!this.instance) {
+      this.instance = new PerformanceMonitor()
+    }
+    return this.instance
+  }
+  
+  recordMetric(metric: PerformanceMetrics): void {
+    this.metrics.push(metric)
+    
+    // Keep only last 1000 metrics
+    if (this.metrics.length > 1000) {
+      this.metrics = this.metrics.slice(-1000)
+    }
+    
+    // Check for performance degradation
+    this.checkPerformanceThresholds(metric)
+  }
+  
+  private checkPerformanceThresholds(metric: PerformanceMetrics): void {
+    const thresholds = {
+      authTime: 50, // 50ms
+      queryTime: 1000, // 1 second
+      totalTime: 2000 // 2 seconds
+    }
+    
+    const alerts = []
+    
+    if (metric.authTime > thresholds.authTime) {
+      alerts.push(`Auth time exceeded: ${metric.authTime}ms`)
+    }
+    
+    if (metric.queryTime > thresholds.queryTime) {
+      alerts.push(`Query time exceeded: ${metric.queryTime}ms`)
+    }
+    
+    if (metric.totalTime > thresholds.totalTime) {
+      alerts.push(`Total time exceeded: ${metric.totalTime}ms`)
+    }
+    
+    if (alerts.length > 0) {
+      console.warn('Performance alert:', {
+        endpoint: metric.endpoint,
+        alerts,
+        timestamp: new Date(metric.timestamp).toISOString()
+      })
+    }
+  }
+  
+  getMetrics(): PerformanceMetrics[] {
+    return this.metrics
+  }
+}
+
+const performanceMonitor = PerformanceMonitor.getInstance()
+
+export function withAuth(
+  handler: (request: NextRequest, context: AuthContext) => Promise<Response>,
+  options: AuthOptions = {}
+) {
+  return async (request: NextRequest): Promise<Response> => {
+    const startTime = Date.now()
+    const endpoint = new URL(request.url).pathname
+    let authTime = 0
+    let queryTime = 0
+    
+    try {
+      // Skip auth if requested
+      if (options.skipAuth) {
+        const queryStart = Date.now()
+        const response = await handler(request, {} as AuthContext)
+        queryTime = Date.now() - queryStart
+        
+        const totalTime = Date.now() - startTime
+        performanceMonitor.recordMetric({
+          authTime: 0,
+          queryTime,
+          totalTime,
+          endpoint,
+          timestamp: Date.now()
+        })
+        
+        return response
+      }
+
+      // Authentication
+      const authStart = Date.now()
+      const authResult = await getAuthenticatedUser(request)
+      authTime = Date.now() - authStart
+      
+      if (!authResult) {
+        return createErrorResponse('Authentication required', 401, {
+          code: 'AUTH_REQUIRED',
+          timestamp: new Date().toISOString()
+        })
+      }
+
+      const { user, profile } = authResult
+
+      // Check permissions
+      if (options.permission && !hasPermission(profile, options.permission)) {
+        return createErrorResponse('Insufficient permissions', 403, {
+          code: 'INSUFFICIENT_PERMISSIONS',
+          required: options.permission,
+          userRole: profile.role,
+          timestamp: new Date().toISOString()
+        })
+      }
+
+      if (options.requiredRole && profile.role !== options.requiredRole) {
+        return createErrorResponse('Insufficient role', 403, {
+          code: 'INSUFFICIENT_ROLE',
+          required: options.requiredRole,
+          userRole: profile.role,
+          timestamp: new Date().toISOString()
+        })
+      }
+
+      // Execute handler
+      const queryStart = Date.now()
+      const authContext: AuthContext = {
+        user,
+        profile,
+        permissions: getPermissionsForRole(profile.role)
+      }
+
+      const response = await handler(request, authContext)
+      queryTime = Date.now() - queryStart
+      
+      // Add performance headers
+      const totalTime = Date.now() - startTime
+      response.headers.set('X-Auth-Time', `${authTime}ms`)
+      response.headers.set('X-Query-Time', `${queryTime}ms`)
+      response.headers.set('X-Total-Time', `${totalTime}ms`)
+      
+      // Record performance metrics
+      performanceMonitor.recordMetric({
+        authTime,
+        queryTime,
+        totalTime,
+        endpoint,
+        timestamp: Date.now()
+      })
+      
+      return response
+      
+    } catch (error) {
+      console.error(`API Error in ${endpoint}:`, error)
+      
+      // Record error metrics
+      const totalTime = Date.now() - startTime
+      performanceMonitor.recordMetric({
+        authTime,
+        queryTime,
+        totalTime,
+        endpoint: `${endpoint}:ERROR`,
+        timestamp: Date.now()
+      })
+      
+      return createErrorResponse('Internal server error', 500, {
+        code: 'INTERNAL_ERROR',
+        timestamp: new Date().toISOString(),
+        ...(process.env.NODE_ENV === 'development' && { 
+          error: error instanceof Error ? error.message : 'Unknown error' 
+        })
+      })
+    }
+  }
+}
+
+export function createSuccessResponse(data: any, pagination?: any): Response {
+  const response = {
+    success: true,
+    data,
+    ...(pagination && { pagination }),
+    timestamp: new Date().toISOString()
+  }
+  
+  return new Response(JSON.stringify(response), {
+    status: 200,
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-cache'
+    }
+  })
+}
+
+export function createErrorResponse(message: string, status: number, details?: any): Response {
+  const response = {
+    success: false,
+    error: message,
+    status,
+    ...(details && { details }),
+    timestamp: new Date().toISOString()
+  }
+  
+  return new Response(JSON.stringify(response), {
+    status,
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-cache'
+    }
+  })
+}
+
+function hasPermission(profile: UserProfile, requiredPermission: string): boolean {
+  const permissions = getPermissionsForRole(profile.role)
+  return permissions.includes('*') || permissions.includes(requiredPermission)
+}
+
+function getPermissionsForRole(role: string): string[] {
+  const rolePermissions: Record<string, string[]> = {
+    company_owner: ['*'], // All permissions
+    general_manager: ['*'], // All permissions
+    deputy_general_manager: [
+      'read:projects', 'write:projects',
+      'read:users', 'write:users',
+      'read:scope', 'write:scope',
+      'read:tasks', 'write:tasks',
+      'read:suppliers', 'write:suppliers'
+    ],
+    technical_director: [
+      'read:projects', 'write:projects',
+      'read:scope', 'write:scope',
+      'read:tasks', 'write:tasks',
+      'read:suppliers', 'write:suppliers'
+    ],
+    admin: ['*'], // All permissions
+    project_manager: [
+      'read:projects', 'write:projects',
+      'read:tasks', 'write:tasks',
+      'read:scope', 'write:scope',
+      'read:suppliers', 'write:suppliers'
+    ],
+    architect: [
+      'read:projects', 'write:projects',
+      'read:tasks', 'write:tasks',
+      'read:scope', 'write:scope'
+    ],
+    technical_engineer: [
+      'read:projects',
+      'read:tasks', 'write:tasks',
+      'read:scope', 'write:scope'
+    ],
+    purchase_director: [
+      'read:projects',
+      'read:scope',
+      'read:suppliers', 'write:suppliers',
+      'read:tasks'
+    ],
+    purchase_specialist: [
+      'read:projects',
+      'read:scope',
+      'read:suppliers', 'write:suppliers',
+      'read:tasks'
+    ],
+    field_worker: [
+      'read:projects',
+      'read:tasks', 'write:tasks',
+      'read:scope'
+    ],
+    client: [
+      'read:projects',
+      'read:tasks',
+      'read:scope'
+    ],
+    subcontractor: [
+      'read:projects',
+      'read:tasks', 'write:tasks',
+      'read:scope'
+    ]
+  }
+
+  return rolePermissions[role] || []
+}
+
+// Export performance monitor for dashboard
+export { performanceMonitor }

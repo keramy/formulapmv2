@@ -45,7 +45,7 @@ export const useImpersonation = () => {
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, []) // No dependencies - only run once on mount
 
   // Start impersonating a user
   const impersonateUser = useCallback((originalAdmin: UserProfile, targetUser: UserProfile): boolean => {

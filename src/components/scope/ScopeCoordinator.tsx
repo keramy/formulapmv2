@@ -15,7 +15,7 @@ import { usePermissions } from '@/hooks/usePermissions'
 import { useToast } from '@/components/ui/use-toast'
 import { ScopeCategory, ScopeFilters, ScopeStatus, ScopeItem } from '@/types/scope'
 import { DataStateWrapper } from '@/components/ui/loading-states'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ScopeItemModal } from './ScopeItemModal'
@@ -111,7 +111,8 @@ export const useScopeCoordinator = ({
     canExport
   } = useScopeExcel(projectId)
 
-  const progressMetrics = useScopeProgress(globalView ? undefined : projectId)
+  // Fixed: Pass scope data to progress hook instead of calling useScope again
+  const progressMetrics = useScopeProgress(scopeItems, statistics)
 
   // === EFFECTIVE PERMISSIONS (Quality Gate) ===
   const effectivePermissions = userPermissions || {

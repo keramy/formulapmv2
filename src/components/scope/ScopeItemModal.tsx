@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useAuth } from '@/hooks/useAuth'
 import { Plus, AlertTriangle } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { authenticatedFetch, getUserFriendlyErrorMessage } from '@/lib/fetch-utils'
 
 interface Supplier {
   id: string
@@ -58,7 +59,7 @@ const UNITS = [
 ]
 
 export function ScopeItemModal({ onSubmit, trigger, open, onOpenChange }: ScopeItemModalProps) {
-  const { getAccessToken } = useAuth()
+  const { getAccessToken, isAuthenticated, loading: authLoading } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [suppliers, setSuppliers] = useState<Supplier[]>([])
@@ -77,32 +78,42 @@ export function ScopeItemModal({ onSubmit, trigger, open, onOpenChange }: ScopeI
     notes: ''
   })
 
-  // Load suppliers on mount
+  // Load suppliers when authentication is ready
   useEffect(() => {
-    loadSuppliers()
-  }, [])
+    if (isAuthenticated && !authLoading && !loadingSuppliers && suppliers.length === 0) {
+      loadSuppliers()
+    }
+  }, [isAuthenticated, authLoading])
 
   const loadSuppliers = async () => {
+    // Prevent duplicate calls
+    if (loadingSuppliers) return
+
     try {
       setLoadingSuppliers(true)
-      const token = await getAccessToken()
-      if (!token) throw new Error('No access token')
-
-      const response = await fetch('/api/suppliers', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+      
+      // Wait for authentication to be ready
+      if (authLoading || !isAuthenticated) {
+        setLoadingSuppliers(false)
+        return
+      }
+      
+      const response = await authenticatedFetch('/api/suppliers', getAccessToken, {
+        retries: 1,
+        timeout: 5000
       })
 
-      if (!response.ok) throw new Error('Failed to load suppliers')
+      if (!response.ok) {
+        throw new Error('Failed to load suppliers')
+      }
 
       const result = await response.json()
       if (result.success && result.data) {
         setSuppliers(Array.isArray(result.data) ? result.data : [])
       }
     } catch (error) {
-      console.error('Error loading suppliers:', error)
+      // Handle gracefully - suppliers are not critical
+      setSuppliers([])
     } finally {
       setLoadingSuppliers(false)
     }
